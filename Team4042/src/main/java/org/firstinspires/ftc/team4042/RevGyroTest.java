@@ -48,11 +48,24 @@ public class RevGyroTest extends LinearOpMode {
             angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
             gravity = imu.getGravity();
 
+            /*System Status Codes:
+            Result  Meaning
+            0       idle
+            1       system error
+            2       initializing peripherals
+            3       system initialization
+            4       executing self-test
+            5       sensor fusion algorithm running
+            6       system running without fusion algorithms
+            */
             telemetry.addData("status", imu.getSystemStatus().toShortString());
+
+            //see https://goo.gl/AnKWEn
             telemetry.addData("heading", angles.firstAngle);
             telemetry.addData("roll", angles.secondAngle);
             telemetry.addData("pitch", angles.thirdAngle);
             telemetry.addData("gravity", gravity.toString());
+
             telemetry.addData("mag", Math.sqrt(gravity.xAccel*gravity.xAccel + gravity.yAccel*gravity.yAccel + gravity.zAccel*gravity.zAccel));
             telemetry.update();
         }

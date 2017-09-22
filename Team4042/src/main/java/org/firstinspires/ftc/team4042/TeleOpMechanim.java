@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name = "TeleOp", group = "Iterative Opmode")
+@TeleOp(name = "Mecanum", group = "Iterative Opmode")
 public class TeleOpMechanim extends OpMode {
 
     /* Declare OpMode members. */
@@ -15,12 +15,12 @@ public class TeleOpMechanim extends OpMode {
 
     @Override
     public void init() {
-
+        drive = new MechanimDrive(hardwareMap, telemetry);
     }
     
     @Override
     public void loop() {
-
+        drive.drive(false, gamepad1, 1);
     }
 
 }

@@ -66,8 +66,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
  * is explained in {@link ConceptVuforiaNavigation}.
  */
 
-@Autonomous(name="Concept: VuMark Id", group ="Concept")
-@Disabled
+@Autonomous(name="Mark Read Test", group ="auto")
 public class VuMarkIdentification extends LinearOpMode {
 
     public static final String TAG = "Vuforia VuMark Sample";
@@ -167,6 +166,9 @@ public class VuMarkIdentification extends LinearOpMode {
                     double rX = rot.firstAngle;
                     double rY = rot.secondAngle;
                     double rZ = rot.thirdAngle;
+
+                    telemetry.addData("Pose offset", "X: " + tX + ", Y: " + tY + ", Z: " + tZ);
+                    telemetry.addData("Pose rotation", "X: " + rX + ", Y: " + rY + ", Z: " + rZ);
                 }
             }
             else {
