@@ -7,9 +7,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class MechanimDrive {
-    //Initializes a factor for the speed of movement to a position
-    public static double BASE_SPEED = .3;
+public class MecanumDrive {
     public static final double DEADZONE_SIZE = .01;
 
     /***instance variables***/
@@ -26,7 +24,7 @@ public class MechanimDrive {
      * @param hardwareMap hardware map of robot so Drive can use motors
      * @param tel telemetry so Drive can send data to the phone
      */
-    public MechanimDrive(HardwareMap hardwareMap, Telemetry tel) {
+    public MecanumDrive(HardwareMap hardwareMap, Telemetry tel) {
         //Initialize motors and gyro
         this.telemetry = tel;
 
