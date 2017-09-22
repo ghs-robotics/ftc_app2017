@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp(name = "Mecanum", group = "Iterative Opmode")
-public class TeleOpMechanim extends OpMode {
+public class TeleOpMecanum extends OpMode {
 
     /* Declare OpMode members. */
     MecanumDrive drive;

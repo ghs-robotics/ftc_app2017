@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-@TeleOp(name = "DylanTest", group = "Iterative Opmode")
+@TeleOp(name = "Motor Test", group = "Iterative Opmode")
 public class MotorTestDrive extends Drive{
 
     /**
