@@ -7,16 +7,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class MecanumDrive {
-    public static final double DEADZONE_SIZE = .01;
-
-    /***instance variables***/
-    DcMotor motorLeftFront;
-    DcMotor motorRightFront;
-    DcMotor motorLeftBack;
-    DcMotor motorRightBack;
-
-    Telemetry telemetry;
+public class MecanumDrive extends Drive {
 
     /**
      * Constructor for Drive, it creates the motors and the gyro objects
@@ -26,74 +17,16 @@ public class MecanumDrive {
      */
     public MecanumDrive(HardwareMap hardwareMap, Telemetry tel) {
         //Initialize motors and gyro
-        this.telemetry = tel;
-
-        try {
-            motorLeftFront = hardwareMap.dcMotor.get("front left");
-        } catch (IllegalArgumentException ex) {
-            telemetry.addData("Front Left", "Could not find.");
-        }
-
-        try {
-            motorRightFront = hardwareMap.dcMotor.get("front right");
-        } catch (IllegalArgumentException ex) {
-            telemetry.addData("Front Right", "Could not find.");
-        }
-
-        try {
-            motorRightBack = hardwareMap.dcMotor.get("back right");
-        } catch (IllegalArgumentException ex) {
-            telemetry.addData("Back Right", "Could not find.");
-        }
-
-        try {
-            motorLeftBack = hardwareMap.dcMotor.get("back left");
-        } catch (IllegalArgumentException ex) {
-            telemetry.addData("Back Left", "Could not find.");
-        }
+        super(hardwareMap, tel);
     }
 
     /**
-     * sets all the motors to run using the PID algorithms and encoders
-     */
-    public void runWithEncoders(){
-        if (motorLeftBack != null) { motorLeftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER); }
-        if (motorLeftFront != null) { motorLeftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER); }
-        if (motorRightBack != null) { motorRightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER); }
-        if (motorRightFront != null) { motorRightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER); }
-    }
-
-    /**
-     * sets all the motors to run NOT using the PID algorithms and encoders
-     */
-    public void runWithoutEncoders(){
-        if (motorLeftBack != null) { motorLeftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); }
-        if (motorLeftFront != null) { motorLeftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); }
-        if (motorRightBack != null) { motorRightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); }
-        if (motorRightFront != null) { motorRightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); }
-    }
-
-    /**
-     * resents the encoder counts of all motors
-     */
-    public void resetEncoders() {
-        if (motorLeftBack != null) { motorLeftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); }
-        if (motorLeftFront != null) { motorLeftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); }
-        if (motorRightBack != null) { motorRightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); }
-        if (motorRightFront != null) { motorRightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); }
-    }
-
-    /**
-     * uses joystick inputs to set motor speeds for mechanim drive
+     * uses joystick inputs to set motor speeds for mecanum drive
      * @param useEncoders determines whether or not the motors use encoders
      */
     public void drive(boolean useEncoders, Gamepad gamepad1, double speedFactor) {
 
-        if (useEncoders) {
-            this.runWithEncoders();
-        } else {
-            this.runWithoutEncoders();
-        }
+        super.setEncoders(useEncoders);
 
         double[] speedWheel = new double[4];
         double x = gamepad1.left_stick_x;
@@ -101,11 +34,11 @@ public class MecanumDrive {
         double r = gamepad1.right_stick_x;
 
         //Deadzone for joysticks
-        if(Math.abs(x - DEADZONE_SIZE) <= 0){x = 0;}
-        if(Math.abs(y - DEADZONE_SIZE) <= 0){y = 0;}
-        if(Math.abs(r - DEADZONE_SIZE) <= 0){r = 0;}
+        x = super.deadZone(x);
+        y = super.deadZone(y);
+        r = super.deadZone(r);
 
-        //Sets relative wheel speeds for mechanim drive based on controller inputs
+        //Sets relative wheel speeds for mecanum drive based on controller inputs
         speedWheel[0] = x + y + r;
         speedWheel[1] = -x + y - r;
         speedWheel[2] = x + y - r;
@@ -117,15 +50,8 @@ public class MecanumDrive {
             if(speedWheel[i] > 1){speedWheel[i] = 1;}
             if(speedWheel[i] < -1){speedWheel[i] = -1;}
         }
-        //sets the wheel powers to the appropriate ratios
-        if (motorLeftFront != null) { motorLeftFront.setPower(speedWheel[0]); }
-        if (motorRightFront != null) { motorRightFront.setPower(-speedWheel[1]); } //The right motors are mounted "upside down", which is why we have to inverse this
-        if (motorRightBack != null) { motorRightBack.setPower(-speedWheel[2]); }
-        if (motorLeftBack != null) { motorLeftBack.setPower(speedWheel[3]); }
 
-        telemetry.addData("Left Front", speedWheel[0]);
-        telemetry.addData("Right Front", -speedWheel[1]);
-        telemetry.addData("Right Back", -speedWheel[2]);
-        telemetry.addData("Left Back", speedWheel[3]);
+        //sets the wheel powers to the appropriate ratios
+        super.setMotorPower(speedWheel);
     }
 }

@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.util.Range;
 public class TeleOpOmni extends OpMode {
 
     /* Declare OpMode members. */
-    Drive drive;
+    OmniDrive drive;
 
     DcMotor motorGun1;
 
@@ -213,7 +213,7 @@ public class TeleOpOmni extends OpMode {
     @Override
     public void init() {
         //creates drive object, allowing control of drive motors
-        drive = new Drive(hardwareMap, "gyro", telemetry);
+        drive = new OmniDrive(hardwareMap, "gyro", telemetry);
         drive.resetEncoders();
         drive.runWithoutEncoders();
 
