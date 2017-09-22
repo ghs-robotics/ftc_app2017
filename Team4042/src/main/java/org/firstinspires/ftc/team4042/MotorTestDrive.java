@@ -17,7 +17,11 @@ public class MotorTestDrive extends Drive{
      * @param tel telemetry so Drive can send data to the phone
      */
     public MotorTestDrive(HardwareMap hardwareMap, Telemetry tel) {
-        super (hardwareMap, tel);
+        super(hardwareMap, tel);
+    }
+
+    public MotorTestDrive(HardwareMap hardwareMap, Telemetry tel, boolean verbose) {
+        super(hardwareMap, tel, verbose);
     }
 
     /**
@@ -38,6 +42,13 @@ public class MotorTestDrive extends Drive{
         xLeft = super.deadZone(xLeft);
         yLeft = super.deadZone(yLeft);
         xRight = super.deadZone(xRight);
+
+        if (verbose) {
+            telemetry.addData("xLeft", xLeft);
+            telemetry.addData("yLeft", yLeft);
+            telemetry.addData("xRight", xRight);
+            telemetry.addData("yRight", yRight);
+        }
 
         //Sets relative wheel speeds for mecanum drive based on controller inputs
         speedWheel[0] =  xLeft;

@@ -20,6 +20,10 @@ public class MecanumDrive extends Drive {
         super(hardwareMap, tel);
     }
 
+    public MecanumDrive(HardwareMap hardwareMap, Telemetry tel, boolean verbose) {
+        super(hardwareMap, tel, verbose);
+    }
+
     /**
      * uses joystick inputs to set motor speeds for mecanum drive
      * @param useEncoders determines whether or not the motors use encoders
@@ -37,6 +41,12 @@ public class MecanumDrive extends Drive {
         x = super.deadZone(x);
         y = super.deadZone(y);
         r = super.deadZone(r);
+
+        if (verbose) {
+            telemetry.addData("x", x);
+            telemetry.addData("y", y);
+            telemetry.addData("r", r);
+        }
 
         //Sets relative wheel speeds for mecanum drive based on controller inputs
         speedWheel[0] = x + y + r;
