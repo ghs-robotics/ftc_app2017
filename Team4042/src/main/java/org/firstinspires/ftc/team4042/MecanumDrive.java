@@ -28,7 +28,7 @@ public class MecanumDrive extends Drive {
      * uses joystick inputs to set motor speeds for mecanum drive
      * @param useEncoders determines whether or not the motors use encoders
      */
-    public void drive(boolean useEncoders, Gamepad gamepad1, double speedFactor) {
+    public void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor) {
 
         super.setEncoders(useEncoders);
 
@@ -54,14 +54,7 @@ public class MecanumDrive extends Drive {
         speedWheel[2] = x + y - r;
         speedWheel[3] = -x + y + r;
 
-        //Scales wheel speeds to fit motors
-        for(int i = 0; i < 4; i++) {
-            speedWheel[i] *= speedFactor;
-            if(speedWheel[i] > 1){speedWheel[i] = 1;}
-            if(speedWheel[i] < -1){speedWheel[i] = -1;}
-        }
-
         //sets the wheel powers to the appropriate ratios
-        super.setMotorPower(speedWheel);
+        super.setMotorPower(speedWheel, speedFactor);
     }
 }

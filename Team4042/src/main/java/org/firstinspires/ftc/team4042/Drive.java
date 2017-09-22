@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.team4042;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -9,7 +10,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  * Created by Hazel on 9/22/2017.
  */
 
-public class Drive {
+public abstract class Drive {
     public static final double DEADZONE_SIZE = .01;
 
     /***instance variables**/
@@ -21,6 +22,9 @@ public class Drive {
     Telemetry telemetry;
 
     boolean verbose;
+
+    //Require drive() in subclasses
+    public abstract void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor);
 
     public Drive(HardwareMap hardwareMap, Telemetry tel) {
         this.telemetry = tel;
@@ -124,13 +128,22 @@ public class Drive {
      * 3 - leftBack
      * @param speedWheel An array of the power to set to each motor
      */
-    public void setMotorPower(double[] speedWheel) {
+    public void setMotorPower(double[] speedWheel, double speedFactor) {
+        //Scales wheel speeds to fit motors
+        for(int i = 0; i < 4; i++) {
+            speedWheel[i] *= speedFactor;
+            if(speedWheel[i] > 1){speedWheel[i] = 1;}
+            if(speedWheel[i] < -1){speedWheel[i] = -1;}
+        }
+
+        //Sets the power
         if (motorLeftFront != null) { motorLeftFront.setPower(speedWheel[0]); }
         if (motorRightFront != null) { motorRightFront.setPower(-speedWheel[1]); } //The right motors are mounted "upside down", which is why we have to inverse this
         if (motorRightBack != null) { motorRightBack.setPower(-speedWheel[2]); }
         if (motorLeftBack != null) { motorLeftBack.setPower(speedWheel[3]); }
 
         if (verbose) {
+            //Prints power
             telemetry.addData("Left Front", speedWheel[0]);
             telemetry.addData("Right Front", -speedWheel[1]);
             telemetry.addData("Right Back", -speedWheel[2]);
@@ -140,5 +153,9 @@ public class Drive {
 
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
+    }
+
+    public void toggleVerbose() {
+        verbose = !verbose;
     }
 }

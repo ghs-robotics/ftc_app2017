@@ -28,7 +28,7 @@ public class MotorTestDrive extends Drive{
      * uses joystick inputs to set motor speeds for mecanum drive
      * @param useEncoders determines whether or not the motors use encoders
      */
-    public void drive(boolean useEncoders, Gamepad gamepad1, double speedFactor) {
+    public void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor) {
 
         super.setEncoders(useEncoders);
 
@@ -56,6 +56,6 @@ public class MotorTestDrive extends Drive{
         speedWheel[2] =  xRight;
         speedWheel[3] =  yRight;
 
-        super.setMotorPower(speedWheel);
+        super.setMotorPower(speedWheel, speedFactor);
     }
 }
