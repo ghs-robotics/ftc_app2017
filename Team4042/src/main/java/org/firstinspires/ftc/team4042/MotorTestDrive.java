@@ -21,7 +21,7 @@ public class MotorTestDrive extends Drive{
     }
 
     /**
-     * uses joystick inputs to set motor speeds for mechanim drive
+     * uses joystick inputs to set motor speeds for mecanum drive
      * @param useEncoders determines whether or not the motors use encoders
      */
     public void drive(boolean useEncoders, Gamepad gamepad1, double speedFactor) {
@@ -29,20 +29,21 @@ public class MotorTestDrive extends Drive{
         super.setEncoders(useEncoders);
 
         double[] speedWheel = new double[4];
-        double x = gamepad1.left_stick_x;
-        double y = -gamepad1.left_stick_y; //Y is the opposite direction of what's intuitive: forward is -1, backwards is 1
-        double r = gamepad1.right_stick_x;
+        double xLeft = gamepad1.left_stick_x;
+        double yLeft = -gamepad1.left_stick_y; //Y is the opposite direction of what's intuitive: forward is -1, backwards is 1
+        double xRight = gamepad1.right_stick_x;
+        double yRight = -gamepad1.right_stick_y;
 
         //Deadzone for joysticks
-        x = super.deadZone(x);
-        y = super.deadZone(y);
-        r = super.deadZone(r);
+        xLeft = super.deadZone(xLeft);
+        yLeft = super.deadZone(yLeft);
+        xRight = super.deadZone(xRight);
 
-        //Sets relative wheel speeds for mechanim drive based on controller inputs
-        speedWheel[0] =  x;
-        speedWheel[1] =  y;
-        speedWheel[2] =  gamepad1.right_stick_y;
-        speedWheel[3] =  r;
+        //Sets relative wheel speeds for mecanum drive based on controller inputs
+        speedWheel[0] =  xLeft;
+        speedWheel[1] =  yLeft;
+        speedWheel[2] =  xRight;
+        speedWheel[3] =  yRight;
 
         super.setMotorPower(speedWheel);
     }
