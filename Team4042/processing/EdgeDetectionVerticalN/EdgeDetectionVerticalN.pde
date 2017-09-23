@@ -10,6 +10,14 @@ float[][] kernel = {{  1,  0, -1},
 PImage convolutedResult;
 boolean[] edgeHere;
 
+int time;
+int lastFPSUpdate = 0;
+int frames = 0;
+int lastFrames = 0;
+int camTime;
+int convolutionTime;
+int edgeTime;
+int drawTime;
 
 void setup() {
   size(1280, 480);
@@ -20,16 +28,36 @@ void setup() {
 }
 
 void draw() {
+  time = millis();
+  camTime = time;
   if(cam.available()) {
     cam.read();
   }
+  camTime = millis() - camTime;
   
+  convolutionTime = millis();
   //runs vertical edge detection kernel convolution
   convolutedResult = kernelConvolution(cam, kernel); 
+  convolutionTime = millis() - convolutionTime;
   
+  edgeTime = millis();
   edgeHere = new boolean[convolutedResult.width];
   edgeHere = filterColumns(convolutedResult);
+  edgeTime = millis() - edgeTime;
   
   //draws convolution result and camera input side by side with potential edge columns highlighted
+  drawTime = millis();
   drawCamKernelConvolutionHighlights(convolutedResult, cam, edgeHere);
+  drawTime = millis() - drawTime;
+  frames++;
+  text(lastFrames, 10, 10);
+  text(camTime, 10, 30);
+  text(convolutionTime, 10, 50);
+  text(edgeTime, 10, 70);
+  text(drawTime, 10, 90);
+  if((time - lastFPSUpdate) > 1000){
+    lastFPSUpdate = time;
+    lastFrames = frames;
+    frames = 0;
+  }
 }

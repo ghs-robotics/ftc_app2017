@@ -17,17 +17,17 @@ PImage kernelConvolution(PImage target, float[][] kernel) {
           sum += kernel[ky+1][kx+1] * val;
         }
       }
-      
+      /*
       float mus = 0;
       for (int ky = -1; ky <= 1; ky++) {
         for (int kx = -1; kx <= 1; kx++) {
           int pos = (y + ky) * target.width + (x + kx);
           float val = red(target.pixels[pos]); //red channel used because greyscale
-          mus -= kernel[ky+1][kx+1] * val; //this time looks for edge going the other way
+          mus -= kernel[ky+1][kx+1] * val;
         }
       }
-      
-      sum = abs(sum) + abs(mus);
+      */
+      sum = abs(sum);// + abs(mus);
       
       // For this pixel in the new image, set the gray value
       // based on the sum from the kernel
