@@ -78,8 +78,8 @@ void drawCamKernelConvolutionHighlights(PImage convolutionImage, PImage camera, 
   image(camera, width / 2, 0);
   for(int x = 0; x < convolutionImage.width; x++) {
     if(xsWithEdges[x]) {
-      line(x, 1, x, convolutionImage.height - 1);
-      line(x + width / 2, 1, x + width / 2, convolutionImage.height - 1);
+      //line(x, 1, x, convolutionImage.height - 1);
+      //line(x + width / 2, 1, x + width / 2, convolutionImage.height - 1);
     }
   }
 }
@@ -93,4 +93,28 @@ float[][] scaleKernel(float[][] toScale, float scaler) {
     }
   }
   return scaledKernel;
+}
+
+PImage edgeLengths(boolean[] edges, PImage conImg, PImage camImg) {
+  float[][] result = new float[conImg.width][2];
+  float[] kernel = new float[] {-1,-2,0,2,1};
+  PImage newCon = createImage(conImg.width, conImg.height, RGB);
+  
+  conImg.loadPixels();
+  newCon.loadPixels();
+  camImg.loadPixels();
+  for(int i = 1; i <= conImg.width - 1; i++) { //iterate through edge list
+    if(edges[i]) { //if there is an edge maybe at that x
+      for(int j = 3; j <= conImg.height - 3; j++) { //iterate vertically through running horizontal edge convolution
+        int sum = 0;
+        for(int k = 0; k <= 4; k++) {
+          int pos = (j + k - 2) * conImg.width + i;
+          sum += red(camImg.pixels[pos]) * kernel[k];
+        }
+        newCon.pixels[j * conImg.width + i] = color(abs(sum), abs(sum), abs(sum));
+      }
+    }
+  }
+  
+  return newCon;
 }

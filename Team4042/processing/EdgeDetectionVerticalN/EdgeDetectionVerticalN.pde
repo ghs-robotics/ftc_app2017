@@ -45,9 +45,11 @@ void draw() {
   edgeHere = filterColumns(convolutedResult);
   edgeTime = millis() - edgeTime;
   
+  PImage newConvolution = edgeLengths(edgeHere, convolutedResult, cam);
+  
   //draws convolution result and camera input side by side with potential edge columns highlighted
   drawTime = millis();
-  drawCamKernelConvolutionHighlights(convolutedResult, cam, edgeHere);
+  drawCamKernelConvolutionHighlights(convolutedResult, newConvolution, edgeHere);
   drawTime = millis() - drawTime;
   frames++;
   text(lastFrames, 10, 10);
