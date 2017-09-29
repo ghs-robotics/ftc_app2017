@@ -92,40 +92,16 @@ public class MecanumDrive extends Drive {
                 double angleShaft = Math.PI / 4 + (Math.PI / 2) * i;
 
                 double[][] xy = new double[1][2];
-
-                try {
-                    xy[0][0] = dX;
-                    xy[0][1] = dY;
-                } catch (ArrayIndexOutOfBoundsException ex) {
-                    StringWriter sw = new StringWriter();
-                    ex.printStackTrace(new PrintWriter(sw));
-                    String exceptionAsString = sw.toString();
-                    telemetry.addData("xy", exceptionAsString);
-                }
+                xy[0][0] = dX;
+                xy[0][1] = dY;
 
                 double[][] sincos1 = new double[1][2];
-
-                try {
-                    sincos1[0][0] = Math.sin(r + angleShaft + Math.PI / 2);
-                    sincos1[0][1] = Math.cos(r + angleShaft + Math.PI / 2);
-                } catch (ArrayIndexOutOfBoundsException ex) {
-                    StringWriter sw = new StringWriter();
-                    ex.printStackTrace(new PrintWriter(sw));
-                    String exceptionAsString = sw.toString();
-                    telemetry.addData("sincos1", exceptionAsString);
-                }
+                sincos1[0][0] = Math.sin(r + angleShaft + Math.PI / 2);
+                sincos1[0][1] = Math.cos(r + angleShaft + Math.PI / 2);
 
                 double[][] sincos2 = new double[2][1];
-
-                try {
-                    sincos2[0][0] = Math.sin(r + angleShaft + rollerAngle);
-                    sincos2[1][0] = Math.cos(r + angleShaft + rollerAngle);
-                } catch (ArrayIndexOutOfBoundsException ex) {
-                    StringWriter sw = new StringWriter();
-                    ex.printStackTrace(new PrintWriter(sw));
-                    String exceptionAsString = sw.toString();
-                    telemetry.addData("sincos2", exceptionAsString);
-                }
+                sincos2[0][0] = Math.sin(r + angleShaft + rollerAngle);
+                sincos2[1][0] = Math.cos(r + angleShaft + rollerAngle);
 
                 speedWheel[i] =
                         multiplyMatrices(
@@ -140,6 +116,11 @@ public class MecanumDrive extends Drive {
             }
 
             super.setMotorPower(speedWheel, speedFactor);
+
+            lastX = x;
+            lastY = y;
+            lastR = r;
+            lastTime = time;
         } catch (ArrayIndexOutOfBoundsException ex) {
             StringWriter sw = new StringWriter();
             ex.printStackTrace(new PrintWriter(sw));
@@ -159,6 +140,9 @@ public class MecanumDrive extends Drive {
             throw(new IllegalArgumentException("Illegal matrix dimensions for addition."));
         }
         else {
+            telemetry.addData("matrix1", matrix1.length + "x" + matrix1[0].length);
+            telemetry.addData("matrix2", matrix2.length + "x" + matrix2[0].length);
+
             double[][] result = new double[matrix1.length][matrix1[0].length];
             for (int i = 0; i < matrix1.length; i++) {
                 for (int j = 0; j < matrix1[0].length; i++) {
