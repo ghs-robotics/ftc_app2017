@@ -3,8 +3,8 @@ package org.firstinspires.ftc.team4042;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@TeleOp(name = "Mecanum1", group = "Iterative Opmode")
-public class TeleOpMecanum extends OpMode {
+@TeleOp(name = "Mecanum", group = "Iterative Opmode")
+public class TeleOpTankDrive extends OpMode {
 
     boolean aPushed = false;
 
@@ -16,12 +16,9 @@ public class TeleOpMecanum extends OpMode {
 
     @Override
     public void init() {
-        if (useBackMecanum) {
-            drive = new MecanumDrive(hardwareMap, telemetry);
-        } else {
-            drive = new HalfMecanumDrive(hardwareMap, telemetry);
+        drive = new TankDrive(hardwareMap, telemetry);
         }
-    }
+
     
     @Override
     public void loop() {
