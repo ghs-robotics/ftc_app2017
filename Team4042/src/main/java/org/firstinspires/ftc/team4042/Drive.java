@@ -132,8 +132,8 @@ public abstract class Drive {
         //Scales wheel speeds to fit motors
         for(int i = 0; i < 4; i++) {
             speedWheel[i] *= speedFactor;
-            if(speedWheel[i] > 1){speedWheel[i] = 1;}
-            if(speedWheel[i] < -1){speedWheel[i] = -1;}
+            if(speedWheel[i] > 1) { speedWheel[i] = 1; }
+            if(speedWheel[i] < -1) { speedWheel[i] = -1; }
         }
 
         //Sets the power

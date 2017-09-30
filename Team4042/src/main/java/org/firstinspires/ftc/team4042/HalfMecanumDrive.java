@@ -47,6 +47,7 @@ public class HalfMecanumDrive extends Drive{
             telemetry.addData("xMec", xMec);
             telemetry.addData("yMec", yMec);
             telemetry.addData("rMec", rMec);
+
             telemetry.addData("yTank", yTank);
             telemetry.addData("rTank", rTank);
         }
