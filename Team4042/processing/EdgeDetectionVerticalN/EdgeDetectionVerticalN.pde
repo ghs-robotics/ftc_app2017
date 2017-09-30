@@ -19,6 +19,8 @@ int convolutionTime;
 int edgeTime;
 int drawTime;
 
+int extraReturnMax;
+
 void setup() {
   size(1280, 480);
   String[] cameras = Capture.list();
@@ -57,6 +59,7 @@ void draw() {
   text(convolutionTime, 10, 50);
   text(edgeTime, 10, 70);
   text(drawTime, 10, 90);
+  text(extraReturnMax, 10, 110);
   if((time - lastFPSUpdate) > 1000){
     lastFPSUpdate = time;
     lastFrames = frames;
