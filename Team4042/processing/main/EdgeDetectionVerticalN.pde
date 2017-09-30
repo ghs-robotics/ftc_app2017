@@ -1,3 +1,4 @@
+/*
 import processing.video.*;
 
 Capture cam;
@@ -21,7 +22,7 @@ int drawTime;
 
 int extraReturnMax;
 
-void setup() {
+void olds() {
   size(1280, 480);
   String[] cameras = Capture.list();
   cam = new Capture(this, cameras[0]);
@@ -29,7 +30,7 @@ void setup() {
   kernel = scaleKernel(kernel, KERNEL_SCALER);
 }
 
-void draw() {
+void old() {
   time = millis();
   camTime = time;
   if(cam.available()) {
@@ -66,3 +67,4 @@ void draw() {
     frames = 0;
   }
 }
+*/

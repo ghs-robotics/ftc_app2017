@@ -1,3 +1,4 @@
+/*
 PImage kernelConvolution(PImage target, float[][] kernel) {
   target.filter(GRAY);
   target.loadPixels();
@@ -26,7 +27,7 @@ PImage kernelConvolution(PImage target, float[][] kernel) {
           mus -= kernel[ky+1][kx+1] * val;
         }
       }
-      */
+      *//*
       sum = abs(sum);// + abs(mus);
       
       // For this pixel in the new image, set the gray value
@@ -72,10 +73,6 @@ float[] sumColumns(PImage target) {
   return xsWithEdges;
 }
 
-boolean[] filterColumns(float[] sums) { 
-  
-  
-}
 
 void drawCamKernelConvolutionHighlights(PImage convolutionImage, PImage camera, boolean[] xsWithEdges) {
   stroke(0, 255, 0);
@@ -131,3 +128,4 @@ PImage edgeLengths(boolean[] edges, PImage conImg, PImage camImg) {
   
   return newCon;
 }
+*/
