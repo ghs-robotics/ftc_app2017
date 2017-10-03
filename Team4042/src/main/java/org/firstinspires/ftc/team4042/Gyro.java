@@ -136,7 +136,7 @@ public class Gyro {
      *  Returns the angle across the z axis
      */
     public int getAngleZ(){
-        int returnAngle = (int)Math.round(angleZ / SCALE) + OmniDrive.OFFSET;
+        int returnAngle = (int)Math.round(angleZ / SCALE) + OmniDriveOld.OFFSET;
         returnAngle = ((returnAngle % 360) + 360) % 360;
         return returnAngle;
     }
