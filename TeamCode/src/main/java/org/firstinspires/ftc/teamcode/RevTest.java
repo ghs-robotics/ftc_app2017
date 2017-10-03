@@ -42,56 +42,53 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 
 /**
- * This file provides basic Telop driving for a Pushbot robot.
- * The code is structured as an Iterative OpMode
+ * Tries to run four motors with names "motor1", "motor2", "motor3", and "motor4".
  *
- * This OpMode uses the common Pushbot hardware class to define the devices on the robot.
- * All device access is managed through the HardwarePushbot class.
+ * If they're found, it prints their current speed to the telemetry and allows the user
+ * to control them with the gamepad.
  *
- * This particular OpMode executes a basic Tank Drive Teleop for a PushBot
- * It raises and lowers the claw using the Gampad Y and A buttons respectively.
- * It also opens and closes the claws slowly using the left and right Bumper buttons.
- *
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
+ * If they're not found, it prints the failure to the telemetry.
  */
 
 @TeleOp(name="RevTest", group="test")
 public class RevTest extends OpMode{
 
-    DcMotor motor1;
-    DcMotor motor2;
-    DcMotor motor3;
-    DcMotor motor4;
+    DcMotor[] motors;
 
     @Override
     public void init() {
-        motor1 = hardwareMap.dcMotor.get("motor1");
-        motor2 = hardwareMap.dcMotor.get("motor2");
-        motor3 = hardwareMap.dcMotor.get("motor3");
-        motor4 = hardwareMap.dcMotor.get("motor4");
-        motor1.setDirection(DcMotorSimple.Direction.FORWARD);
-        motor2.setDirection(DcMotorSimple.Direction.FORWARD);
-        motor3.setDirection(DcMotorSimple.Direction.FORWARD);
-        motor4.setDirection(DcMotorSimple.Direction.FORWARD);
-        motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motor3.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motor4.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motors = new DcMotor[4];
+
+        //Initialize a reference to each motor
+        for (int i = 0; i < motors.length; i++) {
+            try {
+                DcMotor motor = hardwareMap.dcMotor.get("motor" + (i + 1)); //0-indexed
+                motor.setDirection(DcMotorSimple.Direction.FORWARD);
+                motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                motors[i] = motor;
+            } catch (IllegalArgumentException ex) { telemetry.addData("Cannot find motor", i); }
+        }
 
     }
 
     @Override
     public void loop() {
-        motor1.setPower(Range.clip(gamepad1.left_stick_x, -1, 1));
-        motor2.setPower(Range.clip(gamepad1.left_stick_y, -1, 1));
-        motor3.setPower(Range.clip(gamepad1.right_stick_x, -1, 1));
-        motor4.setPower(Range.clip(gamepad1.right_stick_y, -1, 1));
 
-        telemetry.addData("1", motor1.getPower());
-        telemetry.addData("2", motor1.getPower());
-        telemetry.addData("3", motor1.getPower());
-        telemetry.addData("4", motor1.getPower());
+        //Can't for-loop over them b/c they each take different input values from the gamepad
+        if (motors[0] != null) { motors[0].setPower(Range.clip(gamepad1.left_stick_x, -1, 1)); }
+        if (motors[1] != null) { motors[1].setPower(Range.clip(gamepad1.left_stick_y, -1, 1)); }
+        if (motors[2] != null) { motors[2].setPower(Range.clip(gamepad1.right_stick_x, -1, 1)); }
+        if (motors[3] != null) { motors[3].setPower(Range.clip(gamepad1.right_stick_y, -1, 1)); }
+
+        //Print the power level of each motor, if it can be found
+        for (int i = 0; i < motors.length; i++) {
+            DcMotor motor = motors[i];
+            if (motor != null) {
+                telemetry.addData(Integer.toString(i), motor.getCurrentPosition());
+            } else {
+                telemetry.addData(Integer.toString(i), "Cannot find motor " + i);
+            }
+        }
     }
 
 }
