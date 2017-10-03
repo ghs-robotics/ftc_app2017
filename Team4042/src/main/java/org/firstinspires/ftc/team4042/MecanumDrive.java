@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.team4042;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
@@ -32,13 +31,24 @@ public class MecanumDrive extends Drive {
      * @param useEncoders determines whether or not the motors use encoders
      */
     public void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor) {
-
         super.setEncoders(useEncoders);
 
-        double[] speedWheel = new double[4];
         double x = gamepad1.left_stick_x;
         double y = -gamepad1.left_stick_y; //Y is the opposite direction of what's intuitive: forward is -1, backwards is 1
         double r = gamepad1.right_stick_x;
+
+        driveXYR(speedFactor, x, y, r);
+    }
+
+    /**
+     * Drives an inputted amount
+     * @param speedFactor the amount to scale the drive by
+     * @param x x component
+     * @param y y component
+     * @param r rotate component
+     */
+    public void driveXYR(double speedFactor, double x, double y, double r) {
+        double[] speedWheel = new double[4];
 
         //Deadzone for joysticks
         x = super.deadZone(x);
@@ -61,6 +71,66 @@ public class MecanumDrive extends Drive {
         super.setMotorPower(speedWheel, speedFactor);
     }
 
+    /**
+     * Runs the robot to the target location, returning true while it has not
+     * reached the target then false once it has. Also speeds up and slows down
+     *
+     * @param targetTicks the tick count you want to reach with at least one of your motors
+     * @param speed speed at which to travel
+     * @param x true if speed value is for x, false if speed value is for y
+     * @return returns if it is still NOT completed yet (true if hasn't reached target, false if it has)
+     */
+    public boolean driveWithEncoders(double speed, boolean x, double targetTicks) {
+        //telemetry data
+        telemetry.addData("Left Back", motorLeftBack.getCurrentPosition());
+        telemetry.addData("Left Front", motorLeftFront.getCurrentPosition());
+        telemetry.addData("Right Back", motorRightBack.getCurrentPosition());
+        telemetry.addData("Right Front", motorRightFront.getCurrentPosition());
+
+        //finds the maximum of all encoder counts
+        double currentTicks = super.max(motorLeftBack.getCurrentPosition(),
+                motorLeftFront.getCurrentPosition(),
+                motorRightBack.getCurrentPosition(), motorRightFront.getCurrentPosition());
+        //if it has not reached the target, it tests if it is in the
+        // last or first fourth of the way there, and
+        // scales the speed such that it speeds up and slows down
+        // to BASE_SPEED as it reaches the target
+        if (currentTicks <= targetTicks) {
+            double difference = targetTicks / 4;
+            if (currentTicks / targetTicks > .75) { //last fourth
+                difference = targetTicks - currentTicks;
+            } else if (currentTicks / targetTicks < .25) { //first fourth
+                difference = currentTicks;
+            }
+            speed *= (BASE_SPEED + (difference / (targetTicks / 4)) * (1 - BASE_SPEED));
+        } else {
+            //if it has reached target, stop moving, reset encoders, and return false
+            stopMotors(); //stops the motors
+            this.resetEncoders();
+            this.runWithEncoders();
+            return false;
+        }
+        //if it hasn't reached the target (it won't have returned yet),
+        // drive at the given speed (possibly scaled b/c of first and last fourth), and return true
+        speed = Range.clip(speed, 0, 1);
+        if (x) {
+            driveXYR(1, speed, 0, 0);
+        } else {
+            driveXYR(1, 0, speed, 0);
+        }
+        return true;
+    }
+
+    /**
+     * Stops all motors
+     */
+    public void stopMotors() {
+        driveXYR(0, 0, 0, 0);
+    }
+
+    /**
+     * CODE FROM HERE DOWN IS AN ATTEMPT TO IMPLEMENT DYLAN'S DRIVE ALGORITHM
+     */
     double lastX;
     double lastY;
     double lastR;

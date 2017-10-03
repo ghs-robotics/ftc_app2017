@@ -6,13 +6,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 @TeleOp(name = "Mecanum1", group = "Iterative Opmode")
 public class TeleOpMecanum extends OpMode {
 
-    /*boolean aPushed = false;
+    private boolean aPushed = false;
 
     //True if the back wheels are mecanum, false if they're tank
-    final boolean useBackMecanum = true;
+    private final boolean useBackMecanum = true;
 
-    // Declare OpMode members.
-    Drive drive;
+    //Declare OpMode members.
+    private Drive drive;
 
     @Override
     public void init() {
@@ -30,8 +30,9 @@ public class TeleOpMecanum extends OpMode {
         }
         aPushed = gamepad1.a;
         drive.drive(false, gamepad1, gamepad2, 1);
-    }*/
+    }
 
+    /* CODE FROM HERE DOWN IS AN ATTEMPT TO IMPLEMENT DYLAN'S DRIVE ALGORITHM
     MecanumDrive drive;
 
     @Override
@@ -42,6 +43,6 @@ public class TeleOpMecanum extends OpMode {
     @Override
     public void loop() {
         drive.drive(false, gamepad1, 1);
-    }
+    }*/
 
 }

@@ -11,6 +11,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  */
 
 public abstract class Drive {
+    //Initializes a factor for the speed of movement to a position when driving with encoders
+    public static final double BASE_SPEED = .3;
+    //The deadzone size for the joystick inputs
     public static final double DEADZONE_SIZE = .01;
 
     /***instance variables**/
@@ -110,13 +113,13 @@ public abstract class Drive {
     }
 
     /**
-     * Returns x, unless it's within DEAD_ZONE of 0, then returns 0
-     * @param x A value to test
-     * @return X, adjusted for the deadzone
+     * Returns val, unless it's within DEAD_ZONE of 0, then returns 0
+     * @param val A value to test
+     * @return val, adjusted for the deadzone
      */
-    public double deadZone(double x) {
-        if(Math.abs(x - DEADZONE_SIZE) <= 0) {return 0;}
-        else { return x; }
+    public double deadZone(double val) {
+        if(Math.abs(val - DEADZONE_SIZE) <= 0) {return 0;}
+        else { return val; }
     }
 
     /**
@@ -157,5 +160,32 @@ public abstract class Drive {
 
     public void toggleVerbose() {
         verbose = !verbose;
+    }
+
+    /**
+     * finds and returns the largest of four doubles
+     *
+     * @param a first value
+     * @param b second value
+     * @param c third value
+     * @param d fourth value
+     * @return return the maximum of all decimals
+     */
+    public double max(double a, double b, double c, double d) {
+
+        a = Math.abs(a);
+        b = Math.abs(b);
+        c = Math.abs(c);
+        d = Math.abs(d);
+
+        double max = a;
+        double[] vals = {b, c, d};
+
+        for (int i = 0; i < 3; i++) {
+            if (vals[i] > max) {
+                max = vals[i];
+            }
+        }
+        return max;
     }
 }
