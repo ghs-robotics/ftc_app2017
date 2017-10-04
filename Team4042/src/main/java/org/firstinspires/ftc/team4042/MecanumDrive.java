@@ -51,7 +51,7 @@ public class MecanumDrive extends Drive {
         double[] speedWheel = new double[4];
 
         //Deadzone for joysticks
-        x = super.deadZone(x);
+        x = -super.deadZone(x);
         y = super.deadZone(y);
         r = super.deadZone(r);
 
@@ -77,11 +77,12 @@ public class MecanumDrive extends Drive {
      *
      * @param targetTicks the tick count you want to reach with at least one of your motors
      * @param speed speed at which to travel
-     * @param x true if speed value is for x, false if speed value is for y
-     * @return returns if it is still NOT completed yet (true if hasn't reached target, false if it has)
+     * @param direction which direction to go
+     * @return returns if it is completed (true if has reached target, false if it hasn't)
      */
-    public boolean driveWithEncoders(double speed, boolean x, double targetTicks) {
+    public boolean driveWithEncoders(double direction, double speed, double targetTicks) {
         //telemetry data
+        boolean x = (direction == Auto.RIGHT || direction == Auto.LEFT);
         telemetry.addData("Left Back", motorLeftBack.getCurrentPosition());
         telemetry.addData("Left Front", motorLeftFront.getCurrentPosition());
         telemetry.addData("Right Back", motorRightBack.getCurrentPosition());
@@ -104,21 +105,21 @@ public class MecanumDrive extends Drive {
             }
             speed *= (BASE_SPEED + (difference / (targetTicks / 4)) * (1 - BASE_SPEED));
         } else {
-            //if it has reached target, stop moving, reset encoders, and return false
+            //if it has reached target, stop moving, reset encoders, and return true
             stopMotors(); //stops the motors
             this.resetEncoders();
             this.runWithEncoders();
-            return false;
+            return true;
         }
         //if it hasn't reached the target (it won't have returned yet),
-        // drive at the given speed (possibly scaled b/c of first and last fourth), and return true
+        // drive at the given speed (possibly scaled b/c of first and last fourth), and return false
         speed = Range.clip(speed, 0, 1);
         if (x) {
             driveXYR(1, speed, 0, 0);
         } else {
             driveXYR(1, 0, speed, 0);
         }
-        return true;
+        return false;
     }
 
     /**
