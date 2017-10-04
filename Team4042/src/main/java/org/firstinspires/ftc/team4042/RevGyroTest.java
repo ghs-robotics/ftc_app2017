@@ -16,6 +16,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 import java.util.Locale;
 
+/**
+ * Gets all the data from a gyro and prints it to telemetry
+ */
 @Autonomous(name="Rev_Gyro_test", group="K9bot")
 public class RevGyroTest extends LinearOpMode {
 

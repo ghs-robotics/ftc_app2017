@@ -2,8 +2,6 @@ package org.firstinspires.ftc.team4042;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -22,14 +20,10 @@ public class RevGyro {
 
     private String gravity;
     private String status;
-    private double heading;
-    private double roll;
-    private double pitch;
-    private double mag;
-
-    private double angleX  = 0;
-    private double angleY = 0;
-    private double angleZ = 0;
+    private double heading = 0;
+    private double roll = 0;
+    private double pitch = 0;
+    private double mag = 0;
 
     Telemetry telemetry;
     HardwareMap hardwareMap;
@@ -60,44 +54,50 @@ public class RevGyro {
         imu.initialize(parameters);
     }
 
+    /**
+     * Updates all gyro values.
+     */
     public void update() {
-        // Set up our telemetry dashboard
-        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        Acceleration grav = imu.getGravity();
+        updateAngles();
+        updateGravMag();
+        updateStatus();
+    }
 
-        /*System Status Codes:
-        Result  Meaning
-        0       idle
-        1       system error
-        2       initializing peripherals
-        3       system initialization
-        4       executing self-test
-        5       sensor fusion algorithm running
-        6       system running without fusion algorithms
-        */
-        status = imu.getSystemStatus().toShortString();
+    /**
+     * Updates heading, roll, and pitch
+     */
+    public void updateAngles() {
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
         //see https://goo.gl/AnKWEn
-        heading = angles.firstAngle;
+        heading = -(angles.firstAngle - 180);
         roll = angles.secondAngle;
         pitch = angles.thirdAngle;
-        gravity = grav.toString();
+    }
 
+    /**
+     * Updates status
+     */
+    public void updateStatus() {
+        status = imu.getSystemStatus().toShortString();
+    }
+
+    /**
+     * Updates gravity and mag
+     */
+    public void updateGravMag() {
+        Acceleration grav = imu.getGravity();
+
+        gravity = grav.toString();
         mag = Math.sqrt(grav.xAccel * grav.xAccel + grav.yAccel * grav.yAccel + grav.zAccel * grav.zAccel);
     }
 
+    /**
+     * Updates the heading value.
+     */
     public double getHeading() {
-        double diff = (heading + OmniDrive2.OFFSET) * (timer.milliseconds() - oldTime);
-        heading += diff;
-        oldTime = timer.milliseconds();
-
-        double heading = Math.round(angleZ / SCALE) + OmniDrive2.OFFSET;
-        heading = ((heading % 360) + 360) % 360;
+        updateAngles();
         return heading;
-    }
-
-    public double getMag() {
-        return mag;
     }
 
     public double getPitch() {
@@ -108,11 +108,34 @@ public class RevGyro {
         return roll;
     }
 
+    private double formatAngle(double oldAngle) {
+        double newAngle = Math.round(oldAngle / SCALE) + OmniDrive.OFFSET;
+        newAngle = ((newAngle % 360) + 360) % 360;
+        return newAngle;
+    }
+
+
+    public double getMag() {
+        return mag;
+    }
+
     public String getGravity() {
         return gravity;
     }
 
-    public String getStatus() {
-        return status;
+    /**
+     * System Status Codes:
+     * Result  Meaning
+     * 0       idle
+     * 1       system error
+     * 2       initializing peripherals
+     * 3       system initialization
+     * 4       executing self-test
+     * 5       sensor fusion algorithm running
+     * 6       system running without fusion algorithms
+     * @return The gyro's current status
+     */
+    public int getStatus() {
+        return Integer.parseInt(status);
     }
 }

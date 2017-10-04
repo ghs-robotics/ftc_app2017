@@ -70,23 +70,51 @@ public class EncoderTest extends OpMode
      */
     @Override
     public void init() {
-        motor = hardwareMap.dcMotor.get("motor");
-        servo = hardwareMap.servo.get("servo");
-        sensor = hardwareMap.digitalChannel.get("sensor");
+        try {
+            motor = hardwareMap.dcMotor.get("motor");
+        } catch (IllegalArgumentException ex) {
 
-        sensor.setMode(DigitalChannel.Mode.INPUT);
-        motor.setDirection(DcMotorSimple.Direction.FORWARD);
-        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+
+        try {
+            servo = hardwareMap.servo.get("servo");
+        } catch (IllegalArgumentException ex) {
+
+        }
+
+        try {
+            sensor = hardwareMap.digitalChannel.get("sensor");
+        } catch (IllegalArgumentException ex) {
+
+        }
+
+        if(sensor != null) { sensor.setMode(DigitalChannel.Mode.INPUT); }
+        if (motor != null) {
+            motor.setDirection(DcMotorSimple.Direction.FORWARD);
+            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
     }
 
     @Override
     public void loop() {
-        motor.setPower(Range.clip(gamepad1.left_stick_y, -1, 1));
-        servo.setPosition(Range.scale(gamepad1.right_stick_y, -1, 1, 0, 1));
+        if (motor != null) {
+            motor.setPower(Range.clip(gamepad1.left_stick_y, -1, 1));
+            telemetry.addData("where is jimbobjow?", motor.getCurrentPosition());
+        } else {
+            telemetry.addData("could not find", "motor");
+        }
 
-        telemetry.addData("sensor", sensor.getState());
-        telemetry.addData("where is jimbobjow?", motor.getCurrentPosition());
-        telemetry.addData("where be jimbobjowjunior?", servo.getPosition());
+        if (servo != null) {
+            servo.setPosition(Range.scale(gamepad1.right_stick_y, -1, 1, 0, 1));
+            telemetry.addData("where be jimbobjowjunior?", servo.getPosition());
+        } else {
+            telemetry.addData("could not find", "servo");
+        }
+
+        if (sensor != null) {
+            telemetry.addData("sensor", sensor.getState());
+        }
+
         telemetry.addData("time", timer.milliseconds());
         timer.reset();
     }
