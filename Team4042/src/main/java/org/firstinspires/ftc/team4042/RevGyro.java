@@ -28,16 +28,11 @@ public class RevGyro {
     Telemetry telemetry;
     HardwareMap hardwareMap;
 
-    private double oldTime = 0;
-    private ElapsedTime timer;
-
-    final static double SCALE = 440;
+    private final static double SCALE = 440;
 
     public RevGyro(HardwareMap hardwareMap, Telemetry telemetry) {
 
         this.telemetry = telemetry;
-
-        timer = new ElapsedTime();
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;

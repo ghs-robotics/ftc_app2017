@@ -15,6 +15,10 @@ public abstract class Drive {
     public static final double BASE_SPEED = .3;
     //The deadzone size for the joystick inputs
     public static final double DEADZONE_SIZE = .01;
+    //The largest speed factor possible
+    public static final double FULL_SPEED = 1;
+    //The power to put to the motors to stop them
+    public static final double STOP_SPEED = 0;
 
     /***instance variables**/
     DcMotor motorLeftFront;
@@ -23,6 +27,8 @@ public abstract class Drive {
     DcMotor motorRightBack;
 
     Telemetry telemetry;
+
+    RevGyro gyro;
 
     boolean verbose;
 
@@ -55,6 +61,8 @@ public abstract class Drive {
         } catch (IllegalArgumentException ex) {
             telemetry.addData("Back Left", "Could not find.");
         }
+
+        gyro = new RevGyro(hardwareMap, tel);
 
         verbose = false;
     }

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.team4042;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
+import org.firstinspires.ftc.team4042.Auto.Direction;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -80,9 +81,9 @@ public class MecanumDrive extends Drive {
      * @param direction which direction to go
      * @return returns if it is completed (true if has reached target, false if it hasn't)
      */
-    public boolean driveWithEncoders(double direction, double speed, double targetTicks) {
+    public boolean driveWithEncoders(Direction direction, double speed, double targetTicks) {
         //telemetry data
-        boolean x = (direction == Auto.RIGHT || direction == Auto.LEFT);
+        boolean x = (direction.equals(Direction.Right) || direction.equals(Direction.Left));
         telemetry.addData("Left Back", motorLeftBack.getCurrentPosition());
         telemetry.addData("Left Front", motorLeftFront.getCurrentPosition());
         telemetry.addData("Right Back", motorRightBack.getCurrentPosition());
@@ -113,11 +114,12 @@ public class MecanumDrive extends Drive {
         }
         //if it hasn't reached the target (it won't have returned yet),
         // drive at the given speed (possibly scaled b/c of first and last fourth), and return false
-        speed = Range.clip(speed, 0, 1);
+        speed = Range.clip(speed, 0, FULL_SPEED);
+        //TODO: ADJUST VIA GYRO
         if (x) {
-            driveXYR(1, speed, 0, 0);
+            driveXYR(FULL_SPEED, speed, 0, 0);
         } else {
-            driveXYR(1, 0, speed, 0);
+            driveXYR(FULL_SPEED, 0, speed, 0);
         }
         return false;
     }
@@ -126,7 +128,7 @@ public class MecanumDrive extends Drive {
      * Stops all motors
      */
     public void stopMotors() {
-        driveXYR(0, 0, 0, 0);
+        driveXYR(STOP_SPEED, 0, 0, 0);
     }
 
     /**
