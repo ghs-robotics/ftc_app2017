@@ -8,10 +8,22 @@ public class Auto extends LinearOpMode {
 
     MecanumDrive drive;
 
+    public final static double RIGHT = 2;
+    public final static double LEFT = -2;
+    public final static double FORWARD = 1;
+    public final static double BACKWARD = -1;
+
     @Override
     public void runOpMode() {
-        drive = new MecanumDrive(hardwareMap, telemetry);
-        drive.driveWithEncoders(1, true, 100);
+        drive = new MecanumDrive(hardwareMap, telemetry, true);
+
+        waitForStart();
+
+        boolean done = false;
+        while (opModeIsActive() && !done) {
+            telemetry.addData("done", done);
+            done = drive.driveWithEncoders(RIGHT, 1, 100);
+        }
 
         //check sensor sums
         //robot starts facing right
