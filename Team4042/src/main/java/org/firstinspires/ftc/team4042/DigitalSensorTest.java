@@ -60,6 +60,7 @@ public class DigitalSensorTest extends OpMode
     DigitalChannel whisker;
 
 
+
     @Override
     public void init() {
         whisker = hardwareMap.digitalChannel.get("whisker");
