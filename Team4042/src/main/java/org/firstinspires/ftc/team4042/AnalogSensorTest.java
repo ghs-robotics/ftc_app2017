@@ -32,13 +32,11 @@ package org.firstinspires.ftc.team4042;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.DigitalChannelController;
-import com.qualcomm.robotcore.hardware.DigitalChannelImpl;
-import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import java.util.Arrays;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -54,28 +52,35 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Whisker test", group="Iterative Opmode")
-public class DigitalSensorTest extends OpMode
-{
-    DigitalChannel whisker;
+@TeleOp(name="Analog Sensor", group="Iterative Opmode")
+public class AnalogSensorTest extends OpMode {
 
+    AnalogInput ultrasonic;
+    double[] val = {0,0,0,0,0,0,0,0,0,0};
 
+    int num = 0;
 
     @Override
     public void init() {
-        whisker = hardwareMap.digitalChannel.get("whisker");
-        whisker.setState(false);
-        whisker.setMode(DigitalChannel.Mode.INPUT);
+        ultrasonic = hardwareMap.analogInput.get("ultrasonic");
     }
-
-    /*
-     * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
-     */
     @Override
     public void loop() {
-        telemetry.addData("whisker on?", whisker.getState());
+        if (val[9] != 0) {
+            double sum = 0;
+            for (double i : val)
+                sum += i;
+            telemetry.addData("Inches:", sum / 10);
+        } else {
+            val[num] = ultrasonic.getVoltage() * 42.8125;
+            num++;
+        }
+
 
     }
 
-
 }
+
+
+
+
