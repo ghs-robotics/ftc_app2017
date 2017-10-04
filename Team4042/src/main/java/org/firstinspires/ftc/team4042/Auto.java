@@ -16,6 +16,7 @@ public class Auto extends LinearOpMode {
 
         waitForStart();
 
+        //TODO: TEST THIS
         autoDrive(Direction.Forward, Drive.FULL_SPEED, 50);
         autoDrive(Direction.Left, Drive.FULL_SPEED, 50);
         autoDrive(Direction.Counterclockwise, Drive.FULL_SPEED, 50);
@@ -34,6 +35,12 @@ public class Auto extends LinearOpMode {
         //detach and extend robot towards glyph
     }
 
+    /**
+     * Drives in the given Direction at the given speed until targetTicks is reached
+     * @param direction The direction to head in
+     * @param speed The speed to move at
+     * @param targetTicks The final distance to have travelled, in encoder ticks
+     */
     private void autoDrive(Direction direction, double speed, double targetTicks) {
         boolean done = false;
         while (opModeIsActive() && !done) {

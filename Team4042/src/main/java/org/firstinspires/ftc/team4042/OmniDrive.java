@@ -51,7 +51,7 @@ public class OmniDrive extends Drive {
         if (!useGyro) {
             heading = OFFSET;
         } else {
-            heading = gyro.getHeading();
+            heading = gyro.updateHeading();
             telemetry.addData("heading", heading);
         }
 

@@ -90,8 +90,16 @@ public class RevGyro {
     /**
      * Updates the heading value.
      */
-    public double getHeading() {
+    public double updateHeading() {
         updateAngles();
+        return heading;
+    }
+
+    /**
+     * Returns the last read heading value
+     * @return Heading
+     */
+    public double getHeading() {
         return heading;
     }
 

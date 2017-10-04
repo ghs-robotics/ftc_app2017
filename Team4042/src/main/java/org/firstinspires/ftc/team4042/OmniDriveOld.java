@@ -146,8 +146,8 @@ public class OmniDriveOld {
         telemetry.addData("gyro", gyro.getAngleZ());
         if (rot == 0) { //if you're not supposed to have rotated, make sure you actually haven't
             double gyroDiff = gyro.getAngleZ() - oldGyro; //hopefully is zero
-            telemetry.addData("oldGyro: ", oldGyro);
-            telemetry.addData("gyroDiff: ", gyroDiff);
+            telemetry.addData("oldGyro", oldGyro);
+            telemetry.addData("gyroDiff", gyroDiff);
             //If you're moving forwards and you drift, this should correct it.
             //Accounts for if you go from 1 degree to 360 degrees
             // which is only a difference of one degree,

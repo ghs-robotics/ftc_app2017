@@ -12,6 +12,8 @@ import java.io.StringWriter;
 
 public class MecanumDrive extends Drive {
 
+    private double oldGyro;
+
     /**
      * Constructor for Drive, it creates the motors and the gyro objects
      *
@@ -95,14 +97,20 @@ public class MecanumDrive extends Drive {
         //if it hasn't reached the target (it won't have returned yet),
         // drive at the given speed (possibly scaled b/c of first and last fourth), and return false
         scaledSpeed = Range.clip(scaledSpeed, 0, FULL_SPEED);
-        //TODO: ADJUST VIA GYRO
+
         if (direction.equals(Direction.Right) || direction.equals(Direction.Left)) { //Moving on the x axis
+            useGyro();
             driveXYR(FULL_SPEED, scaledSpeed, 0, 0);
-        } else if (direction.equals(Direction.Forward) || direction.equals(Direction.Backward)) { //Moving on the y axis
+        }
+        else if (direction.equals(Direction.Forward) || direction.equals(Direction.Backward)) { //Moving on the y axis
+            useGyro();
             driveXYR(FULL_SPEED, 0, scaledSpeed, 0);
-        } else if (direction.equals(Direction.Forward) || direction.equals(Direction.Backward)) { //Rotating
+        }
+        else if (direction.equals(Direction.Forward) || direction.equals(Direction.Backward)) { //Rotating
+            //Don't use the gyro because the robot is MEANT to be turning
             driveXYR(FULL_SPEED, 0, 0, scaledSpeed);
-        } else { //Null or other problematic directions
+        }
+        else { //Null or other problematic directions
             throw new IllegalArgumentException("Illegal direction inputted!");
         }
         return false;
@@ -140,6 +148,34 @@ public class MecanumDrive extends Drive {
             return Math.PI;
         }
         return speed;
+    }
+
+    /**
+     * uses the gyro, first reading from the gyro then setting rotation to
+     * auto correct if the robot gets off
+     */
+    public void useGyro() {
+        double heading = gyro.updateHeading();
+        double r = 0;
+        telemetry.addData("gyro", heading);
+        //you're not supposed to have rotated, make sure you actually haven't
+        double gyroDiff = heading - oldGyro; //hopefully is zero
+        telemetry.addData("oldGyro", oldGyro);
+        telemetry.addData("gyroDiff", gyroDiff);
+        //TODO: FIX THIS
+        //If you're moving forwards and you drift, this should correct it.
+        //Accounts for if you go from 1 degree to 360 degrees
+        // which is only a difference of one degree,
+        //but the bot thinks that's 359 degree difference
+        //Also scales -180 to 180 ==> -1 to 1
+        if (gyroDiff < -180) {
+            r = (180 + gyroDiff) / 180;
+        } else if (gyroDiff > 180) {
+            r = (gyroDiff - 180) / 180;
+        } else {
+            r = (gyroDiff) / 180;
+        }
+        oldGyro = heading;
     }
 
     /**
