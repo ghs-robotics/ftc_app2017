@@ -81,18 +81,45 @@ public class MecanumDrive extends Drive {
      * @param direction which direction to go
      * @return returns if it is completed (true if has reached target, false if it hasn't)
      */
-    public boolean driveWithEncoders(Direction direction, double speed, double targetTicks) {
+    public boolean driveWithEncoders(Direction direction, double speed, double targetTicks) throws IllegalArgumentException{
         //telemetry data
-        boolean x = (direction.equals(Direction.Right) || direction.equals(Direction.Left));
         telemetry.addData("Left Back", motorLeftBack.getCurrentPosition());
         telemetry.addData("Left Front", motorLeftFront.getCurrentPosition());
         telemetry.addData("Right Back", motorRightBack.getCurrentPosition());
         telemetry.addData("Right Front", motorRightFront.getCurrentPosition());
 
+        double scaledSpeed = setUpSpeed(speed, targetTicks);
+        if (scaledSpeed == Math.PI) { //The target's been reached
+            return true;
+        }
+        //if it hasn't reached the target (it won't have returned yet),
+        // drive at the given speed (possibly scaled b/c of first and last fourth), and return false
+        scaledSpeed = Range.clip(scaledSpeed, 0, FULL_SPEED);
+        //TODO: ADJUST VIA GYRO
+        if (direction.equals(Direction.Right) || direction.equals(Direction.Left)) { //Moving on the x axis
+            driveXYR(FULL_SPEED, scaledSpeed, 0, 0);
+        } else if (direction.equals(Direction.Forward) || direction.equals(Direction.Backward)) { //Moving on the y axis
+            driveXYR(FULL_SPEED, 0, scaledSpeed, 0);
+        } else if (direction.equals(Direction.Forward) || direction.equals(Direction.Backward)) { //Rotating
+            driveXYR(FULL_SPEED, 0, 0, scaledSpeed);
+        } else { //Null or other problematic directions
+            throw new IllegalArgumentException("Illegal direction inputted!");
+        }
+        return false;
+    }
+
+    /**
+     * A helper function that scales speed if you're in the first or last fourth of the target encoder values
+     * @param speed The inputted speed
+     * @param targetTicks The final ticks for the encoders
+     * @return Returns the speed, scaled, or Math.PI if you've already reached the value
+     */
+    private double setUpSpeed(double speed, double targetTicks) {
         //finds the maximum of all encoder counts
         double currentTicks = super.max(motorLeftBack.getCurrentPosition(),
                 motorLeftFront.getCurrentPosition(),
                 motorRightBack.getCurrentPosition(), motorRightFront.getCurrentPosition());
+
         //if it has not reached the target, it tests if it is in the
         // last or first fourth of the way there, and
         // scales the speed such that it speeds up and slows down
@@ -110,18 +137,9 @@ public class MecanumDrive extends Drive {
             stopMotors(); //stops the motors
             this.resetEncoders();
             this.runWithEncoders();
-            return true;
+            return Math.PI;
         }
-        //if it hasn't reached the target (it won't have returned yet),
-        // drive at the given speed (possibly scaled b/c of first and last fourth), and return false
-        speed = Range.clip(speed, 0, FULL_SPEED);
-        //TODO: ADJUST VIA GYRO
-        if (x) {
-            driveXYR(FULL_SPEED, speed, 0, 0);
-        } else {
-            driveXYR(FULL_SPEED, 0, speed, 0);
-        }
-        return false;
+        return speed;
     }
 
     /**

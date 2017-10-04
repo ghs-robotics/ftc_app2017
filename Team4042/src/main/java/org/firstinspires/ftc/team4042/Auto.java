@@ -8,7 +8,7 @@ public class Auto extends LinearOpMode {
 
     MecanumDrive drive;
 
-    public enum Direction {Right, Left, Forward, Backward};
+    public enum Direction {Right, Left, Forward, Backward, Clockwise, Counterclockwise};
 
     @Override
     public void runOpMode() {
@@ -18,6 +18,7 @@ public class Auto extends LinearOpMode {
 
         autoDrive(Direction.Forward, Drive.FULL_SPEED, 50);
         autoDrive(Direction.Left, Drive.FULL_SPEED, 50);
+        autoDrive(Direction.Counterclockwise, Drive.FULL_SPEED, 50);
         //check sensor sums
         //robot starts facing right
         //scan vision patter
