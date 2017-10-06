@@ -36,7 +36,7 @@ public class MecanumDrive extends Drive {
     public void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor) {
         super.setEncoders(useEncoders);
 
-        double x = gamepad1.left_stick_x;
+        double x = -gamepad1.left_stick_x;
         double y = -gamepad1.left_stick_y; //Y is the opposite direction of what's intuitive: forward is -1, backwards is 1
         double r = gamepad1.right_stick_x;
 
@@ -100,7 +100,7 @@ public class MecanumDrive extends Drive {
 
         if (direction.equals(Direction.Right) || direction.equals(Direction.Left)) { //Moving on the x axis
             double r = useGyro();
-            driveXYR(FULL_SPEED, -scaledSpeed, 0, r);
+            driveXYR(FULL_SPEED, scaledSpeed, 0, r);
         }
         else if (direction.equals(Direction.Forward) || direction.equals(Direction.Backward)) { //Moving on the y axis
             double r = useGyro();
@@ -127,8 +127,6 @@ public class MecanumDrive extends Drive {
         double currentTicks = super.max(motorLeftBack.getCurrentPosition(),
                 motorLeftFront.getCurrentPosition(),
                 motorRightBack.getCurrentPosition(), motorRightFront.getCurrentPosition());
-        telemetry.addData("currentTicks", currentTicks);
-
         //if it has not reached the target, it tests if it is in the
         // last or first fourth of the way there, and
         // scales the speed such that it speeds up and slows down
@@ -156,6 +154,7 @@ public class MecanumDrive extends Drive {
      * auto correct if the robot gets off
      */
     private double useGyro() {
+        telemetry.addData("gyro", gyro.updateHeading());
         return 0;
         /*double heading = gyro.updateHeading();
         double r = 0;
