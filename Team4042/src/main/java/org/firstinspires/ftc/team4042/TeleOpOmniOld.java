@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name = "TeleOp", group = "Iterative Opmode")
+@TeleOp(name = "OmniOld", group = "Iterative Opmode")
 public class TeleOpOmniOld extends OpMode {
 
     /* Declare OpMode members. */

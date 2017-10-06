@@ -3,7 +3,7 @@ package org.firstinspires.ftc.team4042;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@TeleOp(name = "Mecanum1", group = "Iterative Opmode")
+@TeleOp(name = "Mecanum", group = "Iterative Opmode")
 public class TeleOpMecanum extends OpMode {
 
     private boolean aPushed = false;
@@ -29,7 +29,7 @@ public class TeleOpMecanum extends OpMode {
             drive.toggleVerbose();
         }
         aPushed = gamepad1.a;
-        drive.drive(false, gamepad1, gamepad2, 1);
+        drive.drive(false, gamepad1, gamepad2, Drive.FULL_SPEED);
     }
 
     /* CODE FROM HERE DOWN IS AN ATTEMPT TO IMPLEMENT DYLAN'S DRIVE ALGORITHM

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.team4042;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
+import org.firstinspires.ftc.team4042.Auto.Direction;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -10,6 +11,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 public class MecanumDrive extends Drive {
+
+    private double oldGyro;
 
     /**
      * Constructor for Drive, it creates the motors and the gyro objects
@@ -80,18 +83,51 @@ public class MecanumDrive extends Drive {
      * @param direction which direction to go
      * @return returns if it is completed (true if has reached target, false if it hasn't)
      */
-    public boolean driveWithEncoders(double direction, double speed, double targetTicks) {
+    public boolean driveWithEncoders(Direction direction, double speed, double targetTicks) throws IllegalArgumentException{
         //telemetry data
-        boolean x = (direction == Auto.RIGHT || direction == Auto.LEFT);
         telemetry.addData("Left Back", motorLeftBack.getCurrentPosition());
         telemetry.addData("Left Front", motorLeftFront.getCurrentPosition());
         telemetry.addData("Right Back", motorRightBack.getCurrentPosition());
         telemetry.addData("Right Front", motorRightFront.getCurrentPosition());
 
+        double scaledSpeed = setUpSpeed(speed, targetTicks);
+        if (scaledSpeed == Math.PI) { //The target's been reached
+            return true;
+        }
+        //if it hasn't reached the target (it won't have returned yet),
+        // drive at the given speed (possibly scaled b/c of first and last fourth), and return false
+        scaledSpeed = Range.clip(scaledSpeed, 0, FULL_SPEED);
+
+        if (direction.equals(Direction.Right) || direction.equals(Direction.Left)) { //Moving on the x axis
+            useGyro();
+            driveXYR(FULL_SPEED, scaledSpeed, 0, 0);
+        }
+        else if (direction.equals(Direction.Forward) || direction.equals(Direction.Backward)) { //Moving on the y axis
+            useGyro();
+            driveXYR(FULL_SPEED, 0, scaledSpeed, 0);
+        }
+        else if (direction.equals(Direction.Forward) || direction.equals(Direction.Backward)) { //Rotating
+            //Don't use the gyro because the robot is MEANT to be turning
+            driveXYR(FULL_SPEED, 0, 0, scaledSpeed);
+        }
+        else { //Null or other problematic directions
+            throw new IllegalArgumentException("Illegal direction inputted!");
+        }
+        return false;
+    }
+
+    /**
+     * A helper function that scales speed if you're in the first or last fourth of the target encoder values
+     * @param speed The inputted speed
+     * @param targetTicks The final ticks for the encoders
+     * @return Returns the speed, scaled, or Math.PI if you've already reached the value
+     */
+    private double setUpSpeed(double speed, double targetTicks) {
         //finds the maximum of all encoder counts
         double currentTicks = super.max(motorLeftBack.getCurrentPosition(),
                 motorLeftFront.getCurrentPosition(),
                 motorRightBack.getCurrentPosition(), motorRightFront.getCurrentPosition());
+
         //if it has not reached the target, it tests if it is in the
         // last or first fourth of the way there, and
         // scales the speed such that it speeds up and slows down
@@ -109,24 +145,44 @@ public class MecanumDrive extends Drive {
             stopMotors(); //stops the motors
             this.resetEncoders();
             this.runWithEncoders();
-            return true;
+            return Math.PI;
         }
-        //if it hasn't reached the target (it won't have returned yet),
-        // drive at the given speed (possibly scaled b/c of first and last fourth), and return false
-        speed = Range.clip(speed, 0, 1);
-        if (x) {
-            driveXYR(1, speed, 0, 0);
+        return speed;
+    }
+
+    /**
+     * uses the gyro, first reading from the gyro then setting rotation to
+     * auto correct if the robot gets off
+     */
+    public void useGyro() {
+        double heading = gyro.updateHeading();
+        double r = 0;
+        telemetry.addData("gyro", heading);
+        //you're not supposed to have rotated, make sure you actually haven't
+        double gyroDiff = heading - oldGyro; //hopefully is zero
+        telemetry.addData("oldGyro", oldGyro);
+        telemetry.addData("gyroDiff", gyroDiff);
+        //TODO: FIX THIS
+        //If you're moving forwards and you drift, this should correct it.
+        //Accounts for if you go from 1 degree to 360 degrees
+        // which is only a difference of one degree,
+        //but the bot thinks that's 359 degree difference
+        //Also scales -180 to 180 ==> -1 to 1
+        if (gyroDiff < -180) {
+            r = (180 + gyroDiff) / 180;
+        } else if (gyroDiff > 180) {
+            r = (gyroDiff - 180) / 180;
         } else {
-            driveXYR(1, 0, speed, 0);
+            r = (gyroDiff) / 180;
         }
-        return false;
+        oldGyro = heading;
     }
 
     /**
      * Stops all motors
      */
     public void stopMotors() {
-        driveXYR(0, 0, 0, 0);
+        driveXYR(STOP_SPEED, 0, 0, 0);
     }
 
     /**

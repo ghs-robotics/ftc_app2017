@@ -3,7 +3,7 @@ package org.firstinspires.ftc.team4042;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@TeleOp(name = "Omni2", group = "Iterative Opmode")
+@TeleOp(name = "Omni", group = "Iterative Opmode")
 public class TeleOpOmni extends OpMode {
 
     OmniDrive drive;
@@ -15,7 +15,7 @@ public class TeleOpOmni extends OpMode {
 
     @Override
     public void loop() {
-        drive.drive(false, gamepad1, gamepad2, 1);
+        drive.drive(false, gamepad1, gamepad2, Drive.FULL_SPEED);
     }
 
 }

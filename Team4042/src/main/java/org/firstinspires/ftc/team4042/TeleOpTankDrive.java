@@ -3,7 +3,7 @@ package org.firstinspires.ftc.team4042;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@TeleOp(name = "Mecanum", group = "Iterative Opmode")
+@TeleOp(name = "Tank", group = "Iterative Opmode")
 public class TeleOpTankDrive extends OpMode {
 
     boolean aPushed = false;
@@ -26,7 +26,7 @@ public class TeleOpTankDrive extends OpMode {
             drive.toggleVerbose();
         }
         aPushed = gamepad1.a;
-        drive.drive(false, gamepad1, gamepad2, 1);
+        drive.drive(false, gamepad1, gamepad2, Drive.FULL_SPEED);
     }
 
 }
