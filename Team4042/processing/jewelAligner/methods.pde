@@ -1,0 +1,1 @@
+//8001.3/(d - 1.880) + 301.5 = on screen pixel pos from top
