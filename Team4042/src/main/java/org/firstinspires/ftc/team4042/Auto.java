@@ -3,7 +3,7 @@ package org.firstinspires.ftc.team4042;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name="TestAuto", group="Autonomous")
+@Autonomous(name="TestAuto", group="K9bot")
 public class Auto extends LinearOpMode {
 
     MecanumDrive drive;
@@ -17,9 +17,10 @@ public class Auto extends LinearOpMode {
         waitForStart();
 
         //TODO: TEST THIS
-        autoDrive(Direction.Forward, Drive.FULL_SPEED, 50);
-        autoDrive(Direction.Left, Drive.FULL_SPEED, 50);
-        autoDrive(Direction.Counterclockwise, Drive.FULL_SPEED, 50);
+        drive.setEncoders(true);
+        autoDrive(Direction.Forward, Drive.FULL_SPEED, 10);
+        autoDrive(Direction.Left, Drive.FULL_SPEED, 10);
+        autoDrive(Direction.Counterclockwise, Drive.FULL_SPEED, 10);
         //check sensor sums
         //robot starts facing right
         //scan vision patter
@@ -45,6 +46,8 @@ public class Auto extends LinearOpMode {
         boolean done = false;
         while (opModeIsActive() && !done) {
             done = drive.driveWithEncoders(direction, speed, targetTicks);
+            telemetry.addData("done", done);
+            telemetry.update();
         }
     }
 }

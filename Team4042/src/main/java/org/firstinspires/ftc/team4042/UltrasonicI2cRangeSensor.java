@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.team4042;
+/*package org.firstinspires.ftc.team4042;
 
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchDevice;
 
@@ -9,5 +9,6 @@ import com.qualcomm.robotcore.hardware.I2cDeviceSynchDevice;
  *
  */
 
-public class UltrasonicI2cRangeSensor extends I2cDeviceSynchDevice<> {
+/*public class UltrasonicI2cRangeSensor extends I2cDeviceSynchDevice<> {
 }
+*/
