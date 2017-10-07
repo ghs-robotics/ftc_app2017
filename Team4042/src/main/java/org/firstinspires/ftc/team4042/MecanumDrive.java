@@ -153,10 +153,9 @@ public class MecanumDrive extends Drive {
      * uses the gyro, first reading from the gyro then setting rotation to
      * auto correct if the robot gets off
      */
-    private double useGyro() {
+    public double useGyro() {
         telemetry.addData("gyro", gyro.updateHeading());
-        return 0;
-        /*double heading = gyro.updateHeading();
+        double heading = gyro.updateHeading();
         double r = 0;
         telemetry.addData("heading", heading);
         //you're not supposed to have rotated, make sure you actually haven't
@@ -177,7 +176,7 @@ public class MecanumDrive extends Drive {
             r = (gyroDiff) / 180;
         }
         oldGyro = heading;
-        return r;*/
+        return r;
     }
 
     /**

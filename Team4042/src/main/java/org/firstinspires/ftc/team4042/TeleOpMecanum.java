@@ -12,15 +12,11 @@ public class TeleOpMecanum extends OpMode {
     private final boolean useBackMecanum = true;
 
     //Declare OpMode members.
-    private Drive drive;
+    private MecanumDrive drive;
 
     @Override
     public void init() {
-        if (useBackMecanum) {
-            drive = new MecanumDrive(hardwareMap, telemetry);
-        } else {
-            drive = new HalfMecanumDrive(hardwareMap, telemetry);
-        }
+        drive = new MecanumDrive(hardwareMap, telemetry);
     }
     
     @Override
@@ -30,6 +26,9 @@ public class TeleOpMecanum extends OpMode {
         }
         aPushed = gamepad1.a;
         drive.drive(false, gamepad1, gamepad2, Drive.FULL_SPEED);
+        drive.useGyro();
+        telemetry.update();
+
     }
 
     /* CODE FROM HERE DOWN IS AN ATTEMPT TO IMPLEMENT DYLAN'S DRIVE ALGORITHM
