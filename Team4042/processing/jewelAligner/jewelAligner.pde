@@ -1,5 +1,5 @@
 PImage img;
-int dist = 25;
+int dist = 35;
 
 void setup() {
   size(1280, 720);
@@ -12,5 +12,8 @@ void setup() {
 void draw() {
   println(distToPos(dist));
   image(img, 0, 0);
-  image(arrToImg(findTape(distToPos(dist), img, kernel)),0,distToPos(dist));
+  float[] tapes = findTape(dist, img, kernel);
+  line(tapes[0], 0, tapes[0], height - 1);
+  line(tapes[1], 0, tapes[1], height - 1);
+  println(distToLength(dist));
 }

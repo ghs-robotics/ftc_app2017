@@ -1,6 +1,9 @@
 //8001.3/(d - 1.880) + 301.5 = on screen pixel pos from top
 int distToPos(float d) {
-  return (int) (FUNCTION_A / (d - FUNCTION_B) + FUNCTION_C);
+  return (int) (FUNCTION_A_A / (d - FUNCTION_A_B) + FUNCTION_A_C);
+}
+int distToLength(float d) {
+  return (int) (FUNCTION_B_A / (d - FUNCTION_B_B) + FUNCTION_B_C);
 }
 
 float[][] kernelScale(float[][] kernel, float scale) {
@@ -13,31 +16,61 @@ float[][] kernelScale(float[][] kernel, float scale) {
 }
 
 //yin is y for tape vertically, position from top
-float[][] findTape(int yin, PImage img, float[][] kernel) {
+float[] findTape(int d, PImage in, float[][] kernel) {
+  int yin = distToPos(d);
   float[] result = new float[2];
-  
-  if(yin < 3 || yin > img.height - 3) println("y is out of bounds");
-  img.loadPixels();
-  float[][] kk = new float[img.width][5];
-  for(int y = yin - 2; y <= yin + 2; y++) {
-    for(int x = 2; x < img.width - 2; x++) {
-      int sum = 0;
-      for(int xo = -1; xo <= 1; xo++) {
-        for(int yo = -1; yo <= 1; yo++) {
-          sum += kernel[xo + 1][yo + 1] * img.pixels[(y + yo) * img.width + x + xo];
+  float[][] kk = new float[in.width][in.height];
+  in.filter(GRAY);
+  in.loadPixels(); //opens pixels for use
+  //iterates through image applying convolution
+  //skips outside to prevent out of bounds error
+  for (int y = yin - 2; y <= yin + 2; y++) {
+    for (int x = 1; x < in.width - 1; x++) {
+      float sum = 0;
+      for (int ky = -1; ky <= 1; ky++) {
+        for (int kx = -1; kx <= 1; kx++) {
+          int pos = (y + ky) * in.width + (x + kx);
+          float val = red(in.pixels[pos]); //channel read arbitrary, image greyscale
+          sum += kernel[ky+1][kx+1] * val;
         }
       }
-      kk[x][y - yin + 2] = abs(sum);
+      sum = abs(sum); //detects edges going either way
+      kk[x][y - yin + 2] = sum;
     }
   }
-  
+  in.updatePixels();
+  int[] maybe = new int[img.width];
+  int maybeI = 0;
   for(int x = 0; x < img.width; x++) {
+    float sum = 0;
     for(int y = 0; y < 5; y++) {
-      
+      sum += kk[x][y];
+    }
+    if(sum > TAPE_THRESHOLD) {
+      maybe[maybeI] = x;
+      maybeI++;
     }
   }
   
-  return kk;
+  int a = 0;
+  int b = 0;
+  int len = distToLength(d);
+  
+  int count = 0;
+  for(int i = 0; i <= maybeI; i++) {
+    for(int j = i + 1; j <= maybeI; j++) {
+      int dist = abs(maybe[i] - maybe[j]); 
+      if(dist > len - 2 && dist < len + 2) {
+        a = maybe[i];
+        b = maybe[j];
+        count++;
+      }
+    }
+  }
+  println(count);
+  result[0] = a;
+  result[1] = b;
+  return result;
 }
 
 PImage arrToImg(float[][] in) {
@@ -47,9 +80,6 @@ PImage arrToImg(float[][] in) {
     for(int x = 0; x < img.width; x++) {
       result.pixels[y * img.width + x] = color(in[x][y], in[x][y], in[x][y]);
     }
-  }
-  for(int n = 0; n < 500; n++) {
-  println(in[n][0]);
   }
   return result;
 }
