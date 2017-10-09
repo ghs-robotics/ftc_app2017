@@ -7,8 +7,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class OmniDrive extends Drive {
 
-    RevGyro gyro;
-
     //How much the robot is rotated when we start (as in, the wheels are in a diamond, not a square)
     public static final int OFFSET = 180;
 
@@ -23,12 +21,10 @@ public class OmniDrive extends Drive {
     public OmniDrive(HardwareMap hardwareMap, Telemetry tel) {
         //Initialize motors and gyro
         super(hardwareMap, tel);
-        gyro = new RevGyro(hardwareMap, tel);
     }
 
     public OmniDrive(HardwareMap hardwareMap, Telemetry tel, boolean verbose) {
         super(hardwareMap, tel, verbose);
-        gyro = new RevGyro(hardwareMap, tel);
     }
 
     /**
@@ -47,11 +43,9 @@ public class OmniDrive extends Drive {
         double yComp = -gamepad1.left_stick_y;
         double rot = gamepad1.right_stick_x;
 
-        double heading;
-        if (!useGyro) {
-            heading = OFFSET;
-        } else {
-            heading = gyro.updateHeading();
+        double heading = OFFSET;
+        if (useGyro) {
+            heading = super.gyro.updateHeading();
             telemetry.addData("heading", heading);
         }
 

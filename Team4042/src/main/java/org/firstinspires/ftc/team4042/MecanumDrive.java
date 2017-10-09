@@ -12,7 +12,11 @@ import java.io.StringWriter;
 
 public class MecanumDrive extends Drive {
 
-    private double oldGyro;
+    //How much the robot is rotated when we start (as in, the wheels are in a diamond, not a square)
+    //Used for not-field-oriented drive
+    public static final int OFFSET = 0;
+
+    private double oldGyro = OFFSET;
 
     /**
      * Constructor for Drive, it creates the motors and the gyro objects
@@ -40,7 +44,7 @@ public class MecanumDrive extends Drive {
         double y = -gamepad1.left_stick_y; //Y is the opposite direction of what's intuitive: forward is -1, backwards is 1
         double r = gamepad1.right_stick_x;
 
-        driveXYR(speedFactor, x, y, r);
+        driveXYR(speedFactor, x, y, r, true);
     }
 
     /**
@@ -50,7 +54,7 @@ public class MecanumDrive extends Drive {
      * @param y y component
      * @param r rotate component
      */
-    public void driveXYR(double speedFactor, double x, double y, double r) {
+    public void driveXYR(double speedFactor, double x, double y, double r, boolean useGyro) {
         double[] speedWheel = new double[4];
 
         //Deadzone for joysticks
@@ -58,17 +62,34 @@ public class MecanumDrive extends Drive {
         y = super.deadZone(y);
         r = super.deadZone(r);
 
+        double hypot = super.deadZone(Math.hypot(x, y));
+
         if (verbose) {
             telemetry.addData("x", x);
             telemetry.addData("y", y);
             telemetry.addData("r", r);
         }
 
+        double heading = OFFSET;
+        if (useGyro) {
+            heading = super.gyro.updateHeading();
+            telemetry.addData("heading", heading);
+        }
+
+        /*
+        Adjust x, y for gyro values
+         */
+
+        double gyroRadians = Math.toRadians(heading);
+
+        double xPrime = x * Math.cos(gyroRadians) + y * Math.sin(gyroRadians);
+        double yPrime = -x * Math.sin(gyroRadians) + y * Math.cos(gyroRadians);
+
         //Sets relative wheel speeds for mecanum drive based on controller inputs
-        speedWheel[0] = x + y + r;
-        speedWheel[1] = -x + y - r;
-        speedWheel[2] = x + y - r;
-        speedWheel[3] = -x + y + r;
+        speedWheel[0] = xPrime + yPrime + r;
+        speedWheel[1] = -xPrime + yPrime - r;
+        speedWheel[2] = xPrime + yPrime - r;
+        speedWheel[3] = -xPrime + yPrime + r;
 
         //sets the wheel powers to the appropriate ratios
         super.setMotorPower(speedWheel, speedFactor);
@@ -100,15 +121,15 @@ public class MecanumDrive extends Drive {
 
         if (direction.equals(Direction.Right) || direction.equals(Direction.Left)) { //Moving on the x axis
             double r = useGyro();
-            driveXYR(FULL_SPEED, scaledSpeed, 0, r);
+            driveXYR(FULL_SPEED, scaledSpeed, 0, r, false);
         }
         else if (direction.equals(Direction.Forward) || direction.equals(Direction.Backward)) { //Moving on the y axis
             double r = useGyro();
-            driveXYR(FULL_SPEED, 0, scaledSpeed, r);
+            driveXYR(FULL_SPEED, 0, scaledSpeed, r, false);
         }
         else if (direction.equals(Direction.Clockwise) || direction.equals(Direction.Counterclockwise)) { //Rotating
             //Don't use the gyro because the robot is MEANT to be turning
-            driveXYR(FULL_SPEED, 0, 0, -scaledSpeed);
+            driveXYR(FULL_SPEED, 0, 0, -scaledSpeed, false);
         }
         else { //Null or other problematic directions
             throw new IllegalArgumentException("Illegal direction inputted!");
@@ -183,7 +204,7 @@ public class MecanumDrive extends Drive {
      * Stops all motors
      */
     public void stopMotors() {
-        driveXYR(STOP_SPEED, 0, 0, 0);
+        driveXYR(STOP_SPEED, 0, 0, 0, false);
     }
 
     /**
