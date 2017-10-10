@@ -19,7 +19,7 @@ public class AutoEncoderTest extends LinearOpMode {
 
         //TODO: TEST THIS
         drive.setEncoders(true);
-        autoDrive(Auto.Direction.Forward, Drive.FULL_SPEED, 10000);
+        autoDrive(Auto.Direction.Forward, Drive.FULL_SPEED, 1000000);
         //check sensor sums
         //robot starts facing right
         //scan vision patter

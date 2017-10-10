@@ -28,7 +28,7 @@ public class TeleOpMecanum extends OpMode {
         sensor = hardwareMap.get(UltrasonicI2cRangeSensor.class, "MB1242-0");
         sensor.startRanging();
 
-        drive = new MecanumDrive(hardwareMap, telemetry);
+        drive = new MecanumDrive(hardwareMap, telemetry, true);
     }
     
     @Override

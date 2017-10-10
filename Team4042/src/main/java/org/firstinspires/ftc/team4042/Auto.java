@@ -8,8 +8,6 @@ public class Auto extends LinearOpMode {
 
     MecanumDrive drive;
 
-    public enum Direction {Right, Left, Forward, Backward, Clockwise, Counterclockwise};
-
     @Override
     public void runOpMode() {
         drive = new MecanumDrive(hardwareMap, telemetry, true);
@@ -18,10 +16,11 @@ public class Auto extends LinearOpMode {
         waitForStart();
 
         //TODO: TEST THIS
+        drive.resetEncoders();
         drive.setEncoders(true);
-        autoDrive(Direction.Forward, Drive.FULL_SPEED, 4);
-        autoDrive(Direction.Left, Drive.FULL_SPEED, 4);
-        autoDrive(Direction.Counterclockwise, Drive.FULL_SPEED, 4);
+        autoDrive(Direction.Forward, Drive.FULL_SPEED, 1000);
+        autoDrive(Direction.Left, Drive.FULL_SPEED, 1000);
+        autoRotate(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000);
         //check sensor sums
         //robot starts facing right
         //scan vision patter
@@ -47,6 +46,14 @@ public class Auto extends LinearOpMode {
         boolean done = false;
         while (opModeIsActive() && !done) {
             done = drive.driveWithEncoders(direction, speed, targetTicks);
+            telemetry.update();
+        }
+    }
+
+    private void autoRotate(Direction.Rotation rotation, double speed, double targetTicks) {
+        boolean done = false;
+        while (opModeIsActive() && !done) {
+            done = drive.rotateWithEncoders(rotation, speed, targetTicks);
             telemetry.update();
         }
     }
