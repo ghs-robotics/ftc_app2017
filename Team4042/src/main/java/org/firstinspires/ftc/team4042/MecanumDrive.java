@@ -16,8 +16,6 @@ public class MecanumDrive extends Drive {
     //Used for not-field-oriented drive
     public static final int OFFSET = 0;
 
-    private double oldGyro = OFFSET;
-
     /**
      * Constructor for Drive, it creates the motors and the gyro objects
      *
@@ -62,8 +60,6 @@ public class MecanumDrive extends Drive {
         y = super.deadZone(y);
         r = super.deadZone(r);
 
-        double hypot = super.deadZone(Math.hypot(x, y));
-
         if (verbose) {
             telemetry.addData("x", x);
             telemetry.addData("y", y);
@@ -79,9 +75,7 @@ public class MecanumDrive extends Drive {
         /*
         Adjust x, y for gyro values
          */
-
         double gyroRadians = Math.toRadians(heading);
-
         double xPrime = x * Math.cos(gyroRadians) + y * Math.sin(gyroRadians);
         double yPrime = -x * Math.sin(gyroRadians) + y * Math.cos(gyroRadians);
 
@@ -121,10 +115,12 @@ public class MecanumDrive extends Drive {
 
         if (direction.equals(Direction.Right) || direction.equals(Direction.Left)) { //Moving on the x axis
             double r = useGyro();
+            telemetry.addData("r", r);
             driveXYR(FULL_SPEED, scaledSpeed, 0, r, false);
         }
         else if (direction.equals(Direction.Forward) || direction.equals(Direction.Backward)) { //Moving on the y axis
             double r = useGyro();
+            telemetry.addData("r", r);
             driveXYR(FULL_SPEED, 0, scaledSpeed, r, false);
         }
         else if (direction.equals(Direction.Clockwise) || direction.equals(Direction.Counterclockwise)) { //Rotating
@@ -132,7 +128,7 @@ public class MecanumDrive extends Drive {
             driveXYR(FULL_SPEED, 0, 0, -scaledSpeed, false);
         }
         else { //Null or other problematic directions
-            throw new IllegalArgumentException("Illegal direction inputted!");
+            throw new IllegalArgumentException("Illegal direction inputted! Direction was: " + direction);
         }
         return false;
     }
@@ -175,29 +171,31 @@ public class MecanumDrive extends Drive {
      * auto correct if the robot gets off
      */
     public double useGyro() {
-        telemetry.addData("gyro", gyro.updateHeading());
-        double heading = gyro.updateHeading();
-        double r = 0;
-        telemetry.addData("heading", heading);
+        double heading = gyro.updateHeading(); //hopefully 0
         //you're not supposed to have rotated, make sure you actually haven't
-        double gyroDiff = heading - oldGyro; //hopefully is zero
-        telemetry.addData("oldGyro", oldGyro);
-        telemetry.addData("gyroDiff", gyroDiff);
         //TODO: TEST THIS
         //If you're moving forwards and you drift, this should correct it.
         //Accounts for if you go from 1 degree to 360 degrees
         // which is only a difference of one degree,
         // but the bot thinks that's 359 degree difference
-        // Also scales -180 to 180 ==> -1 to 1
-        if (gyroDiff < -180) {
-            r = (180 + gyroDiff) / 180;
-        } else if (gyroDiff > 180) {
-            r = (gyroDiff - 180) / 180;
-        } else {
-            r = (gyroDiff) / 180;
+        // Also scales -180 to 180 ==> -8 to 8
+        if (heading < -180) {
+            heading += 180;
+        } else if (heading > 180) {
+            heading -= 180;
         }
-        oldGyro = heading;
-        return r;
+
+        heading = heading / 22.5;
+
+        return heading;
+
+        /*if (heading > 0) {
+            return 0.5; //turn right to adjust
+        } else if (heading < 0) {
+            return -0.5; //turn left to adjust
+        } else {
+            return 0; //no need to turn!
+        }*/
     }
 
     /**

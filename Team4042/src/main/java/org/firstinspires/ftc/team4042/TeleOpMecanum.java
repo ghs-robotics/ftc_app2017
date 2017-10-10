@@ -16,7 +16,7 @@ public class TeleOpMecanum extends OpMode {
 
     @Override
     public void init() {
-        drive = new MecanumDrive(hardwareMap, telemetry);
+        drive = new MecanumDrive(hardwareMap, telemetry, true);
     }
     
     @Override

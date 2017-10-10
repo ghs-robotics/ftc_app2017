@@ -19,9 +19,9 @@ public class Auto extends LinearOpMode {
 
         //TODO: TEST THIS
         drive.setEncoders(true);
-        autoDrive(Direction.Forward, Drive.FULL_SPEED, 4);
-        autoDrive(Direction.Left, Drive.FULL_SPEED, 4);
-        autoDrive(Direction.Counterclockwise, Drive.FULL_SPEED, 4);
+        autoDrive(Direction.Forward, Drive.FULL_SPEED, 400);
+        autoDrive(Direction.Left, Drive.FULL_SPEED, 200);
+        autoDrive(Direction.Counterclockwise, Drive.FULL_SPEED, 200);
         //check sensor sums
         //robot starts facing right
         //scan vision patter
