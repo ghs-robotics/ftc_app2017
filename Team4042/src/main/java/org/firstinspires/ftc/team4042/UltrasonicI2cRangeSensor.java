@@ -11,7 +11,7 @@ import java.util.ArrayList;
 /**
  * Created by Ryan Whiting on 10/3/2017.
  */
-@I2cSensor(name = "MCP9808 Temperature Sensor", description = "Temperature Sensor from Adafruit", xmlTag = "MCP9808")
+@I2cSensor(name = "MB1242 Ultrasonic Sensor", description = "Range Sensor from Maxbotics", xmlTag = "MB1242-0")
 public class UltrasonicI2cRangeSensor extends I2cDeviceSynchDevice<I2cDeviceSynch> {
 
     private ArrayList<Integer> data = new ArrayList<>(2);
