@@ -5,6 +5,12 @@ int distToPos(float d) {
 int distToLength(float d) {
   return (int) (FUNCTION_B_A / (d - FUNCTION_B_B) + FUNCTION_B_C);
 }
+int distToBallY(float d) {
+  return (int) (FUNCTION_C_A / (d - FUNCTION_C_B) + FUNCTION_C_C);
+}
+int distToRightBallX(float d) {
+  return (int) (FUNCTION_D_A / (d - FUNCTION_D_B) + FUNCTION_D_C);
+}
 
 float[][] kernelScale(float[][] kernel, float scale) {
   for(int y = 0; y < 3; y++) {
