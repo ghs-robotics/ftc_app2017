@@ -24,27 +24,27 @@ public class TeleOpMecanum extends OpMode {
     //Declare OpMode members.
     private MecanumDrive drive;
 
-    private UltrasonicI2cRangeSensor sensor;
+    //private UltrasonicI2cRangeSensor sensor;
     private ArrayList<Integer> rangeData;
 
     @Override
     public void init() {
-        try {
+        /*try {
             sensor = hardwareMap.get(UltrasonicI2cRangeSensor.class, "MB1242-0");
         }catch (Exception x){
             telemetry.addLine("it broke");
         }
-            sensor.startRanging();
-
-            drive = new MecanumDrive(hardwareMap, telemetry, true);
+        sensor.startRanging();
+        */
+        drive = new MecanumDrive(hardwareMap, telemetry, true);
         telemetry.update();
     }
     
     @Override
     public void loop() {
 
-        rangeData = sensor.getRange();
-        telemetry.addData("range", rangeData.get(2));
+        //rangeData = sensor.getRange();
+        //telemetry.addData("range", rangeData.get(2));
 
         if (gamepad1.a && !aPushed) {
             drive.toggleVerbose();

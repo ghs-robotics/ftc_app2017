@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp(name = "Mecanum1", group = "Iterative Opmode")
-public class TeleOpMecanum extends OpMode {
+public class ElliotTest extends OpMode {
 
     private boolean aPushed = false;
 

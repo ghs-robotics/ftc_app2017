@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.team12788;
+package org.firstinspires.ftc.robotcontroller.external.samples;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -80,8 +80,8 @@ import java.util.List;
  * is explained below.
  */
 
-@Autonomous(name="VuMark", group ="Concept")
-public class VuTest extends LinearOpMode {
+@Autonomous(name="VuTest", group ="Concept")
+public class redvsblue extends LinearOpMode {
 
     public static final String TAG = "Vuforia Navigation Sample";
 
@@ -198,34 +198,34 @@ public class VuTest extends LinearOpMode {
          * - Then we rotate it  90 around the field's Z access to face it away from the audience.
          * - Finally, we translate it back along the X axis towards the red audience wall.
          *
-        OpenGLMatrix redTargetLocationOnField = OpenGLMatrix
-                /* Then we translate the target off to the RED WALL. Our translation here
-                is a negative translation in X.
-                .translation(-mmFTCFieldWidth/2, 0, 0)
-                .multiplied(Orientation.getRotationMatrix(
-                        /* First, in the fixed (field) coordinate system, we rotate 90deg in X, then 90 in Z
-                        AxesReference.EXTRINSIC, AxesOrder.XZX,
-                        AngleUnit.DEGREES, 90, 90, 0));
-        redTarget.setLocation(redTargetLocationOnField);
-        RobotLog.ii(TAG, "Red Target=%s", format(redTargetLocationOnField));
+         OpenGLMatrix redTargetLocationOnField = OpenGLMatrix
+         /* Then we translate the target off to the RED WALL. Our translation here
+         is a negative translation in X.
+         .translation(-mmFTCFieldWidth/2, 0, 0)
+         .multiplied(Orientation.getRotationMatrix(
+         /* First, in the fixed (field) coordinate system, we rotate 90deg in X, then 90 in Z
+         AxesReference.EXTRINSIC, AxesOrder.XZX,
+         AngleUnit.DEGREES, 90, 90, 0));
+         redTarget.setLocation(redTargetLocationOnField);
+         RobotLog.ii(TAG, "Red Target=%s", format(redTargetLocationOnField));
 
-       /*
-        * To place the Stones Target on the Blue Audience wall:
-        * - First we rotate it 90 around the field's X axis to flip it upright
-        * - Finally, we translate it along the Y axis towards the blue audience wall.
+         /*
+         * To place the Stones Target on the Blue Audience wall:
+         * - First we rotate it 90 around the field's X axis to flip it upright
+         * - Finally, we translate it along the Y axis towards the blue audience wall.
 
-        OpenGLMatrix blueTargetLocationOnField = OpenGLMatrix
-                /* Then we translate the target off to the Blue Audience wall.
-                Our translation here is a positive translation in Y.
-                .translation(0, mmFTCFieldWidth/2, 0)
-                .multiplied(Orientation.getRotationMatrix(
-                        /* First, in the fixed (field) coordinate system, we rotate 90deg in X
-                        AxesReference.EXTRINSIC, AxesOrder.XZX,
-                        AngleUnit.DEGREES, 90, 0, 0));
-        blueTarget.setLocation(blueTargetLocationOnField);
-        RobotLog.ii(TAG, "Blue Target=%s", format(blueTargetLocationOnField));
+         OpenGLMatrix blueTargetLocationOnField = OpenGLMatrix
+         /* Then we translate the target off to the Blue Audience wall.
+         Our translation here is a positive translation in Y.
+         .translation(0, mmFTCFieldWidth/2, 0)
+         .multiplied(Orientation.getRotationMatrix(
+         /* First, in the fixed (field) coordinate system, we rotate 90deg in X
+         AxesReference.EXTRINSIC, AxesOrder.XZX,
+         AngleUnit.DEGREES, 90, 0, 0));
+         blueTarget.setLocation(blueTargetLocationOnField);
+         RobotLog.ii(TAG, "Blue Target=%s", format(blueTargetLocationOnField));
 
-        /**
+         /**
          * Create a transformation matrix describing where the phone is on the robot. Here, we
          * put the phone on the right hand side of the robot with the screen facing in (see our
          * choice of BACK camera above) and in landscape mode. Starting from alignment between the
@@ -237,14 +237,14 @@ public class VuTest extends LinearOpMode {
          * axis towards the origin. A positive rotation about Z (ie: a rotation parallel to the the X-Y
          * plane) is then CCW, as one would normally expect from the usual classic 2D geometry.
 
-        OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
-                .translation(mmBotWidth/2,0,0)
-                .multiplied(Orientation.getRotationMatrix(
-                        AxesReference.EXTRINSIC, AxesOrder.YZY,
-                        AngleUnit.DEGREES, -90, 0, 0));
-        RobotLog.ii(TAG, "phone=%s", format(phoneLocationOnRobot));
+         OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
+         .translation(mmBotWidth/2,0,0)
+         .multiplied(Orientation.getRotationMatrix(
+         AxesReference.EXTRINSIC, AxesOrder.YZY,
+         AngleUnit.DEGREES, -90, 0, 0));
+         RobotLog.ii(TAG, "phone=%s", format(phoneLocationOnRobot));
 
-        /**
+         /**
          * Let the trackable listeners we care about know where the phone is. We know that each
          * listener is a {@link VuforiaTrackableDefaultListener} and can so safely cast because
          * we have not ourselves installed a listener of a different type.
