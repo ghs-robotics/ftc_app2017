@@ -7,6 +7,10 @@ import com.qualcomm.robotcore.hardware.I2cDevice;
 import com.qualcomm.robotcore.hardware.I2cDeviceImpl;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
 
+import java.io.FileWriter;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 @TeleOp(name = "Mecanum", group = "Iterative Opmode")
@@ -25,10 +29,15 @@ public class TeleOpMecanum extends OpMode {
 
     @Override
     public void init() {
-        sensor = hardwareMap.get(UltrasonicI2cRangeSensor.class, "MB1242-0");
-        sensor.startRanging();
+        try {
+            sensor = hardwareMap.get(UltrasonicI2cRangeSensor.class, "MB1242-0");
+        }catch (Exception x){
+            telemetry.addLine("it broke");
+        }
+            sensor.startRanging();
 
-        drive = new MecanumDrive(hardwareMap, telemetry, true);
+            drive = new MecanumDrive(hardwareMap, telemetry, true);
+        telemetry.update();
     }
     
     @Override
