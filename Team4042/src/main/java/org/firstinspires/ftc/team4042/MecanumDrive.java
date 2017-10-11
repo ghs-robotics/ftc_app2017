@@ -37,7 +37,7 @@ public class MecanumDrive extends Drive {
     public void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor) {
         super.setEncoders(useEncoders);
 
-        double x = -gamepad1.left_stick_x;
+        double x = gamepad1.left_stick_x;
         double y = -gamepad1.left_stick_y; //Y is the opposite direction of what's intuitive: forward is -1, backwards is 1
         double r = gamepad1.right_stick_x;
 
@@ -55,7 +55,7 @@ public class MecanumDrive extends Drive {
         double[] speedWheel = new double[4];
 
         //Deadzone for joysticks
-        x = -super.deadZone(x);
+        x = super.deadZone(x);
         y = super.deadZone(y);
         r = super.deadZone(r);
 
@@ -133,10 +133,8 @@ public class MecanumDrive extends Drive {
      */
     public boolean driveWithEncoders(Direction direction, double speed, double targetTicks) throws IllegalArgumentException{
         //telemetry data
-        telemetry.addData("Left Back", motorLeftBack.getCurrentPosition());
-        telemetry.addData("Left Front", motorLeftFront.getCurrentPosition());
-        telemetry.addData("Right Back", motorRightBack.getCurrentPosition());
-        telemetry.addData("Right Front", motorRightFront.getCurrentPosition());
+        telemetry.addData("x", direction.getX());
+        telemetry.addData("y", direction.getY());
 
         double scaledSpeed = setUpSpeed(speed, targetTicks);
         if (scaledSpeed == Math.PI) { //The target's been reached
