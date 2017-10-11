@@ -2,7 +2,6 @@ package org.firstinspires.ftc.team4042;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import org.firstinspires.ftc.team4042.Auto.Direction;
 
 @Autonomous(name="EncoderTest", group="K9bot")
 public class AutoEncoderTest extends LinearOpMode {
