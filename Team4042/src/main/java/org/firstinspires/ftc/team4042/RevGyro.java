@@ -65,7 +65,7 @@ public class RevGyro {
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
         //see https://goo.gl/AnKWEn
-        heading = -(angles.firstAngle - 180);
+        heading = angles.firstAngle;
         roll = angles.secondAngle;
         pitch = angles.thirdAngle;
     }

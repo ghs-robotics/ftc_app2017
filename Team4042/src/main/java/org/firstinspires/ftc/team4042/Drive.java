@@ -70,6 +70,7 @@ public abstract class Drive {
     public Drive(HardwareMap hardwareMap, Telemetry tel, boolean verbose) {
         this(hardwareMap, tel);
         this.verbose = verbose;
+        gyro = new RevGyro(hardwareMap, tel);
     }
 
     /**

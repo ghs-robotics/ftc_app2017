@@ -2,25 +2,24 @@ package org.firstinspires.ftc.team4042;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import org.firstinspires.ftc.team4042.Auto.Direction;
 
-@Autonomous(name="TestAuto", group="K9bot")
-public class Auto extends LinearOpMode {
+@Autonomous(name="EncoderTest", group="K9bot")
+public class AutoEncoderTest extends LinearOpMode {
 
     MecanumDrive drive;
+
+    public enum Direction {Right, Left, Forward, Backward, Clockwise, Counterclockwise};
 
     @Override
     public void runOpMode() {
         drive = new MecanumDrive(hardwareMap, telemetry, true);
-        telemetry.update();
 
         waitForStart();
 
         //TODO: TEST THIS
-        drive.resetEncoders();
         drive.setEncoders(true);
-        autoDrive(Direction.Forward, Drive.FULL_SPEED, 1000);
-        autoDrive(Direction.Left, Drive.FULL_SPEED, 1000);
-        autoRotate(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000);
+        autoDrive(Auto.Direction.Forward, Drive.FULL_SPEED, 1000000);
         //check sensor sums
         //robot starts facing right
         //scan vision patter
@@ -42,18 +41,10 @@ public class Auto extends LinearOpMode {
      * @param speed The speed to move at
      * @param targetTicks The final distance to have travelled, in encoder ticks
      */
-    private void autoDrive(Direction direction, double speed, double targetTicks) {
+    private void autoDrive(Auto.Direction direction, double speed, double targetTicks) {
         boolean done = false;
         while (opModeIsActive() && !done) {
             done = drive.driveWithEncoders(direction, speed, targetTicks);
-            telemetry.update();
-        }
-    }
-
-    private void autoRotate(Direction.Rotation rotation, double speed, double targetTicks) {
-        boolean done = false;
-        while (opModeIsActive() && !done) {
-            done = drive.rotateWithEncoders(rotation, speed, targetTicks);
             telemetry.update();
         }
     }
