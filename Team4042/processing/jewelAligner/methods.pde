@@ -8,8 +8,23 @@ int distToLength(float d) {
 int distToBallY(float d) {
   return (int) (FUNCTION_C_A / (d - FUNCTION_C_B) + FUNCTION_C_C);
 }
-int distToRightBallX(float d) {
+int distToBallXOffset(float d) {
   return (int) (FUNCTION_D_A / (d - FUNCTION_D_B) + FUNCTION_D_C);
+}
+boolean isRedOnLeft(PImage img, float tc, float d, int sr) {
+  boolean result;
+  float lrsum = 0;
+  float lbsum = 0;
+  float rrsum = 0;
+  float rbsum = 0;
+  int off = distToBallXOffset(d);
+  
+  int itc = (int) (tc);
+  for(int x = itc - off - sr; x <= itc + off + sr; x++) {
+    for(int y = 
+  }
+  
+  return result;
 }
 
 float[][] kernelScale(float[][] kernel, float scale) {
