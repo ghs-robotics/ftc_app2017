@@ -3,8 +3,8 @@ float[][] kernel = {{ -1, 0, 1},
                     { -1, 0, 1}};
 final int TAPE_LENGTH_TOLERANCE = 2;
 final float KERNEL_SCALER = 1;
-final float TAPE_THRESHOLD = 2000;
-final float COLOR_CONTRAST_FACTOR = 4; //4 is pretty safe
+final float TAPE_THRESHOLD = 1000;
+final float COLOR_CONTRAST_FACTOR = 2; //4 is pretty safe
 
 final float FUNCTION_A_A = 8001.3;
 final float FUNCTION_A_B = 1.880;

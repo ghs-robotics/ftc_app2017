@@ -1,5 +1,5 @@
 PImage img;
-int dist = 50;
+int dist = 24;
 
 void setup() {
   size(1280, 720);
@@ -15,11 +15,26 @@ void draw() {
   println(distToPos(dist));
   image(img, 0, 0);
   PImage temp = img.get(0, 0, img.width, img.height);
-  float[] tapes = findTape(dist, img, kernel);
+  float[] tapes = {0, 0};
+  int fudge = 0;
+  for(fudge = 0; fudge <= 4; fudge++) {
+    tapes = findTape(dist + fudge, img, kernel);
+    if(tapes[0] != 0 || tapes[1] != 0) {
+      break;
+    }
+    tapes = findTape(dist - fudge, img, kernel);
+    if(tapes[0] != 0 || tapes[1] != 0) {
+      fudge = -1 * fudge;
+      break;
+    }
+    
+  }
   line(tapes[0], 0, tapes[0], height - 1);
   line(tapes[1], 0, tapes[1], height - 1);
-  println(getLeftColor(temp, (tapes[1] + tapes[0]) / 2, dist, 10, COLOR_CONTRAST_FACTOR));
-  println(distToLength(dist));
+  line(0, distToPos(dist + fudge), width - 1, distToPos(dist + fudge));
+  
+  println(getLeftColor(temp, (tapes[1] + tapes[0]) / 2, dist + fudge, 10, COLOR_CONTRAST_FACTOR));
+  println(distToLength(dist + fudge));
   println((tapes[1] + tapes[0]) / 2);
   println(millis() - start);
 }

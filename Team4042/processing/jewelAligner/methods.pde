@@ -27,13 +27,14 @@ String getLeftColor(PImage img, float tc /* tape center */, float d /* distance 
       lbsum += blue(img.pixels[y * img.width + x]);
     }
   }
+  rect(itc - off - sr, ycenter - sr, sr * 2, sr * 2);
   for(int x = itc + off - sr; x <= itc + off + sr; x++) {
     for(int y = ycenter - sr; y <= ycenter + sr; y++) {
       rrsum += red(img.pixels[y * img.width + x]);
       rbsum += blue(img.pixels[y * img.width + x]);
     }
   }
-  println(lrsum, lbsum, rrsum, rbsum);
+  ////////println(lrsum, lbsum, rrsum, rbsum);
   if(lrsum / lbsum > acc && rbsum / rrsum > acc) {
     return "red";
   } else if(lbsum / lrsum > acc && rrsum / rbsum > acc) {
@@ -104,7 +105,7 @@ float[] findTape(float d, PImage in, float[][] kernel) {
       }
     }
   }
-  println(count);
+  //////println(count);
   result[0] = a;
   result[1] = b;
   return result;
