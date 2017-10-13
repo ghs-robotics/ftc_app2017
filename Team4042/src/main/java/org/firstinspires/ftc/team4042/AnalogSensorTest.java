@@ -64,19 +64,27 @@ public class AnalogSensorTest extends OpMode {
     public void init() {
         ultrasonic = hardwareMap.analogInput.get("ultrasonic");
     }
-    @Override
+
+    /*@Override
     public void loop() {
         if (val[9] != 0) {
             double sum = 0;
             for (double i : val)
                 sum += i;
-            telemetry.addData("Inches:", sum / 10);
+            telemetry.addData("Inches", sum / 10);
         } else {
             val[num] = ultrasonic.getVoltage() * 42.8125;
             num++;
         }
+    }*/
 
-
+    @Override
+    public void loop() {
+        int sum = 0;
+        for (int i = 0; i < val.length; i++) {
+            sum += ultrasonic.getVoltage() * 95.5048077;
+        }
+        telemetry.addData("Inches", sum / 10);
     }
 
 }
