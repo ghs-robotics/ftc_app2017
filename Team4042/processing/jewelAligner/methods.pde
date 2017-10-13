@@ -11,20 +11,36 @@ int distToBallY(float d) {
 int distToBallXOffset(float d) {
   return (int) (FUNCTION_D_A / (d - FUNCTION_D_B) + FUNCTION_D_C);
 }
-boolean isRedOnLeft(PImage img, float tc, float d, int sr) {
-  boolean result;
-  float lrsum = 0;
-  float lbsum = 0;
-  float rrsum = 0;
-  float rbsum = 0;
+String getLeftColor(PImage img, float tc /* tape center */, float d /* distance from wall */, int sr /* search radius */, double acc) {
+  String result = "";
+  double lrsum = 0;
+  double lbsum = 0;
+  double rrsum = 0;
+  double rbsum = 0;
   int off = distToBallXOffset(d);
-  
+  int ycenter = distToBallY(d);
   int itc = (int) (tc);
-  for(int x = itc - off - sr; x <= itc + off + sr; x++) {
-    for(int y = 
+  img.loadPixels();
+  for(int x = itc - off - sr; x <= itc - off + sr; x++) {
+    for(int y = ycenter - sr; y <= ycenter + sr; y++) {
+      lrsum += red(img.pixels[y * img.width + x]);
+      lbsum += blue(img.pixels[y * img.width + x]);
+    }
   }
-  
-  return result;
+  for(int x = itc + off - sr; x <= itc + off + sr; x++) {
+    for(int y = ycenter - sr; y <= ycenter + sr; y++) {
+      rrsum += red(img.pixels[y * img.width + x]);
+      rbsum += blue(img.pixels[y * img.width + x]);
+    }
+  }
+  println(lrsum, lbsum, rrsum, rbsum);
+  if(lrsum / lbsum > acc && rbsum / rrsum > acc) {
+    return "red";
+  } else if(lbsum / lrsum > acc && rrsum / rbsum > acc) {
+    return "blue";
+  } else {
+    return "uncertain";
+  }
 }
 
 float[][] kernelScale(float[][] kernel, float scale) {
@@ -37,7 +53,7 @@ float[][] kernelScale(float[][] kernel, float scale) {
 }
 
 //yin is y for tape vertically, position from top
-float[] findTape(int d, PImage in, float[][] kernel) {
+float[] findTape(float d, PImage in, float[][] kernel) {
   int yin = distToPos(d);
   float[] result = new float[2];
   float[][] kk = new float[in.width][in.height];
@@ -81,7 +97,7 @@ float[] findTape(int d, PImage in, float[][] kernel) {
   for(int i = 0; i <= maybeI; i++) {
     for(int j = i + 1; j <= maybeI; j++) {
       int dist = abs(maybe[i] - maybe[j]); 
-      if(dist > len - 2 && dist < len + 2) {
+      if(dist > len - TAPE_LENGTH_TOLERANCE && dist < len + TAPE_LENGTH_TOLERANCE) {
         a = maybe[i];
         b = maybe[j];
         count++;
