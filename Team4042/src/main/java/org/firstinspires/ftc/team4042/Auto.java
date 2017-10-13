@@ -10,7 +10,7 @@ public class Auto extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        drive = new MecanumDrive(hardwareMap, telemetry, true);
+        drive = new MecanumDrive(hardwareMap, telemetry, false);
         telemetry.update();
 
         waitForStart();

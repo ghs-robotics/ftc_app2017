@@ -21,6 +21,13 @@ public class TeleOpMecanum extends OpMode {
     //True if the back wheels are mecanum, false if they're tank
     private final boolean useBackMecanum = true;
 
+    //Use gyro - true/false
+    private final static boolean useGyro = true;
+
+    //Reverses power input to back left motor
+    public static final boolean team12788 = false;
+
+
     //Declare OpMode members.
     private MecanumDrive drive;
 
@@ -36,7 +43,7 @@ public class TeleOpMecanum extends OpMode {
         }
         sensor.startRanging();
         */
-        drive = new MecanumDrive(hardwareMap, telemetry, true);
+        drive = new MecanumDrive(hardwareMap, telemetry, true, useGyro);
         telemetry.update();
     }
     
@@ -51,7 +58,9 @@ public class TeleOpMecanum extends OpMode {
         }
         aPushed = gamepad1.a;
         drive.drive(false, gamepad1, gamepad2, Drive.FULL_SPEED);
-        drive.useGyro();
+        if (useGyro) {
+            drive.useGyro();
+        }
         telemetry.update();
 
     }

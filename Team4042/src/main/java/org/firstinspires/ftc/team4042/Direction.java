@@ -9,7 +9,7 @@ public class Direction {
     private double x;
     private double y;
 
-    public enum Rotation {Clockwise, Counterclockwise};
+    public enum Rotation {Clockwise, Counterclockwise}
 
     public Direction() {
 

@@ -28,6 +28,7 @@ public abstract class Drive {
 
     Telemetry telemetry;
 
+    boolean useGyro;
     RevGyro gyro;
 
     boolean verbose;
@@ -62,15 +63,20 @@ public abstract class Drive {
             telemetry.addData("Back Left", "Could not find.");
         }
 
-        gyro = new RevGyro(hardwareMap, tel);
+        if (useGyro) {
+            gyro = new RevGyro(hardwareMap, tel);
+        }
 
         verbose = false;
     }
 
-    public Drive(HardwareMap hardwareMap, Telemetry tel, boolean verbose) {
+    public Drive(HardwareMap hardwareMap, Telemetry tel, boolean verbose, boolean useGyro) {
         this(hardwareMap, tel);
         this.verbose = verbose;
-        gyro = new RevGyro(hardwareMap, tel);
+        this.useGyro = useGyro;
+        if (useGyro) {
+            gyro = new RevGyro(hardwareMap, tel);
+        }
     }
 
     /**

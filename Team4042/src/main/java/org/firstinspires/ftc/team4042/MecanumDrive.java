@@ -26,8 +26,8 @@ public class MecanumDrive extends Drive {
         super(hardwareMap, tel);
     }
 
-    public MecanumDrive(HardwareMap hardwareMap, Telemetry tel, boolean verbose) {
-        super(hardwareMap, tel, verbose);
+    public MecanumDrive(HardwareMap hardwareMap, Telemetry tel, boolean verbose, boolean useGyro) {
+        super(hardwareMap, tel, verbose, useGyro);
     }
 
     /**
@@ -41,7 +41,7 @@ public class MecanumDrive extends Drive {
         double y = -gamepad1.left_stick_y; //Y is the opposite direction of what's intuitive: forward is -1, backwards is 1
         double r = gamepad1.right_stick_x;
 
-        driveXYR(speedFactor, x, y, r, true);
+        driveXYR(speedFactor, x, y, r, useGyro);
     }
 
     /**
@@ -82,7 +82,11 @@ public class MecanumDrive extends Drive {
         speedWheel[0] = xPrime + yPrime + r;
         speedWheel[1] = -xPrime + yPrime - r;
         speedWheel[2] = xPrime + yPrime - r;
-        speedWheel[3] = -xPrime + yPrime + r;
+        if (TeleOpMecanum.team12788) {
+            speedWheel[3] = -(-xPrime + yPrime + r);
+        } else {
+            speedWheel[3] = -xPrime + yPrime + r;
+        }
 
         //sets the wheel powers to the appropriate ratios
         super.setMotorPower(speedWheel, speedFactor);
