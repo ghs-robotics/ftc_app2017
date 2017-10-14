@@ -17,8 +17,8 @@ public enum JewelColor {
 }
 
 JewelColor[] sezGetJewelColors(PImage img, float d) {
-  float[] temp = ezFindTape(img, dist);
-  JewelColor[] jewelColors = ezGetJewelColors(img, temp[0], dist + temp[1]);
+  float[] temp = ezFindTape(img, d);
+  JewelColor[] jewelColors = ezGetJewelColors(img, temp[0], d + temp[1]);
   return jewelColors;
 }
 
