@@ -11,54 +11,8 @@ int distToBallY(float d) {
 int distToBallXOffset(float d) {
   return (int) (FUNCTION_D_A / (d - FUNCTION_D_B) + FUNCTION_D_C);
 }
-
-public enum JewelColor {
-  red, blue, uncertain
-}
-
-JewelColor[] sezGetJewelColors(PImage img, float d) {
-  float[] temp = ezFindTape(img, dist);
-  JewelColor[] jewelColors = ezGetJewelColors(img, temp[0], dist + temp[1]);
-  return jewelColors;
-}
-
-float[] ezFindTape(PImage img, float d) {
-  float[][] skernel = kernelScale(KERNEL, KERNEL_SCALER);
-  PImage temp = img.get(); //copies to a temporary image because findTape filters to grey
-  float[] tapes = {0, 0};
-  int fudge = 0;
-  float[] result = new float[2];
-  for(fudge = 0; fudge <= FUDGE_AMOUNT; fudge++) {
-    tapes = findTape(d + fudge, temp, skernel);
-    if(tapes[0] != 0 || tapes[1] != 0) {
-      break;
-    }
-    tapes = findTape(d - fudge, temp, skernel);
-    if(tapes[0] != 0 || tapes[1] != 0) {
-      fudge = -1 * fudge;
-      break;
-    }
-  }
-  result[0] = (tapes[0] + tapes[1]) / 2;
-  result[1] = fudge;
-  return result;
-}
-
-JewelColor[] ezGetJewelColors(PImage img, float tc, float d) {
-  return getJewelColors(img, tc, d, SEARCH_RADIUS, COLOR_CONTRAST_FACTOR);
-}
-
-String jewelColorToString(JewelColor in) {
-  switch (in) {
-    case blue: return "blue";
-    case red: return "red";
-    case uncertain: return "uncertain";
-    default: return "invalid input";
-  }
-}
-
-JewelColor[] getJewelColors(PImage img, float tc /* tape center */, float d /* distance from wall */, int sr /* search radius */, double acc) {
-  JewelColor[] result = {JewelColor.uncertain, JewelColor.uncertain};
+String getLeftColor(PImage img, float tc /* tape center */, float d /* distance from wall */, int sr /* search radius */, double acc) {
+  String result = "";
   double lrsum = 0;
   double lbsum = 0;
   double rrsum = 0;
@@ -73,26 +27,21 @@ JewelColor[] getJewelColors(PImage img, float tc /* tape center */, float d /* d
       lbsum += blue(img.pixels[y * img.width + x]);
     }
   }
-  //rect(itc - off - sr, ycenter - sr, sr * 2, sr * 2);
+  rect(itc - off - sr, ycenter - sr, sr * 2, sr * 2);
   for(int x = itc + off - sr; x <= itc + off + sr; x++) {
     for(int y = ycenter - sr; y <= ycenter + sr; y++) {
       rrsum += red(img.pixels[y * img.width + x]);
       rbsum += blue(img.pixels[y * img.width + x]);
     }
   }
-  if(lrsum / lbsum > acc) {
-    result[0] = JewelColor.red;
+  ////////println(lrsum, lbsum, rrsum, rbsum);
+  if(lrsum / lbsum > acc && rbsum / rrsum > acc) {
+    return "red";
+  } else if(lbsum / lrsum > acc && rrsum / rbsum > acc) {
+    return "blue";
+  } else {
+    return "uncertain";
   }
-  if(lbsum / lrsum > acc) {
-    result[0] = JewelColor.blue;
-  }
-  if(rrsum / rbsum > acc) {
-    result[1] = JewelColor.red;
-  }
-  if(rbsum / rrsum > acc) {
-    result[1] = JewelColor.blue;
-  }
-  return result;
 }
 
 float[][] kernelScale(float[][] kernel, float scale) {
@@ -156,7 +105,7 @@ float[] findTape(float d, PImage in, float[][] kernel) {
       }
     }
   }
-  //println(count);
+  //////println(count);
   result[0] = a;
   result[1] = b;
   return result;
