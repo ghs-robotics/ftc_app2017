@@ -27,7 +27,6 @@ public class TeleOpMecanum extends OpMode {
     //Reverses power input to back left motor
     public static final boolean team12788 = false;
 
-
     //Declare OpMode members.
     private MecanumDrive drive;
 

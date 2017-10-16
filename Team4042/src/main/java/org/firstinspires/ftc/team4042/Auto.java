@@ -10,7 +10,7 @@ public class Auto extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        drive = new MecanumDrive(hardwareMap, telemetry, false);
+        drive = new MecanumDrive(hardwareMap, telemetry, false, true);
         telemetry.update();
 
         waitForStart();
@@ -18,7 +18,10 @@ public class Auto extends LinearOpMode {
         //TODO: TEST THIS
         drive.resetEncoders();
         drive.setEncoders(true);
-        autoDrive(new Direction(1, .5), Drive.FULL_SPEED, 1000);
+        //autoDrive(new Direction(1, .5), Drive.FULL_SPEED, 1000);
+
+        autoSensorMove(Direction.Forward, Drive.FULL_SPEED / 4, 7, drive.ir);
+
         //check sensor sums
         //robot starts facing right
         //scan vision patter
@@ -52,6 +55,14 @@ public class Auto extends LinearOpMode {
         boolean done = false;
         while (opModeIsActive() && !done) {
             done = drive.rotateWithEncoders(rotation, speed, targetTicks);
+            telemetry.update();
+        }
+    }
+
+    private void autoSensorMove(Direction direction, double speed, double targetDistance, AnalogSensor ir) {
+        boolean done = false;
+        while (opModeIsActive() && !done) {
+            done = drive.driveWithSensor(direction, speed, targetDistance, ir);
             telemetry.update();
         }
     }

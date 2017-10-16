@@ -16,7 +16,7 @@ public class HalfMecanumDrive extends Drive{
     }
 
     public HalfMecanumDrive(HardwareMap hardwareMap, Telemetry tel, boolean verbose) {
-        super(hardwareMap, tel, verbose);
+        super(hardwareMap, tel, verbose, true);
     }
 
     /**

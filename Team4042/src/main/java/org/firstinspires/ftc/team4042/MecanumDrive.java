@@ -79,17 +79,55 @@ public class MecanumDrive extends Drive {
         double yPrime = -x * Math.sin(gyroRadians) + y * Math.cos(gyroRadians);
 
         //Sets relative wheel speeds for mecanum drive based on controller inputs
-        speedWheel[0] = xPrime + yPrime + r;
-        speedWheel[1] = -xPrime + yPrime - r;
-        speedWheel[2] = xPrime + yPrime - r;
-        if (TeleOpMecanum.team12788) {
-            speedWheel[3] = -(-xPrime + yPrime + r);
-        } else {
-            speedWheel[3] = -xPrime + yPrime + r;
-        }
+        if (TeleOpMecanum.team12788) { speedWheel[0] = -(xPrime + yPrime + r); }
+        else { speedWheel[0] = xPrime + yPrime + r; }
+
+        if (TeleOpMecanum.team12788) { speedWheel[1] = -(xPrime + yPrime - r); }
+        else { speedWheel[1] = -xPrime + yPrime - r; }
+
+        if (TeleOpMecanum.team12788) { speedWheel[2] = -(-xPrime + yPrime - r); }
+        else { speedWheel[2] = xPrime + yPrime - r; }
+
+        if (TeleOpMecanum.team12788) { speedWheel[3] = -(-xPrime + yPrime + r); }
+        else { speedWheel[3] = -xPrime + yPrime + r; }
 
         //sets the wheel powers to the appropriate ratios
         super.setMotorPower(speedWheel, speedFactor);
+    }
+
+    /**
+     * Moves at a direction until the AnalogSensor returns the desired input
+     * @param direction The direction to move in
+     * @param speed The speed to move at
+     * @param targetDistance The distance to end up at
+     * @param ir The AnalogSensor with which to get the distance
+     * @return Whether you've reached the target point
+     */
+    public boolean driveWithSensor(Direction direction, double speed, double targetDistance, AnalogSensor ir) {
+        //Ping 10 times and average the results
+        /*double sum = 0;
+        for (int i = 0; i < 10; i++) { sum += ir.getInchesAvg(); }
+        double currDistance = sum / 10;*/
+
+        double currDistance = ir.getInchesAvg();
+
+        double r = useGyro();
+
+        telemetry.addData("currDistance", currDistance);
+        telemetry.addData("Reached target", Math.abs(targetDistance - currDistance) > 0.5);
+        telemetry.addData("x", direction.getX());
+        telemetry.addData("y", direction.getY());
+        telemetry.addData("r", r);
+
+        if (((direction.getY() >= 0) && (currDistance - 3 < targetDistance)) || //driving forwards and reached distance (0.5 inch tolerance)
+                ((direction.getY() < 0) && (currDistance + 3 > targetDistance))) { //driving backwards and reached distance (0.5 inch tolerance)
+            stopMotors();
+            return true;
+        }
+        else { //haven't reached point yet
+            driveXYR(speed, direction.getX(), direction.getY(), r, false);
+            return false;
+        }
     }
 
     /**

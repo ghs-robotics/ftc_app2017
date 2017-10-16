@@ -31,6 +31,8 @@ public abstract class Drive {
     boolean useGyro;
     RevGyro gyro;
 
+    AnalogSensor ir;
+
     boolean verbose;
 
     //Require drive() in subclasses
@@ -66,6 +68,9 @@ public abstract class Drive {
         if (useGyro) {
             gyro = new RevGyro(hardwareMap, tel);
         }
+
+        ir = new AnalogSensor(hardwareMap);
+        ir.initialize();
 
         verbose = false;
     }
