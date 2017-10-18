@@ -21,37 +21,45 @@ public class TeleOpMecanum extends OpMode {
     //True if the back wheels are mecanum, false if they're tank
     private final boolean useBackMecanum = true;
 
+    //Use gyro - true/false
+    private final static boolean useGyro = true;
+
+    //Reverses power input to back left motor
+    public static final boolean team12788 = false;
+
     //Declare OpMode members.
     private MecanumDrive drive;
 
-    private UltrasonicI2cRangeSensor sensor;
+    //private UltrasonicI2cRangeSensor sensor;
     private ArrayList<Integer> rangeData;
 
     @Override
     public void init() {
-        try {
+        /*try {
             sensor = hardwareMap.get(UltrasonicI2cRangeSensor.class, "MB1242-0");
         }catch (Exception x){
             telemetry.addLine("it broke");
         }
-            sensor.startRanging();
-
-            drive = new MecanumDrive(hardwareMap, telemetry, true);
+        sensor.startRanging();
+        */
+        drive = new MecanumDrive(hardwareMap, telemetry, true, useGyro);
         telemetry.update();
     }
     
     @Override
     public void loop() {
 
-        rangeData = sensor.getRange();
-        telemetry.addData("range", rangeData.get(2));
+        //rangeData = sensor.getRange();
+        //telemetry.addData("range", rangeData.get(2));
 
         if (gamepad1.a && !aPushed) {
             drive.toggleVerbose();
         }
         aPushed = gamepad1.a;
         drive.drive(false, gamepad1, gamepad2, Drive.FULL_SPEED);
-        drive.useGyro();
+        if (useGyro) {
+            drive.useGyro();
+        }
         telemetry.update();
 
     }

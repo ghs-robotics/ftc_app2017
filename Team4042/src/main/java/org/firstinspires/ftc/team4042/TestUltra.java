@@ -29,14 +29,9 @@
 
 package org.firstinspires.ftc.team4042;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.AnalogInput;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-import java.util.Arrays;
+import com.qualcomm.robotcore.hardware.I2cDevice;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -52,39 +47,27 @@ import java.util.Arrays;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Analog Sensor", group="Iterative Opmode")
-public class AnalogSensorTest extends OpMode {
+@Autonomous(name="TestUltra", group="Iterative Opmode")
+public class TestUltra extends OpMode
+{
 
-    AnalogSensor ultrasonic;
+    Ultrasonic12c ultraSensor;
+    I2cDevice ultra;
 
     @Override
     public void init() {
-        ultrasonic = new AnalogSensor(hardwareMap);
-        ultrasonic.initialize();
+        ultra = hardwareMap.i2cDevice.get("ultra");
+        ultraSensor = new Ultrasonic12c(ultra);
     }
-
-    /*@Override
-    public void loop() {
-        if (val[9] != 0) {
-            double sum = 0;
-            for (double i : val)
-                sum += i;
-            telemetry.addData("Inches", sum / 10);
-        } else {
-            val[num] = ultrasonic.getVoltage() * 42.8125;
-            num++;
-        }
-    }*/
 
     @Override
     public void loop() {
-        telemetry.addData("inches", ultrasonic.getInchesRept());
-        telemetry.addData("inches2", ultrasonic.getInchesAvg());
-        telemetry.update();
+        telemetry.addData("value", ultraSensor.read());
+    }
+
+    @Override
+    public void stop() {
+        ultraSensor.close();
     }
 
 }
-
-
-
-

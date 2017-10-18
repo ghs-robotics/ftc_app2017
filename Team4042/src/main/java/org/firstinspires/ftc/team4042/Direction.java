@@ -9,7 +9,7 @@ public class Direction {
     private double x;
     private double y;
 
-    public enum Rotation {Clockwise, Counterclockwise};
+    public enum Rotation {Clockwise, Counterclockwise}
 
     public Direction() {}
 
@@ -43,5 +43,11 @@ public class Direction {
     @Override
     public String toString() {
         return "(" + x + ", " + y + ")";
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        Direction o = (Direction)other;
+        return x == o.getX() && y == o.getY();
     }
 }

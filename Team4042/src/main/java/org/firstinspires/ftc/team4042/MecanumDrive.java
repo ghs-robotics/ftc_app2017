@@ -26,8 +26,8 @@ public class MecanumDrive extends Drive {
         super(hardwareMap, tel);
     }
 
-    public MecanumDrive(HardwareMap hardwareMap, Telemetry tel, boolean verbose) {
-        super(hardwareMap, tel, verbose);
+    public MecanumDrive(HardwareMap hardwareMap, Telemetry tel, boolean verbose, boolean useGyro) {
+        super(hardwareMap, tel, verbose, useGyro);
     }
 
     /**
@@ -37,11 +37,11 @@ public class MecanumDrive extends Drive {
     public void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor) {
         super.setEncoders(useEncoders);
 
-        double x = -gamepad1.left_stick_x;
+        double x = gamepad1.left_stick_x;
         double y = -gamepad1.left_stick_y; //Y is the opposite direction of what's intuitive: forward is -1, backwards is 1
         double r = gamepad1.right_stick_x;
 
-        driveXYR(speedFactor, x, y, r, true);
+        driveXYR(speedFactor, x, y, r, useGyro);
     }
 
     /**
@@ -55,7 +55,7 @@ public class MecanumDrive extends Drive {
         double[] speedWheel = new double[4];
 
         //Deadzone for joysticks
-        x = -super.deadZone(x);
+        x = super.deadZone(x);
         y = super.deadZone(y);
         r = super.deadZone(r);
 
@@ -79,13 +79,55 @@ public class MecanumDrive extends Drive {
         double yPrime = -x * Math.sin(gyroRadians) + y * Math.cos(gyroRadians);
 
         //Sets relative wheel speeds for mecanum drive based on controller inputs
-        speedWheel[0] = xPrime + yPrime + r;
-        speedWheel[1] = -xPrime + yPrime - r;
-        speedWheel[2] = xPrime + yPrime - r;
-        speedWheel[3] = -xPrime + yPrime + r;
+        if (TeleOpMecanum.team12788) { speedWheel[0] = -(xPrime + yPrime + r); }
+        else { speedWheel[0] = xPrime + yPrime + r; }
+
+        if (TeleOpMecanum.team12788) { speedWheel[1] = -(xPrime + yPrime - r); }
+        else { speedWheel[1] = -xPrime + yPrime - r; }
+
+        if (TeleOpMecanum.team12788) { speedWheel[2] = -(-xPrime + yPrime - r); }
+        else { speedWheel[2] = xPrime + yPrime - r; }
+
+        if (TeleOpMecanum.team12788) { speedWheel[3] = -(-xPrime + yPrime + r); }
+        else { speedWheel[3] = -xPrime + yPrime + r; }
 
         //sets the wheel powers to the appropriate ratios
         super.setMotorPower(speedWheel, speedFactor);
+    }
+
+    /**
+     * Moves at a direction until the AnalogSensor returns the desired input
+     * @param direction The direction to move in
+     * @param speed The speed to move at
+     * @param targetDistance The distance to end up at
+     * @param ir The AnalogSensor with which to get the distance
+     * @return Whether you've reached the target point
+     */
+    public boolean driveWithSensor(Direction direction, double speed, double targetDistance, AnalogSensor ir) {
+        //Ping 10 times and average the results
+        /*double sum = 0;
+        for (int i = 0; i < 10; i++) { sum += ir.getInchesAvg(); }
+        double currDistance = sum / 10;*/
+
+        double currDistance = ir.getInchesAvg();
+
+        double r = useGyro();
+
+        telemetry.addData("currDistance", currDistance);
+        telemetry.addData("Reached target", Math.abs(targetDistance - currDistance) > 0.5);
+        telemetry.addData("x", direction.getX());
+        telemetry.addData("y", direction.getY());
+        telemetry.addData("r", r);
+
+        if (((direction.getY() >= 0) && (currDistance - 3 < targetDistance)) || //driving forwards and reached distance (0.5 inch tolerance)
+                ((direction.getY() < 0) && (currDistance + 3 > targetDistance))) { //driving backwards and reached distance (0.5 inch tolerance)
+            stopMotors();
+            return true;
+        }
+        else { //haven't reached point yet
+            driveXYR(speed, direction.getX(), direction.getY(), r, false);
+            return false;
+        }
     }
 
     /**
@@ -133,10 +175,8 @@ public class MecanumDrive extends Drive {
      */
     public boolean driveWithEncoders(Direction direction, double speed, double targetTicks) throws IllegalArgumentException{
         //telemetry data
-        telemetry.addData("Left Back", motorLeftBack.getCurrentPosition());
-        telemetry.addData("Left Front", motorLeftFront.getCurrentPosition());
-        telemetry.addData("Right Back", motorRightBack.getCurrentPosition());
-        telemetry.addData("Right Front", motorRightFront.getCurrentPosition());
+        telemetry.addData("x", direction.getX());
+        telemetry.addData("y", direction.getY());
 
         double scaledSpeed = setUpSpeed(speed, targetTicks);
         if (scaledSpeed == Math.PI) { //The target's been reached
