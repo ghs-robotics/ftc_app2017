@@ -11,9 +11,7 @@ public class Direction {
 
     public enum Rotation {Clockwise, Counterclockwise}
 
-    public Direction() {
-
-    }
+    public Direction() {}
 
     public static Direction Forward = new Direction(0, 1);
     public static Direction Backward = new Direction(0, -1);
@@ -24,6 +22,7 @@ public class Direction {
         this.x = x;
         this.y = y;
     }
+
 
     public double getX() {
         return x;
