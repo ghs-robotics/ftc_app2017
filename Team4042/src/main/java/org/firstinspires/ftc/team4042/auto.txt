@@ -1,0 +1,6 @@
+#help: type x y speed time/distance
+#type: d - dead-reckoning drive
+#type: r - gyro rotation (x = -1 for counter-clockwise; 1 for clockwise) until distance
+#type: s - sensor drive until ir returns distance
+#ex:   d 1 .2 .5 1000 will drive right and slightly forward at half speed for 1000 encoder ticks
+d 1 .2 .5 1000
