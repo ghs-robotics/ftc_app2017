@@ -45,4 +45,10 @@ public class Direction {
     public String toString() {
         return "(" + x + ", " + y + ")";
     }
+
+    @Override
+    public boolean equals(Object other) {
+        Direction o = (Direction)other;
+        return x == o.getX() && y == o.getY();
+    }
 }

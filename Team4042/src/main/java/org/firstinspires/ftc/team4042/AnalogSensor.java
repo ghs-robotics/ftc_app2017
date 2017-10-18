@@ -5,8 +5,6 @@ import android.util.SparseIntArray;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import java.util.HashMap;
-
 /**
  * Created by Hazel on 10/13/2017.
  */

@@ -59,6 +59,7 @@ public class AnalogSensorTest extends OpMode {
 
     @Override
     public void init() {
+        ultrasonic = new AnalogSensor(hardwareMap);
         ultrasonic.initialize();
     }
 
@@ -78,6 +79,7 @@ public class AnalogSensorTest extends OpMode {
     @Override
     public void loop() {
         telemetry.addData("inches", ultrasonic.getInchesRept());
+        telemetry.addData("inches2", ultrasonic.getInchesAvg());
         telemetry.update();
     }
 
