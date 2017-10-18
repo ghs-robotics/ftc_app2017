@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 public class RedTopAuto extends LinearOpMode {
 
     MecanumDrive drive;
+    Auto auto;
 
     @Override
     public void runOpMode() {
@@ -16,9 +17,8 @@ public class RedTopAuto extends LinearOpMode {
         waitForStart();
 
         //TODO: TEST THIS
-        drive.resetEncoders();
-        drive.setEncoders(true);
-        autoDrive(new Direction(1, .5), Drive.FULL_SPEED, 1000);
+        auto = new Auto(hardwareMap, telemetry, "auto.txt");
+        auto.runOpMode();
 
         //autoSensorMove(Direction.Forward, Drive.FULL_SPEED / 4, 7, drive.ir);
 
