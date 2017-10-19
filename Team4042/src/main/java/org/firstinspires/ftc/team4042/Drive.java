@@ -19,6 +19,7 @@ public abstract class Drive {
     public static final double FULL_SPEED = 1;
     //The power to put to the motors to stop them
     public static final double STOP_SPEED = 0;
+    //adjusted power for power levels
 
     /***instance variables**/
     DcMotor motorLeftFront;
