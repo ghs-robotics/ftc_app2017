@@ -4,3 +4,8 @@ void displayImage(PImage img, int getX, int getY, int zoom) {
   rect(0,0,width-1,height-1);
   image(temp, 0, 0);
 }
+
+int intClamp(int val, int min, int max) {
+  return Math.max(min, Math.min(max, val));
+}
+//int mouseToImgSpace(
