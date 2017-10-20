@@ -11,7 +11,7 @@ int distToBallY(float d) {
 int distToBallXOffset(float d) {
   return (int) (FUNCTION_D_A / (d - FUNCTION_D_B) + FUNCTION_D_C);
 }
-boolean isRedOnLeft(PImage img, float tc, float d, int sr) {
+boolean isRedOnLeft(PImage img, float tc /* tape center */, float d /* distance from wall */, int sr /* search radius*/) {
   boolean result;
   float lrsum = 0;
   float lbsum = 0;
