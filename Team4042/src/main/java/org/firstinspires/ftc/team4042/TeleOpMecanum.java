@@ -2,30 +2,13 @@ package org.firstinspires.ftc.team4042;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.HardwareDevice;
-import com.qualcomm.robotcore.hardware.I2cDevice;
-import com.qualcomm.robotcore.hardware.I2cDeviceImpl;
-import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
 
-import java.io.FileWriter;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 
 @TeleOp(name = "Mecanum", group = "Iterative Opmode")
 public class TeleOpMecanum extends OpMode {
 
     private boolean aPushed = false;
-
-    //True if the back wheels are mecanum, false if they're tank
-    private final boolean useBackMecanum = true;
-
-    //Use gyro - true/false
-    private final static boolean useGyro = true;
-
-    //Reverses power input to back left motor
-    public static final boolean team12788 = false;
 
     private double adjustedSpeed;
 
@@ -44,7 +27,7 @@ public class TeleOpMecanum extends OpMode {
         }
         sensor.startRanging();
         */
-        drive = new MecanumDrive(hardwareMap, telemetry, true, useGyro);
+        drive = new MecanumDrive(hardwareMap, telemetry, true);
         telemetry.update();
 
         adjustedSpeed = drive.FULL_SPEED;
@@ -61,7 +44,7 @@ public class TeleOpMecanum extends OpMode {
         }
         aPushed = gamepad1.a;
         drive.drive(false, gamepad1, gamepad2, adjustedSpeed);
-        if (useGyro) {
+        if (Drive.useGyro) {
             drive.useGyro();
         }
         telemetry.update();

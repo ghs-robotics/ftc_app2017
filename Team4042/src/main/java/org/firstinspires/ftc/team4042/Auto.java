@@ -107,7 +107,8 @@ public class Auto {
      * Runs the list of instructions
      */
     public void runOpMode() {
-        drive = new MecanumDrive(hardwareMap, telemetry, false, true);
+        drive = new MecanumDrive(hardwareMap, telemetry, false);
+        drive.setUseGyro(true);
         telemetry.update();
 
         //TODO: TEST THIS

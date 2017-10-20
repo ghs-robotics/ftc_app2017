@@ -14,7 +14,8 @@ public class RedTopAuto extends LinearOpMode {
     @Override
     public void runOpMode() {
         Telemetry.Log log = telemetry.log();
-        drive = new MecanumDrive(hardwareMap, telemetry, false, true);
+        drive = new MecanumDrive(hardwareMap, telemetry, false);
+        drive.setUseGyro(true);
         auto = new Auto(hardwareMap, drive, telemetry, "auto.txt");
         waitForStart();
 

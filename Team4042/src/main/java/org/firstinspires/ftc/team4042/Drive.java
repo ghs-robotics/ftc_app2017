@@ -19,6 +19,15 @@ public abstract class Drive {
     public static final double FULL_SPEED = 1;
     //The power to put to the motors to stop them
     public static final double STOP_SPEED = 0;
+
+    //Use gyro - true/false
+    public static boolean useGyro = true;
+    //Reverses power input to back left motor
+    public static final boolean team12788 = false;
+
+    //Set to false to just get outputs as telemetry
+    public static final boolean useMotors = false;
+
     //adjusted power for power levels
 
     /***instance variables**/
@@ -29,7 +38,6 @@ public abstract class Drive {
 
     Telemetry telemetry;
 
-    boolean useGyro;
     RevGyro gyro;
 
     AnalogSensor ir;
@@ -78,49 +86,82 @@ public abstract class Drive {
         verbose = false;
     }
 
-    public Drive(HardwareMap hardwareMap, Telemetry tel, boolean verbose, boolean useGyro) {
+    public Drive(HardwareMap hardwareMap, Telemetry tel, boolean verbose) {
         this(hardwareMap, tel);
         this.verbose = verbose;
-        this.useGyro = useGyro;
         if (useGyro) {
             gyro = new RevGyro(hardwareMap, tel);
         }
+    }
+
+    public void setUseGyro(boolean useGyro) {
+        Drive.useGyro = useGyro;
     }
 
     /**
      * sets all the motors to run using the PID algorithms and encoders
      */
     public void runWithEncoders(){
-        if (verbose) { telemetry.addData("Encoders", "true"); }
+        if (verbose || !useMotors) { telemetry.addData("Encoders", "true"); }
 
-        if (motorLeftBack != null) { motorLeftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER); }
-        if (motorLeftFront != null) { motorLeftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER); }
-        if (motorRightBack != null) { motorRightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER); }
-        if (motorRightFront != null) { motorRightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER); }
+        if (useMotors) {
+            if (motorLeftBack != null) {
+                motorLeftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+            if (motorLeftFront != null) {
+                motorLeftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+            if (motorRightBack != null) {
+                motorRightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+            if (motorRightFront != null) {
+                motorRightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+        }
     }
 
     /**
      * sets all the motors to run NOT using the PID algorithms and encoders
      */
     public void runWithoutEncoders(){
-        if (verbose) { telemetry.addData("Encoders", "false"); }
+        if (verbose || !useMotors) { telemetry.addData("Encoders", "false"); }
 
-        if (motorLeftBack != null) { motorLeftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); }
-        if (motorLeftFront != null) { motorLeftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); }
-        if (motorRightBack != null) { motorRightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); }
-        if (motorRightFront != null) { motorRightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); }
+        if (useMotors) {
+            if (motorLeftBack != null) {
+                motorLeftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            }
+            if (motorLeftFront != null) {
+                motorLeftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            }
+            if (motorRightBack != null) {
+                motorRightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            }
+            if (motorRightFront != null) {
+                motorRightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            }
+        }
     }
 
     /**
      * resents the encoder counts of all motors
      */
     public void resetEncoders() {
-        if (verbose) { telemetry.addData("Encoders", "reset"); }
+        if (verbose || !useMotors) { telemetry.addData("Encoders", "reset"); }
 
-        if (motorLeftBack != null) { motorLeftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); }
-        if (motorLeftFront != null) { motorLeftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); }
-        if (motorRightBack != null) { motorRightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); }
-        if (motorRightFront != null) { motorRightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); }
+        if (useMotors) {
+            if (motorLeftBack != null) {
+                motorLeftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            }
+            if (motorLeftFront != null) {
+                motorLeftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            }
+            if (motorRightBack != null) {
+                motorRightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            }
+            if (motorRightFront != null) {
+                motorRightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            }
+        }
     }
 
     /**
@@ -162,13 +203,23 @@ public abstract class Drive {
             if(speedWheel[i] < -1) { speedWheel[i] = -1; }
         }
 
-        //Sets the power
-        if (motorLeftFront != null) { motorLeftFront.setPower(speedWheel[0]); }
-        if (motorRightFront != null) { motorRightFront.setPower(-speedWheel[1]); } //The right motors are mounted "upside down", which is why we have to inverse this
-        if (motorRightBack != null) { motorRightBack.setPower(-speedWheel[2]); }
-        if (motorLeftBack != null) { motorLeftBack.setPower(speedWheel[3]); }
+        if (useMotors) {
+            //Sets the power
+            if (motorLeftFront != null) {
+                motorLeftFront.setPower(speedWheel[0]);
+            }
+            if (motorRightFront != null) {
+                motorRightFront.setPower(-speedWheel[1]);
+            } //The right motors are mounted "upside down", which is why we have to inverse this
+            if (motorRightBack != null) {
+                motorRightBack.setPower(-speedWheel[2]);
+            }
+            if (motorLeftBack != null) {
+                motorLeftBack.setPower(speedWheel[3]);
+            }
+        }
 
-        if (verbose) {
+        if (verbose || !useMotors) {
             //Prints power
             telemetry.addData("Left Front", speedWheel[0]);
             telemetry.addData("Right Front", -speedWheel[1]);

@@ -26,8 +26,8 @@ public class MecanumDrive extends Drive {
         super(hardwareMap, tel);
     }
 
-    public MecanumDrive(HardwareMap hardwareMap, Telemetry tel, boolean verbose, boolean useGyro) {
-        super(hardwareMap, tel, verbose, useGyro);
+    public MecanumDrive(HardwareMap hardwareMap, Telemetry tel, boolean verbose) {
+        super(hardwareMap, tel, verbose);
     }
 
     /**
@@ -79,16 +79,16 @@ public class MecanumDrive extends Drive {
         double yPrime = -x * Math.sin(gyroRadians) + y * Math.cos(gyroRadians);
 
         //Sets relative wheel speeds for mecanum drive based on controller inputs
-        if (TeleOpMecanum.team12788) { speedWheel[0] = -(xPrime + yPrime + r); }
+        if (Drive.team12788) { speedWheel[0] = -(xPrime + yPrime + r); }
         else { speedWheel[0] = xPrime + yPrime + r; }
 
-        if (TeleOpMecanum.team12788) { speedWheel[1] = -(xPrime + yPrime - r); }
+        if (Drive.team12788) { speedWheel[1] = -(xPrime + yPrime - r); }
         else { speedWheel[1] = -xPrime + yPrime - r; }
 
-        if (TeleOpMecanum.team12788) { speedWheel[2] = -(-xPrime + yPrime - r); }
+        if (Drive.team12788) { speedWheel[2] = -(-xPrime + yPrime - r); }
         else { speedWheel[2] = xPrime + yPrime - r; }
 
-        if (TeleOpMecanum.team12788) { speedWheel[3] = -(-xPrime + yPrime + r); }
+        if (Drive.team12788) { speedWheel[3] = -(-xPrime + yPrime + r); }
         else { speedWheel[3] = -xPrime + yPrime + r; }
 
         //sets the wheel powers to the appropriate ratios
