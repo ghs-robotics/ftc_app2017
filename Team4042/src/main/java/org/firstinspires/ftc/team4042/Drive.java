@@ -65,6 +65,8 @@ public abstract class Drive {
             telemetry.addData("Back Left", "Could not find.");
         }
 
+        telemetry.update();
+
         if (useGyro) {
             gyro = new RevGyro(hardwareMap, tel);
         }

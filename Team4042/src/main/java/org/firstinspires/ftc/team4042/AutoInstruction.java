@@ -1,46 +1,41 @@
 package org.firstinspires.ftc.team4042;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 /**
  * Created by Hazel on 10/18/2017.
  */
 
 public class AutoInstruction {
-    private Direction direction;
-    private double speed;
-    private double time;
-    private char type;
+
+    String functionName;
+    private HashMap<String, String> parameters;
 
     public AutoInstruction() {
-
+        functionName = "";
+        parameters = new HashMap<>();
     }
 
-    public AutoInstruction(double x, double y, double speed, double time, char type) {
-        this.direction = new Direction(x, y);
-        this.speed = speed;
-        this.time = time;
-        this.type = type;
+    public AutoInstruction(String functionName, HashMap<String, String> parameters) {
+        this.functionName = functionName;
+        this.parameters = parameters;
     }
 
-    public AutoInstruction(String x, String y, String speed, String time, String type) {
-        this.direction = new Direction(Integer.parseInt(x), Integer.parseInt(y));
-        this.speed = Integer.parseInt(speed) * Drive.FULL_SPEED;
-        this.time = Integer.parseInt(time);
-        this.type = type.charAt(0);
+    public String getFunctionName() {
+        return functionName;
     }
 
-    public Direction getDirection() {
-        return direction;
+    public HashMap<String, String> getParameters() {
+        return parameters;
     }
 
-    public double getSpeed() {
-        return speed;
-    }
-
-    public double getTime() {
-        return time;
-    }
-
-    public char getType() {
-        return type;
+    @Override
+    public String toString() {
+        String toReturn = functionName + " ";
+        for (String parameter : parameters.keySet()) {
+            toReturn += parameter + ":" + parameters.get(parameter) + " ";
+        }
+        return toReturn;
     }
 }

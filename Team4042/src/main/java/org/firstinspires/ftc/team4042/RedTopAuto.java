@@ -3,6 +3,8 @@ package org.firstinspires.ftc.team4042;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 @Autonomous(name="RedTopAuto", group="K9bot")
 public class RedTopAuto extends LinearOpMode {
 
@@ -11,13 +13,12 @@ public class RedTopAuto extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        Telemetry.Log log = telemetry.log();
         drive = new MecanumDrive(hardwareMap, telemetry, false, true);
-        telemetry.update();
-
+        auto = new Auto(hardwareMap, drive, telemetry, "auto.txt");
         waitForStart();
 
         //TODO: TEST THIS
-        auto = new Auto(hardwareMap, telemetry, "auto.txt");
         auto.runOpMode();
 
         //autoSensorMove(Direction.Forward, Drive.FULL_SPEED / 4, 7, drive.ir);
@@ -35,35 +36,5 @@ public class RedTopAuto extends LinearOpMode {
         //move right until we see -^-^-| from ultrasonic
         //place block
         //detach and extend robot towards glyph
-    }
-
-    /**
-     * Drives in the given Direction at the given speed until targetTicks is reached
-     * @param direction The direction to head in
-     * @param speed The speed to move at
-     * @param targetTicks The final distance to have travelled, in encoder ticks
-     */
-    private void autoDrive(Direction direction, double speed, double targetTicks) {
-        boolean done = false;
-        while (opModeIsActive() && !done) {
-            done = drive.driveWithEncoders(direction, speed, targetTicks);
-            telemetry.update();
-        }
-    }
-
-    private void autoRotate(Direction.Rotation rotation, double speed, double targetTicks) {
-        boolean done = false;
-        while (opModeIsActive() && !done) {
-            done = drive.rotateWithEncoders(rotation, speed, targetTicks);
-            telemetry.update();
-        }
-    }
-
-    private void autoSensorMove(Direction direction, double speed, double targetDistance, AnalogSensor ir) {
-        boolean done = false;
-        while (opModeIsActive() && !done) {
-            done = drive.driveWithSensor(direction, speed, targetDistance, ir);
-            telemetry.update();
-        }
     }
 }
