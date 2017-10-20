@@ -50,28 +50,30 @@ public abstract class Drive {
     public Drive(HardwareMap hardwareMap, Telemetry tel) {
         this.telemetry = tel;
 
-        try {
-            motorLeftFront = hardwareMap.dcMotor.get("front left");
-        } catch (IllegalArgumentException ex) {
-            telemetry.addData("Front Left", "Could not find.");
-        }
+        if (useMotors) {
+            try {
+                motorLeftFront = hardwareMap.dcMotor.get("front left");
+            } catch (IllegalArgumentException ex) {
+                telemetry.addData("Front Left", "Could not find.");
+            }
 
-        try {
-            motorRightFront = hardwareMap.dcMotor.get("front right");
-        } catch (IllegalArgumentException ex) {
-            telemetry.addData("Front Right", "Could not find.");
-        }
+            try {
+                motorRightFront = hardwareMap.dcMotor.get("front right");
+            } catch (IllegalArgumentException ex) {
+                telemetry.addData("Front Right", "Could not find.");
+            }
 
-        try {
-            motorRightBack = hardwareMap.dcMotor.get("back right");
-        } catch (IllegalArgumentException ex) {
-            telemetry.addData("Back Right", "Could not find.");
-        }
+            try {
+                motorRightBack = hardwareMap.dcMotor.get("back right");
+            } catch (IllegalArgumentException ex) {
+                telemetry.addData("Back Right", "Could not find.");
+            }
 
-        try {
-            motorLeftBack = hardwareMap.dcMotor.get("back left");
-        } catch (IllegalArgumentException ex) {
-            telemetry.addData("Back Left", "Could not find.");
+            try {
+                motorLeftBack = hardwareMap.dcMotor.get("back left");
+            } catch (IllegalArgumentException ex) {
+                telemetry.addData("Back Left", "Could not find.");
+            }
         }
 
         telemetry.update();
