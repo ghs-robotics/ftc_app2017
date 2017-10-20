@@ -21,6 +21,14 @@ public class TeleOpMecanum extends OpMode {
     //True if the back wheels are mecanum, false if they're tank
     private final boolean useBackMecanum = true;
 
+    //Use gyro - true/false
+    private final static boolean useGyro = true;
+
+    //Reverses power input to back left motor
+    public static final boolean team12788 = false;
+
+    private double adjustedSpeed;
+
     //Declare OpMode members.
     private MecanumDrive drive;
 
@@ -36,8 +44,10 @@ public class TeleOpMecanum extends OpMode {
         }
         sensor.startRanging();
         */
-        drive = new MecanumDrive(hardwareMap, telemetry, true);
+        drive = new MecanumDrive(hardwareMap, telemetry, true, useGyro);
         telemetry.update();
+
+        adjustedSpeed = drive.FULL_SPEED;
     }
     
     @Override
@@ -50,10 +60,21 @@ public class TeleOpMecanum extends OpMode {
             drive.toggleVerbose();
         }
         aPushed = gamepad1.a;
-        drive.drive(false, gamepad1, gamepad2, Drive.FULL_SPEED);
-        drive.useGyro();
+        drive.drive(false, gamepad1, gamepad2, adjustedSpeed);
+        if (useGyro) {
+            drive.useGyro();
+        }
         telemetry.update();
 
+        if (gamepad1.left_bumper && adjustedSpeed >= drive.FULL_SPEED)
+        {
+            adjustedSpeed *= 0.5;
+        }
+
+        if (gamepad1.right_bumper && adjustedSpeed <= drive.FULL_SPEED)
+        {
+            adjustedSpeed *= 2;
+        }
     }
 
     /* CODE FROM HERE DOWN IS AN ATTEMPT TO IMPLEMENT DYLAN'S DRIVE ALGORITHM

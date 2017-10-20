@@ -55,28 +55,32 @@ import java.util.Arrays;
 @TeleOp(name="Analog Sensor", group="Iterative Opmode")
 public class AnalogSensorTest extends OpMode {
 
-    AnalogInput ultrasonic;
-    double[] val = {0,0,0,0,0,0,0,0,0,0};
-
-    int num = 0;
+    AnalogSensor ultrasonic;
 
     @Override
     public void init() {
-        ultrasonic = hardwareMap.analogInput.get("ultrasonic");
+        ultrasonic = new AnalogSensor(hardwareMap);
+        ultrasonic.initialize();
     }
-    @Override
+
+    /*@Override
     public void loop() {
         if (val[9] != 0) {
             double sum = 0;
             for (double i : val)
                 sum += i;
-            telemetry.addData("Inches:", sum / 10);
+            telemetry.addData("Inches", sum / 10);
         } else {
             val[num] = ultrasonic.getVoltage() * 42.8125;
             num++;
         }
+    }*/
 
-
+    @Override
+    public void loop() {
+        telemetry.addData("inches", ultrasonic.getInchesRept());
+        telemetry.addData("inches2", ultrasonic.getInchesAvg());
+        telemetry.update();
     }
 
 }

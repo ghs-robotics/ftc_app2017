@@ -19,6 +19,7 @@ public abstract class Drive {
     public static final double FULL_SPEED = 1;
     //The power to put to the motors to stop them
     public static final double STOP_SPEED = 0;
+    //adjusted power for power levels
 
     /***instance variables**/
     DcMotor motorLeftFront;
@@ -28,7 +29,10 @@ public abstract class Drive {
 
     Telemetry telemetry;
 
+    boolean useGyro;
     RevGyro gyro;
+
+    AnalogSensor ir;
 
     boolean verbose;
 
@@ -62,15 +66,23 @@ public abstract class Drive {
             telemetry.addData("Back Left", "Could not find.");
         }
 
-        gyro = new RevGyro(hardwareMap, tel);
+        if (useGyro) {
+            gyro = new RevGyro(hardwareMap, tel);
+        }
+
+        ir = new AnalogSensor(hardwareMap);
+        ir.initialize();
 
         verbose = false;
     }
 
-    public Drive(HardwareMap hardwareMap, Telemetry tel, boolean verbose) {
+    public Drive(HardwareMap hardwareMap, Telemetry tel, boolean verbose, boolean useGyro) {
         this(hardwareMap, tel);
         this.verbose = verbose;
-        gyro = new RevGyro(hardwareMap, tel);
+        this.useGyro = useGyro;
+        if (useGyro) {
+            gyro = new RevGyro(hardwareMap, tel);
+        }
     }
 
     /**

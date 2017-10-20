@@ -20,8 +20,8 @@ public class MotorTestDrive extends Drive{
         super(hardwareMap, tel);
     }
 
-    public MotorTestDrive(HardwareMap hardwareMap, Telemetry tel, boolean verbose) {
-        super(hardwareMap, tel, verbose);
+    public MotorTestDrive(HardwareMap hardwareMap, Telemetry tel, boolean verbose, boolean useGyro) {
+        super(hardwareMap, tel, verbose, useGyro);
     }
 
     /**

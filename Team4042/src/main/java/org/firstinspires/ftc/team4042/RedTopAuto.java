@@ -3,20 +3,25 @@ package org.firstinspires.ftc.team4042;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name="EncoderTest", group="K9bot")
-public class AutoEncoderTest extends LinearOpMode {
+@Autonomous(name="RedTopAuto", group="K9bot")
+public class RedTopAuto extends LinearOpMode {
 
     MecanumDrive drive;
+    Auto auto;
 
     @Override
     public void runOpMode() {
-        drive = new MecanumDrive(hardwareMap, telemetry, true, true);
+        drive = new MecanumDrive(hardwareMap, telemetry, false, true);
+        telemetry.update();
 
         waitForStart();
 
         //TODO: TEST THIS
-        drive.setEncoders(true);
-        autoDrive(Direction.Forward, Drive.FULL_SPEED, 1000000);
+        auto = new Auto(hardwareMap, telemetry, "auto.txt");
+        auto.runOpMode();
+
+        //autoSensorMove(Direction.Forward, Drive.FULL_SPEED / 4, 7, drive.ir);
+
         //check sensor sums
         //robot starts facing right
         //scan vision patter
@@ -42,6 +47,22 @@ public class AutoEncoderTest extends LinearOpMode {
         boolean done = false;
         while (opModeIsActive() && !done) {
             done = drive.driveWithEncoders(direction, speed, targetTicks);
+            telemetry.update();
+        }
+    }
+
+    private void autoRotate(Direction.Rotation rotation, double speed, double targetTicks) {
+        boolean done = false;
+        while (opModeIsActive() && !done) {
+            done = drive.rotateWithEncoders(rotation, speed, targetTicks);
+            telemetry.update();
+        }
+    }
+
+    private void autoSensorMove(Direction direction, double speed, double targetDistance, AnalogSensor ir) {
+        boolean done = false;
+        while (opModeIsActive() && !done) {
+            done = drive.driveWithSensor(direction, speed, targetDistance, ir);
             telemetry.update();
         }
     }
