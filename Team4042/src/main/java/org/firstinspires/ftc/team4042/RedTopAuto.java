@@ -14,16 +14,14 @@ public class RedTopAuto extends LinearOpMode {
     @Override
     public void runOpMode() {
         Telemetry.Log log = telemetry.log();
-        drive = new MecanumDrive(hardwareMap, telemetry, false);
+        drive = new MecanumDrive(hardwareMap, telemetry, true);
         drive.setUseGyro(true);
         auto = new Auto(hardwareMap, drive, telemetry, "auto.txt");
         waitForStart();
 
         //TODO: TEST THIS
         auto.runOpMode();
-
-        //autoSensorMove(Direction.Forward, Drive.FULL_SPEED / 4, 7, drive.ir);
-
+        
         //check sensor sums
         //robot starts facing right
         //scan vision patter

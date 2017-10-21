@@ -26,7 +26,7 @@ public abstract class Drive {
     public static final boolean team12788 = false;
 
     //Set to false to just get outputs as telemetry
-    public static final boolean useMotors = false;
+    public static final boolean useMotors = true;
 
     //adjusted power for power levels
 
@@ -83,7 +83,7 @@ public abstract class Drive {
         }
 
         ir = new AnalogSensor(hardwareMap);
-        ir.initialize();
+        //ir.initialize();
 
         verbose = false;
     }
