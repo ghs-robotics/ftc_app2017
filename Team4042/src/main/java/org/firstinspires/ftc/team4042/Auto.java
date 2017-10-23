@@ -32,7 +32,7 @@ public class Auto {
         this.telemetry = telemetry;
         log = telemetry.log();
 
-        log.add("Loading file");
+        log.add("Reading file " + filePath);
         file = new File("./storage/emulated/0/DCIM/" + filePath);
 
         loadFile();
@@ -58,17 +58,15 @@ public class Auto {
 
                     //x:3 --> k = x, v = 3
                     String[] inputParameters = line.split(" ");
-                    log.add("Parsing " + inputParameters.length + " parameters");
-                    telemetry.update();
                     for (String parameter : inputParameters) {
                         int colon = parameter.indexOf(':');
                         String k = parameter.substring(0, colon);
                         String v = parameter.substring(colon + 1);
                         parameters.put(k, v); //Gets the next parameter and adds it to the list
+                        log.add("Parameter: " + k + ":" + v);
+                        telemetry.update();
                     }
 
-                    log.add("Getting function");
-                    telemetry.update();
                     String functionName = "";
                     switch (parameters.get("function")) {
                         case "d":
@@ -80,12 +78,13 @@ public class Auto {
                         case "s":
                             functionName = "autoSensorMove";
                             break;
+                        case "v":
+                            functionName = "knockJewel";
                         default:
                             System.err.println("Unknown function called from file " + file);
                             break;
                     }
                     //Stores those values as an instruction
-                    log.add("Adding instruction");
                     AutoInstruction instruction = new AutoInstruction(functionName, parameters);
                     instructions.add(instruction);
 
@@ -120,11 +119,12 @@ public class Auto {
             String functionName = instruction.getFunctionName();
             HashMap<String, String> parameters = instruction.getParameters();
             try {
+                log.add("Invoking function " + functionName);
+                telemetry.update();
+
                 //Calls the function "functionName" with parameters "parameters"
                 Method m = Auto.class.getMethod(functionName, parameters.getClass());
                 m.invoke(functionName, parameters);
-                telemetry.addData("Invoking function", functionName);
-                telemetry.update();
             } catch (NoSuchMethodException ex) {
                 telemetry.addData("error", "could not find function " + functionName);
             } catch (Exception ex) {
@@ -150,6 +150,11 @@ public class Auto {
         //move right until we see -^-^-| from ultrasonic
         //place block
         //detach and extend robot towards glyph
+    }
+
+    public void knockJewel(HashMap<String, String> parameters) {
+        //TODO: READ JEWEL COLOR
+        //TODO: KNOCK OFF CORRECT JEWEL
     }
 
     public void autoDrive(HashMap<String, String> parameters) {

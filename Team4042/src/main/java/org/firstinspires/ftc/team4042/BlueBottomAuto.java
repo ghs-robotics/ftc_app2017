@@ -5,8 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-@Autonomous(name="RedTopAuto", group="K9bot")
-public class RedTopAuto extends LinearOpMode {
+@Autonomous(name="BlueBottomAuto", group="K9bot")
+public class BlueBottomAuto extends LinearOpMode {
 
     MecanumDrive drive;
     Auto auto;
@@ -16,7 +16,7 @@ public class RedTopAuto extends LinearOpMode {
         Telemetry.Log log = telemetry.log();
         drive = new MecanumDrive(hardwareMap, telemetry, true);
         drive.setUseGyro(true);
-        auto = new Auto(hardwareMap, drive, telemetry, "redtop.txt");
+        auto = new Auto(hardwareMap, drive, telemetry, "bluebottom.txt");
         waitForStart();
 
         //TODO: TEST THIS

@@ -30,6 +30,30 @@ public class TeleOpMecanum extends OpMode {
 
     private GlyphPlacementSystem glyph;
 
+    /**
+    GAMEPAD 1:
+      Joystick 1 - movement
+      Joystick 2 - rotation
+      Bumpers - speed modes
+      Triggers -
+      Dpad -
+      A - toggle verbose
+      B -
+      X -
+      Y -
+
+    GAMEPAD 2:
+      Joystick 1 -
+      Joystick 2 -
+      Bumpers - run intakes backwards
+      Triggers - run intakes forwards
+      Dpad - placer
+      A - place glyph
+      B -
+      X -
+      Y -
+     */
+
     @Override
     public void init() {
         /*try {
@@ -43,7 +67,7 @@ public class TeleOpMecanum extends OpMode {
         telemetry.update();
 
         adjustedSpeed = MecanumDrive.FULL_SPEED;
-        glyph = new GlyphPlacementSystem(telemetry);
+        glyph = new GlyphPlacementSystem();
     }
     
     @Override
@@ -89,13 +113,19 @@ public class TeleOpMecanum extends OpMode {
         if (gamepad1.a) { glyph.place(); }
         aA = gamepad1.a;
 
-        double rightTrigger = drive.deadZone(gamepad1.right_trigger);
-        if (rightTrigger > 0) {
-            //TODO: RUN INTAKE FORWARD
+        double bRightTrigger = drive.deadZone(gamepad2.right_trigger);
+        if (bRightTrigger > 0) {
+            //TODO: RUN RIGHT INTAKE FORWARD
         }
-        double leftTrigger = drive.deadZone(gamepad1.left_trigger);
-        if (leftTrigger > 0) {
-            //TODO: RUN INTAKE BACKWARD
+        double bLeftTrigger = drive.deadZone(gamepad2.left_trigger);
+        if (bLeftTrigger > 0) {
+            //TODO: RUN LEFT INTAKE FORWARD
+        }
+        if (gamepad2.right_bumper) {
+            //TODO: RUN RIGHT INTAKE BACKWARD
+        }
+        if (gamepad2.left_bumper) {
+            //TODO: RUN LEFT INTAKE BACKWARD
         }
 
         telemetryUpdate();

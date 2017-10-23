@@ -1,34 +1,29 @@
 package org.firstinspires.ftc.team4042;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 /**
  * Created by Ryan Whiting on 10/17/2017.
  */
 
 public class GlyphPlacementSystem
 {
-    private int x;
-    private int y;
+    private int targetX;
+    private int targetY;
+    private int currentX;
+    private int currentY;
     private String baseOutput;
-    private Telemetry out;
 
-    public GlyphPlacementSystem(Telemetry out)
+    public GlyphPlacementSystem()
     {
-        this.out = out;
-        this.baseOutput = "[_______]\n[_______]\n[_______]\n[_______]";
-        this.x = 0;
-        this.y = 0;
+        this(0, 0);
     }
 
-    public GlyphPlacementSystem(Telemetry out, int x, int y)
+    public GlyphPlacementSystem(int currentX, int currentY)
     {
-        this(out);
-        this.x = x;
-        this.y = y;
+        this.baseOutput = "[_______]\n[_______]\n[_______]\n[_______]";
+        this.targetX = currentX;
+        this.targetY = currentY;
+        this.currentX = currentX;
+        this.currentY = currentY;
     }
 
     //returns the current position of the glyph placement system
@@ -36,7 +31,7 @@ public class GlyphPlacementSystem
     {
         char[] output = baseOutput.toCharArray();
 
-        int position = x + 3 * y;
+        int position = targetX + 3 * targetY;
         switch(position)
         {
             case(0): output[2] = 'X'; break;
@@ -68,34 +63,39 @@ public class GlyphPlacementSystem
     }
 
     public int getPosition() {
-        return x + 3 * y;
+        return targetX + 3 * targetY;
     }
 
     public void up() {
-        if (y != 0) {
-            y -= 1;
+        if (targetY != 0) {
+            targetY -= 1;
         }
     }
 
     public void down() {
-        if (y != 3) {
-            y += 1;
+        if (targetY != 3) {
+            targetY += 1;
         }
     }
 
     public void left() {
-        if (x != 0) {
-            x -= 1;
+        if (targetX != 0) {
+            targetX -= 1;
         }
     }
 
     public void right() {
-        if (x != 2) {
-            x += 1;
+        if (targetX != 2) {
+            targetX += 1;
         }
     }
 
     public void place() {
         //TODO: motor code here
+        /*
+        Assuming motor forward power moves it right and up
+        Move sideways motor (block distance * (targetX - currentX))
+        Move vertical motor (block distance * (targetY - currentY))
+         */
     }
 }
