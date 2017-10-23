@@ -23,6 +23,7 @@ public class AnalogSensor {
     }
 
     public double getVoltageAvg() {
+        if (ultrasonic == null) { return -1; }
         double sum = 0;
         for (int i = 0; i < vals.length; i++) {
             sum += ultrasonic.getVoltage();
@@ -32,6 +33,7 @@ public class AnalogSensor {
     }
 
     public double getVoltageRept() {
+        if (ultrasonic == null) { return -1; }
         SparseIntArray occurrences = new SparseIntArray(); //A list of inches and the number of times they've occurred
         while (true) {
             double voltage = ultrasonic.getVoltage(); //Gets the voltage
@@ -53,6 +55,7 @@ public class AnalogSensor {
      * @return The inch equivalent
      */
     private int getInFromVolt(double voltage) {
+        if (voltage == -1) { return -1; }
         return (int)Math.round(6.48 * Math.pow(voltage, -1.5));
     }
 

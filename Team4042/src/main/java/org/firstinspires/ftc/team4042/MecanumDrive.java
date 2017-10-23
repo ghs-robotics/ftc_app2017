@@ -110,23 +110,26 @@ public class MecanumDrive extends Drive {
         double currDistance = sum / 10;*/
 
         double currDistance = ir.getInchesAvg();
-
-        double r = useGyro();
-
-        telemetry.addData("currDistance", currDistance);
-        telemetry.addData("Reached target", Math.abs(targetDistance - currDistance) > 0.5);
-        telemetry.addData("x", direction.getX());
-        telemetry.addData("y", direction.getY());
-        telemetry.addData("r", r);
-
-        if (((direction.getY() >= 0) && (currDistance - 3 < targetDistance)) || //driving forwards and reached distance (0.5 inch tolerance)
-                ((direction.getY() < 0) && (currDistance + 3 > targetDistance))) { //driving backwards and reached distance (0.5 inch tolerance)
-            stopMotors();
+        if (currDistance == -1) {
+            telemetry.addData("Error", "Couldn't find ultrasonic");
             return true;
-        }
-        else { //haven't reached point yet
-            driveXYR(speed, direction.getX(), direction.getY(), r, false);
-            return false;
+        } else {
+            double r = useGyro();
+
+            telemetry.addData("currDistance", currDistance);
+            telemetry.addData("Reached target", Math.abs(targetDistance - currDistance) > 0.5);
+            telemetry.addData("x", direction.getX());
+            telemetry.addData("y", direction.getY());
+            telemetry.addData("r", r);
+
+            if (((direction.getY() >= 0) && (currDistance - 3 < targetDistance)) || //driving forwards and reached distance (0.5 inch tolerance)
+                    ((direction.getY() < 0) && (currDistance + 3 > targetDistance))) { //driving backwards and reached distance (0.5 inch tolerance)
+                stopMotors();
+                return true;
+            } else { //haven't reached point yet
+                driveXYR(speed, direction.getX(), direction.getY(), r, false);
+                return false;
+            }
         }
     }
 

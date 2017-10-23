@@ -26,7 +26,7 @@ public abstract class Drive {
     public static final boolean team12788 = false;
 
     //Set to false to just get outputs as telemetry
-    public static final boolean useMotors = true;
+    public static boolean useMotors = true;
 
     //adjusted power for power levels
 
@@ -50,40 +50,11 @@ public abstract class Drive {
     public Drive(HardwareMap hardwareMap, Telemetry tel) {
         this.telemetry = tel;
 
-        if (useMotors) {
-            try {
-                motorLeftFront = hardwareMap.dcMotor.get("front left");
-            } catch (IllegalArgumentException ex) {
-                telemetry.addData("Front Left", "Could not find.");
-            }
-
-            try {
-                motorRightFront = hardwareMap.dcMotor.get("front right");
-            } catch (IllegalArgumentException ex) {
-                telemetry.addData("Front Right", "Could not find.");
-            }
-
-            try {
-                motorRightBack = hardwareMap.dcMotor.get("back right");
-            } catch (IllegalArgumentException ex) {
-                telemetry.addData("Back Right", "Could not find.");
-            }
-
-            try {
-                motorLeftBack = hardwareMap.dcMotor.get("back left");
-            } catch (IllegalArgumentException ex) {
-                telemetry.addData("Back Left", "Could not find.");
-            }
-        }
-
-        telemetry.update();
-
         if (useGyro) {
             gyro = new RevGyro(hardwareMap, tel);
         }
 
         ir = new AnalogSensor(hardwareMap);
-        //ir.initialize();
 
         verbose = false;
     }
@@ -91,8 +62,40 @@ public abstract class Drive {
     public Drive(HardwareMap hardwareMap, Telemetry tel, boolean verbose) {
         this(hardwareMap, tel);
         this.verbose = verbose;
+    }
+
+    public void initialize(HardwareMap hardwareMap) {
         if (useGyro) {
-            gyro = new RevGyro(hardwareMap, tel);
+            gyro = new RevGyro(hardwareMap, telemetry);
+        }
+        ir.initialize();
+
+        try {
+            motorLeftFront = hardwareMap.dcMotor.get("front left");
+        } catch (IllegalArgumentException ex) {
+            telemetry.addData("Front Left", "Could not find.");
+            useMotors = false;
+        }
+
+        try {
+            motorRightFront = hardwareMap.dcMotor.get("front right");
+        } catch (IllegalArgumentException ex) {
+            telemetry.addData("Front Right", "Could not find.");
+            useMotors = false;
+        }
+
+        try {
+            motorRightBack = hardwareMap.dcMotor.get("back right");
+        } catch (IllegalArgumentException ex) {
+            telemetry.addData("Back Right", "Could not find.");
+            useMotors = false;
+        }
+
+        try {
+            motorLeftBack = hardwareMap.dcMotor.get("back left");
+        } catch (IllegalArgumentException ex) {
+            telemetry.addData("Back Left", "Could not find.");
+            useMotors = false;
         }
     }
 

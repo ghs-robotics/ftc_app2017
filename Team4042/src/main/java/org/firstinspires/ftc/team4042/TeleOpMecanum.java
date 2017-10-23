@@ -23,7 +23,7 @@ public class TeleOpMecanum extends OpMode {
     private boolean aA = false;
 
     //Declare OpMode members.
-    private MecanumDrive drive;
+    private MecanumDrive drive = new MecanumDrive(hardwareMap, telemetry, true);
 
     //private UltrasonicI2cRangeSensor sensor;
     private ArrayList<Integer> rangeData;
@@ -39,7 +39,7 @@ public class TeleOpMecanum extends OpMode {
         }
         sensor.startRanging();
         */
-        drive = new MecanumDrive(hardwareMap, telemetry, true);
+        drive.initialize(hardwareMap);
         telemetry.update();
 
         adjustedSpeed = MecanumDrive.FULL_SPEED;
@@ -57,6 +57,7 @@ public class TeleOpMecanum extends OpMode {
         }
         aPushed = gamepad1.a;
         drive.drive(false, gamepad1, gamepad2, adjustedSpeed * MecanumDrive.FULL_SPEED);
+
         if (Drive.useGyro) {
             drive.useGyro();
         }
@@ -68,12 +69,14 @@ public class TeleOpMecanum extends OpMode {
         }
         aLeftBumper = gamepad1.left_bumper;
 
+        //Right bumper - dial speed up
         if (gamepad1.right_bumper && !aRightBumper && (adjustedSpeed + 0.25) <= MecanumDrive.FULL_SPEED)
         {
             adjustedSpeed += 0.25;
         }
         aRightBumper = gamepad1.right_bumper;
 
+        //Glyph placement
         if (gamepad1.dpad_up && !aUp) { glyph.up(); }
         aUp = gamepad1.dpad_up;
         if (gamepad1.dpad_down && !aDown) { glyph.down(); }
