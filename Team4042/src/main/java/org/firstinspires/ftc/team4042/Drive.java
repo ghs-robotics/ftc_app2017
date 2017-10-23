@@ -53,6 +53,7 @@ public abstract class Drive {
         if (useGyro) {
             gyro = new RevGyro(hardwareMap, tel);
         }
+        telemetry.addData("useGyro", useGyro);
 
         ir = new AnalogSensor(hardwareMap);
 
