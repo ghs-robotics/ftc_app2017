@@ -13,16 +13,14 @@ public class TankDrive extends Drive{
 
     /**
      * Constructor for Drive, it creates the motors and the gyro objects
-     *
-     * @param tel telemetry so Drive can send data to the phone
      */
-    public TankDrive(Telemetry tel) {
+    public TankDrive() {
         //Initialize motors and gyro
-        super(tel);
+        super();
     }
 
-    public TankDrive(Telemetry tel, boolean verbose) {
-        super(tel, verbose);
+    public TankDrive(boolean verbose) {
+        super(verbose);
     }
 
     public void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor) {

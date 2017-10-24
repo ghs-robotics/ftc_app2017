@@ -10,7 +10,7 @@ public class TeleOpOmni extends OpMode {
 
     @Override
     public void init() {
-        drive = new OmniDrive(telemetry);
+        drive = new OmniDrive();
     }
 
     @Override

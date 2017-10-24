@@ -9,7 +9,7 @@ import java.util.ArrayList;
 @TeleOp(name = "Motor Test", group = "Iterative Opmode")
 public class MotorTest extends OpMode {
 
-    private MecanumDrive drive = new MecanumDrive(telemetry, true);
+    private MecanumDrive drive = new MecanumDrive(true);
 
     private DcMotor frontLeft;
     private DcMotor frontRight;

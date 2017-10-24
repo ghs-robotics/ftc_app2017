@@ -17,7 +17,7 @@ import java.util.HashMap;
 
 public class Auto {
 
-    MecanumDrive drive;
+    MecanumDrive drive = new MecanumDrive(false);
     HardwareMap hardwareMap;
     Telemetry telemetry;
     Telemetry.Log log;
@@ -106,7 +106,7 @@ public class Auto {
      * Runs the list of instructions
      */
     public void runOpMode() {
-        drive = new MecanumDrive(telemetry, false);
+        drive.initialize(telemetry, hardwareMap);
         drive.setUseGyro(true);
         telemetry.update();
 
@@ -127,6 +127,9 @@ public class Auto {
                     break;
                 case "autoSensorMove":
                     autoSensorMove(parameters);
+                    break;
+                case "knockJewel":
+                    knockJewel(parameters);
                     break;
             }
         }
@@ -156,7 +159,7 @@ public class Auto {
     }
 
     public void autoDrive(HashMap<String, String> parameters) {
-        Direction direction = new Direction(Integer.parseInt(parameters.get("x")), Integer.parseInt(parameters.get("y")));
+        Direction direction = new Direction(Double.parseDouble(parameters.get("x")), Double.parseDouble(parameters.get("y")));
         double speed = Double.parseDouble(parameters.get("speed"));
         double targetTicks = Double.parseDouble(parameters.get("target"));
 
@@ -179,7 +182,7 @@ public class Auto {
     }
 
     public void autoRotate(HashMap<String, String> parameters) {
-        int r = Integer.parseInt(parameters.get("r"));
+        double r = Double.parseDouble(parameters.get("r"));
         Direction.Rotation rotation;
         if (r < 0) {
             rotation = Direction.Rotation.Counterclockwise;
@@ -207,7 +210,7 @@ public class Auto {
     }
 
     public void autoSensorMove(HashMap<String, String> parameters) {
-        Direction direction = new Direction(Integer.parseInt(parameters.get("x")), Integer.parseInt(parameters.get("y")));
+        Direction direction = new Direction(Double.parseDouble(parameters.get("x")), Double.parseDouble(parameters.get("y")));
         double speed = Double.parseDouble(parameters.get("speed"));
         double targetDistance = Double.parseDouble(parameters.get("target"));
 

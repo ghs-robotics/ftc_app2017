@@ -15,12 +15,12 @@ public class MotorTestDrive extends Drive{
      *
      * @param tel telemetry so Drive can send data to the phone
      */
-    public MotorTestDrive(Telemetry tel) {
-        super(tel);
+    public MotorTestDrive() {
+        super();
     }
 
-    public MotorTestDrive(Telemetry tel, boolean verbose) {
-        super(tel, verbose);
+    public MotorTestDrive(boolean verbose) {
+        super(verbose);
     }
 
     /**

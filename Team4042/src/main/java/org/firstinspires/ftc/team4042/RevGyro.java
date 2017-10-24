@@ -30,11 +30,12 @@ public class RevGyro {
 
     private final static double SCALE = 440;
 
-    public RevGyro(Telemetry telemetry) {
-        this.telemetry = telemetry;
+    public RevGyro() {
+
     }
 
-    public void initialize(HardwareMap hardwareMap) {
+    public void initialize(Telemetry telemetry, HardwareMap hardwareMap) {
+        this.telemetry = telemetry;
         this.hardwareMap = hardwareMap;
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();

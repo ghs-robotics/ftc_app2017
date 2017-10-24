@@ -6,11 +6,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 @Autonomous(name="EncoderTest", group="K9bot")
 public class AutoEncoderTest extends LinearOpMode {
 
-    MecanumDrive drive;
+    MecanumDrive drive = new MecanumDrive(true);
 
     @Override
     public void runOpMode() {
-        drive = new MecanumDrive(telemetry, true);
+        drive.initialize(telemetry, hardwareMap);
         drive.setUseGyro(true);
 
         waitForStart();

@@ -44,12 +44,14 @@ public abstract class Drive {
 
     boolean verbose;
 
+    Telemetry.Log log;
+
     //Require drive() in subclasses
     public abstract void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor);
 
-    public Drive(Telemetry tel) {
+    public Drive() {
         if (useGyro) {
-            gyro = new RevGyro(tel);
+            gyro = new RevGyro();
         }
 
         ir = new AnalogSensor();
@@ -57,17 +59,20 @@ public abstract class Drive {
         verbose = false;
     }
 
-    public Drive(Telemetry tel, boolean verbose) {
-        this(tel);
+    public Drive(boolean verbose) {
+        this();
         this.verbose = verbose;
     }
 
     public void initialize(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
+        this.log = telemetry.log();
+        gyro.initialize(telemetry, hardwareMap);
+
         telemetry.addData("useGyro", useGyro);
 
         if (useGyro) {
-            gyro.initialize(hardwareMap);
+            gyro.initialize(telemetry, hardwareMap);
         }
         ir.initialize(hardwareMap);
 

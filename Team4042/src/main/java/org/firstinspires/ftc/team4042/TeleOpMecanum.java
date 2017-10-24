@@ -23,7 +23,7 @@ public class TeleOpMecanum extends OpMode {
     private boolean aA = false;
 
     //Declare OpMode members.
-    private MecanumDrive drive = new MecanumDrive(telemetry, true);
+    private MecanumDrive drive = new MecanumDrive(true);
 
     //private UltrasonicI2cRangeSensor sensor;
     private ArrayList<Integer> rangeData;

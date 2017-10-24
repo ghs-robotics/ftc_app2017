@@ -8,7 +8,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @Autonomous(name="BlueTopAuto", group="K9bot")
 public class BlueTopAuto extends LinearOpMode {
 
-    MecanumDrive drive = new MecanumDrive(telemetry, true);
+    MecanumDrive drive = new MecanumDrive(true);
     Auto auto;
 
     @Override

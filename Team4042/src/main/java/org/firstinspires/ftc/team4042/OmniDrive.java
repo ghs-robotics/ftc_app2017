@@ -17,13 +17,13 @@ public class OmniDrive extends Drive {
      *
      * @param tel telemetry so Drive can send data to the phone
      */
-    public OmniDrive(Telemetry tel) {
+    public OmniDrive() {
         //Initialize motors and gyro
-        super(tel);
+        super();
     }
 
-    public OmniDrive(Telemetry tel, boolean verbose) {
-        super(tel, verbose);
+    public OmniDrive(boolean verbose) {
+        super(verbose);
     }
 
     /**

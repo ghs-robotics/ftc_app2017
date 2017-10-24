@@ -11,12 +11,12 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class HalfMecanumDrive extends Drive{
 
-    public HalfMecanumDrive(Telemetry tel) {
-        super(tel);
+    public HalfMecanumDrive() {
+        super();
     }
 
-    public HalfMecanumDrive(Telemetry tel, boolean verbose) {
-        super(tel, verbose);
+    public HalfMecanumDrive(boolean verbose) {
+        super(verbose);
     }
 
     /**

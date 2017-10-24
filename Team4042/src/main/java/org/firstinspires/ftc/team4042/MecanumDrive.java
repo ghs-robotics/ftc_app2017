@@ -17,16 +17,14 @@ public class MecanumDrive extends Drive {
 
     /**
      * Constructor for Drive, it creates the motors and the gyro objects
-     *
-     * @param tel telemetry so Drive can send data to the phone
      */
-    public MecanumDrive(Telemetry tel) {
+    public MecanumDrive() {
         //Initialize motors and gyro
-        super(tel);
+        super();
     }
 
-    public MecanumDrive(Telemetry tel, boolean verbose) {
-        super(tel, verbose);
+    public MecanumDrive(boolean verbose) {
+        super(verbose);
     }
 
     /**
@@ -177,8 +175,8 @@ public class MecanumDrive extends Drive {
      */
     public boolean driveWithEncoders(Direction direction, double speed, double targetTicks) throws IllegalArgumentException{
         //telemetry data
-        telemetry.addData("x", direction.getX());
-        telemetry.addData("y", direction.getY());
+        log.add("x " + direction.getX());
+        log.add("y " + direction.getY());
 
         double scaledSpeed = setUpSpeed(speed, targetTicks);
         if (scaledSpeed == Math.PI) { //The target's been reached
@@ -189,7 +187,7 @@ public class MecanumDrive extends Drive {
         scaledSpeed = Range.clip(scaledSpeed, 0, FULL_SPEED);
 
         double r = useGyro();
-        telemetry.addData("r", r);
+        log.add("r " + r);
 
         //Drives at x
         driveXYR(FULL_SPEED, direction.getX() * scaledSpeed, direction.getY() * scaledSpeed, r, false);

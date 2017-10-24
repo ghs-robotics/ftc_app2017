@@ -16,7 +16,7 @@ public class TeleOpTankDrive extends OpMode {
 
     @Override
     public void init() {
-        drive = new TankDrive(telemetry);
+        drive = new TankDrive();
         }
 
     
