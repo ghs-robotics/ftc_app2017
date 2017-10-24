@@ -22,8 +22,8 @@ public class TankDrive extends Drive{
         super(hardwareMap, tel);
     }
 
-    public TankDrive(HardwareMap hardwareMap, Telemetry tel, boolean verbose, boolean useGyro) {
-        super(hardwareMap, tel, verbose, useGyro);
+    public TankDrive(HardwareMap hardwareMap, Telemetry tel, boolean verbose) {
+        super(hardwareMap, tel, verbose);
     }
 
     public void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor) {

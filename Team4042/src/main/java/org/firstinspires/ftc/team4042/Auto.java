@@ -8,23 +8,33 @@ import org.firstinspires.ftc.robotcore.internal.android.dx.rop.code.Exceptions;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Auto {
 
     MecanumDrive drive;
     HardwareMap hardwareMap;
     Telemetry telemetry;
+    Telemetry.Log log;
 
     File file;
 
     ArrayList<AutoInstruction> instructions = new ArrayList<>();
 
-    public Auto(HardwareMap hardwareMap, Telemetry telemetry, String filePath) {
+    public Auto(HardwareMap hardwareMap, MecanumDrive drive, Telemetry telemetry, String filePath) {
+        this.drive = drive;
         this.hardwareMap = hardwareMap;
         this.telemetry = telemetry;
+        log = telemetry.log();
 
-        file = new File(filePath);
+        log.add("Reading file " + filePath);
+        file = new File("./storage/emulated/0/DCIM/" + filePath);
+
         loadFile();
     }
 
@@ -38,28 +48,56 @@ public class Auto {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line;
+            double numLines = 0;
             while ((line = bufferedReader.readLine()) != null) { //Reads the lines from the file in order
+                numLines++;
+                log.add("Reading line " + numLines);
+                telemetry.update();
                 if (line.charAt(0) != '#') { //Use a # for a comment
-                    int space1 = line.indexOf(" ");
-                    int space2 = line.indexOf(" ", space1 + 1);
-                    int space3 = line.indexOf(" ", space2 + 1);
-                    int space4 = line.indexOf(" ", space3 + 1);
+                    HashMap<String, String> parameters = new HashMap<>();
 
-                    //Gets the x, y, and speed, assuming they're separated by a space
-                    String type = line.substring(0, space1);
-                    String x = line.substring(space1 + 1, space2);
-                    String y = line.substring(space2 + 1, space3);
-                    String speed = line.substring(space3 + 1, space4);
-                    String time = line.substring(space4 + 1);
+                    //x:3 --> k = x, v = 3
+                    String[] inputParameters = line.split(" ");
+                    for (String parameter : inputParameters) {
+                        int colon = parameter.indexOf(':');
+                        String k = parameter.substring(0, colon);
+                        String v = parameter.substring(colon + 1);
+                        parameters.put(k, v); //Gets the next parameter and adds it to the list
+                        log.add("Parameter: " + k + ":" + v);
+                        telemetry.update();
+                    }
 
+                    String functionName = "";
+                    switch (parameters.get("function")) {
+                        case "d":
+                            functionName = "autoDrive";
+                            break;
+                        case "r":
+                            functionName = "autoRotate";
+                            break;
+                        case "s":
+                            functionName = "autoSensorMove";
+                            break;
+                        case "v":
+                            functionName = "knockJewel";
+                        default:
+                            System.err.println("Unknown function called from file " + file);
+                            break;
+                    }
                     //Stores those values as an instruction
-                    AutoInstruction instruction = new AutoInstruction(x, y, speed, time, type);
+                    AutoInstruction instruction = new AutoInstruction(functionName, parameters);
                     instructions.add(instruction);
+
+                    telemetry.update();
                 }
             }
             fileReader.close();
         } catch (Exception ex) {
             telemetry.addData("Error", "trying to load file");
+            StringWriter sw = new StringWriter();
+            ex.printStackTrace(new PrintWriter(sw));
+            telemetry.addData("error", sw.toString());
+
         }
 
     }
@@ -68,7 +106,8 @@ public class Auto {
      * Runs the list of instructions
      */
     public void runOpMode() {
-        drive = new MecanumDrive(hardwareMap, telemetry, false, true);
+        drive = new MecanumDrive(hardwareMap, telemetry, false);
+        drive.setUseGyro(true);
         telemetry.update();
 
         //TODO: TEST THIS
@@ -77,21 +116,19 @@ public class Auto {
 
         //Reads each instruction and acts accordingly
         for (AutoInstruction instruction : instructions) {
-            switch (instruction.getType()) {
-                case 'd': //Dead-reckoning drive
-                    autoDrive(instruction.getDirection(), instruction.getSpeed(), instruction.getTime());
-                    break;
-                case 'r': //Gyro rotation (x = -1 for counter-clockwise; 1 for clockwise) until distance
-                    if (instruction.getDirection().getX() > 0) {
-                        autoRotate(Direction.Rotation.Clockwise, instruction.getSpeed(), instruction.getTime());
-                    }
-                    else if (instruction.getDirection().getX() < 0) {
-                        autoRotate(Direction.Rotation.Counterclockwise, instruction.getSpeed(), instruction.getTime());
-                    }
-                    break;
-                case 's': //Sensor drive until ir returns distance
-                    autoSensorMove(instruction.getDirection(), instruction.getSpeed(), instruction.getTime(), drive.ir);
-                    break;
+            String functionName = instruction.getFunctionName();
+            HashMap<String, String> parameters = instruction.getParameters();
+            try {
+                log.add("Invoking function " + functionName);
+                telemetry.update();
+
+                //Calls the function "functionName" with parameters "parameters"
+                Method m = Auto.class.getMethod(functionName, parameters.getClass());
+                m.invoke(functionName, parameters);
+            } catch (NoSuchMethodException ex) {
+                telemetry.addData("error", "could not find function " + functionName);
+            } catch (Exception ex) {
+                telemetry.addData("error", "trying to invoke function " + functionName);
             }
 
         }
@@ -115,6 +152,19 @@ public class Auto {
         //detach and extend robot towards glyph
     }
 
+    public void knockJewel(HashMap<String, String> parameters) {
+        //TODO: READ JEWEL COLOR
+        //TODO: KNOCK OFF CORRECT JEWEL
+    }
+
+    public void autoDrive(HashMap<String, String> parameters) {
+        Direction direction = new Direction(Integer.parseInt(parameters.get("x")), Integer.parseInt(parameters.get("y")));
+        double speed = Double.parseDouble(parameters.get("speed"));
+        double targetTicks = Double.parseDouble(parameters.get("target"));
+
+        autoDrive(direction, speed, targetTicks);
+    }
+
     /**
      * Drives in the given Direction at the given speed until targetTicks is reached
      * @param direction The direction to head in
@@ -127,6 +177,19 @@ public class Auto {
             done = drive.driveWithEncoders(direction, speed, targetTicks);
             telemetry.update();
         }
+    }
+
+    public void autoRotate(HashMap<String, String> parameters) {
+        int r = Integer.parseInt(parameters.get("r"));
+        Direction.Rotation rotation;
+        if (r < 0) {
+            rotation = Direction.Rotation.Counterclockwise;
+        } else {
+            rotation = Direction.Rotation.Clockwise;
+        }
+
+        double speed = Double.parseDouble(parameters.get("speed"));
+        double targetTicks = Double.parseDouble(parameters.get("target"));
     }
 
     /**
@@ -143,6 +206,14 @@ public class Auto {
         }
     }
 
+    public void autoSensorMove(HashMap<String, String> parameters) {
+        Direction direction = new Direction(Integer.parseInt(parameters.get("x")), Integer.parseInt(parameters.get("y")));
+        double speed = Double.parseDouble(parameters.get("speed"));
+        double targetDistance = Double.parseDouble(parameters.get("target"));
+
+        autoSensorMove(direction, speed, targetDistance);
+    }
+
     /**
      * Drives in the given Direction until a sensor returns a given value
      * @param direction The direction to move in
@@ -154,6 +225,14 @@ public class Auto {
         boolean done = false;
         while (!done) {
             done = drive.driveWithSensor(direction, speed, targetDistance, ir);
+            telemetry.update();
+        }
+    }
+
+    private void autoSensorMove(Direction direction, double speed, double targetDistance) {
+        boolean done = false;
+        while (!done) {
+            done = drive.driveWithSensor(direction, speed, targetDistance, drive.ir);
             telemetry.update();
         }
     }

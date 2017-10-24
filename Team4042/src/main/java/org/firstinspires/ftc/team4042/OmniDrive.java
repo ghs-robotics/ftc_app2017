@@ -23,8 +23,8 @@ public class OmniDrive extends Drive {
         super(hardwareMap, tel);
     }
 
-    public OmniDrive(HardwareMap hardwareMap, Telemetry tel, boolean verbose, boolean useGyro) {
-        super(hardwareMap, tel, verbose, useGyro);
+    public OmniDrive(HardwareMap hardwareMap, Telemetry tel, boolean verbose) {
+        super(hardwareMap, tel, verbose);
     }
 
     /**

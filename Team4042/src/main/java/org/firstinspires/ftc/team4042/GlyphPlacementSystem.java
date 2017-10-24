@@ -1,65 +1,101 @@
 package org.firstinspires.ftc.team4042;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 /**
  * Created by Ryan Whiting on 10/17/2017.
  */
 
 public class GlyphPlacementSystem
 {
-    private int position;
+    private int targetX;
+    private int targetY;
+    private int currentX;
+    private int currentY;
     private String baseOutput;
-    private Telemetry out;
 
-    public GlyphPlacementSystem(Telemetry out)
+    public GlyphPlacementSystem()
     {
-        this.out = out;
-        this.baseOutput = "[_______]\n[_______]\n[_______]\n[_______]";
+        this(0, 0);
     }
 
-    public GlyphPlacementSystem(int x, int y)
+    public GlyphPlacementSystem(int currentX, int currentY)
     {
-        position = x + 3 * y;
+        this.baseOutput = "[_______]\n[_______]\n[_______]\n[_______]";
+        this.targetX = currentX;
+        this.targetY = currentY;
+        this.currentX = currentX;
+        this.currentY = currentY;
     }
 
     //returns the current position of the glyph placement system
-    public int getIndex()
+    public String getPositionAsString()
     {
         char[] output = baseOutput.toCharArray();
 
+        int position = targetX + 3 * targetY;
         switch(position)
         {
-            case(0): output[2] = 'X';
+            case(0): output[2] = 'X'; break;
 
-            case(1): output[4] = 'X';
+            case(1): output[4] = 'X'; break;
 
-            case(2): output[6] = 'X';
+            case(2): output[6] = 'X'; break;
 
-            case(3): output[13] = 'X';
+            case(3): output[13] = 'X'; break;
 
-            case(4): output[15] = 'X';
+            case(4): output[15] = 'X'; break;
 
-            case(5): output[17] = 'X';
+            case(5): output[17] = 'X'; break;
 
-            case(6): output[24] = 'X';
+            case(6): output[24] = 'X'; break;
 
-            case(7): output[26] = 'X';
+            case(7): output[26] = 'X'; break;
 
-            case(8): output[28] = 'X';
+            case(8): output[28] = 'X'; break;
 
-            case(9): output[35] = 'X';
+            case(9): output[35] = 'X'; break;
 
-            case(10): output[37] = 'X';
+            case(10): output[37] = 'X'; break;
 
-            case(11): output[39] = 'X';
+            case(11): output[39] = 'X'; break;
         }
 
-        out.addLine(output.toString());
+        return new String(output);
+    }
 
-        return position;
+    public int getPosition() {
+        return targetX + 3 * targetY;
+    }
+
+    public void up() {
+        if (targetY != 0) {
+            targetY -= 1;
+        }
+    }
+
+    public void down() {
+        if (targetY != 3) {
+            targetY += 1;
+        }
+    }
+
+    public void left() {
+        if (targetX != 0) {
+            targetX -= 1;
+        }
+    }
+
+    public void right() {
+        if (targetX != 2) {
+            targetX += 1;
+        }
+    }
+
+    public void place() {
+        //TODO: motor code here
+        /*
+        Assuming motor forward power moves it right and up
+        Move sideways motor (block distance * (targetX - currentX))
+        Move vertical motor (block distance * (targetY - currentY))
+         */
     }
 }

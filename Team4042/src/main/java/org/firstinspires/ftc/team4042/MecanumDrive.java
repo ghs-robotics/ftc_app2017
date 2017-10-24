@@ -26,8 +26,8 @@ public class MecanumDrive extends Drive {
         super(hardwareMap, tel);
     }
 
-    public MecanumDrive(HardwareMap hardwareMap, Telemetry tel, boolean verbose, boolean useGyro) {
-        super(hardwareMap, tel, verbose, useGyro);
+    public MecanumDrive(HardwareMap hardwareMap, Telemetry tel, boolean verbose) {
+        super(hardwareMap, tel, verbose);
     }
 
     /**
@@ -79,16 +79,16 @@ public class MecanumDrive extends Drive {
         double yPrime = -x * Math.sin(gyroRadians) + y * Math.cos(gyroRadians);
 
         //Sets relative wheel speeds for mecanum drive based on controller inputs
-        if (TeleOpMecanum.team12788) { speedWheel[0] = -(xPrime + yPrime + r); }
+        if (Drive.team12788) { speedWheel[0] = -(xPrime + yPrime + r); }
         else { speedWheel[0] = xPrime + yPrime + r; }
 
-        if (TeleOpMecanum.team12788) { speedWheel[1] = -(xPrime + yPrime - r); }
+        if (Drive.team12788) { speedWheel[1] = -(xPrime + yPrime - r); }
         else { speedWheel[1] = -xPrime + yPrime - r; }
 
-        if (TeleOpMecanum.team12788) { speedWheel[2] = -(-xPrime + yPrime - r); }
+        if (Drive.team12788) { speedWheel[2] = -(-xPrime + yPrime - r); }
         else { speedWheel[2] = xPrime + yPrime - r; }
 
-        if (TeleOpMecanum.team12788) { speedWheel[3] = -(-xPrime + yPrime + r); }
+        if (Drive.team12788) { speedWheel[3] = -(-xPrime + yPrime + r); }
         else { speedWheel[3] = -xPrime + yPrime + r; }
 
         //sets the wheel powers to the appropriate ratios
@@ -110,23 +110,26 @@ public class MecanumDrive extends Drive {
         double currDistance = sum / 10;*/
 
         double currDistance = ir.getInchesAvg();
-
-        double r = useGyro();
-
-        telemetry.addData("currDistance", currDistance);
-        telemetry.addData("Reached target", Math.abs(targetDistance - currDistance) > 0.5);
-        telemetry.addData("x", direction.getX());
-        telemetry.addData("y", direction.getY());
-        telemetry.addData("r", r);
-
-        if (((direction.getY() >= 0) && (currDistance - 3 < targetDistance)) || //driving forwards and reached distance (0.5 inch tolerance)
-                ((direction.getY() < 0) && (currDistance + 3 > targetDistance))) { //driving backwards and reached distance (0.5 inch tolerance)
-            stopMotors();
+        if (currDistance == -1) {
+            telemetry.addData("Error", "Couldn't find ultrasonic");
             return true;
-        }
-        else { //haven't reached point yet
-            driveXYR(speed, direction.getX(), direction.getY(), r, false);
-            return false;
+        } else {
+            double r = useGyro();
+
+            telemetry.addData("currDistance", currDistance);
+            telemetry.addData("Reached target", Math.abs(targetDistance - currDistance) > 0.5);
+            telemetry.addData("x", direction.getX());
+            telemetry.addData("y", direction.getY());
+            telemetry.addData("r", r);
+
+            if (((direction.getY() >= 0) && (currDistance - 3 < targetDistance)) || //driving forwards and reached distance (0.5 inch tolerance)
+                    ((direction.getY() < 0) && (currDistance + 3 > targetDistance))) { //driving backwards and reached distance (0.5 inch tolerance)
+                stopMotors();
+                return true;
+            } else { //haven't reached point yet
+                driveXYR(speed, direction.getX(), direction.getY(), r, false);
+                return false;
+            }
         }
     }
 
