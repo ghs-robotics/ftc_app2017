@@ -13,15 +13,14 @@ public class MotorTestDrive extends Drive{
     /**
      * Constructor for Drive, it creates the motors and the gyro objects
      *
-     * @param hardwareMap hardware map of robot so Drive can use motors
      * @param tel telemetry so Drive can send data to the phone
      */
-    public MotorTestDrive(HardwareMap hardwareMap, Telemetry tel) {
-        super(hardwareMap, tel);
+    public MotorTestDrive(Telemetry tel) {
+        super(tel);
     }
 
-    public MotorTestDrive(HardwareMap hardwareMap, Telemetry tel, boolean verbose) {
-        super(hardwareMap, tel, verbose);
+    public MotorTestDrive(Telemetry tel, boolean verbose) {
+        super(tel, verbose);
     }
 
     /**

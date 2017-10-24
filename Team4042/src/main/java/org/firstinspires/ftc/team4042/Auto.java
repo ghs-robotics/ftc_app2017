@@ -106,7 +106,7 @@ public class Auto {
      * Runs the list of instructions
      */
     public void runOpMode() {
-        drive = new MecanumDrive(hardwareMap, telemetry, false);
+        drive = new MecanumDrive(telemetry, false);
         drive.setUseGyro(true);
         telemetry.update();
 
@@ -118,19 +118,17 @@ public class Auto {
         for (AutoInstruction instruction : instructions) {
             String functionName = instruction.getFunctionName();
             HashMap<String, String> parameters = instruction.getParameters();
-            try {
-                log.add("Invoking function " + functionName);
-                telemetry.update();
-
-                //Calls the function "functionName" with parameters "parameters"
-                Method m = Auto.class.getMethod(functionName, parameters.getClass());
-                m.invoke(functionName, parameters);
-            } catch (NoSuchMethodException ex) {
-                telemetry.addData("error", "could not find function " + functionName);
-            } catch (Exception ex) {
-                telemetry.addData("error", "trying to invoke function " + functionName);
+            switch (functionName) {
+                case "autoDrive":
+                    autoDrive(parameters);
+                    break;
+                case "autoRotate":
+                    autoRotate(parameters);
+                    break;
+                case "autoSensorMove":
+                    autoSensorMove(parameters);
+                    break;
             }
-
         }
 
         //autoDrive(new Direction(1, .5), Drive.FULL_SPEED, 1000);
@@ -172,6 +170,7 @@ public class Auto {
      * @param targetTicks The final distance to have travelled, in encoder ticks
      */
     private void autoDrive(Direction direction, double speed, double targetTicks) {
+        log.add("autoDrive invoked with direction " + direction + " speed " + speed + " targetTicks " + targetTicks);
         boolean done = false;
         while (!done) {
             done = drive.driveWithEncoders(direction, speed, targetTicks);
@@ -190,6 +189,7 @@ public class Auto {
 
         double speed = Double.parseDouble(parameters.get("speed"));
         double targetTicks = Double.parseDouble(parameters.get("target"));
+        autoRotate(rotation, speed, targetTicks);
     }
 
     /**

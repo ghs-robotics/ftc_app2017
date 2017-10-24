@@ -23,7 +23,7 @@ public class TeleOpMecanum extends OpMode {
     private boolean aA = false;
 
     //Declare OpMode members.
-    private MecanumDrive drive = new MecanumDrive(hardwareMap, telemetry, true);
+    private MecanumDrive drive = new MecanumDrive(telemetry, true);
 
     //private UltrasonicI2cRangeSensor sensor;
     private ArrayList<Integer> rangeData;
@@ -63,7 +63,7 @@ public class TeleOpMecanum extends OpMode {
         }
         sensor.startRanging();
         */
-        drive.initialize(hardwareMap);
+        drive.initialize(telemetry, hardwareMap);
         telemetry.update();
 
         adjustedSpeed = MecanumDrive.FULL_SPEED;

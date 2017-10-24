@@ -30,9 +30,12 @@ public class RevGyro {
 
     private final static double SCALE = 440;
 
-    public RevGyro(HardwareMap hardwareMap, Telemetry telemetry) {
-
+    public RevGyro(Telemetry telemetry) {
         this.telemetry = telemetry;
+    }
+
+    public void initialize(HardwareMap hardwareMap) {
+        this.hardwareMap = hardwareMap;
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -41,7 +44,6 @@ public class RevGyro {
         parameters.loggingEnabled = true;
         parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-
 // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
 // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
 // and named "imu".

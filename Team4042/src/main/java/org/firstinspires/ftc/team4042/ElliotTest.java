@@ -17,9 +17,9 @@ public class ElliotTest extends OpMode {
     @Override
     public void init() {
         if (useBackMecanum) {
-            drive = new MecanumDrive(hardwareMap, telemetry);
+            drive = new MecanumDrive(telemetry);
         } else {
-            drive = new HalfMecanumDrive(hardwareMap, telemetry);
+            drive = new HalfMecanumDrive(telemetry);
         }
     }
     

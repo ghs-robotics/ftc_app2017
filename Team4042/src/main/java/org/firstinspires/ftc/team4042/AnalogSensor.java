@@ -14,11 +14,10 @@ public class AnalogSensor {
     AnalogInput ultrasonic;
     double[] vals = new double[250];
 
-    public AnalogSensor(HardwareMap hardwareMap) {
-        this.hardwareMap = hardwareMap;
-    }
+    public AnalogSensor() { }
 
-    public void initialize() {
+    public void initialize(HardwareMap hardwareMap) {
+        this.hardwareMap = hardwareMap;
         ultrasonic = hardwareMap.analogInput.get("ultrasonic");
     }
 

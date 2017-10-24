@@ -55,12 +55,11 @@ import java.util.Arrays;
 @TeleOp(name="Analog Sensor", group="Iterative Opmode")
 public class AnalogSensorTest extends OpMode {
 
-    AnalogSensor ultrasonic;
+    AnalogSensor ultrasonic = new AnalogSensor();
 
     @Override
     public void init() {
-        ultrasonic = new AnalogSensor(hardwareMap);
-        ultrasonic.initialize();
+        ultrasonic.initialize(hardwareMap);
     }
 
     /*@Override

@@ -15,16 +15,15 @@ public class OmniDrive extends Drive {
     /**
      * Constructor for Drive, it creates the motors and the gyro objects
      *
-     * @param hardwareMap hardware map of robot so Drive can use motors
      * @param tel telemetry so Drive can send data to the phone
      */
-    public OmniDrive(HardwareMap hardwareMap, Telemetry tel) {
+    public OmniDrive(Telemetry tel) {
         //Initialize motors and gyro
-        super(hardwareMap, tel);
+        super(tel);
     }
 
-    public OmniDrive(HardwareMap hardwareMap, Telemetry tel, boolean verbose) {
-        super(hardwareMap, tel, verbose);
+    public OmniDrive(Telemetry tel, boolean verbose) {
+        super(tel, verbose);
     }
 
     /**

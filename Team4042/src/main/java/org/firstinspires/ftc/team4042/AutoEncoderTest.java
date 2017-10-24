@@ -10,7 +10,7 @@ public class AutoEncoderTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        drive = new MecanumDrive(hardwareMap, telemetry, true);
+        drive = new MecanumDrive(telemetry, true);
         drive.setUseGyro(true);
 
         waitForStart();

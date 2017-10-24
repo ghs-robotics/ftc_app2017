@@ -18,16 +18,15 @@ public class MecanumDrive extends Drive {
     /**
      * Constructor for Drive, it creates the motors and the gyro objects
      *
-     * @param hardwareMap hardware map of robot so Drive can use motors
      * @param tel telemetry so Drive can send data to the phone
      */
-    public MecanumDrive(HardwareMap hardwareMap, Telemetry tel) {
+    public MecanumDrive(Telemetry tel) {
         //Initialize motors and gyro
-        super(hardwareMap, tel);
+        super(tel);
     }
 
-    public MecanumDrive(HardwareMap hardwareMap, Telemetry tel, boolean verbose) {
-        super(hardwareMap, tel, verbose);
+    public MecanumDrive(Telemetry tel, boolean verbose) {
+        super(tel, verbose);
     }
 
     /**
@@ -80,16 +79,16 @@ public class MecanumDrive extends Drive {
 
         //Sets relative wheel speeds for mecanum drive based on controller inputs
         if (Drive.team12788) { speedWheel[0] = -(xPrime + yPrime + r); }
-        else { speedWheel[0] = xPrime + yPrime + r; }
+        else { speedWheel[0] = -xPrime - yPrime - r; }
 
         if (Drive.team12788) { speedWheel[1] = -(xPrime + yPrime - r); }
-        else { speedWheel[1] = -xPrime + yPrime - r; }
+        else { speedWheel[1] = xPrime - yPrime + r; }
 
         if (Drive.team12788) { speedWheel[2] = -(-xPrime + yPrime - r); }
-        else { speedWheel[2] = xPrime + yPrime - r; }
+        else { speedWheel[2] = -xPrime - yPrime + r; }
 
         if (Drive.team12788) { speedWheel[3] = -(-xPrime + yPrime + r); }
-        else { speedWheel[3] = -xPrime + yPrime + r; }
+        else { speedWheel[3] = xPrime - yPrime - r; }
 
         //sets the wheel powers to the appropriate ratios
         super.setMotorPower(speedWheel, speedFactor);

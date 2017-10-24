@@ -8,14 +8,14 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @Autonomous(name="BlueBottomAuto", group="K9bot")
 public class BlueBottomAuto extends LinearOpMode {
 
-    MecanumDrive drive;
+    MecanumDrive drive = new MecanumDrive(telemetry, true);
     Auto auto;
 
     @Override
     public void runOpMode() {
-        Telemetry.Log log = telemetry.log();
-        drive = new MecanumDrive(hardwareMap, telemetry, true);
         drive.setUseGyro(true);
+        drive.initialize(telemetry, hardwareMap);
+
         auto = new Auto(hardwareMap, drive, telemetry, "bluebottom.txt");
         waitForStart();
 

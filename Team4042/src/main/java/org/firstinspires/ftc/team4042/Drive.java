@@ -47,29 +47,29 @@ public abstract class Drive {
     //Require drive() in subclasses
     public abstract void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor);
 
-    public Drive(HardwareMap hardwareMap, Telemetry tel) {
-        this.telemetry = tel;
-
+    public Drive(Telemetry tel) {
         if (useGyro) {
-            gyro = new RevGyro(hardwareMap, tel);
+            gyro = new RevGyro(tel);
         }
-        telemetry.addData("useGyro", useGyro);
 
-        ir = new AnalogSensor(hardwareMap);
+        ir = new AnalogSensor();
 
         verbose = false;
     }
 
-    public Drive(HardwareMap hardwareMap, Telemetry tel, boolean verbose) {
-        this(hardwareMap, tel);
+    public Drive(Telemetry tel, boolean verbose) {
+        this(tel);
         this.verbose = verbose;
     }
 
-    public void initialize(HardwareMap hardwareMap) {
+    public void initialize(Telemetry telemetry, HardwareMap hardwareMap) {
+        this.telemetry = telemetry;
+        telemetry.addData("useGyro", useGyro);
+
         if (useGyro) {
-            gyro = new RevGyro(hardwareMap, telemetry);
+            gyro.initialize(hardwareMap);
         }
-        ir.initialize();
+        ir.initialize(hardwareMap);
 
         try {
             motorLeftFront = hardwareMap.dcMotor.get("front left");
