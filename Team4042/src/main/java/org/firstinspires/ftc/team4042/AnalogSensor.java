@@ -10,32 +10,35 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
  */
 
 public class AnalogSensor {
+    private int ultraCount = 5;
     HardwareMap hardwareMap;
-    AnalogInput ultrasonic;
+    AnalogInput[] infrared = new AnalogInput[5];
     double[] vals = new double[250];
 
-    public AnalogSensor() { }
+    public AnalogSensor(AnalogInput infrared) { }
 
     public void initialize(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
-        ultrasonic = hardwareMap.analogInput.get("ultrasonic");
+        for(int i = 0; i < ultraCount; i++){
+            infrared[i] = hardwareMap.analogInput.get("infrared" + i);
+        }
     }
 
-    public double getVoltageAvg() {
-        if (ultrasonic == null) { return -1; }
+    public double getVoltageAvg(AnalogInput infrared) {
+        if (infrared == null) { return -1; }
         double sum = 0;
         for (int i = 0; i < vals.length; i++) {
-            sum += ultrasonic.getVoltage();
+            sum += infrared.getVoltage();
         }
         double voltage = sum/vals.length;
         return voltage;
     }
 
-    public double getVoltageRept() {
-        if (ultrasonic == null) { return -1; }
+    public double getVoltageRept(AnalogInput infrared) {
+        if (infrared == null) { return -1; }
         SparseIntArray occurrences = new SparseIntArray(); //A list of inches and the number of times they've occurred
         while (true) {
-            double voltage = ultrasonic.getVoltage(); //Gets the voltage
+            double voltage = infrared.getVoltage(); //Gets the voltage
             int inches = getInFromVolt(voltage); //Gets the voltage in inches
             //Gets the number of times the voltage has occurred, or 0 if it hasn't yet
             int count = occurrences.get(inches, 0);
@@ -58,14 +61,14 @@ public class AnalogSensor {
         return (int)Math.round(6.48 * Math.pow(voltage, -1.5));
     }
 
-    public double getInchesAvg() {
-        double voltage = getVoltageAvg();
+    public double getInchesAvg(AnalogInput infrared) {
+        double voltage = getVoltageAvg(infrared);
         double inches = getInFromVolt(voltage);
         return inches;
     }
 
-    public double getInchesRept() {
-        double voltage = getVoltageRept();
+    public double getInchesRept(AnalogInput infrared) {
+        double voltage = getVoltageRept(infrared);
         double inches = getInFromVolt(voltage);
         return inches;
     }
