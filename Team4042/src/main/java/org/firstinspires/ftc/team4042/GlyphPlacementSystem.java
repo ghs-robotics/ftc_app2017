@@ -1,5 +1,16 @@
 package org.firstinspires.ftc.team4042;
 
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DigitalChannelController;
+import com.qualcomm.robotcore.hardware.DigitalChannelImpl;
+import com.qualcomm.robotcore.hardware.HardwareDevice;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
 /**
  * Created by Ryan Whiting on 10/17/2017.
  */
@@ -10,20 +21,28 @@ public class GlyphPlacementSystem
     private int targetY;
     private int currentX;
     private int currentY;
+    private int currentPositon;
+    private int targetPosition;
     private String baseOutput;
+    private DigitalChannel homeLimit;
+    private DcMotor verticalDrive;
 
-    public GlyphPlacementSystem()
+    public GlyphPlacementSystem(HardwareMap map)
     {
-        this(0, 0);
+        this(0, 0, map);
     }
 
-    public GlyphPlacementSystem(int currentX, int currentY)
+    public GlyphPlacementSystem(int currentX, int currentY, HardwareMap map)
     {
+        this.homeLimit = map.digitalChannel.get("Limit");
+        this.verticalDrive = map.dcMotor.get("Vertical Drive");
         this.baseOutput = "[_______]\n[_______]\n[_______]\n[_______]";
         this.targetX = currentX;
         this.targetY = currentY;
         this.currentX = currentX;
         this.currentY = currentY;
+
+        verticalDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     //returns the current position of the glyph placement system
@@ -97,5 +116,10 @@ public class GlyphPlacementSystem
         Move sideways motor (block distance * (targetX - currentX))
         Move vertical motor (block distance * (targetY - currentY))
          */
+    }
+
+    public void runToPosition()
+    {
+
     }
 }
