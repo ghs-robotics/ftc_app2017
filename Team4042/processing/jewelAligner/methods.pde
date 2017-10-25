@@ -184,28 +184,33 @@ float[] findTape(float d, PImage in, float[][] kernel) {
       kk[x][y - yin + 2] = sum;
     }
   }
-  in.updatePixels();
+  in.updatePixels(); //good practice in Processing, closes the image from pixel editing
+  //array which holds possible tape edges as determined by column sums above the threshold
   int[] maybe = new int[img.width];
-  int maybeI = 0;
+  int maybeI = 0; //iterator which goes through maybe[]
   for(int x = 0; x < img.width; x++) {
+    //goes through each column...
     float sum = 0;
     for(int y = 0; y < 5; y++) {
+      //iterates through each item in each column creating a sum for each column...
       sum += kk[x][y];
     }
     if(sum > TAPE_THRESHOLD) {
+      //then checks whether there might be a tape edge just based off of the edge sum
       maybe[maybeI] = x;
       maybeI++;
     }
   }
   
-  int a = 0;
-  int b = 0;
-  int len = distToLength(d);
+  int a = 0; //first tape edge
+  int b = 0; //second tape edge
+  int len = distToLength(d); //calculated/estimated/predicted tape length to compare to
   
-  int count = 0;
-  for(int i = 0; i <= maybeI; i++) {
-    for(int j = i + 1; j <= maybeI; j++) {
-      int dist = abs(maybe[i] - maybe[j]); 
+  int count = 0; //counter for tapes found for debugging/telemetry needs
+  for(int i = 0; i <= maybeI; i++) { //iterates through the list of possible tapes
+    for(int j = i + 1; j <= maybeI; j++) { //compares it to other values after each item
+      int dist = abs(maybe[i] - maybe[j]);  //figures out distance between maybe tapes
+      //if the found length is within tolerances...
       if(dist > len - TAPE_LENGTH_TOLERANCE && dist < len + TAPE_LENGTH_TOLERANCE) {
         a = maybe[i];
         b = maybe[j];
@@ -216,9 +221,12 @@ float[] findTape(float d, PImage in, float[][] kernel) {
   //println(count);
   result[0] = a;
   result[1] = b;
+  //result is left and right bounds of tape
   return result;
 }
 
+//utili-kilt for converting from an array to an image for debug purpouses (viewing the kernel convolution)
+//not used by other code, but may be useful for debugging if needed
 PImage arrToImg(float[][] in) {
   PImage result = createImage(img.width, 5, RGB);
   result.loadPixels();

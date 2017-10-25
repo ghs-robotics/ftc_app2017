@@ -159,7 +159,7 @@ public class Auto {
     }
 
     public void autoDrive(HashMap<String, String> parameters) {
-        Direction direction = new Direction(Double.parseDouble(parameters.get("x")), Double.parseDouble(parameters.get("y")));
+        Direction direction = new Direction(Double.parseDouble(parameters.get("x")), -Double.parseDouble(parameters.get("y")));
         double speed = Double.parseDouble(parameters.get("speed"));
         double targetTicks = Double.parseDouble(parameters.get("target"));
 
