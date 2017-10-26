@@ -235,7 +235,7 @@ public class Auto {
     private void autoSensorMove(Direction direction, double speed, double targetDistance) {
         boolean done = false;
         while (!done) {
-            done = drive.driveWithSensor(direction, speed, targetDistance, drive.ir);
+            done = drive.driveWithSensor(direction, speed, targetDistance, drive.ir[0]);
             telemetry.update();
         }
     }

@@ -67,7 +67,7 @@ public class TeleOpMecanum extends OpMode {
         telemetry.update();
 
         adjustedSpeed = MecanumDrive.FULL_SPEED;
-        glyph = new GlyphPlacementSystem();
+        glyph = new GlyphPlacementSystem(hardwareMap);
     }
     
     @Override

@@ -40,7 +40,7 @@ public abstract class Drive {
 
     RevGyro gyro;
 
-    AnalogSensor ir;
+    AnalogSensor[] ir = new AnalogSensor[5];
 
     boolean verbose;
 
@@ -54,7 +54,9 @@ public abstract class Drive {
             gyro = new RevGyro();
         }
 
-        ir = new AnalogSensor();
+        for(int i = 0; i < ir.length; i++){
+            ir[i] = new AnalogSensor("infrared" + i);
+        }
 
         verbose = false;
     }
@@ -74,7 +76,9 @@ public abstract class Drive {
         if (useGyro) {
             gyro.initialize(telemetry, hardwareMap);
         }
-        ir.initialize(hardwareMap);
+        for (int i = 0; i < ir.length; i++) {
+            ir[i].initialize(hardwareMap);
+        }
 
         try {
             motorLeftFront = hardwareMap.dcMotor.get("front left");

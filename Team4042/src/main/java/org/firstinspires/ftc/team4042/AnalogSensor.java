@@ -12,19 +12,20 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class AnalogSensor {
     private int ultraCount = 5;
     HardwareMap hardwareMap;
-    AnalogInput[] infrared = new AnalogInput[5];
+    AnalogInput infrared;
+    String ir;
     double[] vals = new double[250];
 
-    public AnalogSensor(AnalogInput infrared) { }
+    public AnalogSensor(String ir) {
+        this.ir = ir;
+    }
 
     public void initialize(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
-        for(int i = 0; i < ultraCount; i++){
-            infrared[i] = hardwareMap.analogInput.get("infrared" + i);
-        }
+        infrared = hardwareMap.analogInput.get(ir);
     }
 
-    public double getVoltageAvg(AnalogInput infrared) {
+    public double getVoltageAvg() {
         if (infrared == null) { return -1; }
         double sum = 0;
         for (int i = 0; i < vals.length; i++) {
@@ -34,7 +35,7 @@ public class AnalogSensor {
         return voltage;
     }
 
-    public double getVoltageRept(AnalogInput infrared) {
+    public double getVoltageRept() {
         if (infrared == null) { return -1; }
         SparseIntArray occurrences = new SparseIntArray(); //A list of inches and the number of times they've occurred
         while (true) {
@@ -58,17 +59,17 @@ public class AnalogSensor {
      */
     private int getInFromVolt(double voltage) {
         if (voltage == -1) { return -1; }
-        return (int)Math.round(6.48 * Math.pow(voltage, -1.5));
+        return (int)Math.round(63.9224 * Math.pow(0.106743, voltage) + 4.71592);
     }
 
-    public double getInchesAvg(AnalogInput infrared) {
-        double voltage = getVoltageAvg(infrared);
+    public double getInchesAvg() {
+        double voltage = getVoltageAvg();
         double inches = getInFromVolt(voltage);
         return inches;
     }
 
-    public double getInchesRept(AnalogInput infrared) {
-        double voltage = getVoltageRept(infrared);
+    public double getInchesRept() {
+        double voltage = getVoltageRept();
         double inches = getInFromVolt(voltage);
         return inches;
     }
