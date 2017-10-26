@@ -62,7 +62,7 @@ public class AnalogSensor {
         return (int)Math.round(63.9224 * Math.pow(0.106743, voltage) + 4.71592);
     }
 
-    public double getInchesAvg() {
+    public double getCmAvg() {
         double voltage = getVoltageAvg();
         double inches = getInFromVolt(voltage);
         return inches;

@@ -1,10 +1,7 @@
 package org.firstinspires.ftc.team4042;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -103,10 +100,10 @@ public class MecanumDrive extends Drive {
     public boolean driveWithSensor(Direction direction, double speed, double targetDistance, AnalogSensor ir) {
         //Ping 10 times and average the results
         /*double sum = 0;
-        for (int i = 0; i < 10; i++) { sum += ir.getInchesAvg(); }
+        for (int i = 0; i < 10; i++) { sum += ir.getCmAvg(); }
         double currDistance = sum / 10;*/
 
-        double currDistance = ir.getInchesAvg();
+        double currDistance = ir.getCmAvg();
         if (currDistance == -1) {
             telemetry.addData("Error", "Couldn't find ultrasonic");
             return true;
