@@ -57,9 +57,9 @@ public class AnalogSensor {
      * @param voltage The voltage returned by the IR
      * @return The inch equivalent
      */
-    private int getInFromVolt(double voltage) {
+    private double getInFromVolt(double voltage) {
         if (voltage == -1) { return -1; }
-        return (int)Math.round(63.9224 * Math.pow(0.106743, voltage) + 4.71592);
+        return 63.9224 * Math.pow(0.106743, voltage) + 4.71592;
     }
 
     public double getCmAvg() {
