@@ -2,6 +2,7 @@ package org.firstinspires.ftc.team4042;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import java.util.ArrayList;
 
@@ -21,6 +22,9 @@ public class TeleOpMecanum extends OpMode {
     private boolean aRight = false;
 
     private boolean aA = false;
+
+    private DcMotor intakeLeft;
+    private DcMotor intakeRight;
 
     //Declare OpMode members.
     private MecanumDrive drive = new MecanumDrive(true);
@@ -68,6 +72,9 @@ public class TeleOpMecanum extends OpMode {
 
         adjustedSpeed = MecanumDrive.FULL_SPEED;
         glyph = new GlyphPlacementSystem(hardwareMap);
+
+        intakeLeft = hardwareMap.dcMotor.get("IntakeLeft");
+        intakeRight = hardwareMap.dcMotor.get("IntakeRight");
     }
     
     @Override
@@ -115,17 +122,29 @@ public class TeleOpMecanum extends OpMode {
 
         double bRightTrigger = drive.deadZone(gamepad2.right_trigger);
         if (bRightTrigger > 0) {
-            //TODO: RUN RIGHT INTAKE FORWARD
+            intakeRight.setPower(1);
+        }
+        else {
+            intakeRight.setPower(0);
         }
         double bLeftTrigger = drive.deadZone(gamepad2.left_trigger);
         if (bLeftTrigger > 0) {
-            //TODO: RUN LEFT INTAKE FORWARD
+            intakeLeft.setPower(1);
+        }
+        else {
+            intakeLeft.setPower(0);
         }
         if (gamepad2.right_bumper) {
-            //TODO: RUN RIGHT INTAKE BACKWARD
+            intakeRight.setPower(-1);
+        }
+        else {
+            intakeRight.setPower(0);
         }
         if (gamepad2.left_bumper) {
-            //TODO: RUN LEFT INTAKE BACKWARD
+            intakeLeft.setPower(-1);
+        }
+        else {
+            intakeLeft.setPower(0);
         }
 
         telemetryUpdate();
