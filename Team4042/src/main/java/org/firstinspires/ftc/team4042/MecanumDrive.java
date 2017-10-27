@@ -97,11 +97,13 @@ public class MecanumDrive extends Drive {
      * @param ir The AnalogSensor with which to get the distance
      * @return Whether you've reached the target point
      */
-    public boolean driveWithSensor(Direction direction, double speed, double targetDistance, AnalogSensor ir) {
+    public boolean driveWithSensor(Direction direction, double speed, double targetDistance, double targetTicks, AnalogSensor ir) {
         //Ping 10 times and average the results
         /*double sum = 0;
         for (int i = 0; i < 10; i++) { sum += ir.getCmAvg(); }
         double currDistance = sum / 10;*/
+
+        //TODO: THIS FUNCTION IS ALL WRONG
 
         double currDistance = ir.getCmAvg();
         if (currDistance == -1) {

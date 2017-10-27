@@ -15,7 +15,6 @@ public class AutoEncoderTest extends LinearOpMode {
 
         waitForStart();
 
-        //TODO: TEST THIS
         drive.setEncoders(true);
         autoDrive(Direction.Forward, Drive.FULL_SPEED, 1000000);
         //check sensor sums

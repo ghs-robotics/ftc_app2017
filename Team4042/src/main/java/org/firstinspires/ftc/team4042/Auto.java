@@ -212,9 +212,10 @@ public class Auto {
     public void autoSensorMove(HashMap<String, String> parameters) {
         Direction direction = new Direction(Double.parseDouble(parameters.get("x")), Double.parseDouble(parameters.get("y")));
         double speed = Double.parseDouble(parameters.get("speed"));
-        double targetDistance = Double.parseDouble(parameters.get("target"));
+        double targetDistance = Double.parseDouble(parameters.get("distance"));
+        double targetTicks = Double.parseDouble(parameters.get("target"));
 
-        autoSensorMove(direction, speed, targetDistance);
+        autoSensorMove(direction, speed, targetDistance, targetTicks);
     }
 
     /**
@@ -224,18 +225,18 @@ public class Auto {
      * @param targetDistance The final distance to have travelled, in encoder ticks
      * @param ir The sensor to read a distance from
      */
-    private void autoSensorMove(Direction direction, double speed, double targetDistance, AnalogSensor ir) {
+    private void autoSensorMove(Direction direction, double speed, double targetDistance, double targetTicks, AnalogSensor ir) {
         boolean done = false;
         while (!done) {
-            done = drive.driveWithSensor(direction, speed, targetDistance, ir);
+            done = drive.driveWithSensor(direction, speed, targetDistance, targetTicks, ir);
             telemetry.update();
         }
     }
 
-    private void autoSensorMove(Direction direction, double speed, double targetDistance) {
+    private void autoSensorMove(Direction direction, double speed, double targetDistance, double targetTicks) {
         boolean done = false;
         while (!done) {
-            done = drive.driveWithSensor(direction, speed, targetDistance, drive.ir[0]);
+            done = drive.driveWithSensor(direction, speed, targetDistance, targetTicks, drive.ir[0]);
             telemetry.update();
         }
     }
