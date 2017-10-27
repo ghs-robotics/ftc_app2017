@@ -93,7 +93,6 @@ public class TeleOpMecanum extends OpMode {
         if (Drive.useGyro) {
             drive.useGyro();
         }
-        telemetry.update();
 
         //If you push the left bumper, dials the speed down
         if (gamepad1.left_bumper && !aLeftBumper && (adjustedSpeed - 0.25) >= 0) {
@@ -108,7 +107,7 @@ public class TeleOpMecanum extends OpMode {
         }
         aRightBumper = gamepad1.right_bumper;
 
-        //Glyph placement
+        //Glyph locate
         if (gamepad1.dpad_up && !aUp) { glyph.up(); }
         aUp = gamepad1.dpad_up;
         if (gamepad1.dpad_down && !aDown) { glyph.down(); }
@@ -118,31 +117,31 @@ public class TeleOpMecanum extends OpMode {
         if (gamepad1.dpad_right && !aRight) { glyph.right(); }
         aRight = gamepad1.dpad_right;
 
+        //Places glyph
         if (gamepad1.a) { glyph.place(); }
         aA = gamepad1.a;
 
-        intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        intakeRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        //Right trigger of the b controller runs the right intake forward
         double bRightTrigger = drive.deadZone(gamepad2.right_trigger);
         if (bRightTrigger > 0) {
-            intakeRight.setPower(1);
+            intakeRight.setPower(bRightTrigger);
         }
-        else {
-            intakeRight.setPower(0);
-        }
-        double bLeftTrigger = drive.deadZone(gamepad2.left_trigger);
-        if (bLeftTrigger > 0) {
-            intakeLeft.setPower(1);
-        }
-        else {
-            intakeLeft.setPower(0);
-        }
-        if (gamepad2.right_bumper) {
+        //Right bumper of the b controller runs the right intake backwards
+        else if (gamepad2.right_bumper) {
             intakeRight.setPower(-1);
         }
         else {
             intakeRight.setPower(0);
         }
-        if (gamepad2.left_bumper) {
+
+        //Left trigger of the b controller runs the left intake forward
+        double bLeftTrigger = drive.deadZone(gamepad2.left_trigger);
+        if (bLeftTrigger > 0) {
+            intakeLeft.setPower(bLeftTrigger);
+        }
+        //Left bumper of the b controller runs the left intake backwards
+        else if (gamepad2.left_bumper) {
             intakeLeft.setPower(-1);
         }
         else {
@@ -155,6 +154,7 @@ public class TeleOpMecanum extends OpMode {
     private void telemetryUpdate() {
         telemetry.addData("Speed mode", adjustedSpeed);
         telemetry.addData("Glyph", glyph.getPositionAsString());
+        telemetry.update();
     }
 
     /* CODE FROM HERE DOWN IS AN ATTEMPT TO IMPLEMENT DYLAN'S DRIVE ALGORITHM
