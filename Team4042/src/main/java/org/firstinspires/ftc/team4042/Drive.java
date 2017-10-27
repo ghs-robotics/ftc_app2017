@@ -266,15 +266,7 @@ public abstract class Drive {
         b = Math.abs(b);
         c = Math.abs(c);
         d = Math.abs(d);
-
-        double max = a;
-        double[] vals = {b, c, d};
-
-        for (int i = 0; i < 3; i++) {
-            if (vals[i] > max) {
-                max = vals[i];
-            }
-        }
-        return max;
+        
+        return  Math.max(Math.max(Math.max(a, b), c), d);;
     }
 }

@@ -26,6 +26,8 @@ public class GlyphPlacementSystem
     private String baseOutput;
     private DigitalChannel homeLimit;
     private DcMotor verticalDrive;
+    private final int BASE_DISP = 0;
+    private final int BLOCK_DISP = 0;
 
     public GlyphPlacementSystem(HardwareMap map)
     {
@@ -111,6 +113,7 @@ public class GlyphPlacementSystem
 
     public void place() {
         //TODO: motor code here
+
         /*
         Assuming motor forward power moves it right and up
         Move sideways motor (block distance * (targetX - currentX))
@@ -120,6 +123,8 @@ public class GlyphPlacementSystem
 
     public void runToPosition()
     {
-
+        if(homeLimit.getState()) {
+            currentPositon = 0;
+        }
     }
 }
