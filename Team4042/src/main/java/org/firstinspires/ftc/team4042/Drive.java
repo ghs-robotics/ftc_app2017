@@ -267,6 +267,6 @@ public abstract class Drive {
         c = Math.abs(c);
         d = Math.abs(d);
         
-        return  Math.max(Math.max(Math.max(a, b), c), d);;
+        return  Math.max(Math.max(Math.max(a, b), c), d);
     }
 }
