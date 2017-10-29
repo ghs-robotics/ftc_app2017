@@ -100,12 +100,12 @@ public class MecanumDrive extends Drive {
     public boolean driveWithSensor(Direction direction, double speed, double targetDistance, double targetTicks, AnalogSensor ir) {
         //Ping 10 times and average the results
         /*double sum = 0;
-        for (int i = 0; i < 10; i++) { sum += ir.getCmAvg(); }
+        for (int i = 0; i < 10; i++) { sum += ir.getCmAvgAsShortIR(); }
         double currDistance = sum / 10;*/
 
         //TODO: THIS FUNCTION IS ALL WRONG
 
-        double currDistance = ir.getCmAvg();
+        double currDistance = ir.getCmAvgAsShortIR();
         if (currDistance == -1) {
             telemetry.addData("Error", "Couldn't find ultrasonic");
             return true;

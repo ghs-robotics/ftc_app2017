@@ -64,7 +64,6 @@ public class AnalogSensorTest extends OpMode {
         /*file = new File("./storage/emulated/0/DCIM/ir.txt");
         try {
             writer = new BufferedWriter(new FileWriter(file, true));
-            writer.append("\n\n");
         } catch (IOException ex) {
             telemetry.addData("error", "creating writer");
         }*/
@@ -85,8 +84,8 @@ public class AnalogSensorTest extends OpMode {
 
     @Override
     public void loop() {
-        double cmAvg = ultrasonic.getCmAvg();
-        telemetry.addData("centimeters", cmAvg);
+        telemetry.addData("cm as short ir", ultrasonic.getCmAvgAsShortIR());
+        telemetry.addData("cm as long ir", ultrasonic.getCmAvgAsLongIR());
         telemetry.update();
 
         /*try {
@@ -98,6 +97,7 @@ public class AnalogSensorTest extends OpMode {
 
     public void stop() {
         /*try {
+            writer.append("\n\n");
             writer.close();
         } catch (IOException ex) {
             telemetry.addData("error", "trying to close writer");
