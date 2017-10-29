@@ -3,7 +3,6 @@ package org.firstinspires.ftc.team12788;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import java.util.ArrayList;
@@ -12,7 +11,7 @@ import java.util.ArrayList;
 public class TeleOpMecanum extends OpMode {
 
     //Declare OpMode members.
-    private MecanumDrive drive = new MecanumDrive(true);
+    private MecanumDrive drive = new MecanumDrive();
 
     //private UltrasonicI2cRangeSensor sensor;
     private ArrayList<Integer> rangeData;
@@ -40,14 +39,11 @@ public class TeleOpMecanum extends OpMode {
 
         drive.drive(false, gamepad1, gamepad2, adjustedSpeed * MecanumDrive.FULL_SPEED);
         liftLeft = hardwareMap.dcMotor.get("moo");
-        hardwareMap.dcMotor.get("cluck")
-        hardwareMap.dcMotor.get("chirp")
-        hardwareMap.dcMotor.get("baa")
-        hardwareMap.servo.get("bork")
+        hardwareMap.dcMotor.get("cluck");
+        hardwareMap.dcMotor.get("chirp");
+        hardwareMap.dcMotor.get("baa");
+        hardwareMap.servo.get("bork");
 
-        if (Drive.useGyro) {
-            drive.useGyro();
-        }
         if (gamepad2.dpad_up) {
             liftLeft.setPower(1);
             liftRight.setPower(-1);

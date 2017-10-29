@@ -1,9 +1,5 @@
 package org.firstinspires.ftc.team12788;
 
-/**
- * Created by Hazel on 10/10/2017.
- */
-
 public class Direction {
 
     private double x;
