@@ -30,7 +30,7 @@ public abstract class Drive {
     Telemetry.Log log;
 
     //Require drive() in subclasses
-    public abstract void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor);
+    public abstract void drive(boolean useEncoders, Gamepad gamepad1, double speedFactor, boolean invert);
 
     public Drive() {}
 
