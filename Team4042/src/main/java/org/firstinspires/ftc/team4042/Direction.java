@@ -40,6 +40,22 @@ public class Direction {
         this.y = y;
     }
 
+    /**
+     * Returns true if the direction is more forward than backward
+     * @return Whether the direction is more forward than backward
+     */
+    public boolean isForward() {
+        return y >= 0;
+    }
+
+    /**
+     * Returns true if the direction is more backward than forward
+     * @return Whether the direction is more backward than forward
+     */
+    public boolean isBackward() {
+        return y < 0;
+    }
+
     @Override
     public String toString() {
         return "(" + x + ", " + y + ")";
