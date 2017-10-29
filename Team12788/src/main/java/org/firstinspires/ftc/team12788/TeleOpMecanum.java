@@ -26,18 +26,22 @@ public class TeleOpMecanum extends OpMode {
     public Servo grabLeft;
     public Servo grabRight;
 
+    private boolean invert;
+
     @Override
     public void init() {
         drive.initialize(telemetry, hardwareMap);
         telemetry.update();
 
         adjustedSpeed = MecanumDrive.FULL_SPEED;
+
+        invert = false;
     }
     
     @Override
     public void loop() {
 
-        drive.drive(false, gamepad1, gamepad2, adjustedSpeed * MecanumDrive.FULL_SPEED);
+        drive.drive(false, gamepad1,adjustedSpeed * MecanumDrive.FULL_SPEED, invert);
         liftLeft = hardwareMap.dcMotor.get("moo");
         hardwareMap.dcMotor.get("cluck");
         hardwareMap.dcMotor.get("chirp");

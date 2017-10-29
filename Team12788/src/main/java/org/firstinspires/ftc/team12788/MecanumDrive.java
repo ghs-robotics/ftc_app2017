@@ -22,12 +22,17 @@ public class MecanumDrive extends Drive {
      *
      * @param useEncoders determines whether or not the motors use encoders
      */
-    public void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor) {
+    public void drive(boolean useEncoders, Gamepad gamepad1, double speedFactor, boolean invert) {
         super.setEncoders(useEncoders);
 
         double x = gamepad1.left_stick_x;
         double y = -gamepad1.left_stick_y; //Y is the opposite direction of what's intuitive: forward is -1, backwards is 1
         double r = gamepad1.right_stick_x;
+
+        if (invert) {
+            x = -1 * x;
+            y = -1 * y;
+        }
 
         driveXYR(speedFactor, x, y, r);
     }
