@@ -38,7 +38,7 @@ public class GlyphPlacementSystem
     {
         this.homeLimit = map.digitalChannel.get("Limit");
         this.verticalDrive = map.dcMotor.get("Vertical Drive");
-        this.baseOutput = "[_______]\n[_______]\n[_______]\n[_______]";
+        this.baseOutput = "[ _ _ _ ]\n[ _ _ _ ]\n[ _ _ _ ]\n[ _ _ _ ]";
         this.targetX = currentX;
         this.targetY = currentY;
         this.currentX = currentX;
@@ -61,26 +61,26 @@ public class GlyphPlacementSystem
 
             case(2): output[6] = 'X'; break;
 
-            case(3): output[13] = 'X'; break;
+            case(3): output[12] = 'X'; break;
 
-            case(4): output[15] = 'X'; break;
+            case(4): output[14] = 'X'; break;
 
-            case(5): output[17] = 'X'; break;
+            case(5): output[16] = 'X'; break;
 
-            case(6): output[24] = 'X'; break;
+            case(6): output[22] = 'X'; break;
 
-            case(7): output[26] = 'X'; break;
+            case(7): output[24] = 'X'; break;
 
-            case(8): output[28] = 'X'; break;
+            case(8): output[26] = 'X'; break;
 
-            case(9): output[35] = 'X'; break;
+            case(9): output[32] = 'X'; break;
 
-            case(10): output[37] = 'X'; break;
+            case(10): output[34] = 'X'; break;
 
-            case(11): output[39] = 'X'; break;
+            case(11): output[36] = 'X'; break;
         }
 
-        return new String(output);
+        return "\n" + new String(output);
     }
 
     public int getPosition() {

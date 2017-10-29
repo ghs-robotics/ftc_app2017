@@ -124,7 +124,9 @@ public class TeleOpMecanum extends OpMode {
         if (gamepad2.a) { glyph.place(); }
         bA = gamepad2.a;
 
-        intakeRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        //The left intake is mounted "backwards"
+        intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+
         //Right trigger of the b controller runs the right intake forward
         double bRightTrigger = drive.deadZone(gamepad2.right_trigger);
         if (bRightTrigger > 0) {

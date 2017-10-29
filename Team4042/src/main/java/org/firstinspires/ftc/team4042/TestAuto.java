@@ -1,10 +1,9 @@
 package org.firstinspires.ftc.team4042;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name="BlueBottomAuto", group="K9bot")
-public class BlueBottomAuto extends Auto {
+@Autonomous(name="TestAuto", group="K9bot")
+public class TestAuto extends Auto {
 
     MecanumDrive drive = new MecanumDrive(true);
 
@@ -13,7 +12,7 @@ public class BlueBottomAuto extends Auto {
         drive.setUseGyro(true);
         drive.initialize(telemetry, hardwareMap);
 
-        super.setUp(drive, "bluebottom.txt");
+        super.setUp(drive, "test.txt");
         waitForStart();
 
         //TODO: TEST THIS
