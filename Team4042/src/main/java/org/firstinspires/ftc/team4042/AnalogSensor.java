@@ -58,7 +58,8 @@ public class AnalogSensor {
 
     private int getCmAsLongIR(double voltage) {
         if (voltage == -1) { return -1; }
-        return (int)Math.round(51.0608 * Math.pow(voltage, -1.2463) - -1.2463);
+        return (int)Math.round(51.0608 * Math.pow(voltage, -1.2463) + 4.7463);
+        //return (int)Math.round(51.0608 * Math.pow(voltage, -1.2463) - 1.2463);
     }
 
     /*private double getVReptAsShortIR() {
