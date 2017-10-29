@@ -18,6 +18,7 @@ import org.opencv.core.CvType;
 import org.opencv.core.DMatch;
 import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.core.MatOfDMatch;
@@ -36,6 +37,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.lasarobotics.vision.android.Util.getContext;
+import static org.opencv.core.Core.CMP_GT;
 import static org.opencv.imgcodecs.Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE;
 import static org.opencv.imgcodecs.Imgcodecs.imread;
 
@@ -61,7 +63,7 @@ public class CameraTestVisionOpMode extends TestableVisionOpMode {
     public void init() {
         super.init();
         this.setFrameSize(new Size(3264, 1836));
-        Mat mkernel = new Mat();
+        Mat mkernel = new Mat( 3, 3, CvType.CV_32S );
         mkernel.put(3, 3, kernel);
 
 
@@ -90,8 +92,7 @@ public class CameraTestVisionOpMode extends TestableVisionOpMode {
     }
 
     private int distToPos (double d) {
-        //return (int) (FUNCTION_A_A) / (d - FUNCTION_A_B) + FUNCTION_A_C)
-     return 1;
+        return (int) (FUNCTION_A_A / (d - FUNCTION_A_B) + FUNCTION_A_C);
     }
 
 
@@ -104,17 +105,21 @@ public class CameraTestVisionOpMode extends TestableVisionOpMode {
         return bad;
     }
 
-    /*private double[] findTape(double d, Mat in, double[][] kernel) {
+    private double[] findTape(double d, Mat in, double[][] kernel) {
         int yin = distToPos(d);
         double[] result = new double[2];
-        Mat kmat = null;
+        int width = in.width();
+        int height = in.height();
+        Rect crop = new Rect(0, yin-2, width, 5);
+        Mat kmat = new Mat(height, width, CvType.CV_32S);
 
         Imgproc.cvtColor(in, in, Imgproc.COLOR_RGBA2GRAY);
         Imgproc.filter2D(in, kmat, -1, mkernel);
+        kmat = new Mat(kmat, crop);
         Core.absdiff(kmat, Scalar.all(0), kmat);
-        Mat maybe = null;
-        Core.reduce(kmat, maybe, 0, Core.REDUCE_SUM, Core.);
-
-
-    }*/
+        Mat maybe = new Mat(1, width, CvType.CV_32S);
+        Core.reduce(kmat, maybe, 0, Core.REDUCE_SUM, CvType.CV_32S);
+        Core.compare(maybe, Scalar.all(TAPE_THRESHOLD), maybe, Core.CMP_GT);
+        Core.findNonZero(maybe, maybe);
+    }
 }
