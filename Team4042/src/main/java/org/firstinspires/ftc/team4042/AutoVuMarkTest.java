@@ -23,36 +23,14 @@ public class AutoVuMarkTest extends LinearOpMode{
         occurences = new HashMap<>();
 
         vuMarkIdentifier = new VuMarkIdentifier();
-        /*vuMarkIdentifier.initialize(telemetry, hardwareMap);
-
-        waitForStart();
-
-        vuMarkIdentifier.start();
-
-        while (opModeIsActive()) {
-            RelicRecoveryVuMark vuMark;
-            do {
-                vuMark = vuMarkIdentifier.getMark();
-                telemetry.addData("vuMark", "UNKNOWN");
-                telemetry.update();
-            } while (vuMark.equals(RelicRecoveryVuMark.UNKNOWN));
-
-            //Increments the value for the associated vumark
-            if (occurences.containsKey(vuMark)) {
-                occurences.put(vuMark, occurences.get(vuMark) + 1);
-            } else {
-                occurences.put(vuMark, 1);
-            }
-
-            telemetry.addData("vuMark", vuMark);
-            telemetry.addData("Left", occurences.get(RelicRecoveryVuMark.LEFT));
-            telemetry.addData("Center", occurences.get(RelicRecoveryVuMark.CENTER));
-            telemetry.addData("Right", occurences.get(RelicRecoveryVuMark.RIGHT));
-            telemetry.update();
-        }*/
-
-        waitForStart();
-
         vuMarkIdentifier.initialize(telemetry, hardwareMap);
+
+        waitForStart();
+
+        RelicRecoveryVuMark vuMark = vuMarkIdentifier.getMark();
+        while (opModeIsActive()) {
+            telemetry.addData("vuMark", vuMark);
+            telemetry.update();
+        }
     }
 }

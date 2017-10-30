@@ -1,7 +1,2 @@
-#function:d|r|s - dead-reckoning drive|gyro rotation (x = -1 for counter-clockwise; 1 for clockwise) until distance|sensor drive until name returns distance
-#d parameters - x:[number], y:[number], speed:[number], target:[number]
-#r parameters - r:[number], speed:[number], target:[number]
-#s parameters - x:[number], y:[number], speed:[number], target:[number]
-#ex: function:d x:1 y:.2 speed:.5 target:1000 will drive right and slightly forward at half speed for 1000 encoder ticks
 function:d x:0 y:-1 speed:.5 target:3000
 function:r r:-1 speed:.1 target:1500

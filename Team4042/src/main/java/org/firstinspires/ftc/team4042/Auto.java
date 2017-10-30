@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,15 +18,25 @@ import java.util.HashMap;
 public abstract class Auto extends LinearOpMode {
 
     MecanumDrive drive = new MecanumDrive(false);
-    Telemetry.Log log;
+    private VuMarkIdentifier vuMarkIdentifier = new VuMarkIdentifier();
+    private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
+
+    private Telemetry.Log log;
 
     File file;
 
-    ArrayList<AutoInstruction> instructions = new ArrayList<>();
+    private ArrayList<AutoInstruction> instructions = new ArrayList<>();
 
     public void setUp(MecanumDrive drive, String filePath) {
         this.drive = drive;
+
+        drive.initialize(telemetry, hardwareMap);
+        drive.glyph = new GlyphPlacementSystem(1, 0, hardwareMap);
+        drive.setUseGyro(true);
+        telemetry.update();
+
         log = telemetry.log();
+        vuMarkIdentifier.initialize(telemetry, hardwareMap);
 
         log.add("Reading file " + filePath);
         file = new File("./storage/emulated/0/DCIM/" + filePath);
@@ -73,8 +84,15 @@ public abstract class Auto extends LinearOpMode {
                         case "s":
                             functionName = "autoSensorDrive";
                             break;
-                        case "v":
+                        case "j":
                             functionName = "knockJewel";
+                            break;
+                        case "v":
+                            functionName = "getVuMark";
+                            break;
+                        case "p":
+                            functionName = "placeGlyph";
+                            break;
                         default:
                             System.err.println("Unknown function called from file " + file);
                             break;
@@ -101,9 +119,6 @@ public abstract class Auto extends LinearOpMode {
      * Runs the list of instructions
      */
     public void runAuto() {
-        drive.initialize(telemetry, hardwareMap);
-        drive.setUseGyro(true);
-        telemetry.update();
 
         //TODO: TEST THIS
         drive.resetEncoders();
@@ -126,6 +141,12 @@ public abstract class Auto extends LinearOpMode {
                 case "knockJewel":
                     knockJewel(parameters);
                     break;
+                case "getVuMark":
+                    getVuMark(parameters);
+                    break;
+                case "placeGlyph":
+                    placeGlyph(parameters);
+                    break;
             }
         }
 
@@ -146,6 +167,24 @@ public abstract class Auto extends LinearOpMode {
         //move right until we see -^-^-| from ultrasonic
         //place block
         //detach and extend robot towards glyph
+    }
+
+    public void getVuMark(HashMap<String, String> parameters) {
+        vuMark = vuMarkIdentifier.getMark();
+    }
+
+    public void placeGlyph(HashMap<String, String> parameters) {
+        //The vumark placement system starts at (1, 0), which is the bottom of the center column
+        if (vuMark.equals(RelicRecoveryVuMark.LEFT)) {
+            drive.glyph.left();
+        } else if (vuMark.equals(RelicRecoveryVuMark.RIGHT)) {
+            drive.glyph.right();
+        }
+
+        if (!vuMark.equals(RelicRecoveryVuMark.UNKNOWN)) {
+            drive.glyph.place();
+        }
+
     }
 
     public void knockJewel(HashMap<String, String> parameters) {

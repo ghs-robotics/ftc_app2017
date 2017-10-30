@@ -10,8 +10,6 @@ public class BlueBottomAuto extends Auto {
 
     @Override
     public void runOpMode() {
-        drive.setUseGyro(true);
-        drive.initialize(telemetry, hardwareMap);
 
         super.setUp(drive, "bluebottom.txt");
         waitForStart();

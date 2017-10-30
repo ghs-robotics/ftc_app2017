@@ -104,22 +104,6 @@ public class VuMarkIdentifier {
             parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
             this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
 
-            //Load the data set containing the VuMarks for Relic Recovery.
-            relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
-            relicTemplate = relicTrackables.get(0);
-
-            relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
-
-            relicTrackables.activate();
-
-            RelicRecoveryVuMark relicRecoveryVuMark;
-
-            do {
-                relicRecoveryVuMark = RelicRecoveryVuMark.from(relicTemplate);
-                telemetry.addData("vuMark", relicRecoveryVuMark);
-                telemetry.update();
-            } while (relicRecoveryVuMark.equals(RelicRecoveryVuMark.UNKNOWN));
-
         } catch (VuforiaLocalizerImpl.FailureException ex) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -129,11 +113,21 @@ public class VuMarkIdentifier {
         }
     }
 
-    public void start() {
-        relicTrackables.activate();
-    }
-
     public RelicRecoveryVuMark getMark() {
-        return RelicRecoveryVuMark.from(relicTemplate);
+        //Load the data set containing the VuMarks for Relic Recovery.
+        relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
+        relicTemplate = relicTrackables.get(0);
+
+        relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
+
+        relicTrackables.activate();
+
+        RelicRecoveryVuMark relicRecoveryVuMark;
+
+        do {
+            relicRecoveryVuMark = RelicRecoveryVuMark.from(relicTemplate);
+        } while (relicRecoveryVuMark.equals(RelicRecoveryVuMark.UNKNOWN));
+
+        return relicRecoveryVuMark;
     }
 }
