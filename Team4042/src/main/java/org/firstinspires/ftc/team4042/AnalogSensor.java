@@ -8,41 +8,36 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
  */
 
 public class AnalogSensor {
-    private int ultraCount = 5;
-    HardwareMap hardwareMap;
-    AnalogInput infrared;
-    String ir;
-    double[] vals = new double[250];
+    private AnalogInput sensor;
+    private String name;
+    private boolean isLongRange;
 
-    public AnalogSensor(String ir) {
-        this.ir = ir;
+    public AnalogSensor(String name, boolean isLongRange) {
+        this.name = name;
+        this.isLongRange = isLongRange;
     }
 
     public void initialize(HardwareMap hardwareMap) {
-        this.hardwareMap = hardwareMap;
-        infrared = hardwareMap.analogInput.get(ir);
+        sensor = hardwareMap.analogInput.get(name);
     }
 
-    public double getCmAvgAsShortIR() {
+    public double getCmAvg() {
         double voltage = getVAvg();
-        double cm = getCmAsShortIR(voltage);
-        return cm;
+        if (isLongRange) {
+            return getCmAsLongIR(voltage);
+        } else {
+            return getCmAsShortIR(voltage);
+        }
     }
 
     private double getVAvg() {
-        if (infrared == null) { return -1; }
+        if (sensor == null) { return -1; }
         double sum = 0;
-        for (int i = 0; i < vals.length; i++) {
-            sum += infrared.getVoltage();
+        for (int i = 0; i < 250; i++) {
+            sum += sensor.getVoltage();
         }
-        double voltage = sum/vals.length;
+        double voltage = sum/250;
         return voltage;
-    }
-
-    public double getCmAvgAsLongIR() {
-        double voltage = getVAvg();
-        double cm = getCmAsLongIR(voltage);
-        return cm;
     }
 
     /**
@@ -63,10 +58,10 @@ public class AnalogSensor {
     }
 
     /*private double getVReptAsShortIR() {
-        if (infrared == null) { return -1; }
+        if (sensor == null) { return -1; }
         SparseIntArray occurrences = new SparseIntArray(); //A list of inches and the number of times they've occurred
         while (true) {
-            double voltage = infrared.getVoltage(); //Gets the voltage
+            double voltage = sensor.getVoltage(); //Gets the voltage
             int inches = getIntFromVAsShortIR(voltage); //Gets the voltage in inches
             //Gets the number of times the voltage has occurred, or 0 if it hasn't yet
             int count = occurrences.get(inches, 0);

@@ -1,7 +1,10 @@
 package org.firstinspires.ftc.team4042;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -12,12 +15,19 @@ public class MecanumDrive extends Drive {
     //Used for not-field-oriented drive
     public static final int OFFSET = 0;
 
+    public GlyphPlacementSystem glyph;
+
     /**
      * Constructor for Drive, it creates the motors and the gyro objects
      */
     public MecanumDrive() {
         //Initialize motors and gyro
         super();
+    }
+
+    @Override
+    public void initialize(Telemetry telemetry, HardwareMap hardwareMap) {
+        super.initialize(telemetry, hardwareMap);
     }
 
     public MecanumDrive(boolean verbose) {
@@ -87,59 +97,6 @@ public class MecanumDrive extends Drive {
 
         //sets the wheel powers to the appropriate ratios
         super.setMotorPower(speedWheel, speedFactor);
-    }
-
-    /**
-     * Moves at a direction until the AnalogSensor returns the desired input
-     * @param direction The direction to move in
-     * @param speed The speed to move at
-     * @param targetDistance The distance to end up at
-     * @param ir The AnalogSensor with which to get the distance
-     * @return Successful?
-     */
-    public boolean driveWithSensor(Direction direction, double speed, double targetDistance, double targetTicks, AnalogSensor ir) {
-
-        //TODO: THIS FUNCTION IS ALL WRONG
-
-        double r = useGyro();
-
-        //Drives with the encoders the set amount
-        try {
-            boolean done = false;
-            while (!done) {
-                done = driveWithEncoders(direction, speed, targetTicks);
-            }
-        } catch (IllegalArgumentException ex) {
-            telemetry.addData("Error", "Illegal direction " + direction + " inputted to driveWithSensor");
-            return false;
-        }
-
-        //Checks its current position
-        double currDistance = ir.getCmAvgAsShortIR();
-        if (currDistance == -1) {
-            telemetry.addData("Error", "Couldn't find ultrasonic");
-            return false;
-        } else {
-            telemetry.addData("currDistance", currDistance);
-            telemetry.addData("Reached target", Math.abs(targetDistance - currDistance) > 2);
-            telemetry.addData("x", direction.getX());
-            telemetry.addData("y", direction.getY());
-            telemetry.addData("r", r);
-
-            //If you're off your target by more than 2 cm, try to adjust
-            while (Math.abs(targetDistance - currDistance) > 2) {
-                if (targetDistance > currDistance) { //If you're not far enough, keep driving
-                    driveXYR(speed, direction.getX(), direction.getY(), r, false);
-                    return false;
-                } else if (targetDistance < currDistance) { //If you're too far, drive backwards
-                    driveXYR(speed, direction.getX(), -direction.getY(), r, false);
-                }
-            }
-
-            //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
-            stopMotors();
-            return true;
-        }
     }
 
     /**

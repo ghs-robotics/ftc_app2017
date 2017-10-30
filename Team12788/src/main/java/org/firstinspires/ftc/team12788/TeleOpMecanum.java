@@ -89,8 +89,6 @@ public class TeleOpMecanum extends OpMode {
             invert = true;
         }
 
-
-
     }
 
     private void telemetryUpdate() {
