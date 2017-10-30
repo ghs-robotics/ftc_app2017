@@ -55,7 +55,7 @@ public abstract class Drive {
         }
 
         for(int i = 0; i < ir.length; i++){
-            ir[i] = new AnalogSensor("infrared" + i);
+            ir[i] = new AnalogSensor("infrared" + i, false);
         }
 
         verbose = false;
@@ -221,16 +221,16 @@ public abstract class Drive {
         if (useMotors) {
             //Sets the power
             if (motorLeftFront != null) {
-                motorLeftFront.setPower(speedWheel[0]);
+                motorLeftFront.setPower(deadZone(speedWheel[0]));
             }
             if (motorRightFront != null) {
-                motorRightFront.setPower(-speedWheel[1]);
+                motorRightFront.setPower(deadZone(-speedWheel[1]));
             } //The right motors are mounted "upside down", which is why we have to inverse this
             if (motorRightBack != null) {
-                motorRightBack.setPower(-speedWheel[2]);
+                motorRightBack.setPower(deadZone(-speedWheel[2]));
             }
             if (motorLeftBack != null) {
-                motorLeftBack.setPower(speedWheel[3]);
+                motorLeftBack.setPower(deadZone(speedWheel[3]));
             }
         }
 

@@ -3,24 +3,19 @@ package org.firstinspires.ftc.team4042;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
 @Autonomous(name="BlueBottomAuto", group="K9bot")
-public class BlueBottomAuto extends LinearOpMode {
+public class BlueBottomAuto extends Auto {
 
     MecanumDrive drive = new MecanumDrive(true);
-    Auto auto;
 
     @Override
     public void runOpMode() {
-        drive.setUseGyro(true);
-        drive.initialize(telemetry, hardwareMap);
 
-        auto = new Auto(hardwareMap, drive, telemetry, "bluebottom.txt");
+        super.setUp(drive, "bluebottom.txt");
         waitForStart();
 
         //TODO: TEST THIS
-        auto.runOpMode();
+        super.runAuto();
         
         //check sensor sums
         //robot starts facing right

@@ -1,36 +1,42 @@
 package org.firstinspires.ftc.team4042;
 
-import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.internal.android.dx.rop.code.Exceptions;
+import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.Array;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Auto {
+@Autonomous(name="DO NOT RUN THIS AUTO", group="K9bot")
+public abstract class Auto extends LinearOpMode {
 
     MecanumDrive drive = new MecanumDrive(false);
-    HardwareMap hardwareMap;
-    Telemetry telemetry;
-    Telemetry.Log log;
+    private VuMarkIdentifier vuMarkIdentifier = new VuMarkIdentifier();
+    private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
+
+    private Telemetry.Log log;
 
     File file;
 
-    ArrayList<AutoInstruction> instructions = new ArrayList<>();
+    private ArrayList<AutoInstruction> instructions = new ArrayList<>();
 
-    public Auto(HardwareMap hardwareMap, MecanumDrive drive, Telemetry telemetry, String filePath) {
+    public void setUp(MecanumDrive drive, String filePath) {
         this.drive = drive;
-        this.hardwareMap = hardwareMap;
-        this.telemetry = telemetry;
+
+        drive.initialize(telemetry, hardwareMap);
+        drive.glyph = new GlyphPlacementSystem(1, 0, hardwareMap);
+        drive.setUseGyro(true);
+        telemetry.update();
+
         log = telemetry.log();
+        vuMarkIdentifier.initialize(telemetry, hardwareMap);
 
         log.add("Reading file " + filePath);
         file = new File("./storage/emulated/0/DCIM/" + filePath);
@@ -76,10 +82,17 @@ public class Auto {
                             functionName = "autoRotate";
                             break;
                         case "s":
-                            functionName = "autoSensorMove";
+                            functionName = "autoSensorDrive";
+                            break;
+                        case "j":
+                            functionName = "knockJewel";
                             break;
                         case "v":
-                            functionName = "knockJewel";
+                            functionName = "getVuMark";
+                            break;
+                        case "p":
+                            functionName = "placeGlyph";
+                            break;
                         default:
                             System.err.println("Unknown function called from file " + file);
                             break;
@@ -105,10 +118,7 @@ public class Auto {
     /**
      * Runs the list of instructions
      */
-    public void runOpMode() {
-        drive.initialize(telemetry, hardwareMap);
-        drive.setUseGyro(true);
-        telemetry.update();
+    public void runAuto() {
 
         //TODO: TEST THIS
         drive.resetEncoders();
@@ -125,18 +135,24 @@ public class Auto {
                 case "autoRotate":
                     autoRotate(parameters);
                     break;
-                case "autoSensorMove":
-                    autoSensorMove(parameters);
+                case "autoSensorDrive":
+                    autoSensorDrive(parameters);
                     break;
                 case "knockJewel":
                     knockJewel(parameters);
+                    break;
+                case "getVuMark":
+                    getVuMark(parameters);
+                    break;
+                case "placeGlyph":
+                    placeGlyph(parameters);
                     break;
             }
         }
 
         //autoDrive(new Direction(1, .5), Drive.FULL_SPEED, 1000);
 
-        //autoSensorMove(Direction.Forward, Drive.FULL_SPEED / 4, 7, drive.ir);
+        //autoSensorDrive(Direction.Forward, Drive.FULL_SPEED / 4, 7, drive.ir);
 
         //check sensor sums
         //robot starts facing right
@@ -151,6 +167,24 @@ public class Auto {
         //move right until we see -^-^-| from ultrasonic
         //place block
         //detach and extend robot towards glyph
+    }
+
+    public void getVuMark(HashMap<String, String> parameters) {
+        vuMark = vuMarkIdentifier.getMark();
+    }
+
+    public void placeGlyph(HashMap<String, String> parameters) {
+        //The vumark placement system starts at (1, 0), which is the bottom of the center column
+        if (vuMark.equals(RelicRecoveryVuMark.LEFT)) {
+            drive.glyph.left();
+        } else if (vuMark.equals(RelicRecoveryVuMark.RIGHT)) {
+            drive.glyph.right();
+        }
+
+        if (!vuMark.equals(RelicRecoveryVuMark.UNKNOWN)) {
+            drive.glyph.place();
+        }
+
     }
 
     public void knockJewel(HashMap<String, String> parameters) {
@@ -175,7 +209,7 @@ public class Auto {
     private void autoDrive(Direction direction, double speed, double targetTicks) {
         log.add("autoDrive invoked with direction " + direction + " speed " + speed + " targetTicks " + targetTicks);
         boolean done = false;
-        while (!done) {
+        while (!done && opModeIsActive()) {
             done = drive.driveWithEncoders(direction, speed, targetTicks);
             telemetry.update();
         }
@@ -203,19 +237,19 @@ public class Auto {
      */
     private void autoRotate(Direction.Rotation rotation, double speed, double targetTicks) {
         boolean done = false;
-        while (!done) {
+        while (!done && opModeIsActive()) {
             done = drive.rotateWithEncoders(rotation, speed, targetTicks);
             telemetry.update();
         }
     }
 
-    public void autoSensorMove(HashMap<String, String> parameters) {
+    public void autoSensorDrive(HashMap<String, String> parameters) {
         Direction direction = new Direction(Double.parseDouble(parameters.get("x")), Double.parseDouble(parameters.get("y")));
         double speed = Double.parseDouble(parameters.get("speed"));
         double targetDistance = Double.parseDouble(parameters.get("distance"));
         double targetTicks = Double.parseDouble(parameters.get("target"));
 
-        autoSensorMove(direction, speed, targetDistance, targetTicks);
+        autoSensorDrive(direction, speed, targetDistance, targetTicks);
     }
 
     /**
@@ -225,19 +259,40 @@ public class Auto {
      * @param targetDistance The final distance to have travelled, in encoder ticks
      * @param ir The sensor to read a distance from
      */
-    private void autoSensorMove(Direction direction, double speed, double targetDistance, double targetTicks, AnalogSensor ir) {
-        boolean done = false;
-        while (!done) {
-            done = drive.driveWithSensor(direction, speed, targetDistance, targetTicks, ir);
-            telemetry.update();
+    private void autoSensorDrive(Direction direction, double speed, double targetDistance, double targetTicks, AnalogSensor ir) {
+
+        autoDrive(direction, speed, targetTicks);
+
+        double currDistance = ir.getCmAvg();
+        if (currDistance == -1) {
+            telemetry.addData("Error", "Couldn't find ultrasonic");
+        } else {
+            double r = drive.useGyro();
+
+            telemetry.addData("currDistance", currDistance);
+            telemetry.addData("Reached target", Math.abs(targetDistance - currDistance) > 2);
+            telemetry.addData("x", direction.getX());
+            telemetry.addData("y", direction.getY());
+            telemetry.addData("r", r);
+
+            //If you're off your target by more than 2 cm, try to adjust
+            while ((Math.abs(targetDistance - currDistance) > 2) && opModeIsActive()) {
+                if (((targetDistance > currDistance) && direction.isBackward()) ||
+                        ((targetDistance < currDistance) && direction.isForward())) { //If you're not far enough, keep driving
+                    drive.driveWithEncoders(direction, speed, 100);
+                } else if (((targetDistance > currDistance) && direction.isForward()) ||
+                        ((targetDistance < currDistance) && direction.isBackward())) { //If you're too far, drive backwards slightly
+                    drive.driveWithEncoders(direction, -speed, 100);
+                }
+                currDistance = ir.getCmAvg();
+            }
+
+            //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
+            drive.stopMotors();
         }
     }
 
-    private void autoSensorMove(Direction direction, double speed, double targetDistance, double targetTicks) {
-        boolean done = false;
-        while (!done) {
-            done = drive.driveWithSensor(direction, speed, targetDistance, targetTicks, drive.ir[0]);
-            telemetry.update();
-        }
+    private void autoSensorDrive(Direction direction, double speed, double targetDistance, double targetTicks) {
+        autoSensorDrive(direction, speed, targetDistance, targetTicks, drive.ir[0]);
     }
 }

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.team4042;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
@@ -27,13 +28,14 @@ public class TeleOpMecanum extends OpMode {
     private DcMotor intakeLeft;
     private DcMotor intakeRight;
 
+    private CRServo inLServo;
+    private CRServo inRServo;
+
     //Declare OpMode members.
     private MecanumDrive drive = new MecanumDrive(true);
 
     //private UltrasonicI2cRangeSensor sensor;
     private ArrayList<Integer> rangeData;
-
-    private GlyphPlacementSystem glyph;
 
     /**
     GAMEPAD 1:
@@ -69,13 +71,16 @@ public class TeleOpMecanum extends OpMode {
         sensor.startRanging();
         */
         drive.initialize(telemetry, hardwareMap);
+        drive.glyph = new GlyphPlacementSystem(hardwareMap);
         telemetry.update();
 
         adjustedSpeed = MecanumDrive.FULL_SPEED;
-        glyph = new GlyphPlacementSystem(hardwareMap);
 
         intakeLeft = hardwareMap.dcMotor.get("intake left");
         intakeRight = hardwareMap.dcMotor.get("intake right");
+
+        inLServo = hardwareMap.crservo.get("intake left servo");
+        inRServo = hardwareMap.crservo.get("intake right servo");
     }
     
     @Override
@@ -111,20 +116,22 @@ public class TeleOpMecanum extends OpMode {
         aRightBumper = gamepad1.right_bumper;
 
         //Glyph locate
-        if (gamepad2.dpad_up && !bUp) { glyph.up(); }
+        if (gamepad2.dpad_up && !bUp) { drive.glyph.up(); }
         bUp = gamepad2.dpad_up;
-        if (gamepad2.dpad_down && !bDown) { glyph.down(); }
+        if (gamepad2.dpad_down && !bDown) { drive.glyph.down(); }
         bDown = gamepad2.dpad_down;
-        if (gamepad2.dpad_left && !bLeft) { glyph.left(); }
+        if (gamepad2.dpad_left && !bLeft) { drive.glyph.left(); }
         bLeft = gamepad2.dpad_left;
-        if (gamepad2.dpad_right && !bRight) { glyph.right(); }
+        if (gamepad2.dpad_right && !bRight) { drive.glyph.right(); }
         bRight = gamepad2.dpad_right;
 
         //Places glyph
-        if (gamepad2.a) { glyph.place(); }
+        if (gamepad2.a) { drive.glyph.place(); }
         bA = gamepad2.a;
 
-        intakeRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        //The left intake is mounted "backwards"
+        intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+
         //Right trigger of the b controller runs the right intake forward
         double bRightTrigger = drive.deadZone(gamepad2.right_trigger);
         if (bRightTrigger > 0) {
@@ -156,7 +163,7 @@ public class TeleOpMecanum extends OpMode {
 
     private void telemetryUpdate() {
         telemetry.addData("Speed mode", adjustedSpeed);
-        telemetry.addData("Glyph", glyph.getPositionAsString());
+        telemetry.addData("Glyph", drive.glyph.getPositionAsString());
         telemetry.update();
     }
 }

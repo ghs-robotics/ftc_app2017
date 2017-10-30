@@ -121,5 +121,6 @@ public class CameraTestVisionOpMode extends TestableVisionOpMode {
         Core.reduce(kmat, maybe, 0, Core.REDUCE_SUM, CvType.CV_32S);
         Core.compare(maybe, Scalar.all(TAPE_THRESHOLD), maybe, Core.CMP_GT);
         Core.findNonZero(maybe, maybe);
+        return null;
     }
 }
