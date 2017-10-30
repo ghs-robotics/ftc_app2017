@@ -73,8 +73,6 @@ public class TeleOpMecanum extends OpMode {
             grabLeft.setPosition(1);
         }
 
-
-
     }
 
     private void telemetryUpdate() {
