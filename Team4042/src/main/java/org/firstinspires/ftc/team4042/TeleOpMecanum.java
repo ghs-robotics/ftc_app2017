@@ -2,6 +2,7 @@ package org.firstinspires.ftc.team4042;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
@@ -26,6 +27,9 @@ public class TeleOpMecanum extends OpMode {
 
     private DcMotor intakeLeft;
     private DcMotor intakeRight;
+
+    private CRServo inLServo;
+    private CRServo inRServo;
 
     //Declare OpMode members.
     private MecanumDrive drive = new MecanumDrive(true);
@@ -74,6 +78,9 @@ public class TeleOpMecanum extends OpMode {
 
         intakeLeft = hardwareMap.dcMotor.get("intake left");
         intakeRight = hardwareMap.dcMotor.get("intake right");
+
+        inLServo = hardwareMap.crservo.get("intake left servo");
+        inRServo = hardwareMap.crservo.get("intake right servo");
     }
     
     @Override
