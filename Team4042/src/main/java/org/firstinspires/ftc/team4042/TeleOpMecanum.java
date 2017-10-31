@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import java.util.ArrayList;
 
@@ -78,9 +79,13 @@ public class TeleOpMecanum extends OpMode {
 
         intakeLeft = hardwareMap.dcMotor.get("intake left");
         intakeRight = hardwareMap.dcMotor.get("intake right");
+        //The left intake is mounted "backwards"
+        intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
         inLServo = hardwareMap.crservo.get("intake left servo");
         inRServo = hardwareMap.crservo.get("intake right servo");
+        //The left intake servo is mounted "backwards"
+        inLServo.setDirection(DcMotorSimple.Direction.REVERSE);
     }
     
     @Override
@@ -126,36 +131,39 @@ public class TeleOpMecanum extends OpMode {
         bRight = gamepad2.dpad_right;
 
         //Places glyph
-        if (gamepad2.a) { drive.glyph.place(); }
+        if (gamepad2.a && !bA) { drive.glyph.place(); }
         bA = gamepad2.a;
-
-        //The left intake is mounted "backwards"
-        intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
         //Right trigger of the b controller runs the right intake forward
         double bRightTrigger = drive.deadZone(gamepad2.right_trigger);
         if (bRightTrigger > 0) {
             intakeRight.setPower(bRightTrigger);
+            inRServo.setPower(bRightTrigger);
         }
         //Right bumper of the b controller runs the right intake backwards
         else if (gamepad2.right_bumper) {
             intakeRight.setPower(-1);
+            inRServo.setPower(-1);
         }
         else {
             intakeRight.setPower(0);
+            inRServo.setPower(0);
         }
 
         //Left trigger of the b controller runs the left intake forward
         double bLeftTrigger = drive.deadZone(gamepad2.left_trigger);
         if (bLeftTrigger > 0) {
             intakeLeft.setPower(bLeftTrigger);
+            inLServo.setPower(bLeftTrigger);
         }
         //Left bumper of the b controller runs the left intake backwards
         else if (gamepad2.left_bumper) {
             intakeLeft.setPower(-1);
+            inLServo.setPower(-1);
         }
         else {
             intakeLeft.setPower(0);
+            inLServo.setPower(0);
         }
 
         telemetryUpdate();
