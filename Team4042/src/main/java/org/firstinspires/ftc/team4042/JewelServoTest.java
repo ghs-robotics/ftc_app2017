@@ -11,8 +11,10 @@ import com.qualcomm.robotcore.hardware.Servo;
 @TeleOp(name="Jewel Servo Test", group="Iterative Opmode")
 public class JewelServoTest extends OpMode {
 
-    Servo jewelServo;
-    double position = 0;
+    private Servo jewelServo;
+    private double position = 0;
+    private boolean y = false;
+    private boolean a = false;
 
     @Override
     public void init() {
@@ -22,15 +24,17 @@ public class JewelServoTest extends OpMode {
 
     @Override
     public void loop() {
-        if (gamepad1.y) {
+        if (gamepad1.y && !y) {
             position += .1;
             jewelServo.setPosition(position);
         }
+        y = gamepad1.y;
 
-        if (gamepad1.a) {
+        if (gamepad1.a && !a) {
             position -= .1;
             jewelServo.setPosition(position);
         }
+        a = gamepad1.a;
 
         telemetry.addData("position", position);
         telemetry.update();

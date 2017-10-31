@@ -31,6 +31,7 @@ public class MecanumDrive extends Drive {
     @Override
     public void initialize(Telemetry telemetry, HardwareMap hardwareMap) {
         jewelServo = hardwareMap.servo.get("jewel");
+        jewelServo.setPosition(.7);
         super.initialize(telemetry, hardwareMap);
     }
 
@@ -41,15 +42,21 @@ public class MecanumDrive extends Drive {
     public void jewelLeft() {
         jewelDown();
         //TODO: ROTATE THE ROBOT LEFT
+        jewelUp();
     }
 
     public void jewelRight() {
         jewelDown();
         //TODO: ROTATE THE ROBOT RIGHT
+        jewelUp();
     }
 
     private void jewelDown() {
-        //TODO: PUT THE JEWEL SERVO DOWN
+        jewelServo.setPosition(.2);
+    }
+
+    private void jewelUp() {
+        jewelServo.setPosition(.7);
     }
 
     /**

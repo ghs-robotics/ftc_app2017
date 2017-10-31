@@ -293,22 +293,23 @@ public abstract class Auto extends LinearOpMode {
         if (currDistance == -1) {
             telemetry.addData("Error", "Couldn't find ultrasonic");
         } else {
-            double r = drive.useGyro();
+            double r = drive.useGyro()/180;
 
             telemetry.addData("currDistance", currDistance);
             telemetry.addData("Reached target", Math.abs(targetDistance - currDistance) > 2);
             telemetry.addData("x", direction.getX());
             telemetry.addData("y", direction.getY());
             telemetry.addData("r", r);
+            telemetry.update();
 
             //If you're off your target by more than 2 cm, try to adjust
             while ((Math.abs(targetDistance - currDistance) > 2) && opModeIsActive()) {
                 if (((targetDistance > currDistance) && direction.isBackward()) ||
                         ((targetDistance < currDistance) && direction.isForward())) { //If you're not far enough, keep driving
-                    drive.driveWithEncoders(direction, speed, 100);
+                    drive.driveWithEncoders(direction, .25, 100);
                 } else if (((targetDistance > currDistance) && direction.isForward()) ||
                         ((targetDistance < currDistance) && direction.isBackward())) { //If you're too far, drive backwards slightly
-                    drive.driveWithEncoders(direction, -speed, 100);
+                    drive.driveWithEncoders(direction, -.25, 100);
                 }
                 currDistance = ir.getCmAvg();
             }
