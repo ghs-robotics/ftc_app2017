@@ -113,6 +113,7 @@ public class GlyphPlacementSystem
 
     public void place() {
         //TODO: motor code here
+        verticalDrive.setTargetPosition(BASE_DISP + BLOCK_DISP*targetY);
 
         /*
         Assuming motor forward power moves it right and up
@@ -124,7 +125,11 @@ public class GlyphPlacementSystem
     public void runToPosition()
     {
         if(homeLimit.getState()) {
-            currentPositon = 0;
+             verticalDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+
+        if(verticalDrive.getCurrentPosition() == 0) {
+            verticalDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION   );
         }
     }
 }

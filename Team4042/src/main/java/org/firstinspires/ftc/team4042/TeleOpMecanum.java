@@ -121,7 +121,7 @@ public class TeleOpMecanum extends OpMode {
         if (gamepad1.a) { glyph.place(); }
         aA = gamepad1.a;
 
-        intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        intakeRight.setDirection(DcMotorSimple.Direction.REVERSE);
         double bRightTrigger = drive.deadZone(gamepad2.right_trigger);
         if (bRightTrigger > 0) {
             intakeRight.setPower(1);
