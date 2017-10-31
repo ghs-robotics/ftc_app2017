@@ -12,7 +12,7 @@ import java.util.ArrayList;
 @TeleOp(name = "Mecanum", group = "Iterative Opmode")
 public class TeleOpMecanum extends OpMode {
 
-    private boolean aPushed = false;
+    private boolean aA = false;
 
     private double adjustedSpeed;
 
@@ -95,10 +95,10 @@ public class TeleOpMecanum extends OpMode {
         //telemetry.addData("range", rangeData.get(2));
 
         //1 A - toggle verbose
-        if (gamepad1.a && !aPushed) {
+        if (gamepad1.a && !aA) {
             drive.toggleVerbose();
         }
-        aPushed = gamepad1.a;
+        aA = gamepad1.a;
 
         //Drives the robot
         drive.drive(false, gamepad1, gamepad2, adjustedSpeed * MecanumDrive.FULL_SPEED);
