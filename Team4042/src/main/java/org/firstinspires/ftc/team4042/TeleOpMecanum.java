@@ -2,6 +2,7 @@ package org.firstinspires.ftc.team4042;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 @TeleOp(name = "Mecanum", group = "Iterative Opmode")
 public class TeleOpMecanum extends OpMode {
 
-    private boolean aPushed = false;
+    private boolean aA = false;
 
     private double adjustedSpeed;
 
@@ -27,7 +28,9 @@ public class TeleOpMecanum extends OpMode {
     private DcMotor intakeLeft;
     private DcMotor intakeRight;
 
-    //Declare OpMode members.
+    private CRServo intakeLServo;
+    private CRServo intakeRServo;
+
     private MecanumDrive drive = new MecanumDrive(true);
 
     //private UltrasonicI2cRangeSensor sensor;
@@ -76,6 +79,14 @@ public class TeleOpMecanum extends OpMode {
 
         intakeLeft = hardwareMap.dcMotor.get("intake left");
         intakeRight = hardwareMap.dcMotor.get("intake right");
+
+        //The left intake is mounted "backwards"
+        intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        intakeLServo = hardwareMap.crservo.get("intake left servo");
+        intakeRServo = hardwareMap.crservo.get("intake right servo");
+
+        intakeLServo.setDirection(DcMotorSimple.Direction.REVERSE);
     }
     
     @Override
@@ -85,10 +96,10 @@ public class TeleOpMecanum extends OpMode {
         //telemetry.addData("range", rangeData.get(2));
 
         //1 A - toggle verbose
-        if (gamepad1.a && !aPushed) {
+        if (gamepad1.a && !aA) {
             drive.toggleVerbose();
         }
-        aPushed = gamepad1.a;
+        aA = gamepad1.a;
 
         //Drives the robot
         drive.drive(false, gamepad1, gamepad2, adjustedSpeed * MecanumDrive.FULL_SPEED);
@@ -121,11 +132,8 @@ public class TeleOpMecanum extends OpMode {
         bRight = gamepad2.dpad_right;
 
         //Places glyph
-        if (gamepad2.a) { glyph.place(); }
+        if (gamepad2.a && !bA) { glyph.place(); }
         bA = gamepad2.a;
-
-        //The left intake is mounted "backwards"
-        intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
         //Right trigger of the b controller runs the right intake forward
         double bRightTrigger = drive.deadZone(gamepad2.right_trigger);
