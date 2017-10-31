@@ -41,21 +41,25 @@ public class MecanumDrive extends Drive {
 
     public void jewelLeft() {
         jewelDown();
-        //TODO: ROTATE THE ROBOT LEFT
+        //Rotates the robot left
+        rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 100);
+        rotateWithEncoders(Direction.Rotation.Clockwise, Drive.FULL_SPEED, 100);
         jewelUp();
     }
 
     public void jewelRight() {
         jewelDown();
-        //TODO: ROTATE THE ROBOT RIGHT
+        //Rotates the robot right
+        rotateWithEncoders(Direction.Rotation.Clockwise, Drive.FULL_SPEED, 100);
+        rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 100);
         jewelUp();
     }
 
-    private void jewelDown() {
+    public void jewelDown() {
         jewelServo.setPosition(.2);
     }
 
-    private void jewelUp() {
+    public void jewelUp() {
         jewelServo.setPosition(.7);
     }
 

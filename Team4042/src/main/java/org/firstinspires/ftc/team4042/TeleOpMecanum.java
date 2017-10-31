@@ -25,6 +25,7 @@ public class TeleOpMecanum extends OpMode {
     private boolean bRight = false;
 
     private boolean bA = false;
+    private boolean bB = false;
 
     private DcMotor intakeLeft;
     private DcMotor intakeRight;
@@ -52,12 +53,12 @@ public class TeleOpMecanum extends OpMode {
 
     GAMEPAD 2:
       Joystick 1 -
-      Joystick 2 -
+      Joystick 2 - 
       Bumpers - run intakes backwards
       Triggers - run intakes forwards
       Dpad - placer
       A - place glyph
-      B -
+      B - moves servo arm back in
       X -
       Y -
      */
@@ -133,6 +134,10 @@ public class TeleOpMecanum extends OpMode {
         //Places glyph
         if (gamepad2.a && !bA) { drive.glyph.place(); }
         bA = gamepad2.a;
+
+        //Lifts arm
+        if (gamepad2.b && !bB) { drive.jewelUp(); }
+        bB = gamepad2.b;
 
         //Right trigger of the b controller runs the right intake forward
         double bRightTrigger = drive.deadZone(gamepad2.right_trigger);
