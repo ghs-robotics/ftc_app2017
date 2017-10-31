@@ -12,12 +12,14 @@ public class GlyphPlacementSystem
     private int targetX;
     private int targetY;
     private int currentX;
-    private int currentY;
+    private Position currentY;
     private String baseOutput;
     private DigitalSensor homeLimit = new DigitalSensor("limit");
     private DcMotor verticalDrive;
     private final int BASE_DISP = 0;
     private final int BLOCK_DISP = 0;
+
+    private enum Position{BACK, TOP, MID_TOP, MID_BOTTOM, BOTTOM}
 
     public GlyphPlacementSystem(HardwareMap map)
     {
@@ -32,7 +34,7 @@ public class GlyphPlacementSystem
         this.targetX = currentX;
         this.targetY = currentY;
         this.currentX = currentX;
-        this.currentY = currentY;
+        this.currentY = Position.BACK;
 
         verticalDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
@@ -115,7 +117,7 @@ public class GlyphPlacementSystem
 
     public void runToPosition()
     {
-        
+
     }
 
     public void goToHome() {
@@ -125,6 +127,6 @@ public class GlyphPlacementSystem
         verticalDrive.setPower(0);
         verticalDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         verticalDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        currentY = -1;
+        currentY = Position.BACK;
     }
 }
