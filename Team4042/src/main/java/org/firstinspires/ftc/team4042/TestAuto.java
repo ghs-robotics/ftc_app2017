@@ -9,8 +9,6 @@ public class TestAuto extends Auto {
 
     @Override
     public void runOpMode() {
-        drive.setUseGyro(true);
-        drive.initialize(telemetry, hardwareMap);
 
         super.setUp(drive, "test.txt");
         waitForStart();

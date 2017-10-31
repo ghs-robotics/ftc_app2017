@@ -1,7 +1,11 @@
 package org.firstinspires.ftc.team4042;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -12,6 +16,10 @@ public class MecanumDrive extends Drive {
     //Used for not-field-oriented drive
     public static final int OFFSET = 0;
 
+    public GlyphPlacementSystem glyph;
+
+    private Servo jewelServo;
+
     /**
      * Constructor for Drive, it creates the motors and the gyro objects
      */
@@ -20,8 +28,28 @@ public class MecanumDrive extends Drive {
         super();
     }
 
+    @Override
+    public void initialize(Telemetry telemetry, HardwareMap hardwareMap) {
+        jewelServo = hardwareMap.servo.get("jewel");
+        super.initialize(telemetry, hardwareMap);
+    }
+
     public MecanumDrive(boolean verbose) {
         super(verbose);
+    }
+
+    public void jewelLeft() {
+        jewelDown();
+        //TODO: ROTATE THE ROBOT LEFT
+    }
+
+    public void jewelRight() {
+        jewelDown();
+        //TODO: ROTATE THE ROBOT RIGHT
+    }
+
+    private void jewelDown() {
+        //TODO: PUT THE JEWEL SERVO DOWN
     }
 
     /**

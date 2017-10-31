@@ -10,8 +10,6 @@ public class RedTopAuto extends Auto {
 
     @Override
     public void runOpMode() {
-        drive.setUseGyro(true);
-        drive.initialize(telemetry, hardwareMap);
 
         super.setUp(drive, "redtop.txt");
         waitForStart();
