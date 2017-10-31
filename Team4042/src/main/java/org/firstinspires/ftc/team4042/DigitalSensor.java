@@ -9,15 +9,20 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class DigitalSensor {
 
-    DigitalChannel sensor;
+    private String name;
+    private DigitalChannel sensor;
+
+    public DigitalSensor(String name) {
+        this.name = name;
+    }
 
     public void initialize(HardwareMap hardwareMap) {
-        sensor = hardwareMap.digitalChannel.get("whisker");
+        sensor = hardwareMap.digitalChannel.get(name);
         sensor.setState(false);
         sensor.setMode(DigitalChannel.Mode.INPUT);
     }
 
-    public boolean getV() {
+    public boolean getState() {
         return sensor.getState();
     }
 }

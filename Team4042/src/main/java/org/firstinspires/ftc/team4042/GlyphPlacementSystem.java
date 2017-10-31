@@ -1,14 +1,6 @@
 package org.firstinspires.ftc.team4042;
 
-import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.DigitalChannelController;
-import com.qualcomm.robotcore.hardware.DigitalChannelImpl;
-import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
@@ -24,7 +16,7 @@ public class GlyphPlacementSystem
     private int currentPositon;
     private int targetPosition;
     private String baseOutput;
-    private DigitalChannel homeLimit;
+    private DigitalSensor homeLimit = new DigitalSensor("limit");
     private DcMotor verticalDrive;
     private final int BASE_DISP = 0;
     private final int BLOCK_DISP = 0;
@@ -36,8 +28,8 @@ public class GlyphPlacementSystem
 
     public GlyphPlacementSystem(int currentX, int currentY, HardwareMap map)
     {
-        this.homeLimit = map.digitalChannel.get("Limit");
-        this.verticalDrive = map.dcMotor.get("Vertical Drive");
+        this.homeLimit.initialize(map);
+        this.verticalDrive = map.dcMotor.get("vertical drive");
         this.baseOutput = "[ _ _ _ ]\n[ _ _ _ ]\n[ _ _ _ ]\n[ _ _ _ ]";
         this.targetX = currentX;
         this.targetY = currentY;
