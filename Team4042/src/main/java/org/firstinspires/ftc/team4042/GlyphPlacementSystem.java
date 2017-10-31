@@ -13,8 +13,6 @@ public class GlyphPlacementSystem
     private int targetY;
     private int currentX;
     private int currentY;
-    private int currentPositon;
-    private int targetPosition;
     private String baseOutput;
     private DigitalSensor homeLimit = new DigitalSensor("limit");
     private DcMotor verticalDrive;
@@ -111,12 +109,22 @@ public class GlyphPlacementSystem
         Move sideways motor (block distance * (targetX - currentX))
         Move vertical motor (block distance * (targetY - currentY))
          */
+
+        goToHome();
     }
 
     public void runToPosition()
     {
-        if(homeLimit.getState()) {
-            currentPositon = 0;
+        
+    }
+
+    public void goToHome() {
+        while (!homeLimit.getState()) {
+            verticalDrive.setPower(-1);
         }
+        verticalDrive.setPower(0);
+        verticalDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        verticalDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        currentY = -1;
     }
 }
