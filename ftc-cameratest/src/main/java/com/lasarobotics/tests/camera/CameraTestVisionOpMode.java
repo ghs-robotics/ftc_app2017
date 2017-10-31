@@ -18,6 +18,7 @@ import org.opencv.core.CvType;
 import org.opencv.core.DMatch;
 import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
@@ -63,7 +64,7 @@ public class CameraTestVisionOpMode extends TestableVisionOpMode {
     public void init() {
         super.init();
         this.setFrameSize(new Size(3264, 1836));
-        Mat mkernel = new Mat( 3, 3, CvType.CV_32S );
+        mkernel = new Mat( 3, 3, CvType.CV_32S );
         mkernel.put(3, 3, kernel);
 
 
@@ -88,6 +89,11 @@ public class CameraTestVisionOpMode extends TestableVisionOpMode {
     public Mat frame(Mat rgba, Mat gray) {
         //Imgproc.filter2D(rgba, rgba, -1, mkernel);
         rgba = super.frame(rgba, gray);
+        Mat yo = rgba.clone();
+        for (Point point : findTape(25, yo)) {
+            Imgproc.circle(rgba, point, 2, new Scalar(0,100,0), -1);
+
+        }
         return rgba;
     }
 
@@ -105,7 +111,7 @@ public class CameraTestVisionOpMode extends TestableVisionOpMode {
         return bad;
     }
 
-    private double[] findTape(double d, Mat in, double[][] kernel) {
+    private Point[] findTape(double d, Mat in) { // , double[][] kernel) {
         int yin = distToPos(d);
         double[] result = new double[2];
         int width = in.width();
@@ -121,6 +127,7 @@ public class CameraTestVisionOpMode extends TestableVisionOpMode {
         Core.reduce(kmat, maybe, 0, Core.REDUCE_SUM, CvType.CV_32S);
         Core.compare(maybe, Scalar.all(TAPE_THRESHOLD), maybe, Core.CMP_GT);
         Core.findNonZero(maybe, maybe);
-        return null;
+        MatOfPoint yeah = new MatOfPoint(maybe);
+        return yeah.toArray();
     }
 }
