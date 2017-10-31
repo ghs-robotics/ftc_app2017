@@ -37,6 +37,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
+
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -56,6 +58,7 @@ import com.qualcomm.robotcore.util.Range;
 public class Autonomous extends LinearOpMode {
 
     private MecanumDrive drive = new MecanumDrive();
+    private VuMarkIdentifier mark = new VuMarkIdentifier();
 
     private DcMotor liftLeft;
     private DcMotor liftRight;
@@ -65,10 +68,7 @@ public class Autonomous extends LinearOpMode {
     public Servo grabLeft;
     public Servo grabRight;
 
-    private String vuMark;
-
-
-
+    private RelicRecoveryVuMark vuMark;
 
     @Override
     public void runOpMode() {
@@ -79,50 +79,364 @@ public class Autonomous extends LinearOpMode {
         drive.runWithEncoders();
         grabLeft = hardwareMap.servo.get("grabLeft");
         grabRight = hardwareMap.servo.get("grabRight");
+        mark.initialize(telemetry, hardwareMap);
         waitForStart();
-        vuMark = "CENTER";
-        if ((vuMark = "CENTER")) {
+        vuMark = mark.getMark();
+        if ((vuMark == RelicRecoveryVuMark.CENTER)) {
             while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 4000)) {
             }
-            intakeLeft.setPower(1);
-            intakeRight.setPower(-1);
-            wait(2000);
-            intakeLeft.setPower(0);
-            intakeRight.setPower(0);
-            while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
-            }
-            while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 200)){} ;
-        }
-        if ((vuMark = "RIGHT")) {
-            while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 3800)) {}
-            intakeLeft.setPower(1);
-            intakeRight.setPower(-1);
-            wait(2000);
-            intakeLeft.setPower(0);
-            intakeRight.setPower(0);
-            while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {}
-            while (!drive.driveWithEncoders(Direction.(1, Math.sqrt(3)), Drive.FULL_SPEED, 4000/Math.sqrt(3))) {};
-
-        }
-        if (vuMark =="LEFT") {
-            while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 4200)) {}
             intakeLeft.setPower(1);
             intakeRight.setPower(-1);
             sleep(2000);
             intakeLeft.setPower(0);
             intakeRight.setPower(0);
-            while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {}
-            while (!drive.driveWithEncoders(Direction.(-1, Math.sqrt(3)), Drive.FULL_SPEED, 4000/Math.sqrt(3))) {};
+            while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
+            }
+            while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 200)) {
+            }
+            ;
+        }
+        if ((vuMark == RelicRecoveryVuMark.RIGHT)) {
+            while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 3800)) {
+            }
+            intakeLeft.setPower(1);
+            intakeRight.setPower(-1);
+            sleep(2000);
+            intakeLeft.setPower(0);
+            intakeRight.setPower(0);
+            while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
+            }
+            while (!drive.driveWithEncoders(new Direction(1, Math.sqrt(3)), Drive.FULL_SPEED, 4000 / Math.sqrt(3))) {
+            }
+            ;
+
+        }
+        if (vuMark == RelicRecoveryVuMark.LEFT) {
+            while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 4200)) {
+            }
+            intakeLeft.setPower(1);
+            intakeRight.setPower(-1);
+            sleep(2000);
+            intakeLeft.setPower(0);
+            intakeRight.setPower(0);
+            while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
+            }
+            while (!drive.driveWithEncoders(new Direction(-1, Math.sqrt(3)), Drive.FULL_SPEED, 4000 / Math.sqrt(3))) {
+            }
+
 
         }
 
 
-
-
-
-        }
-
-// hi //
-
+// hi hi hih ihihhi hi h ihii 9ihihihih
     }
+
+    public void lkadl(boolean isRed, boolean isTop) {
+        liftLeft = hardwareMap.dcMotor.get("liftLeft");
+        liftRight = hardwareMap.dcMotor.get("liftRight");
+        intakeLeft = hardwareMap.dcMotor.get("intakeLeft");
+        intakeRight = hardwareMap.dcMotor.get("intakeRight");
+        drive.runWithEncoders();
+        grabLeft = hardwareMap.servo.get("grabLeft");
+        grabRight = hardwareMap.servo.get("grabRight");
+        mark.initialize(telemetry, hardwareMap);
+        waitForStart();
+        vuMark = mark.getMark();
+        if (isRed && !isTop) {
+            if ((vuMark == RelicRecoveryVuMark.CENTER)) {
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 600)) {
+                }
+                intakeLeft.setPower(1);
+                intakeRight.setPower(-1);
+                sleep(2000);
+                intakeLeft.setPower(0);
+                intakeRight.setPower(0);
+                while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))) {
+                }
+                ;
+            }
+            if ((vuMark == RelicRecoveryVuMark.RIGHT)) {
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 500)) {
+                }
+                intakeLeft.setPower(1);
+                intakeRight.setPower(-1);
+                sleep(2000);
+                intakeLeft.setPower(0);
+                intakeRight.setPower(0);
+                while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 100)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))){}
+                ;
+
+            }
+            if (vuMark == RelicRecoveryVuMark.LEFT) {
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 700)) {
+                }
+                intakeLeft.setPower(1);
+                intakeRight.setPower(-1);
+                sleep(2000);
+                intakeLeft.setPower(0);
+                intakeRight.setPower(0);
+                while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
+                }
+                while (!drive.driveWithEncoders (Direction.Left, Drive.FULL_SPEED, 100)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))){};
+            }
+        }
+
+        if (isRed && isTop) {
+            if ((vuMark == RelicRecoveryVuMark.CENTER)) {
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 300)) {
+                }
+                intakeLeft.setPower(1);
+                intakeRight.setPower(-1);
+                sleep(2000);
+                intakeLeft.setPower(0);
+                intakeRight.setPower(0);
+                while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))) {
+                }
+                ;
+            }
+            if ((vuMark == RelicRecoveryVuMark.RIGHT)) {
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 200)) {
+                }
+                intakeLeft.setPower(1);
+                intakeRight.setPower(-1);
+                sleep(2000);
+                intakeLeft.setPower(0);
+                intakeRight.setPower(0);
+                while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 100)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))){}
+                ;
+
+            }
+            if (vuMark == RelicRecoveryVuMark.LEFT) {
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 400)) {
+                }
+                intakeLeft.setPower(1);
+                intakeRight.setPower(-1);
+                sleep(2000);
+                intakeLeft.setPower(0);
+                intakeRight.setPower(0);
+                while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
+                }
+                while (!drive.driveWithEncoders (Direction.Left, Drive.FULL_SPEED, 100)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))){};
+            }
+        }
+        if (!isRed && isTop) {
+            if ((vuMark == RelicRecoveryVuMark.CENTER)) {
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 300)) {
+                }
+                intakeLeft.setPower(1);
+                intakeRight.setPower(-1);
+                sleep(2000);
+                intakeLeft.setPower(0);
+                intakeRight.setPower(0);
+                while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))) {
+                }
+                ;
+            }
+            if ((vuMark == RelicRecoveryVuMark.RIGHT)) {
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 200)) {
+                }
+                intakeLeft.setPower(1);
+                intakeRight.setPower(-1);
+                sleep(2000);
+                intakeLeft.setPower(0);
+                intakeRight.setPower(0);
+                while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 100)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))){}
+                ;
+
+            }
+            if (vuMark == RelicRecoveryVuMark.LEFT) {
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 400)) {
+                }
+                intakeLeft.setPower(1);
+                intakeRight.setPower(-1);
+                sleep(2000);
+                intakeLeft.setPower(0);
+                intakeRight.setPower(0);
+                while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
+                }
+                while (!drive.driveWithEncoders (Direction.Left, Drive.FULL_SPEED, 100)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))){};
+            }
+        }
+        if (!isRed && isTop) {
+            if ((vuMark == RelicRecoveryVuMark.CENTER)) {
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 300)) {
+                }
+                intakeLeft.setPower(1);
+                intakeRight.setPower(-1);
+                sleep(2000);
+                intakeLeft.setPower(0);
+                intakeRight.setPower(0);
+                while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))) {
+                }
+                ;
+            }
+            if ((vuMark == RelicRecoveryVuMark.RIGHT)) {
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 400)) {
+                }
+                intakeLeft.setPower(1);
+                intakeRight.setPower(-1);
+                sleep(2000);
+                intakeLeft.setPower(0);
+                intakeRight.setPower(0);
+                while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 100)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))){}
+                ;
+
+            }
+            if (vuMark == RelicRecoveryVuMark.LEFT) {
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 200)) {
+                }
+                intakeLeft.setPower(1);
+                intakeRight.setPower(-1);
+                sleep(2000);
+                intakeLeft.setPower(0);
+                intakeRight.setPower(0);
+                while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
+                }
+                while (!drive.driveWithEncoders (Direction.Left, Drive.FULL_SPEED, 100)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))){};
+            }
+        }
+        if (!isRed && !isTop) {
+            if ((vuMark == RelicRecoveryVuMark.CENTER)) {
+                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 600)) {
+                }
+                intakeLeft.setPower(1);
+                intakeRight.setPower(-1);
+                sleep(2000);
+                intakeLeft.setPower(0);
+                intakeRight.setPower(0);
+                while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))) {
+                }
+                ;
+            }
+            if ((vuMark == RelicRecoveryVuMark.RIGHT)) {
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 700)) {
+                }
+                intakeLeft.setPower(1);
+                intakeRight.setPower(-1);
+                sleep(2000);
+                intakeLeft.setPower(0);
+                intakeRight.setPower(0);
+                while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 100)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))){}
+                ;
+
+            }
+            if (vuMark == RelicRecoveryVuMark.LEFT) {
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 500)) {
+                }
+                intakeLeft.setPower(1);
+                intakeRight.setPower(-1);
+                sleep(2000);
+                intakeLeft.setPower(0);
+                intakeRight.setPower(0);
+                while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
+                }
+                while (!drive.driveWithEncoders (Direction.Left, Drive.FULL_SPEED, 100)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))){};
+            }
+        }
+        if (isRed && !isTop) {
+            if ((vuMark == RelicRecoveryVuMark.CENTER)) {
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 600)) {
+                }
+                intakeLeft.setPower(1);
+                intakeRight.setPower(-1);
+                sleep(2000);
+                intakeLeft.setPower(0);
+                intakeRight.setPower(0);
+                while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))) {
+                }
+                ;
+            }
+            if ((vuMark == RelicRecoveryVuMark.RIGHT)) {
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 500)) {
+                }
+                intakeLeft.setPower(1);
+                intakeRight.setPower(-1);
+                sleep(2000);
+                intakeLeft.setPower(0);
+                intakeRight.setPower(0);
+                while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 100)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))){}
+                ;
+
+            }
+            if (vuMark == RelicRecoveryVuMark.LEFT) {
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 700)) {
+                }
+                intakeLeft.setPower(1);
+                intakeRight.setPower(-1);
+                sleep(2000);
+                intakeLeft.setPower(0);
+                intakeRight.setPower(0);
+                while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
+                }
+                while (!drive.driveWithEncoders (Direction.Left, Drive.FULL_SPEED, 100)) {
+                }
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))){};
+            }
+        }
+    }
+
 }
