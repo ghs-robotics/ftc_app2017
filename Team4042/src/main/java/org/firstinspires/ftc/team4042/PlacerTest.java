@@ -38,7 +38,6 @@ import com.qualcomm.robotcore.util.Range;
 
 
 @TeleOp(name="Placer Test", group="Iterative Opmode")
-@Disabled
 public class PlacerTest extends OpMode
 {
 
