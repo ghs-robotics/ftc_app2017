@@ -59,6 +59,7 @@ public class CameraTestVisionOpMode extends TestableVisionOpMode {
     final double FUNCTION_B_A = 1000.0;
     final double FUNCTION_B_B = 1.7695;
     final double FUNCTION_B_C = 1.1096;
+    Mat image;
 
     @Override
     public void init() {
@@ -68,11 +69,11 @@ public class CameraTestVisionOpMode extends TestableVisionOpMode {
         mkernel.put(3, 3, kernel);
 
 
-        /*try {
-            this.image = Utils.loadResource(getContext(), R.drawable.legos, CV_LOAD_IMAGE_GRAYSCALE);
+        try {
+            image = Utils.loadResource(getContext(), R.drawable.hate, CV_LOAD_IMAGE_GRAYSCALE);
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
+        }
     }
 
     @Override
@@ -89,12 +90,12 @@ public class CameraTestVisionOpMode extends TestableVisionOpMode {
     public Mat frame(Mat rgba, Mat gray) {
         //Imgproc.filter2D(rgba, rgba, -1, mkernel);
         rgba = super.frame(rgba, gray);
-        Mat yo = rgba.clone();
+        Mat yo = image.clone();
         for (Point point : findTape(25, yo)) {
-            Imgproc.circle(rgba, point, 2, new Scalar(0,100,0), -1);
+            Imgproc.circle(image, point, 2, new Scalar(0,100,0), -1);
 
         }
-        return rgba;
+        return image;
     }
 
     private int distToPos (double d) {
@@ -128,6 +129,7 @@ public class CameraTestVisionOpMode extends TestableVisionOpMode {
         Core.compare(maybe, Scalar.all(TAPE_THRESHOLD), maybe, Core.CMP_GT);
         Core.findNonZero(maybe, maybe);
         MatOfPoint yeah = new MatOfPoint(maybe);
+        System.out.println(yeah.size());
         return yeah.toArray();
     }
 }
