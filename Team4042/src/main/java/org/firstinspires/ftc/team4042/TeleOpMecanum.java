@@ -2,38 +2,42 @@ package org.firstinspires.ftc.team4042;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import java.util.ArrayList;
 
 @TeleOp(name = "Mecanum", group = "Iterative Opmode")
 public class TeleOpMecanum extends OpMode {
 
-    private boolean aPushed = false;
+    private boolean aA = false;
 
     private double adjustedSpeed;
 
     private boolean aLeftBumper = false;
     private boolean aRightBumper = false;
 
-    private boolean aUp = false;
-    private boolean aDown = false;
-    private boolean aLeft = false;
-    private boolean aRight = false;
+    private boolean bUp = false;
+    private boolean bDown = false;
+    private boolean bLeft = false;
+    private boolean bRight = false;
 
-    private boolean aA = false;
+    private boolean bA = false;
+    private boolean bB = false;
 
     private DcMotor intakeLeft;
     private DcMotor intakeRight;
+
+    private CRServo inLServo;
+    private CRServo inRServo;
 
     //Declare OpMode members.
     private MecanumDrive drive = new MecanumDrive(true);
 
     //private UltrasonicI2cRangeSensor sensor;
     private ArrayList<Integer> rangeData;
-
-    private GlyphPlacementSystem glyph;
 
     /**
     GAMEPAD 1:
@@ -49,12 +53,12 @@ public class TeleOpMecanum extends OpMode {
 
     GAMEPAD 2:
       Joystick 1 -
-      Joystick 2 -
+      Joystick 2 - 
       Bumpers - run intakes backwards
       Triggers - run intakes forwards
       Dpad - placer
       A - place glyph
-      B -
+      B - moves servo arm back in
       X -
       Y -
      */
@@ -69,13 +73,20 @@ public class TeleOpMecanum extends OpMode {
         sensor.startRanging();
         */
         drive.initialize(telemetry, hardwareMap);
+        drive.glyph = new GlyphPlacementSystem(hardwareMap);
         telemetry.update();
 
         adjustedSpeed = MecanumDrive.FULL_SPEED;
-        glyph = new GlyphPlacementSystem(hardwareMap);
 
         intakeLeft = hardwareMap.dcMotor.get("intake left");
         intakeRight = hardwareMap.dcMotor.get("intake right");
+        //The left intake is mounted "backwards"
+        intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        inLServo = hardwareMap.crservo.get("intake left servo");
+        inRServo = hardwareMap.crservo.get("intake right servo");
+        //The left intake servo is mounted "backwards"
+        inLServo.setDirection(DcMotorSimple.Direction.REVERSE);
     }
     
     @Override
@@ -84,16 +95,18 @@ public class TeleOpMecanum extends OpMode {
         //rangeData = sensor.getRange();
         //telemetry.addData("range", rangeData.get(2));
 
-        if (gamepad1.a && !aPushed) {
+        //1 A - toggle verbose
+        if (gamepad1.a && !aA) {
             drive.toggleVerbose();
         }
-        aPushed = gamepad1.a;
+        aA = gamepad1.a;
+
+        //Drives the robot
         drive.drive(false, gamepad1, gamepad2, adjustedSpeed * MecanumDrive.FULL_SPEED);
 
         if (Drive.useGyro) {
             drive.useGyro();
         }
-        telemetry.update();
 
         //If you push the left bumper, dials the speed down
         if (gamepad1.left_bumper && !aLeftBumper && (adjustedSpeed - 0.25) >= 0) {
@@ -108,45 +121,54 @@ public class TeleOpMecanum extends OpMode {
         }
         aRightBumper = gamepad1.right_bumper;
 
-        //Glyph placement
-        if (gamepad1.dpad_up && !aUp) { glyph.up(); }
-        aUp = gamepad1.dpad_up;
-        if (gamepad1.dpad_down && !aDown) { glyph.down(); }
-        aDown = gamepad1.dpad_down;
-        if (gamepad1.dpad_left && !aLeft) { glyph.left(); }
-        aLeft = gamepad1.dpad_left;
-        if (gamepad1.dpad_right && !aRight) { glyph.right(); }
-        aRight = gamepad1.dpad_right;
+        //Glyph locate
+        if (gamepad2.dpad_up && !bUp) { drive.glyph.up(); }
+        bUp = gamepad2.dpad_up;
+        if (gamepad2.dpad_down && !bDown) { drive.glyph.down(); }
+        bDown = gamepad2.dpad_down;
+        if (gamepad2.dpad_left && !bLeft) { drive.glyph.left(); }
+        bLeft = gamepad2.dpad_left;
+        if (gamepad2.dpad_right && !bRight) { drive.glyph.right(); }
+        bRight = gamepad2.dpad_right;
 
-        if (gamepad1.a) { glyph.place(); }
-        aA = gamepad1.a;
+        //Places glyph
+        if (gamepad2.a && !bA) { drive.glyph.place(); }
+        bA = gamepad2.a;
 
-        intakeRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        //Lifts arm
+        if (gamepad2.b && !bB) { drive.jewelUp(); }
+        bB = gamepad2.b;
+
+        //Right trigger of the b controller runs the right intake forward
         double bRightTrigger = drive.deadZone(gamepad2.right_trigger);
         if (bRightTrigger > 0) {
-            intakeRight.setPower(1);
+            intakeRight.setPower(bRightTrigger);
+            inRServo.setPower(bRightTrigger);
+        }
+        //Right bumper of the b controller runs the right intake backwards
+        else if (gamepad2.right_bumper) {
+            intakeRight.setPower(-1);
+            inRServo.setPower(-1);
         }
         else {
             intakeRight.setPower(0);
+            inRServo.setPower(0);
         }
+
+        //Left trigger of the b controller runs the left intake forward
         double bLeftTrigger = drive.deadZone(gamepad2.left_trigger);
         if (bLeftTrigger > 0) {
-            intakeLeft.setPower(1);
+            intakeLeft.setPower(bLeftTrigger);
+            inLServo.setPower(bLeftTrigger);
         }
-        else {
-            intakeLeft.setPower(0);
-        }
-        if (gamepad2.right_bumper) {
-            intakeRight.setPower(-1);
-        }
-        else {
-            intakeRight.setPower(0);
-        }
-        if (gamepad2.left_bumper) {
+        //Left bumper of the b controller runs the left intake backwards
+        else if (gamepad2.left_bumper) {
             intakeLeft.setPower(-1);
+            inLServo.setPower(-1);
         }
         else {
             intakeLeft.setPower(0);
+            inLServo.setPower(0);
         }
 
         telemetryUpdate();
@@ -154,20 +176,7 @@ public class TeleOpMecanum extends OpMode {
 
     private void telemetryUpdate() {
         telemetry.addData("Speed mode", adjustedSpeed);
-        telemetry.addData("Glyph", glyph.getPositionAsString());
+        telemetry.addData("Glyph", drive.glyph.getPositionAsString());
+        telemetry.update();
     }
-
-    /* CODE FROM HERE DOWN IS AN ATTEMPT TO IMPLEMENT DYLAN'S DRIVE ALGORITHM
-    MecanumDrive drive;
-
-    @Override
-    public void init() {
-        drive = new MecanumDrive(hardwareMap, telemetry);
-    }
-
-    @Override
-    public void loop() {
-        drive.drive(false, gamepad1, 1);
-    }*/
-
 }

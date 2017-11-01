@@ -1,7 +1,11 @@
 package org.firstinspires.ftc.team4042;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -12,6 +16,10 @@ public class MecanumDrive extends Drive {
     //Used for not-field-oriented drive
     public static final int OFFSET = 0;
 
+    public GlyphPlacementSystem glyph;
+
+    private Servo jewelServo;
+
     /**
      * Constructor for Drive, it creates the motors and the gyro objects
      */
@@ -20,8 +28,39 @@ public class MecanumDrive extends Drive {
         super();
     }
 
+    @Override
+    public void initialize(Telemetry telemetry, HardwareMap hardwareMap) {
+        jewelServo = hardwareMap.servo.get("jewel");
+        jewelServo.setPosition(.7);
+        super.initialize(telemetry, hardwareMap);
+    }
+
     public MecanumDrive(boolean verbose) {
         super(verbose);
+    }
+
+    public void jewelLeft() {
+        jewelDown();
+        //Rotates the robot left
+        rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 100);
+        rotateWithEncoders(Direction.Rotation.Clockwise, Drive.FULL_SPEED, 100);
+        jewelUp();
+    }
+
+    public void jewelRight() {
+        jewelDown();
+        //Rotates the robot right
+        rotateWithEncoders(Direction.Rotation.Clockwise, Drive.FULL_SPEED, 100);
+        rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 100);
+        jewelUp();
+    }
+
+    public void jewelDown() {
+        jewelServo.setPosition(.2);
+    }
+
+    public void jewelUp() {
+        jewelServo.setPosition(.7);
     }
 
     /**
@@ -87,44 +126,6 @@ public class MecanumDrive extends Drive {
 
         //sets the wheel powers to the appropriate ratios
         super.setMotorPower(speedWheel, speedFactor);
-    }
-
-    /**
-     * Moves at a direction until the AnalogSensor returns the desired input
-     * @param direction The direction to move in
-     * @param speed The speed to move at
-     * @param targetDistance The distance to end up at
-     * @param ir The AnalogSensor with which to get the distance
-     * @return Whether you've reached the target point
-     */
-    public boolean driveWithSensor(Direction direction, double speed, double targetDistance, AnalogSensor ir) {
-        //Ping 10 times and average the results
-        /*double sum = 0;
-        for (int i = 0; i < 10; i++) { sum += ir.getCmAvg(); }
-        double currDistance = sum / 10;*/
-
-        double currDistance = ir.getCmAvg();
-        if (currDistance == -1) {
-            telemetry.addData("Error", "Couldn't find ultrasonic");
-            return true;
-        } else {
-            double r = useGyro();
-
-            telemetry.addData("currDistance", currDistance);
-            telemetry.addData("Reached target", Math.abs(targetDistance - currDistance) > 0.5);
-            telemetry.addData("x", direction.getX());
-            telemetry.addData("y", direction.getY());
-            telemetry.addData("r", r);
-
-            if (((direction.getY() >= 0) && (currDistance - 3 < targetDistance)) || //driving forwards and reached distance (0.5 inch tolerance)
-                    ((direction.getY() < 0) && (currDistance + 3 > targetDistance))) { //driving backwards and reached distance (0.5 inch tolerance)
-                stopMotors();
-                return true;
-            } else { //haven't reached point yet
-                driveXYR(speed, direction.getX(), direction.getY(), r, false);
-                return false;
-            }
-        }
     }
 
     /**

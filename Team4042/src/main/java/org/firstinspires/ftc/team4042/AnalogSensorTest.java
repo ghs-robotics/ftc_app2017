@@ -32,11 +32,6 @@ package org.firstinspires.ftc.team4042;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
  * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
@@ -54,7 +49,7 @@ import java.io.IOException;
 @TeleOp(name="Analog Sensor", group="Iterative Opmode")
 public class AnalogSensorTest extends OpMode {
 
-    AnalogSensor ultrasonic = new AnalogSensor("ultrasonic");
+    AnalogSensor ultrasonic = new AnalogSensor("ultrasonic", true);
     /*File file;
     BufferedWriter writer;*/
 
@@ -64,7 +59,6 @@ public class AnalogSensorTest extends OpMode {
         /*file = new File("./storage/emulated/0/DCIM/ir.txt");
         try {
             writer = new BufferedWriter(new FileWriter(file, true));
-            writer.append("\n\n");
         } catch (IOException ex) {
             telemetry.addData("error", "creating writer");
         }*/
@@ -85,8 +79,7 @@ public class AnalogSensorTest extends OpMode {
 
     @Override
     public void loop() {
-        double cmAvg = ultrasonic.getCmAvg();
-        telemetry.addData("centimeters", cmAvg);
+        telemetry.addData("cm", ultrasonic.getCmAvg());
         telemetry.update();
 
         /*try {
@@ -98,6 +91,7 @@ public class AnalogSensorTest extends OpMode {
 
     public void stop() {
         /*try {
+            writer.append("\n\n");
             writer.close();
         } catch (IOException ex) {
             telemetry.addData("error", "trying to close writer");
