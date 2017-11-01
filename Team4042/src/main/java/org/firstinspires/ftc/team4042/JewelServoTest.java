@@ -18,7 +18,7 @@ public class JewelServoTest extends OpMode {
 
     @Override
     public void init() {
-        jewelServo = hardwareMap.servo.get("jewel");
+        jewelServo = hardwareMap.servo.get("hand");
         jewelServo.setPosition(position);
     }
 

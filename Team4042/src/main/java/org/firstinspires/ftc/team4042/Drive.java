@@ -212,10 +212,12 @@ public abstract class Drive {
      */
     public void setMotorPower(double[] speedWheel, double speedFactor) {
         //Scales wheel speeds to fit motors
+        double max = max(speedWheel[0], speedWheel[1], speedWheel[2], speedWheel[3]);
         for(int i = 0; i < 4; i++) {
             speedWheel[i] *= speedFactor;
-            if(speedWheel[i] > 1) { speedWheel[i] = 1; }
-            if(speedWheel[i] < -1) { speedWheel[i] = -1; }
+            if (max > 1) {
+                speedWheel[i] /= max;
+            }
         }
 
         if (useMotors) {
