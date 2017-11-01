@@ -53,17 +53,25 @@ public class TeleOpMecanum extends OpMode {
             liftLeft.setPower(1);
             liftRight.setPower(-1);
         }
-        if (gamepad2.dpad_down) {
+        else if (gamepad2.dpad_down) {
             liftLeft.setPower(-1);
             liftRight.setPower(1);
+        }
+        else {
+            liftLeft.setPower(0);
+            liftRight.setPower(0);
         }
         if (drive.deadZone(gamepad2.right_trigger) > 0) {
             intakeLeft.setPower(1);
             intakeRight.setPower(-1);
         }
-        if (drive.deadZone(gamepad2.left_trigger) > 0) {
+        else if (drive.deadZone(gamepad2.left_trigger) > 0) {
             intakeLeft.setPower(-1);
             intakeRight.setPower(1);
+        }
+        else{
+            intakeLeft.setPower(0);
+            intakeRight.setPower(0);
         }
         if (gamepad2.a) {
             grabLeft.setPosition(-1);

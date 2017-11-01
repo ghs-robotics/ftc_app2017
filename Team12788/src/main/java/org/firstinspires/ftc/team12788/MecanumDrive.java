@@ -52,6 +52,11 @@ public class MecanumDrive extends Drive {
         x = super.deadZone(x);
         y = super.deadZone(y);
         r = super.deadZone(r);
+
+        telemetry.addData("speed wheel 0", speedWheel[0]);
+        telemetry.addData("speed wheel 1", speedWheel[1]);
+        telemetry.addData("speed wheel 2", speedWheel[2]);
+        telemetry.addData("speed wheel 3", speedWheel[3]);
         /*
         Adjust x, y for gyro values
          */
