@@ -54,8 +54,8 @@ public class TeleOpMecanum extends OpMode {
             liftRight.setPower(-1);
         }
         else if (gamepad2.dpad_down) {
-            liftLeft.setPower(-1);
-            liftRight.setPower(1);
+            liftLeft.setPower(-.5);
+            liftRight.setPower(.5);
         }
         else {
             liftLeft.setPower(0);
