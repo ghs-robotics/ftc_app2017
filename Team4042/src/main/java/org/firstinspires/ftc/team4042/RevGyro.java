@@ -106,8 +106,18 @@ public class RevGyro {
         return heading;
     }
 
+    public double updatePitch() {
+        updateAngles();
+        return pitch;
+    }
+
     public double getPitch() {
         return pitch;
+    }
+
+    public double updateRoll() {
+        updateAngles();
+        return roll;
     }
 
     public double getRoll() {

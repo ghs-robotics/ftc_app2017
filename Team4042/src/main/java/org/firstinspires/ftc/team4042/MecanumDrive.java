@@ -2,6 +2,7 @@ package org.firstinspires.ftc.team4042;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -17,6 +18,8 @@ public class MecanumDrive extends Drive {
 
     public GlyphPlacementSystem glyph;
 
+    private Servo jewelServo;
+
     /**
      * Constructor for Drive, it creates the motors and the gyro objects
      */
@@ -27,11 +30,37 @@ public class MecanumDrive extends Drive {
 
     @Override
     public void initialize(Telemetry telemetry, HardwareMap hardwareMap) {
+        jewelServo = hardwareMap.servo.get("jewel");
+        jewelServo.setPosition(.7);
         super.initialize(telemetry, hardwareMap);
     }
 
     public MecanumDrive(boolean verbose) {
         super(verbose);
+    }
+
+    public void jewelLeft() {
+        jewelDown();
+        //Rotates the robot left
+        rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 100);
+        rotateWithEncoders(Direction.Rotation.Clockwise, Drive.FULL_SPEED, 100);
+        jewelUp();
+    }
+
+    public void jewelRight() {
+        jewelDown();
+        //Rotates the robot right
+        rotateWithEncoders(Direction.Rotation.Clockwise, Drive.FULL_SPEED, 100);
+        rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 100);
+        jewelUp();
+    }
+
+    public void jewelDown() {
+        jewelServo.setPosition(.2);
+    }
+
+    public void jewelUp() {
+        jewelServo.setPosition(.7);
     }
 
     /**
