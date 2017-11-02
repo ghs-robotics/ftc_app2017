@@ -131,7 +131,7 @@ public class Autonomous extends LinearOpMode {
 // hi hi hih ihihhi hi h ihii 9ihihihih
     }
 
-    public void lkadl(boolean isRed, boolean isTop) {
+    public void lkadl(boolean isRed, boolean isTop, double tile) {
         liftLeft = hardwareMap.dcMotor.get("liftLeft");
         liftRight = hardwareMap.dcMotor.get("liftRight");
         intakeLeft = hardwareMap.dcMotor.get("intakeLeft");
@@ -144,7 +144,7 @@ public class Autonomous extends LinearOpMode {
         vuMark = mark.getMark();
         if (isRed && !isTop) {
             if ((vuMark == RelicRecoveryVuMark.CENTER)) {
-                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 600)) {
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, tile)) {
                 }
                 intakeLeft.setPower(1);
                 intakeRight.setPower(-1);
@@ -153,12 +153,12 @@ public class Autonomous extends LinearOpMode {
                 intakeRight.setPower(0);
                 while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))) {
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile*Math.sqrt(3))) {
                 }
                 ;
             }
             if ((vuMark == RelicRecoveryVuMark.RIGHT)) {
-                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 500)) {
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 2*tile/3)) {
                 }
                 intakeLeft.setPower(1);
                 intakeRight.setPower(-1);
@@ -167,14 +167,14 @@ public class Autonomous extends LinearOpMode {
                 intakeRight.setPower(0);
                 while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 100)) {
+                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, tile/3)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))){}
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile*Math.sqrt(3))){}
                 ;
 
             }
             if (vuMark == RelicRecoveryVuMark.LEFT) {
-                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 700)) {
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 4*tile/3)) {
                 }
                 intakeLeft.setPower(1);
                 intakeRight.setPower(-1);
@@ -183,17 +183,17 @@ public class Autonomous extends LinearOpMode {
                 intakeRight.setPower(0);
                 while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
                 }
-                while (!drive.driveWithEncoders (Direction.Left, Drive.FULL_SPEED, 100)) {
+                while (!drive.driveWithEncoders (Direction.Left, Drive.FULL_SPEED, tile/3)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))){};
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile*Math.sqrt(3))){};
             }
         }
 
         if (isRed && isTop) {
             if ((vuMark == RelicRecoveryVuMark.CENTER)) {
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600)) {
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 300)) {
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, tile/2)) {
                 }
                 intakeLeft.setPower(1);
                 intakeRight.setPower(-1);
@@ -202,14 +202,14 @@ public class Autonomous extends LinearOpMode {
                 intakeRight.setPower(0);
                 while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))) {
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile*Math.sqrt(3))) {
                 }
                 ;
             }
             if ((vuMark == RelicRecoveryVuMark.RIGHT)) {
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600)) {
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 200)) {
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, tile/6)) {
                 }
                 intakeLeft.setPower(1);
                 intakeRight.setPower(-1);
@@ -218,16 +218,16 @@ public class Autonomous extends LinearOpMode {
                 intakeRight.setPower(0);
                 while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 100)) {
+                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, tile/3)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))){}
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile*Math.sqrt(3))){}
                 ;
 
             }
             if (vuMark == RelicRecoveryVuMark.LEFT) {
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600)) {
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 400)) {
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 5*tile/6)) {
                 }
                 intakeLeft.setPower(1);
                 intakeRight.setPower(-1);
@@ -236,16 +236,16 @@ public class Autonomous extends LinearOpMode {
                 intakeRight.setPower(0);
                 while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
                 }
-                while (!drive.driveWithEncoders (Direction.Left, Drive.FULL_SPEED, 100)) {
+                while (!drive.driveWithEncoders (Direction.Left, Drive.FULL_SPEED, tile/3)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))){};
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile*Math.sqrt(3))){};
             }
         }
         if (!isRed && isTop) {
             if ((vuMark == RelicRecoveryVuMark.CENTER)) {
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600)) {
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 300)) {
+                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, tile/2)) {
                 }
                 intakeLeft.setPower(1);
                 intakeRight.setPower(-1);
@@ -254,14 +254,14 @@ public class Autonomous extends LinearOpMode {
                 intakeRight.setPower(0);
                 while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))) {
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile*Math.sqrt(3))) {
                 }
                 ;
             }
             if ((vuMark == RelicRecoveryVuMark.RIGHT)) {
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600)) {
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 200)) {
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, tile/6)) {
                 }
                 intakeLeft.setPower(1);
                 intakeRight.setPower(-1);
@@ -270,16 +270,16 @@ public class Autonomous extends LinearOpMode {
                 intakeRight.setPower(0);
                 while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 100)) {
+                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, tile/3)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))){}
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile*Math.sqrt(3))){}
                 ;
 
             }
             if (vuMark == RelicRecoveryVuMark.LEFT) {
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600)) {
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 400)) {
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 5*tile/6)) {
                 }
                 intakeLeft.setPower(1);
                 intakeRight.setPower(-1);
@@ -288,16 +288,16 @@ public class Autonomous extends LinearOpMode {
                 intakeRight.setPower(0);
                 while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
                 }
-                while (!drive.driveWithEncoders (Direction.Left, Drive.FULL_SPEED, 100)) {
+                while (!drive.driveWithEncoders (Direction.Left, Drive.FULL_SPEED, tile/3)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))){};
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile*Math.sqrt(3))){};
             }
         }
         if (!isRed && isTop) {
             if ((vuMark == RelicRecoveryVuMark.CENTER)) {
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600)) {
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 300)) {
+                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, tile/2)) {
                 }
                 intakeLeft.setPower(1);
                 intakeRight.setPower(-1);
@@ -306,14 +306,14 @@ public class Autonomous extends LinearOpMode {
                 intakeRight.setPower(0);
                 while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))) {
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile*Math.sqrt(3))) {
                 }
                 ;
             }
             if ((vuMark == RelicRecoveryVuMark.RIGHT)) {
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600)) {
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 400)) {
+                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 5*tile/6)) {
                 }
                 intakeLeft.setPower(1);
                 intakeRight.setPower(-1);
@@ -322,16 +322,16 @@ public class Autonomous extends LinearOpMode {
                 intakeRight.setPower(0);
                 while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 100)) {
+                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, tile/3)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))){}
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile*Math.sqrt(3))){}
                 ;
 
             }
             if (vuMark == RelicRecoveryVuMark.LEFT) {
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600)) {
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 200)) {
+                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, tile/6)) {
                 }
                 intakeLeft.setPower(1);
                 intakeRight.setPower(-1);
@@ -340,14 +340,14 @@ public class Autonomous extends LinearOpMode {
                 intakeRight.setPower(0);
                 while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
                 }
-                while (!drive.driveWithEncoders (Direction.Left, Drive.FULL_SPEED, 100)) {
+                while (!drive.driveWithEncoders (Direction.Left, Drive.FULL_SPEED, tile/3)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))){};
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile*Math.sqrt(3))){};
             }
         }
         if (!isRed && !isTop) {
             if ((vuMark == RelicRecoveryVuMark.CENTER)) {
-                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 600)) {
+                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, tile)) {
                 }
                 intakeLeft.setPower(1);
                 intakeRight.setPower(-1);
@@ -356,12 +356,12 @@ public class Autonomous extends LinearOpMode {
                 intakeRight.setPower(0);
                 while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))) {
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile*Math.sqrt(3))) {
                 }
                 ;
             }
             if ((vuMark == RelicRecoveryVuMark.RIGHT)) {
-                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 700)) {
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 4*tile/3)) {
                 }
                 intakeLeft.setPower(1);
                 intakeRight.setPower(-1);
@@ -370,14 +370,14 @@ public class Autonomous extends LinearOpMode {
                 intakeRight.setPower(0);
                 while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 100)) {
+                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, tile/3)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))){}
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile*Math.sqrt(3))){}
                 ;
 
             }
             if (vuMark == RelicRecoveryVuMark.LEFT) {
-                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 500)) {
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 2*tile/3)) {
                 }
                 intakeLeft.setPower(1);
                 intakeRight.setPower(-1);
@@ -386,14 +386,14 @@ public class Autonomous extends LinearOpMode {
                 intakeRight.setPower(0);
                 while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
                 }
-                while (!drive.driveWithEncoders (Direction.Left, Drive.FULL_SPEED, 100)) {
+                while (!drive.driveWithEncoders (Direction.Left, Drive.FULL_SPEED, tile/3)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))){};
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile*Math.sqrt(3))){};
             }
         }
         if (isRed && !isTop) {
             if ((vuMark == RelicRecoveryVuMark.CENTER)) {
-                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 600)) {
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, tile)) {
                 }
                 intakeLeft.setPower(1);
                 intakeRight.setPower(-1);
@@ -402,12 +402,12 @@ public class Autonomous extends LinearOpMode {
                 intakeRight.setPower(0);
                 while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))) {
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile*Math.sqrt(3))) {
                 }
                 ;
             }
             if ((vuMark == RelicRecoveryVuMark.RIGHT)) {
-                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 500)) {
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 2*tile/3)) {
                 }
                 intakeLeft.setPower(1);
                 intakeRight.setPower(-1);
@@ -416,14 +416,14 @@ public class Autonomous extends LinearOpMode {
                 intakeRight.setPower(0);
                 while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 100)) {
+                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, tile/3)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))){}
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile*Math.sqrt(3))){}
                 ;
 
             }
             if (vuMark == RelicRecoveryVuMark.LEFT) {
-                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 700)) {
+                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 4*tile/3)) {
                 }
                 intakeLeft.setPower(1);
                 intakeRight.setPower(-1);
@@ -432,9 +432,9 @@ public class Autonomous extends LinearOpMode {
                 intakeRight.setPower(0);
                 while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
                 }
-                while (!drive.driveWithEncoders (Direction.Left, Drive.FULL_SPEED, 100)) {
+                while (!drive.driveWithEncoders (Direction.Left, Drive.FULL_SPEED, tile/3)) {
                 }
-                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 600*Math.sqrt(3))){};
+                while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile*Math.sqrt(3))){};
             }
         }
     }
