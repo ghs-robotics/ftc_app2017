@@ -26,6 +26,8 @@ public class TeleOpMecanum extends OpMode {
 
     private boolean bA = false;
     private boolean bB = false;
+    private boolean bY = false;
+
 
     //Declare OpMode members.
     private MecanumDrive drive = new MecanumDrive(true);
@@ -111,6 +113,10 @@ public class TeleOpMecanum extends OpMode {
         }
         aRightBumper = gamepad1.right_bumper;
 
+        //Glyph override: if active, forces arm to place even if position is incorrect
+        if (gamepad2.y && !bY) { drive.glyph.switchOverride(); }
+        bY = gamepad2.y;
+
         //Glyph locate
         if (gamepad2.dpad_up && !bUp) { drive.glyph.up(); }
         bUp = gamepad2.dpad_up;
@@ -154,13 +160,13 @@ public class TeleOpMecanum extends OpMode {
         else {
             drive.intakeLeft(0);
         }
-
+        drive.glyph.runToPosition();
         telemetryUpdate();
     }
 
     private void telemetryUpdate() {
         telemetry.addData("Speed mode", adjustedSpeed);
-        telemetry.addData("Glyph", drive.glyph.getPositionAsString());
+        telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
         telemetry.update();
     }
 }
