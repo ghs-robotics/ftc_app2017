@@ -54,26 +54,29 @@ import com.qualcomm.robotcore.util.Range;
 @Disabled
 public class IntakeTest extends OpMode {
 
-}
+    /*
+     * Code to run ONCE when the driver hits INIT
+     */
     @Override
     public void init() {
 
-
-
+    }
 
     /*
      * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
      */
     @Override
     public void init_loop() {
-            whisker = hardwareMap.digitalChannel.get("whisker")
+
     }
 
     /*
      * Code to run ONCE when the driver hits PLAY
      */
     @Override
+    public void start() {
 
+    }
 
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
@@ -88,6 +91,7 @@ public class IntakeTest extends OpMode {
      */
     @Override
     public void stop() {
+
     }
 
 }
