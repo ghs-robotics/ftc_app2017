@@ -31,7 +31,7 @@ public class MecanumDrive extends Drive {
     @Override
     public void initialize(Telemetry telemetry, HardwareMap hardwareMap) {
         jewelServo = hardwareMap.servo.get("jewel");
-        jewelServo.setPosition(.7);
+        jewelIn();
         super.initialize(telemetry, hardwareMap);
     }
 
@@ -62,6 +62,8 @@ public class MecanumDrive extends Drive {
     public void jewelUp() {
         jewelServo.setPosition(.7);
     }
+
+    public void jewelIn() { jewelServo.setPosition(.9); }
 
     /**
      * uses joystick inputs to set motor speeds for mecanum drive

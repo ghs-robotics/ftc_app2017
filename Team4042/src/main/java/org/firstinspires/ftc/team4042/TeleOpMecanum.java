@@ -88,6 +88,12 @@ public class TeleOpMecanum extends OpMode {
         //The left intake servo is mounted "backwards"
         inLServo.setDirection(DcMotorSimple.Direction.REVERSE);
     }
+
+    @Override
+    public void start() {
+        //Moves the servo to the up position
+        drive.jewelUp();
+    }
     
     @Override
     public void loop() {
