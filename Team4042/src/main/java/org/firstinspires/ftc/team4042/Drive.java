@@ -22,8 +22,6 @@ public abstract class Drive {
 
     //Use gyro - true/false
     public static boolean useGyro = true;
-    //Reverses power input to back left motor
-    public static final boolean team12788 = false;
 
     //Set to false to just get outputs as telemetry
     public static boolean useMotors = true;
