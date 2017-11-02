@@ -39,7 +39,7 @@ public class GlyphPlacementSystem
     {
         this.homeLimit.initialize(map);
         this.verticalDrive = map.dcMotor.get("vertical drive");
-        this.grabbyBoi = map.servo.get("grabby boi");
+        this.grabbyBoi = map.servo.get("hand");
         this.slidyBoi = map.crservo.get("slidy boi");
 
         this.baseOutput = "[ _ _ _ ]\n[ _ _ _ ]\n[ _ _ _ ]";

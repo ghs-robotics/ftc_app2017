@@ -128,7 +128,7 @@ public class TeleOpMecanum extends OpMode {
         bRight = gamepad2.dpad_right;
 
         //Places glyph
-        if (gamepad2.a && !bA) { drive.glyph.place(); }
+        if ((gamepad2.a && !bA) || drive.glyph.getIsPlacing()) { drive.glyph.place(); }
         bA = gamepad2.a;
 
         //Lifts arm
