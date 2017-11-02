@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -20,6 +23,12 @@ public class MecanumDrive extends Drive {
 
     private Servo jewelServo;
 
+    private DcMotor intakeLeft;
+    private DcMotor intakeRight;
+
+    private CRServo inLServo;
+    private CRServo inRServo;
+
     /**
      * Constructor for Drive, it creates the motors and the gyro objects
      */
@@ -33,10 +42,30 @@ public class MecanumDrive extends Drive {
         jewelServo = hardwareMap.servo.get("jewel");
         jewelIn();
         super.initialize(telemetry, hardwareMap);
+
+        intakeLeft = hardwareMap.dcMotor.get("intake left");
+        intakeRight = hardwareMap.dcMotor.get("intake right");
+        //The left intake is mounted "backwards"
+        intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        inLServo = hardwareMap.crservo.get("intake left servo");
+        inRServo = hardwareMap.crservo.get("intake right servo");
+        //The left intake servo is mounted "backwards"
+        inLServo.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public MecanumDrive(boolean verbose) {
         super(verbose);
+    }
+
+    public void intakeLeft(double power) {
+        intakeLeft.setPower(power);
+        inLServo.setPower(power);
+    }
+
+    public void intakeRight(double power) {
+        intakeRight.setPower(power);
+        inRServo.setPower(power);
     }
 
     public void jewelLeft() {
