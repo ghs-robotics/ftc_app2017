@@ -23,6 +23,8 @@ public class TeleOpMecanum extends OpMode {
     private DcMotor intakeRight;
     private DcMotor intakeLeft;
 
+    private boolean overide;
+
     public Servo grabLeft;
     public Servo grabRight;
 
@@ -36,12 +38,11 @@ public class TeleOpMecanum extends OpMode {
         adjustedSpeed = MecanumDrive.FULL_SPEED;
 
         invert = false;
+        overide = false;
     }
     
     @Override
     public void loop() {
-
-        drive.drive(false, gamepad1,adjustedSpeed * MecanumDrive.FULL_SPEED, invert);
         liftLeft = hardwareMap.dcMotor.get("liftLeft");
         liftRight = hardwareMap.dcMotor.get("liftRight");
         intakeLeft = hardwareMap.dcMotor.get("intakeLeft");
@@ -73,7 +74,7 @@ public class TeleOpMecanum extends OpMode {
             intakeLeft.setPower(0);
             intakeRight.setPower(0);
         }
-        if (gamepad2.a) {
+        if (gamepad2.b) {
             grabLeft.setPosition(-1);
             grabRight.setPosition(1);
         }
@@ -96,7 +97,18 @@ public class TeleOpMecanum extends OpMode {
         if (gamepad1.left_bumper) {
             invert = true;
         }
+        if (gamepad2.a || overide){
+            overide = true;
+            if (!drive.driveWithEncoders(Direction.Forward, .5, 500)) {
 
+            } else {
+                grabLeft.setPosition(-1);
+                grabRight.setPosition(1);
+                overide = false;
+            }
+        } else {
+            drive.drive(false, gamepad1,adjustedSpeed * MecanumDrive.FULL_SPEED, invert);
+        }
     }
 
     private void telemetryUpdate() {

@@ -80,68 +80,26 @@ public class Autonomous extends LinearOpMode {
         grabLeft = hardwareMap.servo.get("grabLeft");
         grabRight = hardwareMap.servo.get("grabRight");
         mark.initialize(telemetry, hardwareMap);
-        waitForStart();
-        vuMark = mark.getMark();
-        if ((vuMark == RelicRecoveryVuMark.CENTER)) {
-            while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 4000)) {
+        boolean isRed = false;
+        boolean isTop = false;
+        while (!isStarted()) {
+            if(gamepad1.a) {
+                isTop = false;
+            } else if(gamepad1.b) {
+                isRed = true;
+            } else if(gamepad1.y) {
+                isTop = true;
+            } else if(gamepad1.x) {
+                isRed = false;
             }
-            intakeLeft.setPower(1);
-            intakeRight.setPower(-1);
-            sleep(2000);
-            intakeLeft.setPower(0);
-            intakeRight.setPower(0);
-            while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
-            }
-            while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 200)) {
-            }
-            ;
+            telemetry.addData("Red: ", isRed);
+            telemetry.addData("Top: ", isTop);
+            telemetry.update();
         }
-        if ((vuMark == RelicRecoveryVuMark.RIGHT)) {
-            while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 3800)) {
-            }
-            intakeLeft.setPower(1);
-            intakeRight.setPower(-1);
-            sleep(2000);
-            intakeLeft.setPower(0);
-            intakeRight.setPower(0);
-            while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
-            }
-            while (!drive.driveWithEncoders(new Direction(1, Math.sqrt(3)), Drive.FULL_SPEED, 4000 / Math.sqrt(3))) {
-            }
-            ;
-
-        }
-        if (vuMark == RelicRecoveryVuMark.LEFT) {
-            while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 4200)) {
-            }
-            intakeLeft.setPower(1);
-            intakeRight.setPower(-1);
-            sleep(2000);
-            intakeLeft.setPower(0);
-            intakeRight.setPower(0);
-            while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 1000)) {
-            }
-            while (!drive.driveWithEncoders(new Direction(-1, Math.sqrt(3)), Drive.FULL_SPEED, 4000 / Math.sqrt(3))) {
-            }
-
-
-        }
-
-
-// hi hi hih ihihhi hi h ihii 9ihihihih
+        lkadl(isRed, isTop);
     }
 
     public void lkadl(boolean isRed, boolean isTop, double tile) {
-        liftLeft = hardwareMap.dcMotor.get("liftLeft");
-        liftRight = hardwareMap.dcMotor.get("liftRight");
-        intakeLeft = hardwareMap.dcMotor.get("intakeLeft");
-        intakeRight = hardwareMap.dcMotor.get("intakeRight");
-        drive.runWithEncoders();
-        grabLeft = hardwareMap.servo.get("grabLeft");
-        grabRight = hardwareMap.servo.get("grabRight");
-        mark.initialize(telemetry, hardwareMap);
-        waitForStart();
-        vuMark = mark.getMark();
         if (isRed && !isTop) {
             if ((vuMark == RelicRecoveryVuMark.CENTER)) {
                 while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, tile)) {
@@ -204,7 +162,6 @@ public class Autonomous extends LinearOpMode {
                 }
                 while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile*Math.sqrt(3))) {
                 }
-                ;
             }
             if ((vuMark == RelicRecoveryVuMark.RIGHT)) {
                 while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, tile)) {
