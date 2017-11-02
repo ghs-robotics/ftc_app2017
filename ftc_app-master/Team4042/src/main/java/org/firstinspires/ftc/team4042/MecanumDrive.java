@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.team4042;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -20,6 +21,18 @@ public class MecanumDrive extends Drive {
 
     private Servo jewelServo;
 
+    private Servo handServo;
+    private enum Hand { OPEN, CLOSED }
+    private Hand handState;
+
+    private DcMotor uTrack;
+
+    private DcMotor intakeLeft;
+    private DcMotor intakeRight;
+
+    private CRServo inLServo;
+    private CRServo inRServo;
+
     /**
      * Constructor for Drive, it creates the motors and the gyro objects
      */
@@ -32,11 +45,61 @@ public class MecanumDrive extends Drive {
     public void initialize(Telemetry telemetry, HardwareMap hardwareMap) {
         jewelServo = hardwareMap.servo.get("jewel");
         jewelIn();
+
+        handServo = hardwareMap.servo.get("hand");
+        handState = Hand.CLOSED;
+
+        intakeLeft = hardwareMap.dcMotor.get("intake left");
+        intakeRight = hardwareMap.dcMotor.get("intake right");
+        //The left intake is mounted "backwards"
+        intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        inLServo = hardwareMap.crservo.get("intake left servo");
+        inRServo = hardwareMap.crservo.get("intake right servo");
+        //The left intake servo is mounted "backwards"
+        inLServo.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        uTrack = hardwareMap.dcMotor.get("u track");
+
         super.initialize(telemetry, hardwareMap);
     }
 
     public MecanumDrive(boolean verbose) {
         super(verbose);
+    }
+
+    public void runUTrack(double power) {
+        uTrack.setPower(power);
+    }
+
+    public void runIntakeLeft(double power) {
+        intakeLeft.setPower(power);
+        inLServo.setPower(power);
+    }
+
+    public void runIntakeRight(double power) {
+        intakeRight.setPower(power);
+        inRServo.setPower(power);
+    }
+
+    public void closeHand() {
+        //TODO: CLOSE HAND
+        handState = Hand.CLOSED;
+    }
+
+    public void openHand() {
+        //TODO: OPEN HAND
+        handState = Hand.OPEN;
+    }
+
+    public void toggleHand() {
+        if (handState.equals(Hand.OPEN)) {
+            handState = Hand.CLOSED;
+            closeHand();
+        } else if (handState.equals(Hand.CLOSED)) {
+            handState = Hand.OPEN;
+            openHand();
+        }
     }
 
     public void jewelLeft() {

@@ -129,9 +129,14 @@ public class GlyphPlacementSystem
     }
 
     public void goToHome() {
-        while (!homeLimit.getState()) {
+        if (!homeLimit.getState()) {
             verticalDrive.setPower(-1);
+        } else {
+            reset();
         }
+    }
+
+    public void reset() {
         verticalDrive.setPower(0);
         verticalDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         verticalDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
