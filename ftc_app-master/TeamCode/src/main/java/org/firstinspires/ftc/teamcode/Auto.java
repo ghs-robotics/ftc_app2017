@@ -70,7 +70,7 @@ public abstract class Auto extends LinearOpMode {
                         String k = parameter.substring(0, colon);
                         String v = parameter.substring(colon + 1);
                         parameters.put(k, v); //Gets the next parameter and adds it to the list
-                        log.add(k + ":" + v);
+                        log.add("Parameter: " + k + ":" + v);
                         telemetry.update();
                     }
 

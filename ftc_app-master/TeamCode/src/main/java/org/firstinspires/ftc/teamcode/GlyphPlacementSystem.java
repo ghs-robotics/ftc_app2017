@@ -1,7 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
  * Created by Ryan Whiting on 10/17/2017.
@@ -128,14 +129,9 @@ public class GlyphPlacementSystem
     }
 
     public void goToHome() {
-        if (!homeLimit.getState()) {
+        while (!homeLimit.getState()) {
             verticalDrive.setPower(-1);
-        } else {
-            reset();
         }
-    }
-
-    public void reset() {
         verticalDrive.setPower(0);
         verticalDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         verticalDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

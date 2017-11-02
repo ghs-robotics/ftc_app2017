@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 @Autonomous(name="BlueBottomAuto", group="K9bot")
 public class BlueBottomAuto extends Auto {

@@ -2,6 +2,10 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import java.util.ArrayList;
 
@@ -22,8 +26,12 @@ public class TeleOpMecanum extends OpMode {
 
     private boolean bA = false;
     private boolean bB = false;
-    private boolean bY = false;
-    private boolean bX = false;
+
+    private DcMotor intakeLeft;
+    private DcMotor intakeRight;
+
+    private CRServo inLServo;
+    private CRServo inRServo;
 
     //Declare OpMode members.
     private MecanumDrive drive = new MecanumDrive(true);
@@ -52,7 +60,7 @@ public class TeleOpMecanum extends OpMode {
       A - place glyph
       B - moves servo arm back in
       X - u-track reset
-      Y - toggle hand
+      Y -
      */
 
     @Override
@@ -69,6 +77,16 @@ public class TeleOpMecanum extends OpMode {
         telemetry.update();
 
         adjustedSpeed = MecanumDrive.FULL_SPEED;
+
+        intakeLeft = hardwareMap.dcMotor.get("intake left");
+        intakeRight = hardwareMap.dcMotor.get("intake right");
+        //The left intake is mounted "backwards"
+        intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        inLServo = hardwareMap.crservo.get("intake left servo");
+        inRServo = hardwareMap.crservo.get("intake right servo");
+        //The left intake servo is mounted "backwards"
+        inLServo.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     @Override
@@ -130,44 +148,34 @@ public class TeleOpMecanum extends OpMode {
         //Right trigger of the b controller runs the right intake forward
         double bRightTrigger = drive.deadZone(gamepad2.right_trigger);
         if (bRightTrigger > 0) {
-            drive.runIntakeRight(bRightTrigger);
+            intakeRight.setPower(bRightTrigger);
+            inRServo.setPower(bRightTrigger);
         }
         //Right bumper of the b controller runs the right intake backwards
         else if (gamepad2.right_bumper) {
-            drive.runIntakeRight(-1);
+            intakeRight.setPower(-1);
+            inRServo.setPower(-1);
         }
         else {
-            drive.runIntakeRight(0);
+            intakeRight.setPower(0);
+            inRServo.setPower(0);
         }
 
         //Left trigger of the b controller runs the left intake forward
         double bLeftTrigger = drive.deadZone(gamepad2.left_trigger);
         if (bLeftTrigger > 0) {
-            drive.runIntakeLeft(bLeftTrigger);
+            intakeLeft.setPower(bLeftTrigger);
+            inLServo.setPower(bLeftTrigger);
         }
         //Left bumper of the b controller runs the left intake backwards
         else if (gamepad2.left_bumper) {
-            drive.runIntakeLeft(-1);
+            intakeLeft.setPower(-1);
+            inLServo.setPower(-1);
         }
         else {
-            drive.runIntakeLeft(0);
+            intakeLeft.setPower(0);
+            inLServo.setPower(0);
         }
-
-        //Left joystick's y on the b controller runs the u track
-        double bLeftY = -drive.deadZone(gamepad2.left_stick_y);
-        drive.runUTrack(bLeftY);
-
-        //Y on b controller toggles hand
-        if (!bY && gamepad2.y) {
-            drive.toggleHand();
-        }
-        bY = gamepad2.y;
-
-        //X on b controller resets the u track's current position
-        if (!bX && gamepad2.x) {
-            drive.glyph.reset();
-        }
-        bX = gamepad2.x;
 
         telemetryUpdate();
     }

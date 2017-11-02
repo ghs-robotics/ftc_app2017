@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import java.util.ArrayList;
+
 @TeleOp(name = "Motor Test", group = "Iterative Opmode")
 public class MotorTest extends OpMode {
 
