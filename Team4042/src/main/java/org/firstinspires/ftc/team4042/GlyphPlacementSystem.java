@@ -1,14 +1,7 @@
 package org.firstinspires.ftc.team4042;
 
-import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.DigitalChannelController;
-import com.qualcomm.robotcore.hardware.DigitalChannelImpl;
-import com.qualcomm.robotcore.hardware.HardwareDevice;
+import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
@@ -20,14 +13,14 @@ public class GlyphPlacementSystem
     private int targetX;
     private int targetY;
     private int currentX;
-    private int currentY;
-    private int currentPositon;
-    private int targetPosition;
+    private Position currentY;
     private String baseOutput;
-    private DigitalChannel homeLimit;
+    private DigitalSensor homeLimit = new DigitalSensor("limit");
     private DcMotor verticalDrive;
     private final int BASE_DISP = 0;
     private final int BLOCK_DISP = 0;
+
+    private enum Position{BACK, TOP, MID_TOP, MID_BOTTOM, BOTTOM}
 
     public GlyphPlacementSystem(HardwareMap map)
     {
@@ -36,13 +29,13 @@ public class GlyphPlacementSystem
 
     public GlyphPlacementSystem(int currentX, int currentY, HardwareMap map)
     {
-        this.homeLimit = map.digitalChannel.get("Limit");
-        this.verticalDrive = map.dcMotor.get("Vertical Drive");
+        this.homeLimit.initialize(map);
+        this.verticalDrive = map.dcMotor.get("vertical drive");
         this.baseOutput = "[ _ _ _ ]\n[ _ _ _ ]\n[ _ _ _ ]\n[ _ _ _ ]";
         this.targetX = currentX;
         this.targetY = currentY;
         this.currentX = currentX;
-        this.currentY = currentY;
+        this.currentY = Position.BACK;
 
         verticalDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
@@ -113,18 +106,35 @@ public class GlyphPlacementSystem
 
     public void place() {
         //TODO: motor code here
+        verticalDrive.setTargetPosition(BASE_DISP + BLOCK_DISP*targetY);
 
         /*
         Assuming motor forward power moves it right and up
         Move sideways motor (block distance * (targetX - currentX))
         Move vertical motor (block distance * (targetY - currentY))
          */
+
+        goToHome();
     }
 
-    public void runToPosition()
-    {
-        if(homeLimit.getState()) {
-            currentPositon = 0;
+    public void runToPosition() {
+        if (homeLimit.getState()) {
+            verticalDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
+
+        if (verticalDrive.getCurrentPosition() == 0) {
+            verticalDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        }
+    }
+
+    public void goToHome() {
+        while (!homeLimit.getState()) {
+            verticalDrive.setPower(-1);
+        }
+        verticalDrive.setPower(0);
+        verticalDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        verticalDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        currentY = Position.BACK;
     }
 }

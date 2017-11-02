@@ -33,6 +33,7 @@ public abstract class Auto extends LinearOpMode {
         drive.initialize(telemetry, hardwareMap);
         drive.glyph = new GlyphPlacementSystem(1, 0, hardwareMap);
         drive.setUseGyro(true);
+        telemetry.addData("glyph", drive.glyph.getPositionAsString());
         telemetry.update();
 
         log = telemetry.log();
@@ -84,8 +85,11 @@ public abstract class Auto extends LinearOpMode {
                         case "s":
                             functionName = "autoSensorDrive";
                             break;
-                        case "j":
-                            functionName = "knockJewel";
+                        case "jr":
+                            functionName = "knockRedJewel";
+                            break;
+                        case "jb":
+                            functionName = "knockBlueJewel";
                             break;
                         case "v":
                             functionName = "getVuMark";
@@ -119,8 +123,6 @@ public abstract class Auto extends LinearOpMode {
      * Runs the list of instructions
      */
     public void runAuto() {
-
-        //TODO: TEST THIS
         drive.resetEncoders();
         drive.setEncoders(true);
 
@@ -138,8 +140,11 @@ public abstract class Auto extends LinearOpMode {
                 case "autoSensorDrive":
                     autoSensorDrive(parameters);
                     break;
-                case "knockJewel":
-                    knockJewel(parameters);
+                case "knockRedJewel":
+                    knockRedJewel(parameters);
+                    break;
+                case "knockBlueJewel":
+                    knockBlueJewel(parameters);
                     break;
                 case "getVuMark":
                     getVuMark(parameters);
@@ -185,11 +190,36 @@ public abstract class Auto extends LinearOpMode {
             drive.glyph.place();
         }
 
+        telemetry.addData("glyph", drive.glyph.getPositionAsString());
+        telemetry.update();
     }
 
-    public void knockJewel(HashMap<String, String> parameters) {
-        //TODO: READ JEWEL COLOR
+    public void knockRedJewel(HashMap<String, String> parameters) {
+        //TODO: READ JEWEL ORDER
         //TODO: KNOCK OFF CORRECT JEWEL
+
+        drive.jewelLeft();
+
+        /**
+         * If left jewel is red:
+         *      drive.jewelLeft();
+         * If right jewel is red:
+         *      drive.jewelRight();
+         */
+    }
+
+    public void knockBlueJewel(HashMap<String, String> parameters) {
+        //TODO: READ JEWEL ORDER
+        //TODO: KNOCK OFF CORRECT JEWEL
+
+        drive.jewelRight();
+
+        /**
+         * If left jewel is blue:
+         *      drive.jewelLeft();
+         * If right jewel is blue:
+         *      drive.jewelRight();
+         */
     }
 
     public void autoDrive(HashMap<String, String> parameters) {
@@ -267,22 +297,23 @@ public abstract class Auto extends LinearOpMode {
         if (currDistance == -1) {
             telemetry.addData("Error", "Couldn't find ultrasonic");
         } else {
-            double r = drive.useGyro();
+            double r = drive.useGyro()/180;
 
             telemetry.addData("currDistance", currDistance);
             telemetry.addData("Reached target", Math.abs(targetDistance - currDistance) > 2);
             telemetry.addData("x", direction.getX());
             telemetry.addData("y", direction.getY());
             telemetry.addData("r", r);
+            telemetry.update();
 
             //If you're off your target by more than 2 cm, try to adjust
             while ((Math.abs(targetDistance - currDistance) > 2) && opModeIsActive()) {
                 if (((targetDistance > currDistance) && direction.isBackward()) ||
                         ((targetDistance < currDistance) && direction.isForward())) { //If you're not far enough, keep driving
-                    drive.driveWithEncoders(direction, speed, 100);
+                    drive.driveWithEncoders(direction, .25, 100);
                 } else if (((targetDistance > currDistance) && direction.isForward()) ||
                         ((targetDistance < currDistance) && direction.isBackward())) { //If you're too far, drive backwards slightly
-                    drive.driveWithEncoders(direction, -speed, 100);
+                    drive.driveWithEncoders(direction, -.25, 100);
                 }
                 currDistance = ir.getCmAvg();
             }

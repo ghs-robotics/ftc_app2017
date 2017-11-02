@@ -14,7 +14,6 @@ public class BlueBottomAuto extends Auto {
         super.setUp(drive, "bluebottom.txt");
         waitForStart();
 
-        //TODO: TEST THIS
         super.runAuto();
         
         //check sensor sums
