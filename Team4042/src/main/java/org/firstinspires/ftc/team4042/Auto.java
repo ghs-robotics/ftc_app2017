@@ -198,6 +198,8 @@ public abstract class Auto extends LinearOpMode {
         //TODO: READ JEWEL ORDER
         //TODO: KNOCK OFF CORRECT JEWEL
 
+        drive.jewelLeft();
+
         /**
          * If left jewel is red:
          *      drive.jewelLeft();
@@ -209,6 +211,8 @@ public abstract class Auto extends LinearOpMode {
     public void knockBlueJewel(HashMap<String, String> parameters) {
         //TODO: READ JEWEL ORDER
         //TODO: KNOCK OFF CORRECT JEWEL
+
+        drive.jewelRight();
 
         /**
          * If left jewel is blue:

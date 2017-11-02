@@ -212,10 +212,13 @@ public abstract class Drive {
      */
     public void setMotorPower(double[] speedWheel, double speedFactor) {
         //Scales wheel speeds to fit motors
+        double max = max(speedWheel[0], speedWheel[1], speedWheel[2], speedWheel[3]);
+        //Since max is an absolute value function, this also accounts for a data set like [3, 1, 0, -5], since max will be 5
         for(int i = 0; i < 4; i++) {
             speedWheel[i] *= speedFactor;
-            if(speedWheel[i] > 1) { speedWheel[i] = 1; }
-            if(speedWheel[i] < -1) { speedWheel[i] = -1; }
+            if (max > 1) {
+                speedWheel[i] /= max;
+            }
         }
 
         if (useMotors) {
@@ -267,6 +270,10 @@ public abstract class Drive {
         c = Math.abs(c);
         d = Math.abs(d);
         
-        return  Math.max(Math.max(Math.max(a, b), c), d);
+        return Math.max(Math.max(Math.max(a, b), c), d);
+    }
+
+    public double min(double a, double b, double c, double d) {
+        return Math.min(a, (Math.min(b, (Math.min(c, d)))));
     }
 }

@@ -52,14 +52,19 @@ public class MecanumDrive extends Drive {
         x = super.deadZone(x);
         y = super.deadZone(y);
         r = super.deadZone(r);
+
+        telemetry.addData("speed wheel 0", speedWheel[0]);
+        telemetry.addData("speed wheel 1", speedWheel[1]);
+        telemetry.addData("speed wheel 2", speedWheel[2]);
+        telemetry.addData("speed wheel 3", speedWheel[3]);
         /*
         Adjust x, y for gyro values
          */
         //Sets relative wheel speeds for mecanum drive based on controller inputs
-        speedWheel[0] = -(x + y + r);
-        speedWheel[1] = -(x + y - r);
-        speedWheel[2] = -(-x + y - r);
-        speedWheel[3] = -(-x + y + r);
+        speedWheel[0] = -x - y - r;
+        speedWheel[1] = x - y - r;
+        speedWheel[2] = -x - y - r;
+        speedWheel[3] = x - y - r;
 
         //sets the wheel powers to the appropriate ratios
         super.setMotorPower(speedWheel, speedFactor);

@@ -18,6 +18,7 @@ import org.opencv.core.CvType;
 import org.opencv.core.DMatch;
 import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
@@ -58,20 +59,21 @@ public class CameraTestVisionOpMode extends TestableVisionOpMode {
     final double FUNCTION_B_A = 1000.0;
     final double FUNCTION_B_B = 1.7695;
     final double FUNCTION_B_C = 1.1096;
+    Mat image;
 
     @Override
     public void init() {
         super.init();
         this.setFrameSize(new Size(3264, 1836));
-        Mat mkernel = new Mat( 3, 3, CvType.CV_32S );
+        mkernel = new Mat( 3, 3, CvType.CV_32S );
         mkernel.put(3, 3, kernel);
 
 
-        /*try {
-            this.image = Utils.loadResource(getContext(), R.drawable.legos, CV_LOAD_IMAGE_GRAYSCALE);
+        try {
+            image = Utils.loadResource(getContext(), R.drawable.hate, CV_LOAD_IMAGE_GRAYSCALE);
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
+        }
     }
 
     @Override
@@ -88,7 +90,12 @@ public class CameraTestVisionOpMode extends TestableVisionOpMode {
     public Mat frame(Mat rgba, Mat gray) {
         //Imgproc.filter2D(rgba, rgba, -1, mkernel);
         rgba = super.frame(rgba, gray);
-        return rgba;
+        Mat yo = image.clone();
+        for (Point point : findTape(25, yo)) {
+            Imgproc.circle(image, point, 2, new Scalar(0,100,0), -1);
+
+        }
+        return image;
     }
 
     private int distToPos (double d) {
@@ -105,7 +112,7 @@ public class CameraTestVisionOpMode extends TestableVisionOpMode {
         return bad;
     }
 
-    private double[] findTape(double d, Mat in, double[][] kernel) {
+    private Point[] findTape(double d, Mat in) { // , double[][] kernel) {
         int yin = distToPos(d);
         double[] result = new double[2];
         int width = in.width();
@@ -121,6 +128,8 @@ public class CameraTestVisionOpMode extends TestableVisionOpMode {
         Core.reduce(kmat, maybe, 0, Core.REDUCE_SUM, CvType.CV_32S);
         Core.compare(maybe, Scalar.all(TAPE_THRESHOLD), maybe, Core.CMP_GT);
         Core.findNonZero(maybe, maybe);
-        return null;
+        MatOfPoint yeah = new MatOfPoint(maybe);
+        System.out.println(yeah.size());
+        return yeah.toArray();
     }
 }
