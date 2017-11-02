@@ -53,14 +53,14 @@ public class TeleOpMecanum extends OpMode {
 
     GAMEPAD 2:
       Joystick 1 -
-      Joystick 2 - 
+      Joystick 2 -
       Bumpers - run intakes backwards
       Triggers - run intakes forwards
       Dpad - placer
       A - place glyph
       B - moves servo arm back in
       X -
-      Y -
+      Y - 
      */
 
     @Override
