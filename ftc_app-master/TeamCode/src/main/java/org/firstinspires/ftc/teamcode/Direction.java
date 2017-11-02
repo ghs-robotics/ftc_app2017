@@ -1,9 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-/**
- * Created by Hazel on 10/10/2017.
- */
-
 public class Direction {
 
     private double x;
@@ -38,22 +34,6 @@ public class Direction {
 
     public void setY(double y) {
         this.y = y;
-    }
-
-    /**
-     * Returns true if the direction is more forward than backward
-     * @return Whether the direction is more forward than backward
-     */
-    public boolean isForward() {
-        return y >= 0;
-    }
-
-    /**
-     * Returns true if the direction is more backward than forward
-     * @return Whether the direction is more backward than forward
-     */
-    public boolean isBackward() {
-        return y < 0;
     }
 
     @Override
