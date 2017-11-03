@@ -13,3 +13,6 @@ apply from: '../build.common.gradle'
 dependencies {
     compile project(':FtcRobotController')
 }
+android {
+    compileSdkVersion 21
+}
