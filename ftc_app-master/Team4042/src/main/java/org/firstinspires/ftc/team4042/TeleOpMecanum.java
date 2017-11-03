@@ -21,7 +21,6 @@ public class TeleOpMecanum extends OpMode {
     private boolean bRight = false;
 
     private boolean bA = false;
-    private boolean bB = false;
     private boolean bY = false;
 
 
@@ -49,8 +48,8 @@ public class TeleOpMecanum extends OpMode {
       Bumpers - run intakes backwards
       Triggers - run intakes forwards
       Dpad - placer
-      A - opens/closes glyph hand
-      B -
+      A - places glyph
+      B - opens/closes glyph hand
       X - u-track reset
       Y - glyph override
      */
