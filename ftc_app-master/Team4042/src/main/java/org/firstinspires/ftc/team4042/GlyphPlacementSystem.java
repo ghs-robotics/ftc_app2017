@@ -118,8 +118,8 @@ public class GlyphPlacementSystem
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
         isPlacing = true;
-        //close servo
-        grabbyBoi.setPosition(1);
+        //Current servo positions are placeholder until we have actual numbers
+        closeHand();
 
         verticalDrive.setTargetPosition(BASE_DISP);
 
@@ -130,9 +130,7 @@ public class GlyphPlacementSystem
             verticalDrive.setTargetPosition(BLOCK_DISP * (targetY + 1));
 
             if( (currentY.ordinal() - 2 == targetY || override) && timer.milliseconds() >= 1000) {
-
-                //open servo
-                grabbyBoi.setPosition(.57);
+                openHand();
                 goToHome();
                 isPlacing = false;
             }
@@ -149,6 +147,14 @@ public class GlyphPlacementSystem
          */
 
 
+    }
+
+    public void openHand() {
+        grabbyBoi.setPosition(.57);
+    }
+
+    public void closeHand() {
+        grabbyBoi.setPosition(1);
     }
 
     //TODO: this method should run in the main loop
