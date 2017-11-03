@@ -24,13 +24,13 @@ public class ServoTest extends OpMode {
     @Override
     public void loop() {
         if (gamepad1.y && !y) {
-            position += .1;
+            position += .01;
             servo.setPosition(position);
         }
         y = gamepad1.y;
 
         if (gamepad1.a && !a) {
-            position -= .1;
+            position -= .01;
             servo.setPosition(position);
         }
         a = gamepad1.a;
