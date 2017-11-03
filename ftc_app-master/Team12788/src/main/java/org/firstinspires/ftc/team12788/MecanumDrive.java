@@ -62,8 +62,8 @@ public class MecanumDrive extends Drive {
          */
         //Sets relative wheel speeds for mecanum drive based on controller inputs
         speedWheel[0] = -x - y - r;
-        speedWheel[1] = x - y - r;
-        speedWheel[2] = -x - y - r;
+        speedWheel[1] = -x - y + r;
+        speedWheel[2] = x - y + r;
         speedWheel[3] = x - y - r;
 
         //sets the wheel powers to the appropriate ratios
@@ -153,8 +153,13 @@ public class MecanumDrive extends Drive {
      */
     public boolean driveWithEncoders(Direction direction, double speed, double targetTicks) throws IllegalArgumentException {
         //telemetry data
-        log.add("x " + direction.getX());
-        log.add("y " + direction.getY());
+        //log.add("x " + direction.getX());
+        //log.add("y " + direction.getY());
+        telemetry.addData("Left Back", motorLeftBack.getCurrentPosition());
+        telemetry.addData("Left Front", motorLeftFront.getCurrentPosition());
+        telemetry.addData("Right Back", motorRightBack.getCurrentPosition());
+        telemetry.addData("Right Front", motorRightFront.getCurrentPosition());
+        telemetry.update();
 
         double scaledSpeed = setUpSpeed(speed, targetTicks);
         if (scaledSpeed == Math.PI) { //The target's been reached
