@@ -69,6 +69,7 @@ public class Autonomous extends LinearOpMode {
 
     public static final int tile = 1200;
     public static final int turn = 620;
+    public static final double speedy = .5;
 
 
     private RelicRecoveryVuMark vuMark;
@@ -103,10 +104,10 @@ public class Autonomous extends LinearOpMode {
     }
 
     public void dropoff() {
-        while (!drive.driveWithEncoders(Direction.Backward, Drive.FULL_SPEED, 11 * tile / 24)) ;
-        grabLeft.setPosition(1);
-        grabRight.setPosition(-1);
-        while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 11 * tile / 24)) ;
+        while (!drive.driveWithEncoders(Direction.Backward, Drive.FULL_SPEED, 9 * tile / 24)) ;
+        grabLeft.setPosition(.5);
+        grabRight.setPosition(-.1);
+        while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 9 * tile / 24)) ;
 
     }
 
@@ -121,93 +122,93 @@ public class Autonomous extends LinearOpMode {
         liftRight.setPower(0);
         if (isRed && !isTop) {
             if ((vuMark == RelicRecoveryVuMark.CENTER)) {
-                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, tile) && opModeIsActive()) ;
+                while (!drive.driveWithEncoders(Direction.Left, speedy, tile) && opModeIsActive()) ;
                 dropoff();
             }
             if ((vuMark == RelicRecoveryVuMark.RIGHT)) {
-                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 2 * tile / 3) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Left, speedy, 2 * tile / 3) && opModeIsActive()) {
                 }
                 while (!drive.rotateWithEncoders(Direction.Rotation.Clockwise, Drive.FULL_SPEED, 2*turn) && opModeIsActive()) {
                 }
 
                 dropoff();
-                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, tile / 3) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Right, speedy-.1, tile / 3) && opModeIsActive()) {
                 }
             }
             if (vuMark == RelicRecoveryVuMark.LEFT) {
-                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, 4 * tile / 3) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Left, speedy, 4 * tile / 3) && opModeIsActive()) {
                 }
                 while (!drive.rotateWithEncoders(Direction.Rotation.Clockwise, Drive.FULL_SPEED, 2*turn) && opModeIsActive()) {
                 }
                 dropoff();
-                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, tile / 3) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Left, speedy-.1, tile / 3) && opModeIsActive()) {
                 }
             }
         }
 
         if (isRed && isTop) {
             if ((vuMark == RelicRecoveryVuMark.CENTER)) {
-                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, tile) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Left, speedy, tile) && opModeIsActive()) {
                 }
-                while (!drive.driveWithEncoders(Direction.Backward, Drive.FULL_SPEED, tile / 2) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Backward, speedy-.1, tile / 2) && opModeIsActive()) {
                 }
-                while (!drive.rotateWithEncoders(Direction.Rotation.Clockwise, Drive.FULL_SPEED, turn) && opModeIsActive()) {
+                while (!drive.rotateWithEncoders(Direction.Rotation.Clockwise, speedy-.2, turn) && opModeIsActive()) {
                 }
                 dropoff();
             }
             if ((vuMark == RelicRecoveryVuMark.RIGHT)) {
-                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, tile) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Left, speedy, tile) && opModeIsActive()) {
                 }
-                while (!drive.driveWithEncoders(Direction.Backward, Drive.FULL_SPEED, tile / 6) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Backward, speedy-.2, tile / 6) && opModeIsActive()) {
                 }
-                while (!drive.rotateWithEncoders(Direction.Rotation.Clockwise, Drive.FULL_SPEED, turn) && opModeIsActive()) {
+                while (!drive.rotateWithEncoders(Direction.Rotation.Clockwise, speedy-.2, turn) && opModeIsActive()) {
                 }
                 dropoff();
-                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, tile / 3) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Right, speedy-.1, tile / 3) && opModeIsActive()) {
                 }
             }
             if (vuMark == RelicRecoveryVuMark.LEFT) {
-                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, tile) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Left, speedy, tile) && opModeIsActive()) {
                 }
-                while (!drive.driveWithEncoders(Direction.Backward, Drive.FULL_SPEED, 5 * tile / 6) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Backward, speedy, 5 * tile / 6) && opModeIsActive()) {
                 }
-                while (!drive.rotateWithEncoders(Direction.Rotation.Clockwise, Drive.FULL_SPEED, turn) && opModeIsActive()) {
+                while (!drive.rotateWithEncoders(Direction.Rotation.Clockwise, speedy-.2, turn) && opModeIsActive()) {
                 }
                 dropoff();
-                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, tile / 3) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Left, speedy-.1, tile / 3) && opModeIsActive()) {
                 }
             }
         }
         if (!isRed && isTop) {
             if ((vuMark == RelicRecoveryVuMark.CENTER)) {
-                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, tile) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Right, speedy, tile) && opModeIsActive()) {
                 }
-                while (!drive.driveWithEncoders(Direction.Backward, Drive.FULL_SPEED, tile / 2) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Backward, speedy, tile / 2) && opModeIsActive()) {
                 }
-                while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, turn) && opModeIsActive()) {
+                while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, speedy-.2, turn) && opModeIsActive()) {
                 }
                 dropoff();
             }
             if ((vuMark == RelicRecoveryVuMark.RIGHT)) {
-                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, tile) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Right, speedy, tile) && opModeIsActive()) {
                 }
-                while (!drive.driveWithEncoders(Direction.Backward, Drive.FULL_SPEED, tile / 6) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Backward, speedy-.2, tile / 6) && opModeIsActive()) {
                 }
-                while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, turn) && opModeIsActive()) {
+                while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, speedy-.2, turn) && opModeIsActive()) {
                 }
                 dropoff();
-                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, tile / 3) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Left, speedy-.1, tile / 3) && opModeIsActive()) {
                 }
             }
             if (vuMark == RelicRecoveryVuMark.LEFT) {
-                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, tile) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Right, speedy, tile) && opModeIsActive()) {
                 }
-                while (!drive.driveWithEncoders(Direction.Backward, Drive.FULL_SPEED, 5 * tile / 6) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Backward, speedy, 5 * tile / 6) && opModeIsActive()) {
                 }
                 while (!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, turn) && opModeIsActive()) {
                 }
                 dropoff();
-                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, tile / 3) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Right, speedy-.1, tile / 3) && opModeIsActive()) {
                 }
             }
         }
@@ -215,31 +216,31 @@ public class Autonomous extends LinearOpMode {
 
         if (!isRed && !isTop) {
             if ((vuMark == RelicRecoveryVuMark.CENTER)) {
-                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, tile) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Right, speedy, tile) && opModeIsActive()) {
                 }
-                while (!drive.rotateWithEncoders(Direction.Rotation.Clockwise, Drive.FULL_SPEED, 2*turn) && opModeIsActive()) {
+                while (!drive.rotateWithEncoders(Direction.Rotation.Clockwise, speedy-.2, 2*turn) && opModeIsActive()) {
                 }
                 dropoff();
             }
             if ((vuMark == RelicRecoveryVuMark.RIGHT)) {
-                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 4 * tile / 3) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Right, speedy, 4 * tile / 3) && opModeIsActive()) {
                 }
-                while (!drive.rotateWithEncoders(Direction.Rotation.Clockwise, Drive.FULL_SPEED, 2*turn) && opModeIsActive()) {
+                while (!drive.rotateWithEncoders(Direction.Rotation.Clockwise, speedy-.2, 2*turn) && opModeIsActive()) {
                 }
                 dropoff();
-                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, tile / 3) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Right, speedy-.1, tile / 3) && opModeIsActive()) {
                 }
             }
             if (vuMark == RelicRecoveryVuMark.LEFT) {
-                while (!drive.driveWithEncoders(Direction.Right, Drive.FULL_SPEED, 2 * tile / 3) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Right, speedy, 2 * tile / 3) && opModeIsActive()) {
                 }
                 dropoff();
-                while (!drive.driveWithEncoders(Direction.Left, Drive.FULL_SPEED, tile / 3) && opModeIsActive()) {
+                while (!drive.driveWithEncoders(Direction.Left, speedy-.1, tile / 3) && opModeIsActive()) {
                 }
             }
         }
 
-        while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 7*tile/24) && opModeIsActive()) {
+        while (!drive.driveWithEncoders(Direction.Forward, speedy-.1, 7*tile/24) && opModeIsActive()) {
         }
 
     }
