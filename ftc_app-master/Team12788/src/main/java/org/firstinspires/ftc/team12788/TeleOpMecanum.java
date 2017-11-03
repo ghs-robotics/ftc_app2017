@@ -99,7 +99,7 @@ public class TeleOpMecanum extends OpMode {
         }
         if (gamepad2.a || overide){
             overide = true;
-            if (!drive.driveWithEncoders(Direction.Forward, .5, 500)) {
+            if (!drive.driveWithEncoders(Direction.Forward, .5, .2*Autonomous.tile)) {
 
             } else {
                 grabLeft.setPosition(-1);
