@@ -31,9 +31,9 @@ public abstract class Auto extends LinearOpMode {
         this.drive = drive;
 
         drive.initialize(telemetry, hardwareMap);
-        drive.glyph = new GlyphPlacementSystem(1, 0, hardwareMap, false);
+        //drive.glyph = new GlyphPlacementSystem(1, 0, hardwareMap, false);
         drive.setUseGyro(true);
-        telemetry.addData("glyph", drive.glyph.getTargetPositionAsString());
+        //telemetry.addData("glyph", drive.glyph.getTargetPositionAsString());
         telemetry.update();
 
         log = telemetry.log();
@@ -150,7 +150,7 @@ public abstract class Auto extends LinearOpMode {
                     getVuMark(parameters);
                     break;
                 case "placeGlyph":
-                    placeGlyph(parameters);
+                    //placeGlyph(parameters);
                     break;
             }
         }
@@ -178,6 +178,7 @@ public abstract class Auto extends LinearOpMode {
         vuMark = vuMarkIdentifier.getMark();
     }
 
+    /*
     public void placeGlyph(HashMap<String, String> parameters) {
         //The vumark placement system starts at (1, 0), which is the bottom of the center column
         if (vuMark.equals(RelicRecoveryVuMark.LEFT)) {
@@ -193,6 +194,7 @@ public abstract class Auto extends LinearOpMode {
         telemetry.addData("glyph", drive.glyph.getTargetPositionAsString());
         telemetry.update();
     }
+    */
 
     public void knockRedJewel(HashMap<String, String> parameters) {
         //TODO: READ JEWEL ORDER

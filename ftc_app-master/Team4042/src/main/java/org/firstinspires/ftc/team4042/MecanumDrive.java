@@ -19,7 +19,7 @@ public class MecanumDrive extends Drive {
     //Used for not-field-oriented drive
     public static final int OFFSET = 0;
 
-    public GlyphPlacementSystem glyph;
+    public AlternateGlyphPlacementSystem glyph;
 
     private Servo jewelServo;
 
