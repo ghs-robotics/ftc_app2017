@@ -130,7 +130,7 @@ public class GlyphPlacementSystem
             verticalDrive.setTargetPosition(BLOCK_DISP * (targetY + 1));
 
             if( (currentY.ordinal() - 2 == targetY || override) && timer.milliseconds() >= 1000) {
-                grabbyBoi.setPosition(0);
+                grabbyBoi.setPosition(.57);
                 goToHome();
                 isPlacing = false;
             }
