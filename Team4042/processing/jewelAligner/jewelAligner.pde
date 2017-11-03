@@ -1,5 +1,5 @@
 PImage img;
-int dist = 31;
+int dist = 25;
 
 void setup() {
   //size(1280, 720);
