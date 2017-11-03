@@ -2,10 +2,6 @@ package org.firstinspires.ftc.team4042;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import java.util.ArrayList;
 
@@ -26,6 +22,8 @@ public class TeleOpMecanum extends OpMode {
 
     private boolean bA = false;
     private boolean bB = false;
+    private boolean bY = false;
+
 
     //Declare OpMode members.
     private MecanumDrive drive = new MecanumDrive(true);
@@ -68,6 +66,7 @@ public class TeleOpMecanum extends OpMode {
         */
         drive.initialize(telemetry, hardwareMap);
         drive.glyph = new GlyphPlacementSystem(hardwareMap);
+        //drive.glyph = new AlternateGlyphPlacementSystem(hardwareMap);
         telemetry.update();
 
         adjustedSpeed = MecanumDrive.FULL_SPEED;
@@ -111,6 +110,19 @@ public class TeleOpMecanum extends OpMode {
         }
         aRightBumper = gamepad1.right_bumper;
 
+        /*
+        if(gamepad2.a) {
+            drive.glyph.setTargetPosition(2);
+        }
+        else {
+            drive.glyph.setTargetPosition(0);
+        }
+        */
+
+        //Glyph override: if active, forces arm to place even if position is incorrect
+        if (gamepad2.y && !bY) { drive.glyph.switchOverride(); }
+        bY = gamepad2.y;
+
         //Glyph locate
         if (gamepad2.dpad_up && !bUp) { drive.glyph.up(); }
         bUp = gamepad2.dpad_up;
@@ -121,8 +133,9 @@ public class TeleOpMecanum extends OpMode {
         if (gamepad2.dpad_right && !bRight) { drive.glyph.right(); }
         bRight = gamepad2.dpad_right;
 
+
         //Places glyph
-        if (gamepad2.a && !bA) { drive.glyph.place(); }
+        if ((gamepad2.a && !bA) || drive.glyph.getIsPlacing()) { drive.glyph.place(); }
         bA = gamepad2.a;
 
         //Lifts arm
@@ -154,13 +167,15 @@ public class TeleOpMecanum extends OpMode {
         else {
             drive.intakeLeft(0);
         }
-
+        drive.glyph.runToPosition();
         telemetryUpdate();
     }
 
     private void telemetryUpdate() {
         telemetry.addData("Speed mode", adjustedSpeed);
-        telemetry.addData("Glyph", drive.glyph.getPositionAsString());
+        telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
+        telemetry.addData("encoder", drive.glyph.verticalDrive.getCurrentPosition());
+        telemetry.addData("limit", drive.glyph.homeLimit.getState());
         telemetry.update();
     }
 }
