@@ -25,6 +25,8 @@ public class TeleOpMecanum extends OpMode {
 
     private boolean overide;
 
+    private int liftPos;
+
     public Servo grabLeft;
     public Servo grabRight;
 
@@ -49,6 +51,10 @@ public class TeleOpMecanum extends OpMode {
         intakeRight = hardwareMap.dcMotor.get("intakeRight");
         grabLeft = hardwareMap.servo.get("grabLeft");
         grabRight = hardwareMap.servo.get("grabRight");
+        liftLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        liftRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intakeLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intakeRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         if (gamepad2.dpad_up) {
             liftLeft.setPower(1);
@@ -57,11 +63,29 @@ public class TeleOpMecanum extends OpMode {
         else if (gamepad2.dpad_down) {
             liftLeft.setPower(-.5);
             liftRight.setPower(.5);
-        }
-        else {
+        }else {
             liftLeft.setPower(0);
             liftRight.setPower(0);
         }
+
+        if (gamepad2.dpad_up) {
+            liftPos = 6000;
+        }else if (gamepad2.dpad_down) {
+            liftPos = 3000;
+        }else if (gamepad2.dpad_left || gamepad2.dpad_right) {
+            liftPos = 0;
+        }
+
+        if (0 < Math.abs(liftLeft.getCurrentPosition() - liftPos) - 50){
+            if (liftPos < liftLeft.getCurrentPosition()) {
+                liftLeft.setPower(-.5);
+                liftRight.setPower(.5);
+            } else {
+                liftLeft.setPower(1);
+                liftRight.setPower(-1);
+            }
+        }
+
         if (drive.deadZone(gamepad2.right_trigger) > 0) {
             intakeLeft.setPower(1);
             intakeRight.setPower(-1);
@@ -99,7 +123,7 @@ public class TeleOpMecanum extends OpMode {
         }
         if (gamepad2.a || overide){
             overide = true;
-            if (!drive.driveWithEncoders(Direction.Forward, .5, 500)) {
+            if (!drive.driveWithEncoders(Direction.Forward, .5, .2*Autonomous.tile)) {
 
             } else {
                 grabLeft.setPosition(-1);

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.team4042;
 
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -57,6 +58,7 @@ public class GlyphPlacementSystem
         this.isPlacing = false;
 
         drive.verticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        drive.verticalDriveDir(DcMotorSimple.Direction.REVERSE);
     }
 
     //returns the current position of the glyph placement system
@@ -128,7 +130,7 @@ public class GlyphPlacementSystem
         //The functions toggle the hand variable so we don't need to
     }
 
-    ////this is not done////
+    ////this is some shit////
     public void place() {
 
         //step 1
@@ -162,7 +164,7 @@ public class GlyphPlacementSystem
             drive.verticalDrive(0);
         }
 
-        if (homeLimit.getState()) {
+        if (!homeLimit.getState()) {
             drive.verticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             drive.verticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
@@ -202,7 +204,7 @@ public class GlyphPlacementSystem
 
     //go home robot, ur drunk
     public void goToHome() {
-        if (!homeLimit.getState()) {
+        if (homeLimit.getState()) {
             drive.verticalDrivePos(0);
             drive.verticalDrive(REVERSE_SPEED);
         }

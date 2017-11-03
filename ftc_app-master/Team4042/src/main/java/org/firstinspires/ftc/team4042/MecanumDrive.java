@@ -101,6 +101,8 @@ public class MecanumDrive extends Drive {
         return verticalDrive.getTargetPosition();
     }
 
+    public void verticalDriveDir(DcMotorSimple.Direction dir) { verticalDrive.setDirection(dir);}
+
     public void intakeLeft(double power) {
         intakeLeft.setPower(power);
         inLServo.setPower(power);

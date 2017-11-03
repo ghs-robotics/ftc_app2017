@@ -2,10 +2,6 @@ package org.firstinspires.ftc.team4042;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import java.util.ArrayList;
 
@@ -70,6 +66,7 @@ public class TeleOpMecanum extends OpMode {
         */
         drive.initialize(telemetry, hardwareMap);
         drive.glyph = new GlyphPlacementSystem(hardwareMap, drive);
+        //drive.glyph = new AlternateGlyphPlacementSystem(hardwareMap);
         telemetry.update();
 
         adjustedSpeed = MecanumDrive.FULL_SPEED;
@@ -113,6 +110,15 @@ public class TeleOpMecanum extends OpMode {
         }
         aRightBumper = gamepad1.right_bumper;
 
+        /*
+        if(gamepad2.a) {
+            drive.glyph.setTargetPosition(2);
+        }
+        else {
+            drive.glyph.setTargetPosition(0);
+        }
+        */
+
         //Glyph override: if active, forces arm to place even if position is incorrect
         if (gamepad2.y && !bY) { drive.glyph.switchOverride(); }
         bY = gamepad2.y;
@@ -127,8 +133,8 @@ public class TeleOpMecanum extends OpMode {
         if (gamepad2.dpad_right && !bRight) { drive.glyph.right(); }
         bRight = gamepad2.dpad_right;
 
-        //Opens/closes hand
-        if (gamepad2.a && !bA) { drive.glyph.toggleHand(); }
+        //Places glyph
+        if ((gamepad2.a && !bA) || drive.glyph.getIsPlacing()) { drive.glyph.place(); }
         bA = gamepad2.a;
 
         //Adjust jewel arm
