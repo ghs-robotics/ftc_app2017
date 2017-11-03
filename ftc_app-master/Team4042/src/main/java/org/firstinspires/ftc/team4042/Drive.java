@@ -21,7 +21,7 @@ public abstract class Drive {
     public static final double STOP_SPEED = 0;
 
     //Use gyro - true/false
-    public static boolean useGyro = false;
+    public static boolean useGyro = true;
 
     //Set to false to just get outputs as telemetry
     public static boolean useMotors = true;
