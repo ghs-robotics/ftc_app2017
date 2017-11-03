@@ -165,8 +165,10 @@ public class TeleOpMecanum extends OpMode {
     }
 
     private void telemetryUpdate() {
+        telemetry.addData("limit switch", drive.glyph.homeLimit.getState());
         telemetry.addData("Speed mode", adjustedSpeed);
         telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
+        telemetry.addData("encoder", drive.glyph.verticalDrive.getCurrentPosition());
         telemetry.update();
     }
 }

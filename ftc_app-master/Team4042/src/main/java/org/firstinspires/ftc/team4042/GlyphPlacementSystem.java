@@ -17,8 +17,8 @@ public class GlyphPlacementSystem
     private int currentX;
     private Position currentY;
     private String baseOutput;
-    private DigitalSensor homeLimit = new DigitalSensor("limit");
-    private DcMotor verticalDrive;
+    public DigitalSensor homeLimit = new DigitalSensor("limit");
+    public DcMotor verticalDrive;
     private Servo grabbyBoi;
     private CRServo slidyBoi;
     private final int BASE_DISP = 900;
