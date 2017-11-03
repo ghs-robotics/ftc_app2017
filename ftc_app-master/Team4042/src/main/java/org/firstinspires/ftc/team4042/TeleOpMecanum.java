@@ -37,8 +37,8 @@ public class TeleOpMecanum extends OpMode {
 
     /**
     GAMEPAD 1:
-      Joystick 1 - movement
-      Joystick 2 - rotation
+      Joystick 1 X & Y - movement
+      Joystick 2 X - rotation
       Bumpers - speed modes
       Triggers -
       Dpad -
@@ -48,15 +48,15 @@ public class TeleOpMecanum extends OpMode {
       Y -
 
     GAMEPAD 2:
-      Joystick 1 - adjust u-track
-      Joystick 2 - 
+      Joystick 1 Y - adjust u-track
+      Joystick 2 Y - servo arm
       Bumpers - run intakes backwards
       Triggers - run intakes forwards
       Dpad - placer
-      A - place glyph
-      B - moves servo arm back in
+      A - opens/closes glyph hand
+      B -
       X - u-track reset
-      Y -
+      Y - glyph override
      */
 
     @Override
@@ -69,7 +69,7 @@ public class TeleOpMecanum extends OpMode {
         sensor.startRanging();
         */
         drive.initialize(telemetry, hardwareMap);
-        drive.glyph = new GlyphPlacementSystem(hardwareMap);
+        drive.glyph = new GlyphPlacementSystem(hardwareMap, drive);
         telemetry.update();
 
         adjustedSpeed = MecanumDrive.FULL_SPEED;
@@ -127,13 +127,12 @@ public class TeleOpMecanum extends OpMode {
         if (gamepad2.dpad_right && !bRight) { drive.glyph.right(); }
         bRight = gamepad2.dpad_right;
 
-        //Places glyph
-        if ((gamepad2.a && !bA) || drive.glyph.getIsPlacing()) { drive.glyph.place(); }
+        //Opens/closes hand
+        if (gamepad2.a && !bA) { drive.glyph.toggleHand(); }
         bA = gamepad2.a;
 
-        //Lifts arm
-        if (gamepad2.b && !bB) { drive.jewelUp(); }
-        bB = gamepad2.b;
+        //Adjust jewel arm
+        drive.jewelAdjust(-gamepad2.right_stick_y);
 
         //Right trigger of the b controller runs the right intake forward
         double bRightTrigger = drive.deadZone(gamepad2.right_trigger);
@@ -160,6 +159,10 @@ public class TeleOpMecanum extends OpMode {
         else {
             drive.intakeLeft(0);
         }
+
+        //Left stick's y drives the u track
+        drive.verticalDrive(drive.deadZone(-gamepad2.left_stick_y));
+
         drive.glyph.runToPosition();
         telemetryUpdate();
     }
@@ -167,8 +170,9 @@ public class TeleOpMecanum extends OpMode {
     private void telemetryUpdate() {
         telemetry.addData("Speed mode", adjustedSpeed);
         telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
-        telemetry.addData("encoder", drive.glyph.verticalDrive.getCurrentPosition());
+        telemetry.addData("encoder", drive.verticalDriveCurrPos());
         telemetry.addData("limit", drive.glyph.homeLimit.getState());
+        telemetry.addData("hand is open", drive.isHandOpen());
         telemetry.update();
     }
 }

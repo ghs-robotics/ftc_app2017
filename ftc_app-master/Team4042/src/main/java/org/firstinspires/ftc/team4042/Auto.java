@@ -31,7 +31,8 @@ public abstract class Auto extends LinearOpMode {
         this.drive = drive;
 
         drive.initialize(telemetry, hardwareMap);
-        drive.glyph = new GlyphPlacementSystem(1, 0, hardwareMap, false);
+        drive.jewelUp();
+        drive.glyph = new GlyphPlacementSystem(1, 0, hardwareMap, drive, false);
         drive.setUseGyro(true);
         telemetry.addData("glyph", drive.glyph.getTargetPositionAsString());
         telemetry.update();

@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 /**
  * Created by Ryan Whiting on 10/17/2017.
  */
@@ -16,30 +18,34 @@ public class GlyphPlacementSystem
     private int targetY;
     private int currentX;
     private Position currentY;
+
     private String baseOutput;
+
     public DigitalSensor homeLimit = new DigitalSensor("limit");
-    public DcMotor verticalDrive;
-    private Servo grabbyBoi;
     private CRServo slidyBoi;
+
     private final int BASE_DISP = 900;
     private final int BLOCK_DISP = 700;
     private final double FORWARD_SPEED = 0.5;
     private final double REVERSE_SPEED = 1;
+
     private boolean isPlacing;
     public boolean override;
 
+    private MecanumDrive drive;
+
     private enum Position{HOME, RAISED, TOP, MID, BOT, ERROR}
 
-    public GlyphPlacementSystem(HardwareMap map)
+    public GlyphPlacementSystem(HardwareMap map, MecanumDrive drive)
     {
-        this(0, 0, map, false);
+        this(0, 0, map, drive, false);
     }
 
-    public GlyphPlacementSystem(int currentX, int currentY, HardwareMap map, boolean override)
+    public GlyphPlacementSystem(int currentX, int currentY, HardwareMap map, MecanumDrive drive, boolean override)
     {
+        this.drive = drive;
+
         this.homeLimit.initialize(map);
-        this.verticalDrive = map.dcMotor.get("vertical drive");
-        this.grabbyBoi = map.servo.get("hand");
         this.slidyBoi = map.crservo.get("slidy boi");
 
         this.baseOutput = "[ _ _ _ ]\n[ _ _ _ ]\n[ _ _ _ ]";
@@ -50,7 +56,7 @@ public class GlyphPlacementSystem
         this.override = override;
         this.isPlacing = false;
 
-        verticalDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        drive.verticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     //returns the current position of the glyph placement system
@@ -113,32 +119,28 @@ public class GlyphPlacementSystem
         }
     }
 
+    public void toggleHand() {
+        if (drive.isHandOpen()) {
+            drive.closeHand();
+        } else {
+            drive.openHand();
+        }
+        //The functions toggle the hand variable so we don't need to
+    }
+
     ////this is not done////
     public void place() {
-        ElapsedTime timer = new ElapsedTime();
-        timer.reset();
-        isPlacing = true;
-        //Current servo positions are placeholder until we have actual numbers
-        closeHand();
 
-        verticalDrive.setTargetPosition(BASE_DISP);
+        //step 1
+        drive.closeHand();
+        drive.verticalDrivePos(BASE_DISP);
 
-        if( currentY.equals(Position.RAISED) && timer.milliseconds() >= 500) {
-            timer.reset();
+        //step 2
+        drive.verticalDrivePos(BLOCK_DISP * (targetY + 1));
 
-            //TODO: horizontal index code here
-            verticalDrive.setTargetPosition(BLOCK_DISP * (targetY + 1));
-
-            if( (currentY.ordinal() - 2 == targetY || override) && timer.milliseconds() >= 1000) {
-                openHand();
-                goToHome();
-                isPlacing = false;
-            }
-        }
-        else if (timer.milliseconds() > 10000) {
-            goToHome();
-            isPlacing = false;
-        }
+        //step 3
+        drive.openHand();
+        goToHome();
 
         /*
         Assuming motor forward power moves it right and up
@@ -149,28 +151,20 @@ public class GlyphPlacementSystem
 
     }
 
-    public void openHand() {
-        grabbyBoi.setPosition(.57);
-    }
-
-    public void closeHand() {
-        grabbyBoi.setPosition(1);
-    }
-
     //TODO: this method should run in the main loop
     public void runToPosition() {
-        int pos = verticalDrive.getCurrentPosition();
+        int pos = drive.verticalDriveCurrPos();
 
-        if (pos < verticalDrive.getTargetPosition()) {
-            verticalDrive.setPower(FORWARD_SPEED);
+        if (pos < drive.verticalDriveTargetPos()) {
+            drive.verticalDrive(FORWARD_SPEED);
         }
         else {
-            verticalDrive.setPower(0);
+            drive.verticalDrive(0);
         }
 
         if (homeLimit.getState()) {
-            verticalDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            verticalDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            drive.verticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            drive.verticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
 
         //these statements determine the position of the vertical drive with a 20 tick margin of error
@@ -209,8 +203,8 @@ public class GlyphPlacementSystem
     //go home robot, ur drunk
     public void goToHome() {
         if (!homeLimit.getState()) {
-            verticalDrive.setTargetPosition(0);
-            verticalDrive.setPower(REVERSE_SPEED);
+            drive.verticalDrivePos(0);
+            drive.verticalDrive(REVERSE_SPEED);
         }
     }
 }

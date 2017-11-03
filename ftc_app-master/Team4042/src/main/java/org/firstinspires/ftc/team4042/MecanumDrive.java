@@ -29,6 +29,11 @@ public class MecanumDrive extends Drive {
     private CRServo inLServo;
     private CRServo inRServo;
 
+    private DcMotor verticalDrive;
+
+    private Servo grabbyBoi;
+    private boolean handIsOpen = false;
+
     /**
      * Constructor for Drive, it creates the motors and the gyro objects
      */
@@ -43,6 +48,8 @@ public class MecanumDrive extends Drive {
         jewelIn();
         super.initialize(telemetry, hardwareMap);
 
+        this.grabbyBoi = hardwareMap.servo.get("hand");
+
         intakeLeft = hardwareMap.dcMotor.get("intake left");
         intakeRight = hardwareMap.dcMotor.get("intake right");
         //The left intake is mounted "backwards"
@@ -52,10 +59,46 @@ public class MecanumDrive extends Drive {
         inRServo = hardwareMap.crservo.get("intake right servo");
         //The left intake servo is mounted "backwards"
         inLServo.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        verticalDrive = hardwareMap.dcMotor.get("vertical drive");
     }
 
     public MecanumDrive(boolean verbose) {
         super(verbose);
+    }
+
+    public void openHand() {
+        handIsOpen = true;
+        grabbyBoi.setPosition(.57);
+    }
+
+    public void closeHand() {
+        handIsOpen = false;
+        grabbyBoi.setPosition(1);
+    }
+
+    public boolean isHandOpen() {
+        return handIsOpen;
+    }
+
+    public void verticalDrive(double power) {
+        verticalDrive.setPower(power);
+    }
+
+    public void verticalDriveMode(DcMotor.RunMode mode) {
+        verticalDrive.setMode(mode);
+    }
+
+    public void verticalDrivePos(int position) {
+        verticalDrive.setTargetPosition(position);
+    }
+
+    public int verticalDriveCurrPos() {
+        return verticalDrive.getCurrentPosition();
+    }
+
+    public int verticalDriveTargetPos() {
+        return verticalDrive.getTargetPosition();
     }
 
     public void intakeLeft(double power) {
@@ -93,6 +136,12 @@ public class MecanumDrive extends Drive {
     }
 
     public void jewelIn() { jewelServo.setPosition(.9); }
+
+    public void jewelAdjust(double adjustAmt) {
+        double currPos = jewelServo.getPosition();
+
+        jewelServo.setPosition(Range.clip(currPos + adjustAmt, 0, 1));
+    }
 
     /**
      * uses joystick inputs to set motor speeds for mecanum drive
