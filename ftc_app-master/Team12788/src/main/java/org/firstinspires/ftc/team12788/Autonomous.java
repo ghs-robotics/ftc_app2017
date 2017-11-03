@@ -104,10 +104,10 @@ public class Autonomous extends LinearOpMode {
     }
 
     public void dropoff() {
-        while (!drive.driveWithEncoders(Direction.Backward, Drive.FULL_SPEED, 11 * tile / 24)) ;
+        while (!drive.driveWithEncoders(Direction.Backward, Drive.FULL_SPEED, 9 * tile / 24)) ;
         grabLeft.setPosition(.5);
         grabRight.setPosition(-.1);
-        while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 11 * tile / 24)) ;
+        while (!drive.driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 9 * tile / 24)) ;
 
     }
 
