@@ -23,7 +23,6 @@ public class TeleOpMecanum extends OpMode {
     private boolean bA = false;
     private boolean bY = false;
 
-
     //Declare OpMode members.
     private MecanumDrive drive = new MecanumDrive(true);
 
