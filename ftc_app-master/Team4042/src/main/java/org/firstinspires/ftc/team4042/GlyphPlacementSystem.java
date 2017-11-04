@@ -12,22 +12,21 @@ import com.sun.tools.javac.util.Position;
 
 public class GlyphPlacementSystem {
 
-    private DcMotor verticalDrive;
     private Servo hand;
-    private final int BASE_DISP = 0;
-    private final int BLOCK_DISP = 1500;
+    private final int BASE_DISP = 900;
+    private final int BLOCK_DISP = 700;
     private int targetX;
     private int targetY;
     private Position currentY;
     private String baseOutput;
+    private MecanumDrive drive;
 
     private enum Position{HOME, RAISED, TOP, MID, BOT, ERROR}
 
-    public GlyphPlacementSystem(HardwareMap map) {
-        verticalDrive = map.dcMotor.get("vertical drive");
+    public GlyphPlacementSystem(HardwareMap map, MecanumDrive drive) {
         currentY = Position.HOME;
+        this.drive = drive;
         this.baseOutput = "[ _ _ _ ]\n[ _ _ _ ]\n[ _ _ _ ]";
-        verticalDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public String getTargetPositionAsString()
@@ -84,13 +83,19 @@ public class GlyphPlacementSystem {
     }
 
     public void setTargetPosition() {
-        verticalDrive.setTargetPosition(BASE_DISP + targetY*(BLOCK_DISP + 1));
+        drive.closeHand();
+        drive.verticalDrivePos(BASE_DISP + (targetY + 1)*BLOCK_DISP);
+    }
+
+    public void setHomeTarget() {
+        drive.openHand();
+        drive.verticalDrivePos(10);
     }
 
     public void runToPosition() {
-        verticalDrive.setPower((verticalDrive.getTargetPosition() - verticalDrive.getCurrentPosition())/ 500);
+        drive.verticalDrive((drive.verticalDriveTargetPos() - drive.verticalDriveCurrPos())/ 100);
 
-        int pos = verticalDrive.getCurrentPosition();
+        int pos = drive.verticalDriveCurrPos();
 
         if (pos == 0) {
             currentY = Position.HOME;

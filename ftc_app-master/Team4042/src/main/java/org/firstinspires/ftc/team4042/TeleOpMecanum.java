@@ -22,6 +22,7 @@ public class TeleOpMecanum extends OpMode {
 
     private boolean bA = false;
     private boolean bY = false;
+    private boolean bB = false;
 
     //Declare OpMode members.
     private MecanumDrive drive = new MecanumDrive(true);
@@ -63,7 +64,7 @@ public class TeleOpMecanum extends OpMode {
         sensor.startRanging();
         */
         drive.initialize(telemetry, hardwareMap);
-        drive.glyph = new GlyphPlacementSystem(hardwareMap);
+        drive.glyph = new GlyphPlacementSystem(hardwareMap, drive);
         //drive.glyph = new GlyphPlacementSystem(hardwareMap);
         telemetry.update();
 
@@ -108,14 +109,14 @@ public class TeleOpMecanum extends OpMode {
         }
         aRightBumper = gamepad1.right_bumper;
 
-        /*
+
         if(gamepad2.a) {
-            drive.glyph.setTargetPosition(2);
+            drive.glyph.setTargetPosition();
         }
         else {
-            drive.glyph.setTargetPosition(0);
+            drive.glyph.setHomeTarget();
         }
-        */
+
 
         //Glyph locate
         if (gamepad2.dpad_up && !bUp) { drive.glyph.up(); drive.glyph.setTargetPosition(); }
@@ -128,10 +129,10 @@ public class TeleOpMecanum extends OpMode {
         bRight = gamepad2.dpad_right;
 
         //Places glyph
-        if (gamepad2.a && !bA) {
-            drive.glyph.runToPosition();
-        }
-        bA = gamepad2.a;
+        //if (gamepad2.a && !bA) {
+        //    drive.glyph.runToPosition();
+        //}
+        //bA = gamepad2.a;
 
         //Adjust jewel arm
         drive.jewelAdjust(-gamepad2.right_stick_y);
@@ -164,6 +165,12 @@ public class TeleOpMecanum extends OpMode {
 
         //Left stick's y drives the u track
         drive.verticalDrive(drive.deadZone(-gamepad2.left_stick_y));
+
+        if (gamepad2.b && !bB) {
+            if(drive.isHandOpen()) { drive.closeHand(); }
+            else { drive.openHand(); }
+        }
+        bB = gamepad2.b;
 
         drive.glyph.runToPosition();
         telemetryUpdate();
