@@ -11,7 +11,7 @@ public class AutoEncoderTest extends LinearOpMode {
     @Override
     public void runOpMode() {
         drive.initialize(telemetry, hardwareMap);
-        drive.setUseGyro(true);
+        //drive.setUseGyro(true);
 
         waitForStart();
 

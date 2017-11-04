@@ -19,6 +19,7 @@ import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -47,7 +48,7 @@ public abstract class Auto extends LinearVisionOpMode {
         drive.initialize(telemetry, hardwareMap);
         //drive.glyph = new GlyphPlacementSystem(1, 0, hardwareMap, drive, false);
 
-        drive.setUseGyro(true);
+        //drive.setUseGyro(true);
         //telemetry.addData("glyph", drive.glyph.getTargetPositionAsString());
         telemetry.update();
 
@@ -113,6 +114,9 @@ public abstract class Auto extends LinearVisionOpMode {
                         case "s":
                             functionName = "autoSensorDrive";
                             break;
+                        case "up":
+                            functionName = "jewelUp";
+                            break;
                         case "jr":
                             functionName = "knockRedJewel";
                             break;
@@ -174,6 +178,9 @@ public abstract class Auto extends LinearVisionOpMode {
                     break;
                 case "autoSensorDrive":
                     autoSensorDrive(parameters);
+                    break;
+                case "jewelUp":
+                    jewelUp(parameters);
                     break;
                 case "knockRedJewel":
                     knockRedJewel(parameters);
@@ -238,11 +245,11 @@ public abstract class Auto extends LinearVisionOpMode {
     */
 
     public String getBallColor(Mat frame){
-        telemetry.addData("hello", frame.height() + " x " + frame.width());
+        log.add(frame.height() + " x " + frame.width());
+        Imgproc.resize(frame, frame, new Size(960, 720));
         telemetry.update();
-        assert(1==0);
-        Rect left_crop = new Rect(new Point(836,1670), new Point(1380, 2190));
-        Rect right_crop = new Rect(new Point(1580,1630), new Point(2100, 2150));
+        Rect left_crop = new Rect(new Point(215,585), new Point(380, 719));
+        Rect right_crop = new Rect(new Point(460,585), new Point(620, 719));
 
         Log.d("stupid", this.getFrameSize().width + " x " + this.getFrameSize().height);
         Mat right = new Mat(frame, right_crop);
@@ -268,6 +275,10 @@ public abstract class Auto extends LinearVisionOpMode {
         return result;
     }
 
+    public void jewelUp(HashMap<String, String> parameters) {
+        drive.jewelUp();
+    }
+
     public void knockLeftJewel(HashMap<String, String> parameters) {
         drive.jewelLeft();
     }
@@ -279,6 +290,7 @@ public abstract class Auto extends LinearVisionOpMode {
     public void knockRedJewel(HashMap<String, String> parameters) {
         try {
             String balls = getBallColor(getFrameRgba());
+            discardFrame();
             telemetry.addData("ball orientation", balls);
             switch (balls) {
                 case "red":
