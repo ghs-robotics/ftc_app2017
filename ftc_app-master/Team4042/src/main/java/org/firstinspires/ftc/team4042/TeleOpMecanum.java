@@ -13,6 +13,12 @@ public class TeleOpMecanum extends OpMode {
     private boolean aLeftBumper = false;
     private boolean aRightBumper = false;
 
+    private boolean bUp;
+    private boolean bDown;
+    private boolean bLeft;
+    private boolean bRight;
+    private boolean bB;
+
     //Declare OpMode members.
     private MecanumDrive drive = new MecanumDrive(true);
 
@@ -44,7 +50,7 @@ public class TeleOpMecanum extends OpMode {
     public void init() {
         drive.initialize(telemetry, hardwareMap);
         drive.glyph = new GlyphPlacementSystem(hardwareMap, drive);
-        //drive.glyph = new AlternateGlyphPlacementSystem(hardwareMap);
+        //drive.glyph = new GlyphPlacementSystem(hardwareMap);
         telemetry.update();
 
         adjustedSpeed = MecanumDrive.FULL_SPEED;
@@ -85,6 +91,32 @@ public class TeleOpMecanum extends OpMode {
         }
         aRightBumper = gamepad1.right_bumper;
 
+        if(gamepad2.a) {
+            drive.glyph.setTargetPosition();
+        }
+        else {
+            drive.glyph.setHomeTarget();
+        }
+
+
+        //Glyph locate
+        if (gamepad2.dpad_up && !bUp) { drive.glyph.up(); drive.glyph.setTargetPosition(); }
+        bUp = gamepad2.dpad_up;
+        if (gamepad2.dpad_down && !bDown) { drive.glyph.down(); drive.glyph.setTargetPosition(); }
+        bDown = gamepad2.dpad_down;
+        if (gamepad2.dpad_left && !bLeft) { drive.glyph.left(); drive.glyph.setTargetPosition(); }
+        bLeft = gamepad2.dpad_left;
+        if (gamepad2.dpad_right && !bRight) { drive.glyph.right(); drive.glyph.setTargetPosition(); }
+        bRight = gamepad2.dpad_right;
+
+        //Places glyph
+        //if (gamepad2.a && !bA) {
+        //    drive.glyph.runToPosition();
+        //}
+        //bA = gamepad2.a;
+        //Adjust jewel arm
+        drive.jewelAdjust(-gamepad2.right_stick_y);
+
         //Right trigger of the b controller runs the right intake forward
         double bRightTrigger = drive.deadZone(gamepad2.right_trigger);
         if (bRightTrigger > 0) {
@@ -112,36 +144,21 @@ public class TeleOpMecanum extends OpMode {
         }
 
         //Left stick's y drives the u track
-        drive.verticalDrive(drive.deadZone(-gamepad2.left_stick_y));
+        //drive.verticalDrive(drive.deadZone(-gamepad2.left_stick_y));
 
-        //A on 2nd joystick toggles hand
-        if (gamepad2.a) {
-            if (drive.isHandOpen()) {
-                drive.closeHand();
-            }
-        } else {
-            drive.openHand();
+        if (gamepad2.b && !bB) {
+            if(drive.isHandOpen()) { drive.closeHand(); }
+            else { drive.openHand(); }
         }
 
-        //D-pad and A
-        /*if (gamepad1.dpad_up) {
-            drive.gyro.setAdjust(0);
-        } else if (gamepad1.dpad_down) {
-            drive.gyro.setAdjust(180);
-        } else if (gamepad1.dpad_left) {
-            drive.gyro.setAdjust(90);
-        } else if (gamepad1.dpad_right) {
-            drive.gyro.setAdjust(-90);
-        }*/
-
+        drive.glyph.runToPosition();
         telemetryUpdate();
     }
 
     private void telemetryUpdate() {
         telemetry.addData("Speed mode", adjustedSpeed);
-        //telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
+        telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
         telemetry.addData("encoder", drive.verticalDriveCurrPos());
-        //telemetry.addData("limit", drive.glyph.homeLimit.getState());
         telemetry.addData("hand is open", drive.isHandOpen());
         if (Drive.useGyro) {
             telemetry.addData("gyro", drive.gyro.updateHeading());
