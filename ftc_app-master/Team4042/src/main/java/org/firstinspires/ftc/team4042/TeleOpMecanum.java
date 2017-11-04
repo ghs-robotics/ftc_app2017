@@ -3,8 +3,6 @@ package org.firstinspires.ftc.team4042;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import java.util.ArrayList;
-
 @TeleOp(name = "Mecanum", group = "Iterative Opmode")
 public class TeleOpMecanum extends OpMode {
 
@@ -15,20 +13,14 @@ public class TeleOpMecanum extends OpMode {
     private boolean aLeftBumper = false;
     private boolean aRightBumper = false;
 
-    private boolean bUp = false;
-    private boolean bDown = false;
-    private boolean bLeft = false;
-    private boolean bRight = false;
-
-    private boolean bA = false;
-    private boolean bY = false;
-    private boolean bB = false;
+    private boolean bUp;
+    private boolean bDown;
+    private boolean bLeft;
+    private boolean bRight;
+    private boolean bB;
 
     //Declare OpMode members.
     private MecanumDrive drive = new MecanumDrive(true);
-
-    //private UltrasonicI2cRangeSensor sensor;
-    private ArrayList<Integer> rangeData;
 
     /**
     GAMEPAD 1:
@@ -56,13 +48,6 @@ public class TeleOpMecanum extends OpMode {
 
     @Override
     public void init() {
-        /*try {
-            sensor = hardwareMap.get(I2cRangeSensor.class, "MB1242-0");
-        }catch (Exception x){
-            telemetry.addLine("it broke");
-        }
-        sensor.startRanging();
-        */
         drive.initialize(telemetry, hardwareMap);
         drive.glyph = new GlyphPlacementSystem(hardwareMap, drive);
         //drive.glyph = new GlyphPlacementSystem(hardwareMap);
@@ -79,9 +64,6 @@ public class TeleOpMecanum extends OpMode {
     
     @Override
     public void loop() {
-
-        //rangeData = sensor.getRange();
-        //telemetry.addData("range", rangeData.get(2));
 
         //1 A - toggle verbose
         if (gamepad1.a && !aA) {
@@ -133,7 +115,6 @@ public class TeleOpMecanum extends OpMode {
         //    drive.glyph.runToPosition();
         //}
         //bA = gamepad2.a;
-
         //Adjust jewel arm
         drive.jewelAdjust(-gamepad2.right_stick_y);
 
@@ -164,13 +145,12 @@ public class TeleOpMecanum extends OpMode {
         }
 
         //Left stick's y drives the u track
-        drive.verticalDrive(drive.deadZone(-gamepad2.left_stick_y));
+        //drive.verticalDrive(drive.deadZone(-gamepad2.left_stick_y));
 
         if (gamepad2.b && !bB) {
             if(drive.isHandOpen()) { drive.closeHand(); }
             else { drive.openHand(); }
         }
-        bB = gamepad2.b;
 
         drive.glyph.runToPosition();
         telemetryUpdate();
@@ -181,6 +161,9 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
         telemetry.addData("encoder", drive.verticalDriveCurrPos());
         telemetry.addData("hand is open", drive.isHandOpen());
+        if (Drive.useGyro) {
+            telemetry.addData("gyro", drive.gyro.updateHeading());
+        }
         telemetry.update();
     }
 }

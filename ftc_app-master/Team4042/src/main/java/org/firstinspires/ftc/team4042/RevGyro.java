@@ -28,6 +28,8 @@ public class RevGyro {
     Telemetry telemetry;
     HardwareMap hardwareMap;
 
+    private double adjust = 0;
+
     private final static double SCALE = 440;
 
     public RevGyro() {
@@ -52,6 +54,10 @@ public class RevGyro {
         imu.initialize(parameters);
     }
 
+    public void setAdjust(double adjust) {
+        this.adjust = adjust;
+    }
+
     /**
      * Updates all gyro values.
      */
@@ -68,7 +74,15 @@ public class RevGyro {
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
         //see https://goo.gl/AnKWEn
-        heading = angles.firstAngle;
+        heading = angles.firstAngle + adjust;
+        //Since the gyro should be from -180 to 180
+        while (heading > 180) {
+            heading -= 360;
+        }
+        while (heading < -180) {
+            heading += 360;
+        }
+
         roll = angles.secondAngle;
         pitch = angles.thirdAngle;
     }

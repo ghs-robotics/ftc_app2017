@@ -70,6 +70,15 @@ public class MecanumDrive extends Drive {
         super(verbose);
     }
 
+    public void toggleHand() {
+        if (isHandOpen()) {
+            closeHand();
+        } else {
+            openHand();
+        }
+        //The functions toggle the hand variable so we don't need to
+    }
+
     public void openHand() {
         handIsOpen = true;
         grabbyBoi.setPosition(.57);
@@ -121,16 +130,16 @@ public class MecanumDrive extends Drive {
     public void jewelLeft() {
         jewelDown();
         //Rotates the robot left
-        rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 100);
-        rotateWithEncoders(Direction.Rotation.Clockwise, Drive.FULL_SPEED, 100);
+        while (!rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 100)) { }
+        while (!rotateWithEncoders(Direction.Rotation.Clockwise, Drive.FULL_SPEED, 100)) { }
         jewelUp();
     }
 
     public void jewelRight() {
         jewelDown();
         //Rotates the robot right
-        rotateWithEncoders(Direction.Rotation.Clockwise, Drive.FULL_SPEED, 100);
-        rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 100);
+        while (rotateWithEncoders(Direction.Rotation.Clockwise, Drive.FULL_SPEED, 100)) { }
+        while (rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 100)) { }
         jewelUp();
     }
 

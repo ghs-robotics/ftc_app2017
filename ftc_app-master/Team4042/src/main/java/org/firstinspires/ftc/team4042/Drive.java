@@ -21,7 +21,7 @@ public abstract class Drive {
     public static final double STOP_SPEED = 0;
 
     //Use gyro - true/false
-    public static boolean useGyro = true;
+    public static boolean useGyro = false;
 
     //Set to false to just get outputs as telemetry
     public static boolean useMotors = true;
@@ -67,7 +67,9 @@ public abstract class Drive {
     public void initialize(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
         this.log = telemetry.log();
-        gyro.initialize(telemetry, hardwareMap);
+        if (useGyro) {
+            gyro.initialize(telemetry, hardwareMap);
+        }
 
         telemetry.addData("useGyro", useGyro);
 
