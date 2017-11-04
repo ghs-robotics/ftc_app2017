@@ -13,6 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.lasarobotics.vision.opmode.extensions.CameraControlExtension;
 import org.lasarobotics.vision.util.ScreenOrientation;
 import org.opencv.core.Core;
+import org.opencv.core.CvException;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
@@ -273,27 +274,33 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void knockRedJewel(HashMap<String, String> parameters) {
-        String balls = getBallColor(getFrameRgba());
-        telemetry.addData("ball orientation", balls);
-        switch (balls) {
-            case "red":
-                drive.jewelLeft();
-                break;
-            case "blue":
-                drive.jewelRight();
-                break;
-            case "red, blue":
-                drive.jewelLeft();
-                break;
-            case "blue, red":
-                drive.jewelRight();
-                break;
-            case ", blue":
-                drive.jewelLeft();
-                break;
-            case ", red":
-                drive.jewelRight();
-                break;
+        try {
+            String balls = getBallColor(getFrameRgba());
+            telemetry.addData("ball orientation", balls);
+            switch (balls) {
+                case "red":
+                    drive.jewelLeft();
+                    break;
+                case "blue":
+                    drive.jewelRight();
+                    break;
+                case "red, blue":
+                    drive.jewelLeft();
+                    break;
+                case "blue, red":
+                    drive.jewelRight();
+                    break;
+                case ", blue":
+                    drive.jewelLeft();
+                    break;
+                case ", red":
+                    drive.jewelRight();
+                    break;
+            }
+        } catch (CvException ex) {
+            StringWriter sw = new StringWriter();
+            ex.printStackTrace(new PrintWriter(sw));
+            telemetry.addData("CvException", sw.toString());
         }
     }
 
