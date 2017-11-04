@@ -142,9 +142,8 @@ public class MecanumDrive extends Drive {
             timer.reset();
 
             //Rotates the robot left
-            while (!driveWithEncoders(Direction.Backward, Drive.FULL_SPEED, 100)) {
+            while (!driveWithEncoders(Direction.Backward, Drive.FULL_SPEED, 200)) {
             }
-            //while (!rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 100)) { }
 
             while (timer.seconds() < 1) {
             }
@@ -175,9 +174,8 @@ public class MecanumDrive extends Drive {
             timer.reset();
 
             //Rotates the robot left
-            while (!driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 100)) {
+            while (!driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 200)) {
             }
-            //while (!rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 100)) { }
 
             while (timer.seconds() < 1) {
             }
