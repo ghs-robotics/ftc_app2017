@@ -88,7 +88,7 @@ public class Autonomous extends LinearOpMode {
         boolean isRed = false;
         boolean isTop = false;
 
-        while (!isStarted()) {
+        while (!isStarted() && opModeIsActive()) {
             if (gamepad1.a) {
                 isTop = false;
             } else if (gamepad1.b) {
@@ -107,10 +107,10 @@ public class Autonomous extends LinearOpMode {
     }
 
     public void dropoff() {
-        while (!drive.driveWithEncoders(Direction.Backward, speedy - .1, 9 * tile / 24)) ;
+        while (!drive.driveWithEncoders(Direction.Backward, speedy - .1, 9 * tile / 24) && opModeIsActive()) ;
         grabLeft.setPosition(.5);
         grabRight.setPosition(-.1);
-        while (!drive.driveWithEncoders(Direction.Forward , speedy - .1, 9 * tile / 24)) ;
+        while (!drive.driveWithEncoders(Direction.Forward , speedy - .1, 9 * tile / 24) && opModeIsActive()) ;
 
     }
 
@@ -232,6 +232,7 @@ public class Autonomous extends LinearOpMode {
                 while (!drive.rotateWithEncoders(Direction.Rotation.Clockwise, speedy - .1, 2*turn) && opModeIsActive()) {
                 }
                 dropoff();
+
                 while (!drive.driveWithEncoders(Direction.Right, speedy - .1, tile / 3) && opModeIsActive()) {
                 }
             }

@@ -96,6 +96,11 @@ public class  VuMarkIdentifier {
             parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
             this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
 
+            relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
+            relicTemplate = relicTrackables.get(0);
+
+            relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
+
         } catch (VuforiaLocalizerImpl.FailureException ex) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -108,10 +113,6 @@ public class  VuMarkIdentifier {
     public RelicRecoveryVuMark getMark() {
         //Load the data set containing the VuMarks for Relic Recovery.
         try {
-            relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
-            relicTemplate = relicTrackables.get(0);
-
-            relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
 
             relicTrackables.activate();
 
