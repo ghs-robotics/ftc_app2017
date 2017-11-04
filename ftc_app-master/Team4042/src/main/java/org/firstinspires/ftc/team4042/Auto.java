@@ -58,6 +58,8 @@ public abstract class Auto extends LinearVisionOpMode {
 
         loadFile();
 
+        telemetry.addData("wowoww", "help");
+        telemetry.update();
         this.setCamera(Cameras.PRIMARY);
         this.setFrameSize(new Size(900, 900));
         //enableExtension(Extensions.BEACON);
@@ -236,6 +238,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
     public String getBallColor(Mat frame){
         telemetry.addData("hello", frame.height() + " x " + frame.width());
+        telemetry.update();
         assert(1==0);
         Rect left_crop = new Rect(new Point(836,1670), new Point(1380, 2190));
         Rect right_crop = new Rect(new Point(1580,1630), new Point(2100, 2150));
