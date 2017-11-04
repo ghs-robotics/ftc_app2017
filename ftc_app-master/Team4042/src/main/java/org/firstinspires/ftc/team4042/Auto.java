@@ -31,7 +31,6 @@ public abstract class Auto extends LinearOpMode {
         this.drive = drive;
 
         drive.initialize(telemetry, hardwareMap);
-        drive.jewelUp();
         //drive.glyph = new GlyphPlacementSystem(1, 0, hardwareMap, drive, false);
 
         drive.setUseGyro(true);
@@ -125,6 +124,7 @@ public abstract class Auto extends LinearOpMode {
      * Runs the list of instructions
      */
     public void runAuto() {
+        drive.jewelUp();
         drive.resetEncoders();
         drive.setEncoders(true);
 

@@ -85,9 +85,6 @@ public class TeleOpMecanum extends OpMode {
         }
         aRightBumper = gamepad1.right_bumper;
 
-        //Adjust jewel arm
-        drive.jewelAdjust(-gamepad2.right_stick_y);
-
         //Right trigger of the b controller runs the right intake forward
         double bRightTrigger = drive.deadZone(gamepad2.right_trigger);
         if (bRightTrigger > 0) {

@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -126,19 +127,69 @@ public class MecanumDrive extends Drive {
     }
 
     public void jewelLeft() {
-        jewelDown();
-        //Rotates the robot left
-        while (!rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 100)) { }
-        while (!rotateWithEncoders(Direction.Rotation.Clockwise, Drive.FULL_SPEED, 100)) { }
-        jewelUp();
+        try {
+            super.resetEncoders();
+            super.runWithEncoders();
+            ElapsedTime timer = new ElapsedTime();
+
+            timer.reset();
+            jewelDown();
+
+            while (timer.seconds() < 1) {
+            }
+            timer.reset();
+
+            //Rotates the robot left
+            while (!driveWithEncoders(Direction.Backward, Drive.FULL_SPEED, 100)) {
+            }
+            //while (!rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 100)) { }
+
+            while (timer.seconds() < 1) {
+            }
+            timer.reset();
+
+            jewelUp();
+
+            while (timer.seconds() < 1) {
+            }
+        } catch (NullPointerException ex) {
+            StringWriter sw = new StringWriter();
+            ex.printStackTrace(new PrintWriter(sw));
+            telemetry.addData("NullPointerException", sw.toString());
+        }
     }
 
     public void jewelRight() {
-        jewelDown();
-        //Rotates the robot right
-        while (rotateWithEncoders(Direction.Rotation.Clockwise, Drive.FULL_SPEED, 100)) { }
-        while (rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 100)) { }
-        jewelUp();
+        try {
+            super.resetEncoders();
+            super.runWithEncoders();
+            ElapsedTime timer = new ElapsedTime();
+
+            timer.reset();
+            jewelDown();
+
+            while (timer.seconds() < 1) {
+            }
+            timer.reset();
+
+            //Rotates the robot left
+            while (!driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 100)) {
+            }
+            //while (!rotateWithEncoders(Direction.Rotation.Counterclockwise, Drive.FULL_SPEED, 100)) { }
+
+            while (timer.seconds() < 1) {
+            }
+            timer.reset();
+
+            jewelUp();
+
+            while (timer.seconds() < 1) {
+            }
+        } catch (NullPointerException ex) {
+            StringWriter sw = new StringWriter();
+            ex.printStackTrace(new PrintWriter(sw));
+            telemetry.addData("NullPointerException", sw.toString());
+        }
     }
 
     public void jewelDown() {
@@ -152,8 +203,8 @@ public class MecanumDrive extends Drive {
     }
 
     public void jewelIn() {
-        jewelServo.setPosition(.9);
-        while (jewelServo.getPosition() != .9) {  }
+        jewelServo.setPosition(.8);
+        while (jewelServo.getPosition() != .8) {  }
     }
 
     public void jewelAdjust(double adjustAmt) {
@@ -276,7 +327,10 @@ public class MecanumDrive extends Drive {
         // drive at the given speed (possibly scaled b/c of first and last fourth), and return false
         scaledSpeed = Range.clip(scaledSpeed, 0, FULL_SPEED);
 
-        double r = useGyro();
+        double r = 0;
+        if (useGyro) {
+            r = useGyro();
+        }
         log.add("r " + r);
 
         //Drives at x
