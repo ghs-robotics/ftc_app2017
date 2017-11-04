@@ -121,15 +121,6 @@ public class GlyphPlacementSystem
         }
     }
 
-    public void toggleHand() {
-        if (drive.isHandOpen()) {
-            drive.closeHand();
-        } else {
-            drive.openHand();
-        }
-        //The functions toggle the hand variable so we don't need to
-    }
-
     ////this is some shit////
     public void place() {
 
