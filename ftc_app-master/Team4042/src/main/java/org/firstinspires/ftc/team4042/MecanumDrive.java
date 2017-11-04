@@ -107,11 +107,13 @@ public class MecanumDrive extends Drive {
     public void intakeLeft(double power) {
         intakeLeft.setPower(power);
         inLServo.setPower(power);
+        telemetry.addData("cr left servo", inLServo.getPower());
     }
 
     public void intakeRight(double power) {
         intakeRight.setPower(power);
         inRServo.setPower(power);
+        telemetry.addData("cr right servo", inRServo.getPower());
     }
 
     public void jewelLeft() {
