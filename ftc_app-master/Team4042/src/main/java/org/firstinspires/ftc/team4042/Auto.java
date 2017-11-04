@@ -251,31 +251,53 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void knockRedJewel(HashMap<String, String> parameters) {
-        //TODO: READ JEWEL ORDER
-        //TODO: KNOCK OFF CORRECT JEWEL
-
-        drive.jewelLeft();
-
-        /**
-         * If left jewel is red:
-         *      drive.jewelLeft();
-         * If right jewel is red:
-         *      drive.jewelRight();
-         */
+        String balls = getBallColor(getFrameRgba());
+        telemetry.addData("ball orientation", balls);
+        switch (balls) {
+            case "red":
+                drive.jewelLeft();
+                break;
+            case "blue":
+                drive.jewelRight();
+                break;
+            case "red, blue":
+                drive.jewelLeft();
+                break;
+            case "blue, red":
+                drive.jewelRight();
+                break;
+            case ", blue":
+                drive.jewelLeft();
+                break;
+            case ", red":
+                drive.jewelRight();
+                break;
+        }
     }
 
     public void knockBlueJewel(HashMap<String, String> parameters) {
-        //TODO: READ JEWEL ORDER
-        //TODO: KNOCK OFF CORRECT JEWEL
-
-        drive.jewelRight();
-
-        /**
-         * If left jewel is blue:
-         *      drive.jewelLeft();
-         * If right jewel is blue:
-         *      drive.jewelRight();
-         */
+        String balls = getBallColor(getFrameRgba());
+        telemetry.addData("ball orientation", balls);
+        switch (balls) {
+            case "red":
+                drive.jewelRight();
+                break;
+            case "blue":
+                drive.jewelLeft();
+                break;
+            case "red, blue":
+                drive.jewelRight();
+                break;
+            case "blue, red":
+                drive.jewelLeft();
+                break;
+            case ", blue":
+                drive.jewelRight();
+                break;
+            case ", red":
+                drive.jewelLeft();
+                break;
+        }
     }
 
     public void autoDrive(HashMap<String, String> parameters) {
