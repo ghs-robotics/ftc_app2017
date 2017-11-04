@@ -131,14 +131,14 @@ public class MecanumDrive extends Drive {
     }
 
     public void jewelDown() {
-        jewelServo.setPosition(.8);
+        jewelServo.setPosition(0);
     }
 
     public void jewelUp() {
-        jewelServo.setPosition(.3);
+        jewelServo.setPosition(.6);
     }
 
-    public void jewelIn() { jewelServo.setPosition(.1); }
+    public void jewelIn() { jewelServo.setPosition(.9); }
 
     public void jewelAdjust(double adjustAmt) {
         double currPos = jewelServo.getPosition();
