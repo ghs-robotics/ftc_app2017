@@ -29,7 +29,8 @@ import static org.opencv.imgcodecs.Imgcodecs.imread;
  * Vision OpMode run by the Camera Test Activity
  * Use TestableVisionOpModes in testing apps ONLY (but you can easily convert between opmodes just by changingt t
  */
-public class CameraTestVisionOpMode extends TestableVisionOpMode {
+public interface
+CameraTestVisionOpMode extends TestableVisionOpMode {
     final double FUNCTION_A_A = 8001.3;
     final double FUNCTION_A_B = 1.880;
     final double FUNCTION_A_C = 301.5;

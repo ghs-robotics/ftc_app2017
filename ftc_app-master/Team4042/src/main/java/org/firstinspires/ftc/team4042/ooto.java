@@ -1,23 +1,10 @@
 package org.firstinspires.ftc.team4042;
 
-import android.util.Log;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.lasarobotics.vision.android.Cameras;
-import org.lasarobotics.vision.opmode.LinearVisionOpMode;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
-import org.lasarobotics.vision.opmode.extensions.CameraControlExtension;
-import org.lasarobotics.vision.util.ScreenOrientation;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
-import org.opencv.core.Size;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -28,7 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 @Autonomous(name="DO NOT RUN THIS AUTO", group="K9bot")
-public abstract class Auto extends LinearVisionOpMode {
+public abstract class ooto extends LinearOpMode {
 
     MecanumDrive drive = new MecanumDrive(false);
     private VuMarkIdentifier vuMarkIdentifier = new VuMarkIdentifier();
@@ -57,17 +44,6 @@ public abstract class Auto extends LinearVisionOpMode {
         file = new File("./storage/emulated/0/DCIM/" + filePath);
 
         loadFile();
-
-        this.setCamera(Cameras.PRIMARY);
-        this.setFrameSize(new Size(900, 900));
-        //enableExtension(Extensions.BEACON);
-        enableExtension(Extensions.ROTATION);
-        enableExtension(Extensions.CAMERA_CONTROL);
-        rotation.setIsUsingSecondaryCamera(false);
-        rotation.disableAutoRotate();
-        rotation.setActivityOrientationFixed(ScreenOrientation.LANDSCAPE);
-        cameraControl.setColorTemperature(CameraControlExtension.ColorTemperature.AUTO);
-        cameraControl.setAutoExposureCompensation();
     }
 
     /**
@@ -221,34 +197,6 @@ public abstract class Auto extends LinearVisionOpMode {
         telemetry.update();
     }
     */
-
-    public String getBallColor(Mat frame){
-        Rect left_crop = new Rect(new Point(836,1670), new Point(1380, 2190));
-        Rect right_crop = new Rect(new Point(1580,1630), new Point(2100, 2150));
-
-        Log.d("stupid", this.getFrameSize().width + " x " + this.getFrameSize().height);
-        Mat right = new Mat(frame, right_crop);
-        Mat left = new Mat(frame, left_crop);
-
-
-        String result = "unspecified";
-        Scalar left_colors  = Core.sumElems(left);
-        Scalar right_colors = Core.sumElems(right);
-
-        if(left_colors.val[0] >= left_colors.val[2]){
-            result = "red";
-        } else {
-            result = "blue";
-        }
-
-        if(right_colors.val[0] >= right_colors.val[2]){
-            result = result.concat(", red");
-        } else {
-            result = result.concat(", blue");
-        }
-
-        return result;
-    }
 
     public void knockRedJewel(HashMap<String, String> parameters) {
         //TODO: READ JEWEL ORDER
