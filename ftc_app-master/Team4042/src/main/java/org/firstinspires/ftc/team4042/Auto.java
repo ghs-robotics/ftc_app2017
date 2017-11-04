@@ -27,7 +27,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-@Autonomous(name="DO NOT RUN THIS AUTO", group="K9bot")
+@Autonomous(name="Abstract Auto", group="K9bot")
 public abstract class Auto extends LinearVisionOpMode {
 
     MecanumDrive drive = new MecanumDrive(false);
