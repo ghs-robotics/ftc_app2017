@@ -91,7 +91,6 @@ public class TeleOpMecanum extends OpMode {
         }
         aRightBumper = gamepad1.right_bumper;
 
-
         if(gamepad2.a) {
             drive.glyph.setTargetPosition();
         }
