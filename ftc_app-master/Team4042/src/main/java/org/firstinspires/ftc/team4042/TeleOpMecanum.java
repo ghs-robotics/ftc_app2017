@@ -21,9 +21,8 @@ public class TeleOpMecanum extends OpMode {
     private boolean bRight = false;
 
     private boolean bA = false;
-    private boolean bB = false;
     private boolean bY = false;
-
+    private boolean bB = false;
 
     //Declare OpMode members.
     private MecanumDrive drive = new MecanumDrive(true);
@@ -49,8 +48,8 @@ public class TeleOpMecanum extends OpMode {
       Bumpers - run intakes backwards
       Triggers - run intakes forwards
       Dpad - placer
-      A - opens/closes glyph hand
-      B -
+      A - places glyph
+      B - opens/closes glyph hand
       X - u-track reset
       Y - glyph override
      */
@@ -120,22 +119,22 @@ public class TeleOpMecanum extends OpMode {
         */
 
         //Glyph override: if active, forces arm to place even if position is incorrect
-        if (gamepad2.y && !bY) { drive.glyph.switchOverride(); }
-        bY = gamepad2.y;
+        //if (gamepad2.y && !bY) { drive.glyph.switchOverride(); }
+        //bY = gamepad2.y;
 
         //Glyph locate
-        if (gamepad2.dpad_up && !bUp) { drive.glyph.up(); }
+        /*if (gamepad2.dpad_up && !bUp) { drive.glyph.up(); }
         bUp = gamepad2.dpad_up;
         if (gamepad2.dpad_down && !bDown) { drive.glyph.down(); }
         bDown = gamepad2.dpad_down;
         if (gamepad2.dpad_left && !bLeft) { drive.glyph.left(); }
         bLeft = gamepad2.dpad_left;
         if (gamepad2.dpad_right && !bRight) { drive.glyph.right(); }
-        bRight = gamepad2.dpad_right;
+        bRight = gamepad2.dpad_right;*/
 
         //Places glyph
-        if ((gamepad2.a && !bA) || drive.glyph.getIsPlacing()) { drive.glyph.place(); }
-        bA = gamepad2.a;
+        /*if ((gamepad2.a && !bA) || drive.glyph.getIsPlacing()) { drive.glyph.place(); }
+        bA = gamepad2.a;*/
 
         //Adjust jewel arm
         drive.jewelAdjust(-gamepad2.right_stick_y);
@@ -169,15 +168,21 @@ public class TeleOpMecanum extends OpMode {
         //Left stick's y drives the u track
         drive.verticalDrive(drive.deadZone(-gamepad2.left_stick_y));
 
-        drive.glyph.runToPosition();
+        //B toggles hand
+        if (gamepad2.b && !bB) {
+            drive.glyph.toggleHand();
+        }
+        bB = gamepad2.b;
+
+        //drive.glyph.runToPosition();
         telemetryUpdate();
     }
 
     private void telemetryUpdate() {
         telemetry.addData("Speed mode", adjustedSpeed);
-        telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
+        //telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
         telemetry.addData("encoder", drive.verticalDriveCurrPos());
-        telemetry.addData("limit", drive.glyph.homeLimit.getState());
+        //telemetry.addData("limit", drive.glyph.homeLimit.getState());
         telemetry.addData("hand is open", drive.isHandOpen());
         telemetry.update();
     }

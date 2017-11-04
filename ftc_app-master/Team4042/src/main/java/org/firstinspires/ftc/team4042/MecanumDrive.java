@@ -61,6 +61,7 @@ public class MecanumDrive extends Drive {
         inLServo.setDirection(DcMotorSimple.Direction.REVERSE);
 
         verticalDrive = hardwareMap.dcMotor.get("vertical drive");
+        verticalDrive.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public MecanumDrive(boolean verbose) {
@@ -106,11 +107,13 @@ public class MecanumDrive extends Drive {
     public void intakeLeft(double power) {
         intakeLeft.setPower(power);
         inLServo.setPower(power);
+        telemetry.addData("cr left servo", inLServo.getPower());
     }
 
     public void intakeRight(double power) {
         intakeRight.setPower(power);
         inRServo.setPower(power);
+        telemetry.addData("cr right servo", inRServo.getPower());
     }
 
     public void jewelLeft() {
@@ -130,14 +133,19 @@ public class MecanumDrive extends Drive {
     }
 
     public void jewelDown() {
-        jewelServo.setPosition(.2);
+        jewelServo.setPosition(0);
+        while (jewelServo.getPosition() != 0) {  }
     }
 
     public void jewelUp() {
-        jewelServo.setPosition(.7);
+        jewelServo.setPosition(.6);
+        while (jewelServo.getPosition() != .6) {  }
     }
 
-    public void jewelIn() { jewelServo.setPosition(.9); }
+    public void jewelIn() {
+        jewelServo.setPosition(.9);
+        while (jewelServo.getPosition() != .9) {  }
+    }
 
     public void jewelAdjust(double adjustAmt) {
         double currPos = jewelServo.getPosition();

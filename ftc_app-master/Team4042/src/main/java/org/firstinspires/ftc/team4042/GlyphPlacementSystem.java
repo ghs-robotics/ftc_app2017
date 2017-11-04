@@ -134,15 +134,23 @@ public class GlyphPlacementSystem
     public void place() {
 
         //step 1
-        drive.closeHand();
-        drive.verticalDrivePos(BASE_DISP);
+        if(currentY.equals(Position.HOME)) {
+            this.isPlacing = true;
+            drive.closeHand();
+            drive.verticalDrivePos(BASE_DISP);
+        }
 
         //step 2
-        drive.verticalDrivePos(BLOCK_DISP * (targetY + 1));
+        if(currentY.equals(Position.RAISED)) {
+            drive.verticalDrivePos(BLOCK_DISP * (targetY + 1));
+        }
 
         //step 3
-        drive.openHand();
-        goToHome();
+        if(currentY.ordinal() - 2 == targetY) {
+            drive.openHand();
+            goToHome();
+            this.isPlacing = false;
+        }
 
         /*
         Assuming motor forward power moves it right and up
@@ -157,14 +165,9 @@ public class GlyphPlacementSystem
     public void runToPosition() {
         int pos = drive.verticalDriveCurrPos();
 
-        if (pos < drive.verticalDriveTargetPos()) {
-            drive.verticalDrive(FORWARD_SPEED);
-        }
-        else {
-            drive.verticalDrive(0);
-        }
+        drive.verticalDrive((drive.verticalDriveTargetPos() - pos)/100);
 
-        if (!homeLimit.getState()) {
+        if (homeLimit.getState()) {
             drive.verticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             drive.verticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
@@ -204,9 +207,8 @@ public class GlyphPlacementSystem
 
     //go home robot, ur drunk
     public void goToHome() {
-        if (homeLimit.getState()) {
+        if (!homeLimit.getState()) {
             drive.verticalDrivePos(0);
-            drive.verticalDrive(REVERSE_SPEED);
         }
     }
 }
