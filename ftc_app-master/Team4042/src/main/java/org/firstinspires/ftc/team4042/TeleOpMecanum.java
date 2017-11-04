@@ -147,8 +147,13 @@ public class TeleOpMecanum extends OpMode {
         //drive.verticalDrive(drive.deadZone(-gamepad2.left_stick_y));
 
         if (gamepad2.b && !bB) {
+            bB = true;
             if(drive.isHandOpen()) { drive.closeHand(); }
             else { drive.openHand(); }
+        }
+        if (!gamepad2.b && bB){
+            bB = false;
+
         }
 
         drive.glyph.runToPosition();
