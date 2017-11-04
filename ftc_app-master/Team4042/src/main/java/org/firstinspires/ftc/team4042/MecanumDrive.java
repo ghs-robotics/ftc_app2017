@@ -61,6 +61,7 @@ public class MecanumDrive extends Drive {
         inLServo.setDirection(DcMotorSimple.Direction.REVERSE);
 
         verticalDrive = hardwareMap.dcMotor.get("vertical drive");
+        verticalDrive.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public MecanumDrive(boolean verbose) {
