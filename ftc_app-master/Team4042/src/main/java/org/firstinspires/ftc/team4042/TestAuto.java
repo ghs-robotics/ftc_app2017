@@ -11,7 +11,9 @@ public class TestAuto extends Auto {
     public void runOpMode() {
 
         super.setUp(drive, "test.txt");
-        waitForStart();
+        try {
+            waitForStart();
+        } catch (InterruptedException ex) { }
 
         super.runAuto();
         

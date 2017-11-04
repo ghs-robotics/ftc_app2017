@@ -67,17 +67,7 @@ CameraTestVisionOpMode extends TestableVisionOpMode {
 
     @Override
     public Mat frame(Mat rgba, Mat gray) {
-        //Imgproc.filter2D(rgba, rgba, -1, mkernel);
-        rgba = super.frame(rgba, gray);
-        Mat yo = image.clone();
-        Point[] yeah = findTape(25, yo);
-        Log.d("much" , Integer.toString(yeah.length));
-        for (Point point : yeah) {
-            Imgproc.circle(image, point, 2, new Scalar(0,255,0), -1);
-
-        }
-        //int yin = distToPos(25);
-        //Imgproc.rectangle(image, new Point(0, yin-2), new Point(1280, yin+3), new Scalar(0, 0, 255));
+        Log.d("much" , rgba);
         return image;
     }
 

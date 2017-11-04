@@ -12,7 +12,9 @@ public class RedTopAuto extends Auto {
     public void runOpMode() {
 
         super.setUp(drive, "redtop.txt");
-        waitForStart();
+        try {
+            waitForStart();
+        } catch (InterruptedException ex) { }
 
         super.runAuto();
         
