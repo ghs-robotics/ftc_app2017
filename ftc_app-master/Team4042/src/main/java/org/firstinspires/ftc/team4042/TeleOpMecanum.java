@@ -63,8 +63,8 @@ public class TeleOpMecanum extends OpMode {
         sensor.startRanging();
         */
         drive.initialize(telemetry, hardwareMap);
-        drive.glyph = new GlyphPlacementSystem(hardwareMap, drive);
-        //drive.glyph = new AlternateGlyphPlacementSystem(hardwareMap);
+        drive.glyph = new GlyphPlacementSystem(hardwareMap);
+        //drive.glyph = new GlyphPlacementSystem(hardwareMap);
         telemetry.update();
 
         adjustedSpeed = MecanumDrive.FULL_SPEED;
@@ -117,22 +117,20 @@ public class TeleOpMecanum extends OpMode {
         }
         */
 
-        //Glyph override: if active, forces arm to place even if position is incorrect
-        if (gamepad2.y && !bY) { drive.glyph.switchOverride(); }
-        bY = gamepad2.y;
-
         //Glyph locate
-        if (gamepad2.dpad_up && !bUp) { drive.glyph.up(); }
+        if (gamepad2.dpad_up && !bUp) { drive.glyph.up(); drive.glyph.setTargetPosition(); }
         bUp = gamepad2.dpad_up;
-        if (gamepad2.dpad_down && !bDown) { drive.glyph.down(); }
+        if (gamepad2.dpad_down && !bDown) { drive.glyph.down(); drive.glyph.setTargetPosition(); }
         bDown = gamepad2.dpad_down;
-        if (gamepad2.dpad_left && !bLeft) { drive.glyph.left(); }
+        if (gamepad2.dpad_left && !bLeft) { drive.glyph.left(); drive.glyph.setTargetPosition(); }
         bLeft = gamepad2.dpad_left;
-        if (gamepad2.dpad_right && !bRight) { drive.glyph.right(); }
+        if (gamepad2.dpad_right && !bRight) { drive.glyph.right(); drive.glyph.setTargetPosition(); }
         bRight = gamepad2.dpad_right;
 
         //Places glyph
-        if ((gamepad2.a && !bA) || drive.glyph.getIsPlacing()) { drive.glyph.place(); }
+        if (gamepad2.a && !bA) {
+            drive.glyph.runToPosition();
+        }
         bA = gamepad2.a;
 
         //Adjust jewel arm
@@ -175,7 +173,6 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Speed mode", adjustedSpeed);
         telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
         telemetry.addData("encoder", drive.verticalDriveCurrPos());
-        telemetry.addData("limit", drive.glyph.homeLimit.getState());
         telemetry.addData("hand is open", drive.isHandOpen());
         telemetry.update();
     }
