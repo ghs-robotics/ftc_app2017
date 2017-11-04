@@ -116,6 +116,12 @@ public abstract class Auto extends LinearVisionOpMode {
                         case "jb":
                             functionName = "knockBlueJewel";
                             break;
+                        case "jleft":
+                            functionName = "knockLeftJewel";
+                            break;
+                        case "jright":
+                            functionName = "knockRightJewel";
+                            break;
                         case "v":
                             functionName = "getVuMark";
                             break;
@@ -171,6 +177,12 @@ public abstract class Auto extends LinearVisionOpMode {
                     break;
                 case "knockBlueJewel":
                     knockBlueJewel(parameters);
+                    break;
+                case "knockLeftJewel":
+                    knockLeftJewel(parameters);
+                    break;
+                case "knockRightJewel":
+                    knockRightJewel(parameters);
                     break;
                 case "getVuMark":
                     getVuMark(parameters);
@@ -248,6 +260,14 @@ public abstract class Auto extends LinearVisionOpMode {
         }
 
         return result;
+    }
+
+    public void knockLeftJewel(HashMap<String, String> parameters) {
+        drive.jewelLeft();
+    }
+
+    public void knockRightJewel(HashMap<String, String> parameters) {
+        drive.jewelRight();
     }
 
     public void knockRedJewel(HashMap<String, String> parameters) {
