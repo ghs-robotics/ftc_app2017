@@ -99,6 +99,7 @@ CameraTestVisionOpMode extends TestableVisionOpMode {
         Core.compare(maybe, Scalar.all(1000), maybe, Core.CMP_GT);
         //maybe.setTo(Scalar.all(255.0));
         Core.findNonZero(maybe, maybe);
+        mat
         MatOfPoint yeah = new MatOfPoint(maybe);
         return yeah.toArray();
     }

@@ -116,6 +116,12 @@ public abstract class Auto extends LinearVisionOpMode {
                         case "jb":
                             functionName = "knockBlueJewel";
                             break;
+                        case "jleft":
+                            functionName = "knockLeftJewel";
+                            break;
+                        case "jright":
+                            functionName = "knockRightJewel";
+                            break;
                         case "v":
                             functionName = "getVuMark";
                             break;
@@ -171,6 +177,12 @@ public abstract class Auto extends LinearVisionOpMode {
                     break;
                 case "knockBlueJewel":
                     knockBlueJewel(parameters);
+                    break;
+                case "knockLeftJewel":
+                    knockLeftJewel(parameters);
+                    break;
+                case "knockRightJewel":
+                    knockRightJewel(parameters);
                     break;
                 case "getVuMark":
                     getVuMark(parameters);
@@ -252,32 +264,62 @@ public abstract class Auto extends LinearVisionOpMode {
         return result;
     }
 
-    public void knockRedJewel(HashMap<String, String> parameters) {
-        //TODO: READ JEWEL ORDER
-        //TODO: KNOCK OFF CORRECT JEWEL
-
+    public void knockLeftJewel(HashMap<String, String> parameters) {
         drive.jewelLeft();
+    }
 
-        /**
-         * If left jewel is red:
-         *      drive.jewelLeft();
-         * If right jewel is red:
-         *      drive.jewelRight();
-         */
+    public void knockRightJewel(HashMap<String, String> parameters) {
+        drive.jewelRight();
+    }
+
+    public void knockRedJewel(HashMap<String, String> parameters) {
+        String balls = getBallColor(getFrameRgba());
+        telemetry.addData("ball orientation", balls);
+        switch (balls) {
+            case "red":
+                drive.jewelLeft();
+                break;
+            case "blue":
+                drive.jewelRight();
+                break;
+            case "red, blue":
+                drive.jewelLeft();
+                break;
+            case "blue, red":
+                drive.jewelRight();
+                break;
+            case ", blue":
+                drive.jewelLeft();
+                break;
+            case ", red":
+                drive.jewelRight();
+                break;
+        }
     }
 
     public void knockBlueJewel(HashMap<String, String> parameters) {
-        //TODO: READ JEWEL ORDER
-        //TODO: KNOCK OFF CORRECT JEWEL
-
-        drive.jewelRight();
-
-        /**
-         * If left jewel is blue:
-         *      drive.jewelLeft();
-         * If right jewel is blue:
-         *      drive.jewelRight();
-         */
+        String balls = getBallColor(getFrameRgba());
+        telemetry.addData("ball orientation", balls);
+        switch (balls) {
+            case "red":
+                drive.jewelRight();
+                break;
+            case "blue":
+                drive.jewelLeft();
+                break;
+            case "red, blue":
+                drive.jewelRight();
+                break;
+            case "blue, red":
+                drive.jewelLeft();
+                break;
+            case ", blue":
+                drive.jewelRight();
+                break;
+            case ", red":
+                drive.jewelLeft();
+                break;
+        }
     }
 
     public void autoDrive(HashMap<String, String> parameters) {
