@@ -270,7 +270,7 @@ public abstract class Auto extends LinearVisionOpMode {
             result = result.concat(", red");
         } else {
             result = result.concat(", blue");
-        }
+    }
 
         return result;
     }
