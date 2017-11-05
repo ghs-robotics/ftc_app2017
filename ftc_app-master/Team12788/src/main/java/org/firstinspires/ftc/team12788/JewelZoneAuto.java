@@ -1,18 +1,12 @@
 package org.firstinspires.ftc.team12788;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-
-import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Zone Only", group="Linear Opmode")
-public class AutoMoveZone extends LinearOpMode {
+public class JewelZoneAuto extends LinearOpMode {
 
     private MecanumDrive drive = new MecanumDrive();
     private VuMarkIdentifier mark = new VuMarkIdentifier();

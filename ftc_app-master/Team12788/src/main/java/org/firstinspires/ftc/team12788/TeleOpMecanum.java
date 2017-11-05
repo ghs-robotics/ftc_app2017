@@ -106,6 +106,10 @@ public class TeleOpMecanum extends OpMode {
             grabRight.setPosition(.57);
             grabLeft.setPosition(.3);
         }
+        if (gamepad2.x) {
+            grabRight.setPosition(-1 );
+            grabLeft.setPosition(.8);
+        }
         if (gamepad1.a) {
             adjustedSpeed = .5;
         }
