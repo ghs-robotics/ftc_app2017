@@ -256,28 +256,6 @@ public class MecanumDrive extends Drive {
     }
 
     /**
-     * uses the gyro, first reading from the gyro then setting rotation to
-     * auto correct if the robot gets off
-     */
-    public double useGyro() {
-        double heading = gyro.updateHeading(); //hopefully still 0
-        //If you're moving forwards and you drift, this should correct it.
-        //Accounts for if you go from -180 degrees to 180 degrees
-        // which is only a difference of one degree,
-        // but the bot thinks that's 359 degree difference
-        if (heading < -180) {
-            heading += 180;
-        } else if (heading > 180) {
-            heading -= 180;
-        }
-
-        // Scales -180 to 180 ==> -8 to 8
-        heading = heading / 22.5;
-
-        return heading;
-    }
-
-    /**
      * Stops all motors
      */
     public void stopMotors() {
