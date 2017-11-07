@@ -16,25 +16,6 @@ import java.io.StringWriter;
 
 public class MecanumDrive extends Drive {
 
-    //How much the robot is rotated when we start (as in, the wheels are in a diamond, not a square)
-    //Used for not-field-oriented drive
-    public static final int OFFSET = 0;
-
-    public GlyphPlacementSystem glyph;
-
-    private Servo jewelServo;
-
-    private DcMotor intakeLeft;
-    private DcMotor intakeRight;
-
-    private CRServo inLServo;
-    private CRServo inRServo;
-
-    private DcMotor verticalDrive;
-
-    private Servo grabbyBoi;
-    private boolean handIsOpen = false;
-
     /**
      * Constructor for Drive, it creates the motors and the gyro objects
      */
@@ -45,93 +26,17 @@ public class MecanumDrive extends Drive {
 
     @Override
     public void initialize(Telemetry telemetry, HardwareMap hardwareMap) {
-        jewelServo = hardwareMap.servo.get("jewel");
-        jewelIn();
         super.initialize(telemetry, hardwareMap);
-
-        this.grabbyBoi = hardwareMap.servo.get("hand");
-
-        intakeLeft = hardwareMap.dcMotor.get("intake left");
-        intakeRight = hardwareMap.dcMotor.get("intake right");
-        //The left intake is mounted "backwards"
-        intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        inLServo = hardwareMap.crservo.get("intake left servo");
-        inRServo = hardwareMap.crservo.get("intake right servo");
-        //The left intake servo is mounted "backwards"
-        inLServo.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        verticalDrive = hardwareMap.dcMotor.get("vertical drive");
-        verticalDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        verticalDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        //verticalDrive.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public MecanumDrive(boolean verbose) {
         super(verbose);
     }
 
-    public void toggleHand() {
-        if (isHandOpen()) {
-            closeHand();
-        } else {
-            openHand();
-        }
-        //The functions toggle the hand variable so we don't need to
-    }
-
-    public void openHand() {
-        handIsOpen = true;
-        grabbyBoi.setPosition(.57);
-    }
-
-    public void closeHand() {
-        handIsOpen = false;
-        grabbyBoi.setPosition(1);
-    }
-
-    public boolean isHandOpen() {
-        return handIsOpen;
-    }
-
-    public void verticalDrive(double power) {
-        verticalDrive.setPower(power);
-    }
-
-    public void verticalDriveMode(DcMotor.RunMode mode) {
-        verticalDrive.setMode(mode);
-    }
-
-    public void verticalDrivePos(int position) {
-        verticalDrive.setTargetPosition(position);
-    }
-
-    public int verticalDriveCurrPos() {
-        return verticalDrive.getCurrentPosition();
-    }
-
-    public int verticalDriveTargetPos() {
-        return verticalDrive.getTargetPosition();
-    }
-
-    public void verticalDriveDir(DcMotorSimple.Direction dir) { verticalDrive.setDirection(dir);}
-
-    public void intakeLeft(double power) {
-        intakeLeft.setPower(power);
-        inLServo.setPower(power);
-        telemetry.addData("cr left servo", inLServo.getPower());
-    }
-
-    public void intakeRight(double power) {
-        intakeRight.setPower(power);
-        inRServo.setPower(power);
-        telemetry.addData("cr right servo", inRServo.getPower());
-    }
-
     public void jewelLeft() {
         try {
-            super.resetEncoders();
-            super.runWithEncoders();
+            resetEncoders();
+            runWithEncoders();
             ElapsedTime timer = new ElapsedTime();
 
             timer.reset();
@@ -141,7 +46,7 @@ public class MecanumDrive extends Drive {
             }
             timer.reset();
 
-            //Rotates the robot left
+            //Moves the robot left
             while (!driveWithEncoders(Direction.Backward, Drive.FULL_SPEED, 200)) {
             }
 
@@ -162,8 +67,8 @@ public class MecanumDrive extends Drive {
 
     public void jewelRight() {
         try {
-            super.resetEncoders();
-            super.runWithEncoders();
+            resetEncoders();
+            runWithEncoders();
             ElapsedTime timer = new ElapsedTime();
 
             timer.reset();
@@ -173,7 +78,7 @@ public class MecanumDrive extends Drive {
             }
             timer.reset();
 
-            //Rotates the robot left
+            //Moves the robot right
             while (!driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 200)) {
             }
 
@@ -190,27 +95,6 @@ public class MecanumDrive extends Drive {
             ex.printStackTrace(new PrintWriter(sw));
             telemetry.addData("NullPointerException", sw.toString());
         }
-    }
-
-    public void jewelDown() {
-        jewelServo.setPosition(0);
-        while (jewelServo.getPosition() != 0) {  }
-    }
-
-    public void jewelUp() {
-        jewelServo.setPosition(.6);
-        while (jewelServo.getPosition() != .6) {  }
-    }
-
-    public void jewelIn() {
-        jewelServo.setPosition(.8);
-        while (jewelServo.getPosition() != .8) {  }
-    }
-
-    public void jewelAdjust(double adjustAmt) {
-        double currPos = jewelServo.getPosition();
-
-        jewelServo.setPosition(Range.clip(currPos + adjustAmt, 0, 1));
     }
 
     /**
