@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 /**
- * Created by meme on 11/2/2017.
+ * Created by Ryan Whiting (aka meme) on 11/2/2017.
  */
 
 public class AlternateGlyphPlacementSystem {
