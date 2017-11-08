@@ -26,7 +26,6 @@ public class RevGyroTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-
         revGyro.initialize(telemetry, hardwareMap);
 
 

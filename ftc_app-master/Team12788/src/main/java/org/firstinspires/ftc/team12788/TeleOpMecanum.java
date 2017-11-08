@@ -67,7 +67,7 @@ public class TeleOpMecanum extends OpMode {
             liftLeft.setPower(0);
             liftRight.setPower(0);
         }
-
+        /*
         if (gamepad2.dpad_up) {
             liftPos = 6000;
         }else if (gamepad2.dpad_down) {
@@ -84,7 +84,7 @@ public class TeleOpMecanum extends OpMode {
                 liftLeft.setPower(1);
                 liftRight.setPower(-1);
             }
-        }
+        }*/
 
         if (drive.deadZone(gamepad2.right_trigger) > 0) {
             intakeLeft.setPower(1);
@@ -103,8 +103,12 @@ public class TeleOpMecanum extends OpMode {
             grabRight.setPosition(1);
         }
         if (gamepad2.y) {
-            grabRight.setPosition(-1);
-            grabLeft.setPosition(1);
+            grabRight.setPosition(.57);
+            grabLeft.setPosition(.3);
+        }
+        if (gamepad2.x) {
+            grabRight.setPosition(-1 );
+            grabLeft.setPosition(.8);
         }
         if (gamepad1.a) {
             adjustedSpeed = .5;

@@ -41,7 +41,7 @@ abstract class VisionOpModeCore extends OpMode implements CameraBridgeViewBase.C
         openCVCamera = null;
     }
 
-    boolean isInitialized() {
+    public boolean isInitialized() {
         return initialized;
     }
 

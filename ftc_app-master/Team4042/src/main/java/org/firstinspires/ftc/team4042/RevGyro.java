@@ -14,6 +14,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 public class RevGyro {
 
+    private static final double OFFSET = 180;
+
     private BNO055IMU imu;
 
     private Orientation angles;
@@ -27,6 +29,8 @@ public class RevGyro {
 
     Telemetry telemetry;
     HardwareMap hardwareMap;
+
+    private double adjust = 0;
 
     private final static double SCALE = 440;
 
@@ -52,6 +56,10 @@ public class RevGyro {
         imu.initialize(parameters);
     }
 
+    public void setAdjust(double adjust) {
+        this.adjust = adjust;
+    }
+
     /**
      * Updates all gyro values.
      */
@@ -68,7 +76,15 @@ public class RevGyro {
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
         //see https://goo.gl/AnKWEn
-        heading = angles.firstAngle;
+        heading = angles.firstAngle + adjust;
+        //Since the gyro should be from -180 to 180
+        while (heading > 180) {
+            heading -= 360;
+        }
+        while (heading < -180) {
+            heading += 360;
+        }
+
         roll = angles.secondAngle;
         pitch = angles.thirdAngle;
     }
@@ -125,7 +141,7 @@ public class RevGyro {
     }
 
     private double formatAngle(double oldAngle) {
-        double newAngle = Math.round(oldAngle / SCALE) + OmniDrive.OFFSET;
+        double newAngle = Math.round(oldAngle / SCALE) + OFFSET;
         newAngle = ((newAngle % 360) + 360) % 360;
         return newAngle;
     }

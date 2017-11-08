@@ -8,7 +8,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public abstract class Drive {
     //Initializes a factor for the speed of movement to a position when driving with encoders
-    public static final double BASE_SPEED = .3;
+    public static final double BASE_SPEED = .5;
     //The deadzone size for the joystick inputs
     public static final double DEADZONE_SIZE = .01;
     //The largest speed factor possible

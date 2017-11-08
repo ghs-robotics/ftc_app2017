@@ -1,10 +1,25 @@
 package org.firstinspires.ftc.team4042;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.lasarobotics.vision.android.Cameras;
+import org.lasarobotics.vision.opmode.LinearVisionOpMode;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
+import org.lasarobotics.vision.opmode.extensions.CameraControlExtension;
+import org.lasarobotics.vision.util.ScreenOrientation;
+import org.opencv.core.Core;
+import org.opencv.core.CvException;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,8 +29,8 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-@Autonomous(name="DO NOT RUN THIS AUTO", group="K9bot")
-public abstract class Auto extends LinearOpMode {
+@Autonomous(name="Abstract Auto", group="K9bot")
+public abstract class Auto extends LinearVisionOpMode {
 
     MecanumDrive drive = new MecanumDrive(false);
     private VuMarkIdentifier vuMarkIdentifier = new VuMarkIdentifier();
@@ -31,10 +46,9 @@ public abstract class Auto extends LinearOpMode {
         this.drive = drive;
 
         drive.initialize(telemetry, hardwareMap);
-        drive.jewelUp();
         //drive.glyph = new GlyphPlacementSystem(1, 0, hardwareMap, drive, false);
 
-        drive.setUseGyro(true);
+        //drive.setUseGyro(true);
         //telemetry.addData("glyph", drive.glyph.getTargetPositionAsString());
         telemetry.update();
 
@@ -45,6 +59,19 @@ public abstract class Auto extends LinearOpMode {
         file = new File("./storage/emulated/0/DCIM/" + filePath);
 
         loadFile();
+
+        telemetry.addData("wowoww", "help");
+        telemetry.update();
+        this.setCamera(Cameras.PRIMARY);
+        this.setFrameSize(new Size(900, 900));
+        //enableExtension(Extensions.BEACON);
+        enableExtension(Extensions.ROTATION);
+        enableExtension(Extensions.CAMERA_CONTROL);
+        rotation.setIsUsingSecondaryCamera(false);
+        rotation.disableAutoRotate();
+        rotation.setActivityOrientationFixed(ScreenOrientation.LANDSCAPE);
+        cameraControl.setColorTemperature(CameraControlExtension.ColorTemperature.AUTO);
+        cameraControl.setAutoExposureCompensation();
     }
 
     /**
@@ -87,11 +114,20 @@ public abstract class Auto extends LinearOpMode {
                         case "s":
                             functionName = "autoSensorDrive";
                             break;
+                        case "up":
+                            functionName = "jewelUp";
+                            break;
                         case "jr":
                             functionName = "knockRedJewel";
                             break;
                         case "jb":
                             functionName = "knockBlueJewel";
+                            break;
+                        case "jleft":
+                            functionName = "knockLeftJewel";
+                            break;
+                        case "jright":
+                            functionName = "knockRightJewel";
                             break;
                         case "v":
                             functionName = "getVuMark";
@@ -125,6 +161,7 @@ public abstract class Auto extends LinearOpMode {
      * Runs the list of instructions
      */
     public void runAuto() {
+        drive.jewelUp();
         drive.resetEncoders();
         drive.setEncoders(true);
 
@@ -142,11 +179,20 @@ public abstract class Auto extends LinearOpMode {
                 case "autoSensorDrive":
                     autoSensorDrive(parameters);
                     break;
+                case "jewelUp":
+                    jewelUp(parameters);
+                    break;
                 case "knockRedJewel":
                     knockRedJewel(parameters);
                     break;
                 case "knockBlueJewel":
                     knockBlueJewel(parameters);
+                    break;
+                case "knockLeftJewel":
+                    knockLeftJewel(parameters);
+                    break;
+                case "knockRightJewel":
+                    knockRightJewel(parameters);
                     break;
                 case "getVuMark":
                     getVuMark(parameters);
@@ -198,32 +244,104 @@ public abstract class Auto extends LinearOpMode {
     }
     */
 
-    public void knockRedJewel(HashMap<String, String> parameters) {
-        //TODO: READ JEWEL ORDER
-        //TODO: KNOCK OFF CORRECT JEWEL
+    public String getBallColor(Mat frame){
+        log.add(frame.height() + " x " + frame.width());
+        Imgproc.resize(frame, frame, new Size(960, 720));
+        telemetry.update();
+        Rect left_crop = new Rect(new Point(215,585), new Point(380, 719));
+        Rect right_crop = new Rect(new Point(460,585), new Point(620, 719));
 
+        Log.d("stupid", this.getFrameSize().width + " x " + this.getFrameSize().height);
+        Mat right = new Mat(frame, right_crop);
+        Mat left = new Mat(frame, left_crop);
+
+
+        String result = "unspecified";
+        Scalar left_colors  = Core.sumElems(left);
+        Scalar right_colors = Core.sumElems(right);
+
+        if(left_colors.val[0] >= left_colors.val[2]){
+            result = "red";
+        } else {
+            result = "blue";
+        }
+
+        if(right_colors.val[0] >= right_colors.val[2]){
+            result = result.concat(", red");
+        } else {
+            result = result.concat(", blue");
+    }
+
+        return result;
+    }
+
+    public void jewelUp(HashMap<String, String> parameters) {
+        drive.jewelUp();
+    }
+
+    public void knockLeftJewel(HashMap<String, String> parameters) {
         drive.jewelLeft();
+    }
 
-        /**
-         * If left jewel is red:
-         *      drive.jewelLeft();
-         * If right jewel is red:
-         *      drive.jewelRight();
-         */
+    public void knockRightJewel(HashMap<String, String> parameters) {
+        drive.jewelRight();
+    }
+
+    public void knockRedJewel(HashMap<String, String> parameters) {
+        try {
+            String balls = getBallColor(getFrameRgba());
+            discardFrame();
+            telemetry.addData("ball orientation", balls);
+            switch (balls) {
+                case "red":
+                    drive.jewelLeft();
+                    break;
+                case "blue":
+                    drive.jewelRight();
+                    break;
+                case "red, blue":
+                    drive.jewelLeft();
+                    break;
+                case "blue, red":
+                    drive.jewelRight();
+                    break;
+                case ", blue":
+                    drive.jewelLeft();
+                    break;
+                case ", red":
+                    drive.jewelRight();
+                    break;
+            }
+        } catch (CvException ex) {
+            StringWriter sw = new StringWriter();
+            ex.printStackTrace(new PrintWriter(sw));
+            telemetry.addData("CvException", sw.toString());
+        }
     }
 
     public void knockBlueJewel(HashMap<String, String> parameters) {
-        //TODO: READ JEWEL ORDER
-        //TODO: KNOCK OFF CORRECT JEWEL
-
-        drive.jewelRight();
-
-        /**
-         * If left jewel is blue:
-         *      drive.jewelLeft();
-         * If right jewel is blue:
-         *      drive.jewelRight();
-         */
+        String balls = getBallColor(getFrameRgba());
+        telemetry.addData("ball orientation", balls);
+        switch (balls) {
+            case "red":
+                drive.jewelRight();
+                break;
+            case "blue":
+                drive.jewelLeft();
+                break;
+            case "red, blue":
+                drive.jewelRight();
+                break;
+            case "blue, red":
+                drive.jewelLeft();
+                break;
+            case ", blue":
+                drive.jewelRight();
+                break;
+            case ", red":
+                drive.jewelLeft();
+                break;
+        }
     }
 
     public void autoDrive(HashMap<String, String> parameters) {

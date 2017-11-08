@@ -12,6 +12,7 @@
 apply from: '../build.common.gradle'
 dependencies {
     compile project(':FtcRobotController')
+    compile project(':ftc-visionlib')
 }
 android {
     compileSdkVersion 21

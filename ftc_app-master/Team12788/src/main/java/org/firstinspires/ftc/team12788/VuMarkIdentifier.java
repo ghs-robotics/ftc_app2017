@@ -63,7 +63,7 @@ import java.io.StringWriter;
  * is explained in {@link ConceptVuforiaNavigation}.
  */
 
-public class VuMarkIdentifier {
+public class  VuMarkIdentifier {
 
     public static final String TAG = "Vuforia VuMark Sample";
 
@@ -96,6 +96,11 @@ public class VuMarkIdentifier {
             parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
             this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
 
+            relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
+            relicTemplate = relicTrackables.get(0);
+
+            relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
+
         } catch (VuforiaLocalizerImpl.FailureException ex) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -107,19 +112,24 @@ public class VuMarkIdentifier {
 
     public RelicRecoveryVuMark getMark() {
         //Load the data set containing the VuMarks for Relic Recovery.
-        relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
-        relicTemplate = relicTrackables.get(0);
+        try {
 
-        relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
+            relicTrackables.activate();
 
-        relicTrackables.activate();
+            RelicRecoveryVuMark relicRecoveryVuMark;
 
-        RelicRecoveryVuMark relicRecoveryVuMark;
+            do {
+                relicRecoveryVuMark = RelicRecoveryVuMark.from(relicTemplate);
+            } while (relicRecoveryVuMark.equals(RelicRecoveryVuMark.UNKNOWN));
 
-        do {
-            relicRecoveryVuMark = RelicRecoveryVuMark.from(relicTemplate);
-        } while (relicRecoveryVuMark.equals(RelicRecoveryVuMark.UNKNOWN));
-
-        return relicRecoveryVuMark;
+            return relicRecoveryVuMark;
+        } catch (VuforiaLocalizerImpl.FailureException ex) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            ex.printStackTrace(pw);
+            telemetry.addData("error", sw.toString());
+            telemetry.update();
+            return getMark();
+        }
     }
 }

@@ -1,17 +1,16 @@
 package org.firstinspires.ftc.team4042;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name="RedTopAuto", group="K9bot")
-public class RedTopAuto extends Auto {
+@Autonomous(name="BlueAuto", group="K9bot")
+public class BlueAuto extends Auto {
 
     MecanumDrive drive = new MecanumDrive(true);
 
     @Override
     public void runOpMode() {
 
-        super.setUp(drive, "redtop.txt");
+        super.setUp(drive, "blue.txt");
         try {
             waitForStart();
         } catch (InterruptedException ex) { }

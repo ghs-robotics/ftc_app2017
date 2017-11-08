@@ -29,7 +29,8 @@ import static org.opencv.imgcodecs.Imgcodecs.imread;
  * Vision OpMode run by the Camera Test Activity
  * Use TestableVisionOpModes in testing apps ONLY (but you can easily convert between opmodes just by changingt t
  */
-public class CameraTestVisionOpMode extends TestableVisionOpMode {
+public interface
+CameraTestVisionOpMode extends TestableVisionOpMode {
     final double FUNCTION_A_A = 8001.3;
     final double FUNCTION_A_B = 1.880;
     final double FUNCTION_A_C = 301.5;
@@ -66,17 +67,7 @@ public class CameraTestVisionOpMode extends TestableVisionOpMode {
 
     @Override
     public Mat frame(Mat rgba, Mat gray) {
-        //Imgproc.filter2D(rgba, rgba, -1, mkernel);
-        rgba = super.frame(rgba, gray);
-        Mat yo = image.clone();
-        Point[] yeah = findTape(25, yo);
-        Log.d("much" , Integer.toString(yeah.length));
-        for (Point point : yeah) {
-            Imgproc.circle(image, point, 2, new Scalar(0,255,0), -1);
-
-        }
-        //int yin = distToPos(25);
-        //Imgproc.rectangle(image, new Point(0, yin-2), new Point(1280, yin+3), new Scalar(0, 0, 255));
+        Log.d("much" , rgba);
         return image;
     }
 
@@ -108,6 +99,7 @@ public class CameraTestVisionOpMode extends TestableVisionOpMode {
         Core.compare(maybe, Scalar.all(1000), maybe, Core.CMP_GT);
         //maybe.setTo(Scalar.all(255.0));
         Core.findNonZero(maybe, maybe);
+        mat
         MatOfPoint yeah = new MatOfPoint(maybe);
         return yeah.toArray();
     }
