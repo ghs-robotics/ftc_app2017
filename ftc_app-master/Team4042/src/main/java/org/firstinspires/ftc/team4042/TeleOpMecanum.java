@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class TeleOpMecanum extends OpMode {
 
     private boolean aA = false;
+    private boolean aY = false;
 
     private double adjustedSpeed;
 
@@ -64,6 +65,12 @@ public class TeleOpMecanum extends OpMode {
     
     @Override
     public void loop() {
+
+        //1 Y - toggle extendo
+        if (gamepad1.y && !aY) {
+            Drive.isExtendo = !Drive.isExtendo;
+        }
+        aY = gamepad1.y;
 
         //1 A - toggle verbose
         if (gamepad1.a && !aA) {

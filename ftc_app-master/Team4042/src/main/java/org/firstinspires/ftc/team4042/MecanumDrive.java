@@ -96,6 +96,27 @@ public class MecanumDrive extends Drive {
             telemetry.addData("NullPointerException", sw.toString());
         }
     }
+    private void driveLR(double speedFactor, double l, double r) {
+
+        double[] speedWheel = new double[4];
+
+        //Deadzone for joysticks
+        l = super.deadZone(l);
+        r = super.deadZone(r);
+
+        if (verbose) {
+            telemetry.addData("left", l);
+            telemetry.addData("right", r);
+        }
+
+        speedWheel[0] = l;
+        speedWheel[1] = r;
+        //We don't move the back motors, for obvious reasons
+        speedWheel[2] = 0;
+        speedWheel[3] = 0;
+
+        super.setMotorPower(speedWheel, speedFactor);
+    }
 
     /**
      * uses joystick inputs to set motor speeds for mecanum drive
@@ -104,11 +125,18 @@ public class MecanumDrive extends Drive {
     public void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor) {
         super.setEncoders(useEncoders);
 
-        double x = gamepad1.left_stick_x;
-        double y = -gamepad1.left_stick_y; //Y is the opposite direction of what's intuitive: forward is -1, backwards is 1
-        double r = gamepad1.right_stick_x;
+        if (isExtendo) {
+            double left = -gamepad1.left_stick_y;
+            double right = -gamepad1.right_stick_y;
 
-        driveXYR(speedFactor, x, y, r, useGyro);
+            driveLR(speedFactor, left, right);
+        } else {
+            double x = gamepad1.left_stick_x;
+            double y = -gamepad1.left_stick_y; //Y is the opposite direction of what's intuitive: forward is -1, backwards is 1
+            double r = gamepad1.right_stick_x;
+
+            driveXYR(speedFactor, x, y, r, useGyro);
+        }
     }
 
     /**
