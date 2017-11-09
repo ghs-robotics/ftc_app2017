@@ -38,7 +38,7 @@ hit jewel with poles
 then
 	get off the balancing stone (using gyro)
 	maintain the right distance from the side walls using left/right long range IR
-	rotate using gyro
+	rotate using gyro (depending on color)
 	ram into the cryptobox
 	back up
 	place glyph
