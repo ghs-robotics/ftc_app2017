@@ -6,8 +6,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Hardware;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -80,7 +78,8 @@ public abstract class Drive {
 
     RevGyro gyro = new RevGyro();
 
-    AnalogSensor[] ir = new AnalogSensor[5];
+    AnalogSensor[] shortIr = new AnalogSensor[3];
+    AnalogSensor[] longIr = new AnalogSensor[2];
 
     boolean verbose;
 
@@ -100,8 +99,12 @@ public abstract class Drive {
             gyro = new RevGyro();
         }
 
-        for(int i = 0; i < ir.length; i++){
-            ir[i] = new AnalogSensor("infrared" + i, false);
+        for(int i = 0; i < shortIr.length; i++){
+            shortIr[i] = new AnalogSensor("ir" + i, false);
+        }
+
+        for(int i = 0; i < longIr.length; i++){
+            shortIr[i] = new AnalogSensor("longir" + i, true);
         }
 
         verbose = false;
@@ -128,8 +131,8 @@ public abstract class Drive {
 
         telemetry.addData("useGyro", useGyro);
 
-        for (int i = 0; i < ir.length; i++) {
-            ir[i].initialize(hardwareMap);
+        for (int i = 0; i < shortIr.length; i++) {
+            shortIr[i].initialize(hardwareMap);
         }
 
         try {

@@ -4,7 +4,6 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.lasarobotics.vision.android.Cameras;
@@ -468,6 +467,6 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     private void autoSensorDrive(Direction direction, double speed, double targetDistance, double targetTicks) {
-        autoSensorDrive(direction, speed, targetDistance, targetTicks, drive.ir[0]);
+        autoSensorDrive(direction, speed, targetDistance, targetTicks, drive.shortIr[0]);
     }
 }
