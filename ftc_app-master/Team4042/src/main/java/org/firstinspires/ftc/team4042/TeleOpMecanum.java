@@ -62,7 +62,7 @@ public class TeleOpMecanum extends OpMode {
         timer = new ElapsedTime();
         timer.reset();
 
-        target = GlyphPlacementSystem.Position.HOME;
+        target = GlyphPlacementSystem.Position.TOP;
 
         adjustedSpeed = MecanumDrive.FULL_SPEED;
     }
@@ -177,7 +177,7 @@ public class TeleOpMecanum extends OpMode {
         else {
             drive.openHand();
         }*/
-        //drive.glyph.runToPosition();
+        drive.glyph.runToPosition();
         telemetryUpdate();
     }
 
