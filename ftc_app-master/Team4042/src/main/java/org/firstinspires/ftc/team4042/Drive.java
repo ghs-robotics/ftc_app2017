@@ -28,6 +28,15 @@ public abstract class Drive {
     //The power to put to the motors to stop them
     public static final double STOP_SPEED = 0;
 
+    public static final boolean THE_FAST_ONES_ARE_THE_FRONT_ONES = true;
+    public static final double LOW_SPEED_MOTOR_THINGS = 7;
+    public static final double LOW_SPEED_WHEEL_THINGS = 5;
+    public static final double HIGH_SPEED_MOTOR_THINGS = 3;
+    public static final double HIGH_SPEED_WHEEL_THINGS = 2;
+    public static final double HIGH_SPEED_SLOWER_DOWNER_NUMBER =
+            (LOW_SPEED_MOTOR_THINGS/LOW_SPEED_WHEEL_THINGS) /
+            (HIGH_SPEED_MOTOR_THINGS/HIGH_SPEED_WHEEL_THINGS);
+
     //How much the robot is rotated when we start (as in, the wheels are in a diamond, not a square)
     //Used for not-field-oriented drive
     public static final int OFFSET = 0;
@@ -374,18 +383,33 @@ public abstract class Drive {
         }
 
         if (useMotors) {
-            //Sets the power
-            if (motorLeftFront != null) {
-                motorLeftFront.setPower(deadZone(speedWheel[0]));
-            }
-            if (motorRightFront != null) {
-                motorRightFront.setPower(deadZone(-speedWheel[1]));
-            } //The right motors are mounted "upside down", which is why we have to inverse this
-            if (motorRightBack != null) {
-                motorRightBack.setPower(deadZone(-speedWheel[2]));
-            }
-            if (motorLeftBack != null) {
-                motorLeftBack.setPower(deadZone(speedWheel[3]));
+            //which ones to scale down? fast ones. if THE_FAST_ONES_ARE_THE_FRONT_ONES, the front.
+            if(THE_FAST_ONES_ARE_THE_FRONT_ONES) {
+                if (motorLeftFront != null) {
+                    motorLeftFront.setPower(deadZone(speedWheel[0]) * HIGH_SPEED_SLOWER_DOWNER_NUMBER);
+                }
+                if (motorRightFront != null) {
+                    motorRightFront.setPower(deadZone(-speedWheel[1]) * HIGH_SPEED_SLOWER_DOWNER_NUMBER);
+                } //The right motors are mounted "upside down", which is why we have to inverse this
+                if (motorRightBack != null) {
+                    motorRightBack.setPower(deadZone(-speedWheel[2]));
+                }
+                if (motorLeftBack != null) {
+                    motorLeftBack.setPower(deadZone(speedWheel[3]));
+                }
+            } else {
+                if (motorLeftFront != null) {
+                    motorLeftFront.setPower(deadZone(speedWheel[0]));
+                }
+                if (motorRightFront != null) {
+                    motorRightFront.setPower(deadZone(-speedWheel[1]));
+                } //The right motors are mounted "upside down", which is why we have to inverse this
+                if (motorRightBack != null) {
+                    motorRightBack.setPower(deadZone(-speedWheel[2]) * HIGH_SPEED_SLOWER_DOWNER_NUMBER);
+                }
+                if (motorLeftBack != null) {
+                    motorLeftBack.setPower(deadZone(speedWheel[3]) * HIGH_SPEED_SLOWER_DOWNER_NUMBER);
+                }
             }
         }
 
