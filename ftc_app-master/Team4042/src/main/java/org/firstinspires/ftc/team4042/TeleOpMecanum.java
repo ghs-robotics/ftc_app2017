@@ -59,6 +59,7 @@ public class TeleOpMecanum extends OpMode {
         //drive.glyph = new GlyphPlacementSystem(hardwareMap);
         telemetry.update();
 
+        timer = new ElapsedTime();
         timer.reset();
 
         target = GlyphPlacementSystem.Position.HOME;
