@@ -55,10 +55,6 @@ public abstract class Auto extends LinearVisionOpMode {
 
         drive.initialize(telemetry, hardwareMap);
 
-        drive.gyro.updateAngles();
-        startRoll = drive.gyro.getRoll();
-        startPitch = drive.gyro.getPitch();
-
         //drive.glyph = new GlyphPlacementSystem(1, 0, hardwareMap, drive, false);
 
         //drive.setUseGyro(true);
@@ -74,7 +70,12 @@ public abstract class Auto extends LinearVisionOpMode {
         loadFile();
 
         telemetry.addData("wowoww", "help");
+
+        telemetry.addData("startRoll", startRoll);
+        telemetry.addData("startPitch", startPitch);
+
         telemetry.update();
+
         this.setCamera(Cameras.PRIMARY);
         this.setFrameSize(new Size(900, 900));
         //enableExtension(Extensions.BEACON);
@@ -85,6 +86,7 @@ public abstract class Auto extends LinearVisionOpMode {
         rotation.setActivityOrientationFixed(ScreenOrientation.LANDSCAPE);
         cameraControl.setColorTemperature(CameraControlExtension.ColorTemperature.AUTO);
         cameraControl.setAutoExposureCompensation();
+
         telemetry.addData("time", timer.seconds());
     }
 
@@ -142,6 +144,12 @@ public abstract class Auto extends LinearVisionOpMode {
         drive.jewelUp();
         drive.resetEncoders();
         drive.setEncoders(true);
+
+        drive.initializeGyro(telemetry, hardwareMap);
+
+        drive.gyro.updateAngles();
+        startRoll = drive.gyro.getRoll();
+        startPitch = drive.gyro.getPitch();
 
         timer.reset();
         //Reads each instruction and acts accordingly
@@ -360,7 +368,7 @@ public abstract class Auto extends LinearVisionOpMode {
         Direction direction = new Direction(Double.parseDouble(parameters.get("x")), -Double.parseDouble(parameters.get("y")));
         double speed = Double.parseDouble(parameters.get("speed"));
 
-        autoDrive(direction, speed, 1000);
+        autoDrive(direction, speed, 500);
 
         double roll;
         double pitch;

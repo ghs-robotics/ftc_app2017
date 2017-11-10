@@ -10,12 +10,18 @@ public class TestAuto extends Auto {
     @Override
     public void runOpMode() {
 
-        super.setUp(drive, "test.txt");
         try {
-            waitForStart();
-        } catch (InterruptedException ex) { }
 
-        super.runAuto();
+            super.setUp(drive, "test.txt");
+            try {
+                waitForStart();
+            } catch (InterruptedException ex) {
+            }
+
+            super.runAuto();
+        } catch (Exception ex) {
+            telemetry.addData("Exception", Drive.getStackTrace(ex));
+        }
         
         //check sensor sums
         //robot starts facing right

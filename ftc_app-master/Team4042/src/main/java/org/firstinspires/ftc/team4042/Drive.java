@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Hardware;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -77,13 +78,19 @@ public abstract class Drive {
 
     Telemetry telemetry;
 
-    RevGyro gyro;
+    RevGyro gyro = new RevGyro();
 
     AnalogSensor[] ir = new AnalogSensor[5];
 
     boolean verbose;
 
     Telemetry.Log log;
+
+    public static String getStackTrace(Exception ex) {
+        StringWriter sw = new StringWriter();
+        ex.printStackTrace(new PrintWriter(sw));
+        return sw.toString();
+    }
 
     //Require drive() in subclasses
     public abstract void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor);
@@ -105,18 +112,22 @@ public abstract class Drive {
         this.verbose = verbose;
     }
 
+    public void initializeGyro(Telemetry telemetry, HardwareMap hardwareMap) {
+        gyro.initialize(telemetry, hardwareMap);
+    }
+
     public void initialize(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
         this.log = telemetry.log();
+
+        glyph = new GlyphPlacementSystem(hardwareMap, this);
+
         if (useGyro) {
-            gyro.initialize(telemetry, hardwareMap);
+            initializeGyro(telemetry, hardwareMap);
         }
 
         telemetry.addData("useGyro", useGyro);
 
-        if (useGyro) {
-            gyro.initialize(telemetry, hardwareMap);
-        }
         for (int i = 0; i < ir.length; i++) {
             ir[i].initialize(hardwareMap);
         }

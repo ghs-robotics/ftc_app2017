@@ -18,7 +18,7 @@ public class AutoInstruction {
     }
 
     public AutoInstruction(HashMap<String, String> parameters) {
-        this.functionName = parameters.get("functionName");
+        this.functionName = parameters.get("function");
         this.parameters = parameters;
     }
 

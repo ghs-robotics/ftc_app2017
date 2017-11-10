@@ -19,11 +19,11 @@ public class GlyphPlacementSystem {
     private int targetY;
     private Position currentY;
     private String baseOutput;
-    private MecanumDrive drive;
+    private Drive drive;
 
     private enum Position{HOME, RAISED, TOP, MID, BOT, ERROR}
 
-    public GlyphPlacementSystem(HardwareMap map, MecanumDrive drive) {
+    public GlyphPlacementSystem(HardwareMap map, Drive drive) {
         currentY = Position.HOME;
         this.drive = drive;
         this.baseOutput = "[ _ _ _ ]\n[ _ _ _ ]\n[ _ _ _ ]";
