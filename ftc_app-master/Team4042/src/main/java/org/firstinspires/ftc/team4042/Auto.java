@@ -46,11 +46,20 @@ public abstract class Auto extends LinearVisionOpMode {
 
     private ArrayList<AutoInstruction> instructions = new ArrayList<>();
 
+    private double startRoll;
+    private double startPitch;
+
+
     public void setUp(MecanumDrive drive, String filePath) {
         timer = new ElapsedTime();
         this.drive = drive;
 
         drive.initialize(telemetry, hardwareMap);
+
+        drive.gyro.updateAngles();
+        startRoll = drive.gyro.getRoll();
+        startPitch = drive.gyro.getPitch();
+
         //drive.glyph = new GlyphPlacementSystem(1, 0, hardwareMap, drive, false);
 
         //drive.setUseGyro(true);
@@ -109,44 +118,8 @@ public abstract class Auto extends LinearVisionOpMode {
                         telemetry.update();
                     }
 
-                    String functionName = "";
-                    switch (parameters.get("function")) {
-                        case "d":
-                            functionName = "autoDrive";
-                            break;
-                        case "r":
-                            functionName = "autoRotate";
-                            break;
-                        case "s":
-                            functionName = "autoSensorDrive";
-                            break;
-                        case "up":
-                            functionName = "jewelUp";
-                            break;
-                        case "jr":
-                            functionName = "knockRedJewel";
-                            break;
-                        case "jb":
-                            functionName = "knockBlueJewel";
-                            break;
-                        case "jleft":
-                            functionName = "knockLeftJewel";
-                            break;
-                        case "jright":
-                            functionName = "knockRightJewel";
-                            break;
-                        case "v":
-                            functionName = "getVuMark";
-                            break;
-                        case "p":
-                            functionName = "placeGlyph";
-                            break;
-                        default:
-                            System.err.println("Unknown function called from file " + file);
-                            break;
-                    }
                     //Stores those values as an instruction
-                    AutoInstruction instruction = new AutoInstruction(functionName, parameters);
+                    AutoInstruction instruction = new AutoInstruction(parameters);
                     instructions.add(instruction);
 
                     telemetry.update();
@@ -177,35 +150,40 @@ public abstract class Auto extends LinearVisionOpMode {
             String functionName = instruction.getFunctionName();
             HashMap<String, String> parameters = instruction.getParameters();
             switch (functionName) {
-                case "autoDrive":
+                case "d":
                     autoDrive(parameters);
                     break;
-                case "autoRotate":
+                case "doff":
+                    autoDriveOff(parameters);
+                case "r":
                     autoRotate(parameters);
                     break;
-                case "autoSensorDrive":
+                case "s":
                     autoSensorDrive(parameters);
                     break;
-                case "jewelUp":
+                case "up":
                     jewelUp(parameters);
                     break;
-                case "knockRedJewel":
+                case "jr":
                     knockRedJewel(parameters);
                     break;
-                case "knockBlueJewel":
+                case "jb":
                     knockBlueJewel(parameters);
                     break;
-                case "knockLeftJewel":
+                case "jleft":
                     knockLeftJewel(parameters);
                     break;
-                case "knockRightJewel":
+                case "jright":
                     knockRightJewel(parameters);
                     break;
-                case "getVuMark":
+                case "v":
                     getVuMark(parameters);
                     break;
-                case "placeGlyph":
-                    //placeGlyph(parameters);
+                case "p":
+                    placeGlyph(parameters);
+                    break;
+                default:
+                    System.err.println("Unknown function called from file " + file);
                     break;
             }
         }
@@ -283,6 +261,10 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
         return result;
+    }
+
+    public void placeGlyph(HashMap<String, String> parameters) {
+        //TODO: MAKE THIS A USEFUL FUNCTION based on vuMark
     }
 
     public void jewelUp(HashMap<String, String> parameters) {
@@ -375,6 +357,28 @@ public abstract class Auto extends LinearVisionOpMode {
             done = drive.driveWithEncoders(direction, speed, targetTicks);
             telemetry.update();
         }
+    }
+
+    private void autoDriveOff(HashMap<String, String> parameters) {
+        Direction direction = new Direction(Double.parseDouble(parameters.get("x")), -Double.parseDouble(parameters.get("y")));
+        double speed = Double.parseDouble(parameters.get("speed"));
+
+        autoDrive(direction, speed, 1000);
+
+        double roll;
+        double pitch;
+
+        do {
+            drive.gyro.updateAngles();
+            roll = drive.gyro.getRoll();
+            pitch = drive.gyro.getPitch();
+            autoDrive(direction, speed, 100);
+        }
+        while ((Math.abs(roll - startRoll) >= 3) ||
+                (Math.abs(pitch - startPitch) >= 3));
+            //If too tipped forward/backwards
+            //or left/right
+            //keep driving
     }
 
     public void autoRotate(HashMap<String, String> parameters) {
