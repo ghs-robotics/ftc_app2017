@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.lasarobotics.vision.android.Cameras;
 import org.lasarobotics.vision.opmode.LinearVisionOpMode;
@@ -40,9 +41,12 @@ public abstract class Auto extends LinearVisionOpMode {
 
     File file;
 
+    ElapsedTime timer;
+
     private ArrayList<AutoInstruction> instructions = new ArrayList<>();
 
     public void setUp(MecanumDrive drive, String filePath) {
+        timer = new ElapsedTime();
         this.drive = drive;
 
         drive.initialize(telemetry, hardwareMap);
@@ -72,6 +76,7 @@ public abstract class Auto extends LinearVisionOpMode {
         rotation.setActivityOrientationFixed(ScreenOrientation.LANDSCAPE);
         cameraControl.setColorTemperature(CameraControlExtension.ColorTemperature.AUTO);
         cameraControl.setAutoExposureCompensation();
+        telemetry.addData("time", timer.seconds());
     }
 
     /**
@@ -165,6 +170,7 @@ public abstract class Auto extends LinearVisionOpMode {
         drive.resetEncoders();
         drive.setEncoders(true);
 
+        timer.reset();
         //Reads each instruction and acts accordingly
         for (AutoInstruction instruction : instructions) {
             String functionName = instruction.getFunctionName();
@@ -202,6 +208,7 @@ public abstract class Auto extends LinearVisionOpMode {
                     break;
             }
         }
+        telemetry.addData("jewel time", timer.seconds());
 
         //autoDrive(new Direction(1, .5), Drive.FULL_SPEED, 1000);
 
