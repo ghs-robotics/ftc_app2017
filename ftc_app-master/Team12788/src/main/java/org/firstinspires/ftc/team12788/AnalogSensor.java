@@ -23,7 +23,7 @@ public class AnalogSensor {
     public void initialize(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
         infrared = hardwareMap.analogInput.get(ir);
-    }
+}
 
     public double getVoltageAvg() {
         if (infrared == null) { return -1; }
