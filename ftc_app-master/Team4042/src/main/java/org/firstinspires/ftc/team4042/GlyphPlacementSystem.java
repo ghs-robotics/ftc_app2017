@@ -15,13 +15,22 @@ public class GlyphPlacementSystem {
     private Servo hand;
     private final int BASE_DISP = 900;
     private final int BLOCK_DISP = 700;
+    public final int HORIZONTAL_TRANSLATION_TIME = 500;
     private int targetX;
     private int targetY;
-    private Position currentY;
+    public Position currentY;
     private String baseOutput;
     private MecanumDrive drive;
 
-    private enum Position{HOME, RAISED, TOP, MID, BOT, ERROR}
+    public enum Position {
+        HOME(0), RAISED(1200), TOP(1600), MID(2000), BOT(2500), TRANSITION(null);
+
+        private final Integer encoderVal;
+        Position(Integer encoderVal) { this.encoderVal = encoderVal; }
+        public Integer getEncoderVal() { return encoderVal; }
+        @Override
+        public String toString() { return this.name() + this.getEncoderVal(); }
+    }
 
     public GlyphPlacementSystem(HardwareMap map, MecanumDrive drive) {
         currentY = Position.HOME;
@@ -58,33 +67,37 @@ public class GlyphPlacementSystem {
         return "\n" + new String(output);
     }
 
-    public void up() {
+    public int up() {
         if (targetY != 0) {
             targetY -= 1;
         }
+        return targetY;
     }
 
-    public void down() {
+    public int down() {
         if (targetY != 2) {
             targetY += 1;
         }
+        return targetY;
     }
 
-    public void left() {
+    public int left() {
         if (targetX != 0) {
             targetX -= 1;
         }
+        return targetX;
     }
 
-    public void right() {
+    public int right() {
         if (targetX != 2) {
             targetX += 1;
         }
+        return targetX;
     }
 
-    public void setTargetPosition() {
+    public void setTargetPosition(Position position) {
         drive.closeHand();
-        drive.verticalDrivePos(BASE_DISP + (targetY + 1)*BLOCK_DISP);
+        drive.verticalDrivePos(position.getEncoderVal());
     }
 
     public void setHomeTarget() {
@@ -100,20 +113,20 @@ public class GlyphPlacementSystem {
         if (pos == 0) {
             currentY = Position.HOME;
         }
-        else if (pos > BASE_DISP - 10 && pos < BASE_DISP + 10) {
+        else if (pos > Position.RAISED.getEncoderVal() - 10 && pos < Position.RAISED.getEncoderVal() + 10) {
             currentY = Position.RAISED;
         }
-        else if (pos > (BASE_DISP + BLOCK_DISP) - 10 && pos < (BASE_DISP + BLOCK_DISP) + 10) {
+        else if (pos > Position.TOP.getEncoderVal() - 10 && pos < Position.TOP.getEncoderVal() + 10) {
             currentY = Position.TOP;
         }
-        else if (pos > (BASE_DISP + 2*BLOCK_DISP) - 10 && pos < (BASE_DISP + 2*BLOCK_DISP) + 10) {
+        else if (pos > Position.MID.getEncoderVal() - 10 && pos < Position.MID.getEncoderVal() + 10) {
             currentY = Position.MID;
         }
-        else if (pos > (BASE_DISP + 3*BLOCK_DISP) - 10 && pos < (BASE_DISP + 3*BLOCK_DISP) + 10) {
+        else if (pos > Position.BOT.getEncoderVal() - 10 && pos < Position.BOT.getEncoderVal() + 10) {
             currentY = Position.BOT;
         }
         else {
-            currentY = Position.ERROR;
+            currentY = Position.TRANSITION;
         }
 
 

@@ -2,6 +2,9 @@ package org.firstinspires.ftc.team4042;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import javax.microedition.khronos.opengles.GL;
 
 @TeleOp(name = "Mecanum", group = "Iterative Opmode")
 public class TeleOpMecanum extends OpMode {
@@ -19,6 +22,8 @@ public class TeleOpMecanum extends OpMode {
     private boolean bLeft;
     private boolean bRight;
     private boolean bB;
+    private GlyphPlacementSystem.Position target;
+    private ElapsedTime timer;
 
     //Declare OpMode members.
     private Drive drive = new MecanumDrive(true);
@@ -53,6 +58,10 @@ public class TeleOpMecanum extends OpMode {
         //drive.glyph = new GlyphPlacementSystem(hardwareMap, drive);
         //drive.glyph = new GlyphPlacementSystem(hardwareMap);
         telemetry.update();
+
+        timer.reset();
+
+        target = GlyphPlacementSystem.Position.HOME;
 
         adjustedSpeed = MecanumDrive.FULL_SPEED;
     }
@@ -99,7 +108,14 @@ public class TeleOpMecanum extends OpMode {
         aRightBumper = gamepad1.right_bumper;
 
         if(gamepad2.a) {
-            drive.glyph.setTargetPosition();
+            if (drive.glyph.currentY.getEncoderVal() < GlyphPlacementSystem.Position.RAISED.getEncoderVal() + 10) {
+                drive.glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
+                timer.reset();
+            } else if (timer.milliseconds() <= drive.glyph.HORIZONTAL_TRANSLATION_TIME && drive.glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
+                //TODO: add the horizontal translation servo code
+            } else if (timer.milliseconds() > drive.glyph.HORIZONTAL_TRANSLATION_TIME && drive.glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
+                drive.glyph.setTargetPosition(target);
+            }
         }
         else {
             drive.glyph.setHomeTarget();
@@ -107,13 +123,14 @@ public class TeleOpMecanum extends OpMode {
 
 
         //Glyph locate
-        if (gamepad2.dpad_up && !bUp) { drive.glyph.up(); drive.glyph.setTargetPosition(); }
+        if (gamepad2.dpad_up && !bUp) { target = GlyphPlacementSystem.Position.values()[drive.glyph.up() + 2]; }
         bUp = gamepad2.dpad_up;
-        if (gamepad2.dpad_down && !bDown) { drive.glyph.down(); drive.glyph.setTargetPosition(); }
+        if (gamepad2.dpad_down && !bDown) { target = GlyphPlacementSystem.Position.values()[drive.glyph.down() + 2]; }
         bDown = gamepad2.dpad_down;
-        if (gamepad2.dpad_left && !bLeft) { drive.glyph.left(); drive.glyph.setTargetPosition(); }
+        //TODO: add horizontal targeting code once that exists
+        if (gamepad2.dpad_left && !bLeft) { drive.glyph.left(); }
         bLeft = gamepad2.dpad_left;
-        if (gamepad2.dpad_right && !bRight) { drive.glyph.right(); drive.glyph.setTargetPosition(); }
+        if (gamepad2.dpad_right && !bRight) { drive.glyph.right(); }
         bRight = gamepad2.dpad_right;
 
         //Places glyph
@@ -165,7 +182,7 @@ public class TeleOpMecanum extends OpMode {
 
     private void telemetryUpdate() {
         telemetry.addData("Speed mode", adjustedSpeed);
-        //telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
+        telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
         telemetry.addData("encoder", drive.verticalDriveCurrPos());
         telemetry.addData("hand is open", drive.isHandOpen());
         if (Drive.useGyro) {
