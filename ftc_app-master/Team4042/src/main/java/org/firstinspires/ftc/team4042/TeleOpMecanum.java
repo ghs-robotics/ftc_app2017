@@ -186,6 +186,8 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
         telemetry.addData("encoder", drive.verticalDriveCurrPos());
         telemetry.addData("hand is open", drive.isHandOpen());
+        telemetry.addData("target", target.toString());
+        telemetry.addData("encoder target pos", drive.verticalDriveTargetPos());
         if (Drive.useGyro) {
             telemetry.addData("gyro", drive.gyro.updateHeading());
         }
