@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.team4042;
 
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -195,6 +196,8 @@ public abstract class Auto extends LinearVisionOpMode {
             }
         }
         telemetry.addData("jewel time", timer.seconds());
+        telemetry.update();
+        SystemClock.sleep(10000);
 
         //autoDrive(new Direction(1, .5), Drive.FULL_SPEED, 1000);
 
