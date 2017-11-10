@@ -16,25 +16,6 @@ import java.io.StringWriter;
 
 public class MecanumDrive extends Drive {
 
-    //How much the robot is rotated when we start (as in, the wheels are in a diamond, not a square)
-    //Used for not-field-oriented drive
-    public static final int OFFSET = 0;
-
-    public GlyphPlacementSystem glyph;
-
-    private Servo jewelServo;
-
-    private DcMotor intakeLeft;
-    private DcMotor intakeRight;
-
-    private CRServo inLServo;
-    private CRServo inRServo;
-
-    private DcMotor verticalDrive;
-
-    private Servo grabbyBoi;
-    private boolean handIsOpen = false;
-
     /**
      * Constructor for Drive, it creates the motors and the gyro objects
      */
@@ -45,93 +26,17 @@ public class MecanumDrive extends Drive {
 
     @Override
     public void initialize(Telemetry telemetry, HardwareMap hardwareMap) {
-        jewelServo = hardwareMap.servo.get("jewel");
-        jewelIn();
         super.initialize(telemetry, hardwareMap);
-
-        this.grabbyBoi = hardwareMap.servo.get("hand");
-
-        intakeLeft = hardwareMap.dcMotor.get("intake left");
-        intakeRight = hardwareMap.dcMotor.get("intake right");
-        //The left intake is mounted "backwards"
-        intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        inLServo = hardwareMap.crservo.get("intake left servo");
-        inRServo = hardwareMap.crservo.get("intake right servo");
-        //The left intake servo is mounted "backwards"
-        inLServo.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        verticalDrive = hardwareMap.dcMotor.get("vertical drive");
-        verticalDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        verticalDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        //verticalDrive.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public MecanumDrive(boolean verbose) {
         super(verbose);
     }
 
-    public void toggleHand() {
-        if (isHandOpen()) {
-            closeHand();
-        } else {
-            openHand();
-        }
-        //The functions toggle the hand variable so we don't need to
-    }
-
-    public void openHand() {
-        handIsOpen = true;
-        grabbyBoi.setPosition(.57);
-    }
-
-    public void closeHand() {
-        handIsOpen = false;
-        grabbyBoi.setPosition(1);
-    }
-
-    public boolean isHandOpen() {
-        return handIsOpen;
-    }
-
-    public void verticalDrive(double power) {
-        verticalDrive.setPower(power);
-    }
-
-    public void verticalDriveMode(DcMotor.RunMode mode) {
-        verticalDrive.setMode(mode);
-    }
-
-    public void verticalDrivePos(int position) {
-        verticalDrive.setTargetPosition(position);
-    }
-
-    public int verticalDriveCurrPos() {
-        return verticalDrive.getCurrentPosition();
-    }
-
-    public int verticalDriveTargetPos() {
-        return verticalDrive.getTargetPosition();
-    }
-
-    public void verticalDriveDir(DcMotorSimple.Direction dir) { verticalDrive.setDirection(dir);}
-
-    public void intakeLeft(double power) {
-        intakeLeft.setPower(power);
-        inLServo.setPower(power);
-        telemetry.addData("cr left servo", inLServo.getPower());
-    }
-
-    public void intakeRight(double power) {
-        intakeRight.setPower(power);
-        inRServo.setPower(power);
-        telemetry.addData("cr right servo", inRServo.getPower());
-    }
-
     public void jewelLeft() {
         try {
-            super.resetEncoders();
-            super.runWithEncoders();
+            resetEncoders();
+            runWithEncoders();
             ElapsedTime timer = new ElapsedTime();
 
             timer.reset();
@@ -141,7 +46,7 @@ public class MecanumDrive extends Drive {
             }
             timer.reset();
 
-            //Rotates the robot left
+            //Moves the robot left
             while (!driveWithEncoders(Direction.Backward, Drive.FULL_SPEED, 200)) {
             }
 
@@ -162,8 +67,8 @@ public class MecanumDrive extends Drive {
 
     public void jewelRight() {
         try {
-            super.resetEncoders();
-            super.runWithEncoders();
+            resetEncoders();
+            runWithEncoders();
             ElapsedTime timer = new ElapsedTime();
 
             timer.reset();
@@ -173,7 +78,7 @@ public class MecanumDrive extends Drive {
             }
             timer.reset();
 
-            //Rotates the robot left
+            //Moves the robot right
             while (!driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 200)) {
             }
 
@@ -191,26 +96,26 @@ public class MecanumDrive extends Drive {
             telemetry.addData("NullPointerException", sw.toString());
         }
     }
+    private void driveLR(double speedFactor, double l, double r) {
 
-    public void jewelDown() {
-        jewelServo.setPosition(0);
-        while (jewelServo.getPosition() != 0) {  }
-    }
+        double[] speedWheel = new double[4];
 
-    public void jewelUp() {
-        jewelServo.setPosition(.6);
-        while (jewelServo.getPosition() != .6) {  }
-    }
+        //Deadzone for joysticks
+        l = super.deadZone(l);
+        r = super.deadZone(r);
 
-    public void jewelIn() {
-        jewelServo.setPosition(.8);
-        while (jewelServo.getPosition() != .8) {  }
-    }
+        if (verbose) {
+            telemetry.addData("left", l);
+            telemetry.addData("right", r);
+        }
 
-    public void jewelAdjust(double adjustAmt) {
-        double currPos = jewelServo.getPosition();
+        speedWheel[0] = l;
+        speedWheel[1] = r;
+        //We don't move the back motors, for obvious reasons
+        speedWheel[2] = 0;
+        speedWheel[3] = 0;
 
-        jewelServo.setPosition(Range.clip(currPos + adjustAmt, 0, 1));
+        super.setMotorPower(speedWheel, speedFactor);
     }
 
     /**
@@ -220,11 +125,18 @@ public class MecanumDrive extends Drive {
     public void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor) {
         super.setEncoders(useEncoders);
 
-        double x = gamepad1.left_stick_x;
-        double y = -gamepad1.left_stick_y; //Y is the opposite direction of what's intuitive: forward is -1, backwards is 1
-        double r = gamepad1.right_stick_x;
+        if (isExtendo) {
+            double left = -gamepad1.left_stick_y;
+            double right = -gamepad1.right_stick_y;
 
-        driveXYR(speedFactor, x, y, r, useGyro);
+            driveLR(speedFactor, left, right);
+        } else {
+            double x = gamepad1.left_stick_x;
+            double y = -gamepad1.left_stick_y; //Y is the opposite direction of what's intuitive: forward is -1, backwards is 1
+            double r = gamepad1.right_stick_x;
+
+            driveXYR(speedFactor, x, y, r, useGyro);
+        }
     }
 
     /**
@@ -369,28 +281,6 @@ public class MecanumDrive extends Drive {
             return Math.PI;
         }
         return speed;
-    }
-
-    /**
-     * uses the gyro, first reading from the gyro then setting rotation to
-     * auto correct if the robot gets off
-     */
-    public double useGyro() {
-        double heading = gyro.updateHeading(); //hopefully still 0
-        //If you're moving forwards and you drift, this should correct it.
-        //Accounts for if you go from -180 degrees to 180 degrees
-        // which is only a difference of one degree,
-        // but the bot thinks that's 359 degree difference
-        if (heading < -180) {
-            heading += 180;
-        } else if (heading > 180) {
-            heading -= 180;
-        }
-
-        // Scales -180 to 180 ==> -8 to 8
-        heading = heading / 22.5;
-
-        return heading;
     }
 
     /**

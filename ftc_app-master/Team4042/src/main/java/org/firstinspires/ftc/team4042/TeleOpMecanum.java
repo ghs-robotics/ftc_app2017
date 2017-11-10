@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class TeleOpMecanum extends OpMode {
 
     private boolean aA = false;
+    private boolean aY = false;
 
     private double adjustedSpeed;
 
@@ -20,7 +21,7 @@ public class TeleOpMecanum extends OpMode {
     private boolean bB;
 
     //Declare OpMode members.
-    private MecanumDrive drive = new MecanumDrive(true);
+    private Drive drive = new MecanumDrive(true);
 
     /**
     GAMEPAD 1:
@@ -65,6 +66,12 @@ public class TeleOpMecanum extends OpMode {
     @Override
     public void loop() {
 
+        //1 Y - toggle extendo
+        if (gamepad1.y && !aY) {
+            Drive.isExtendo = !Drive.isExtendo;
+        }
+        aY = gamepad1.y;
+
         //1 A - toggle verbose
         if (gamepad1.a && !aA) {
             drive.toggleVerbose();
@@ -91,23 +98,23 @@ public class TeleOpMecanum extends OpMode {
         }
         aRightBumper = gamepad1.right_bumper;
 
-        /*if(gamepad2.a) {
+        if(gamepad2.a) {
             drive.glyph.setTargetPosition();
         }
         else {
             drive.glyph.setHomeTarget();
-        }*/
+        }
 
 
         //Glyph locate
-        /*if (gamepad2.dpad_up && !bUp) { drive.glyph.up(); drive.glyph.setTargetPosition(); }
+        if (gamepad2.dpad_up && !bUp) { drive.glyph.up(); drive.glyph.setTargetPosition(); }
         bUp = gamepad2.dpad_up;
         if (gamepad2.dpad_down && !bDown) { drive.glyph.down(); drive.glyph.setTargetPosition(); }
         bDown = gamepad2.dpad_down;
         if (gamepad2.dpad_left && !bLeft) { drive.glyph.left(); drive.glyph.setTargetPosition(); }
         bLeft = gamepad2.dpad_left;
         if (gamepad2.dpad_right && !bRight) { drive.glyph.right(); drive.glyph.setTargetPosition(); }
-        bRight = gamepad2.dpad_right;*/
+        bRight = gamepad2.dpad_right;
 
         //Places glyph
         //if (gamepad2.a && !bA) {
@@ -144,14 +151,14 @@ public class TeleOpMecanum extends OpMode {
         }
 
         //Left stick's y drives the u track
-        drive.verticalDrive(drive.deadZone(-gamepad2.left_stick_y));
+        /*drive.verticalDrive(drive.deadZone(-gamepad2.left_stick_y));
 
         if (gamepad2.b) {
             drive.closeHand();
         }
         else {
             drive.openHand();
-        }
+        }*/
         //drive.glyph.runToPosition();
         telemetryUpdate();
     }
