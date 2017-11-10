@@ -23,7 +23,7 @@ public class GlyphPlacementSystem {
     private Drive drive;
 
     public enum Position {
-        HOME(0), RAISED(1200), TOP(1600), MID(2000), BOT(2500), TRANSITION(null);
+        HOME(0), RAISED(1200), TOP(1600), MID(2000), BOT(2500), TRANSITION(-1);
 
         private final Integer encoderVal;
         Position(Integer encoderVal) { this.encoderVal = encoderVal; }
