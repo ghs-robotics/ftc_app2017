@@ -109,7 +109,7 @@ public class TeleOpMecanum extends OpMode {
         aRightBumper = gamepad1.right_bumper;
 
         if(gamepad2.a) {
-            if (drive.glyph.currentY.getEncoderVal() < GlyphPlacementSystem.Position.RAISED.getEncoderVal() + 10) {
+            if (drive.glyph.currentY.getEncoderVal() < GlyphPlacementSystem.Position.RAISED.getEncoderVal() + 10 && !drive.glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
                 drive.glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
                 timer.reset();
             } else if (timer.milliseconds() <= drive.glyph.HORIZONTAL_TRANSLATION_TIME && drive.glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
