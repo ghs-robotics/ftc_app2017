@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.sun.tools.javac.util.Position;
 
 /**
@@ -21,6 +22,7 @@ public class GlyphPlacementSystem {
     public Position currentY;
     private String baseOutput;
     private Drive drive;
+    public ElapsedTime timer;
 
     public enum Position {
         HOME(0), RAISED(1200), TOP(1600), MID(2000), BOT(2500), TRANSITION(-1);
@@ -36,6 +38,7 @@ public class GlyphPlacementSystem {
         currentY = Position.HOME;
         this.drive = drive;
         this.baseOutput = "[ _ _ _ ]\n[ _ _ _ ]\n[ _ _ _ ]";
+        timer = new ElapsedTime();
     }
 
     public String getTargetPositionAsString()
