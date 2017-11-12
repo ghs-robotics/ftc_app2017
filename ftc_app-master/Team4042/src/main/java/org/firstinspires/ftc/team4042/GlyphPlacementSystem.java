@@ -39,6 +39,7 @@ public class GlyphPlacementSystem {
         this.drive = drive;
         this.baseOutput = "[ _ _ _ ]\n[ _ _ _ ]\n[ _ _ _ ]";
         timer = new ElapsedTime();
+        timer.reset();
     }
 
     public String getTargetPositionAsString()

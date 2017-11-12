@@ -219,6 +219,8 @@ public abstract class Auto extends LinearVisionOpMode {
 
     public void getVuMark(HashMap<String, String> parameters) {
         vuMark = vuMarkIdentifier.getMark();
+        telemetry.addData("vuMark", vuMark);
+        telemetry.update();
     }
 
     /*
@@ -400,6 +402,15 @@ public abstract class Auto extends LinearVisionOpMode {
         double speed = Double.parseDouble(parameters.get("speed"));
         double targetTicks = Double.parseDouble(parameters.get("target"));
         autoRotate(rotation, speed, targetTicks);
+
+        double gyro = drive.gyro.updateHeading();
+        while (Math.abs(gyro - r) > 10) {
+            if (gyro > r) {
+                autoRotate(Direction.Rotation.Counterclockwise, speed, 100);
+            } else {
+                autoRotate(Direction.Rotation.Clockwise, speed, 100);
+            }
+        }
     }
 
     /**

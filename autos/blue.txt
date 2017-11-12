@@ -10,4 +10,4 @@
 #function:s x:0 y:1 speed:.1 target:1000 distance:25
 function:jr
 function:up
-function:d x:0 y:1 speed:1 target:1250
+function:d x:0 y:-1 speed:1 target:1250
