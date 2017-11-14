@@ -1,25 +1,20 @@
 package org.firstinspires.ftc.team4042;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.sun.tools.javac.util.Position;
 
 /**
- * Created by meme on 11/2/2017.
+ * Created by Ryan on 11/2/2017.
  */
 
 public class GlyphPlacementSystem {
 
-    private Servo hand;
-    private final int BASE_DISP = 900;
-    private final int BLOCK_DISP = 700;
     public final int HORIZONTAL_TRANSLATION_TIME = 500;
     private int targetX;
     private int targetY;
     public Position currentY;
+    public HorizPos currentX;
     private String baseOutput;
     private Drive drive;
     public ElapsedTime timer;
@@ -32,6 +27,16 @@ public class GlyphPlacementSystem {
         public Integer getEncoderVal() { return encoderVal; }
         @Override
         public String toString() { return this.name() + this.getEncoderVal(); }
+    }
+
+    public enum HorizPos {
+        LEFT(0.0), CENTER(0.0), RIGHT(0.0);
+
+        private final Double power;
+        HorizPos(Double power) { this.power = power; }
+        public Double getPower() { return power; }
+        @Override
+        public String toString() { return this.name() + this.getPower(); }
     }
 
     public GlyphPlacementSystem(HardwareMap map, Drive drive) {
@@ -101,16 +106,16 @@ public class GlyphPlacementSystem {
 
     public void setTargetPosition(Position position) {
         drive.closeHand();
-        drive.verticalDrivePos(position.getEncoderVal());
+        drive.setVerticalDrivePos(position.getEncoderVal());
     }
 
     public void setHomeTarget() {
         drive.openHand();
-        drive.verticalDrivePos(10);
+        drive.setVerticalDrivePos(10);
     }
 
     public void runToPosition() {
-        drive.verticalDrive((drive.verticalDriveTargetPos() - drive.verticalDriveCurrPos())/ 100);
+        drive.setVerticalDrive((drive.verticalDriveTargetPos() - drive.verticalDriveCurrPos())/ 100);
 
         int pos = drive.verticalDriveCurrPos();
 

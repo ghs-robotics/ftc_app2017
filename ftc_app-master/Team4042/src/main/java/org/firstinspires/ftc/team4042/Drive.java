@@ -237,15 +237,15 @@ public abstract class Drive {
         return handIsOpen;
     }
 
-    public void verticalDrive(double power) {
+    public void setVerticalDrive(double power) {
         verticalDrive.setPower(power);
     }
 
-    public void verticalDriveMode(DcMotor.RunMode mode) {
+    public void setVerticalDriveMode(DcMotor.RunMode mode) {
         verticalDrive.setMode(mode);
     }
 
-    public void verticalDrivePos(int position) {
+    public void setVerticalDrivePos(int position) {
         verticalDrive.setTargetPosition(position);
     }
 
