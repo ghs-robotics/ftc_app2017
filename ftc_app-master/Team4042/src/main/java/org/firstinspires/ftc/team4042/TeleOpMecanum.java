@@ -174,7 +174,7 @@ public class TeleOpMecanum extends OpMode {
         }
 
         //Left stick's y drives the u track
-        /*drive.verticalDrive(drive.deadZone(-gamepad2.left_stick_y));
+        /*drive.setVerticalDrive(drive.deadZone(-gamepad2.left_stick_y));
 
         if (gamepad2.b) {
             drive.closeHand();

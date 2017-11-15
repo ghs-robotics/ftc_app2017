@@ -67,6 +67,8 @@ public abstract class Drive {
 
     private DcMotor verticalDrive;
 
+    private CRServo horizontalU;
+
     private Servo grabbyBoi;
     private boolean handIsOpen = false;
 
@@ -166,7 +168,9 @@ public abstract class Drive {
         jewelServo = hardwareMap.servo.get("jewel");
         jewelIn();
 
-        this.grabbyBoi = hardwareMap.servo.get("hand");
+        grabbyBoi = hardwareMap.servo.get("hand");
+
+        horizontalU = hardwareMap.crservo.get("horizontal");
 
         intakeLeft = hardwareMap.dcMotor.get("intake left");
         intakeRight = hardwareMap.dcMotor.get("intake right");
@@ -225,19 +229,23 @@ public abstract class Drive {
         grabbyBoi.setPosition(1);
     }
 
+    public void setHorizontalU(double power) {
+        horizontalU.setPower(power);
+    }
+
     public boolean isHandOpen() {
         return handIsOpen;
     }
 
-    public void verticalDrive(double power) {
+    public void setVerticalDrive(double power) {
         verticalDrive.setPower(power);
     }
 
-    public void verticalDriveMode(DcMotor.RunMode mode) {
+    public void setVerticalDriveMode(DcMotor.RunMode mode) {
         verticalDrive.setMode(mode);
     }
 
-    public void verticalDrivePos(int position) {
+    public void setVerticalDrivePos(int position) {
         verticalDrive.setTargetPosition(position);
     }
 
