@@ -22,7 +22,10 @@ public class TeleOpMecanum extends OpMode {
     private boolean bLeft;
     private boolean bRight;
     private boolean bB;
+
+    private boolean timerState = true;
     private GlyphPlacementSystem.Position target;
+    private ElapsedTime timer;
 
     //Declare OpMode members.
     private Drive drive = new MecanumDrive(true);
@@ -57,6 +60,8 @@ public class TeleOpMecanum extends OpMode {
         //drive.glyph = new GlyphPlacementSystem(hardwareMap, drive);
         //drive.glyph = new GlyphPlacementSystem(hardwareMap);
         telemetry.update();
+
+        timer = new ElapsedTime();
 
         target = GlyphPlacementSystem.Position.TOP;
 
@@ -103,19 +108,23 @@ public class TeleOpMecanum extends OpMode {
             adjustedSpeed += 0.25;
         }
         aRightBumper = gamepad1.right_bumper;
-        
+
         //TODO: the timer needs to be reset once the lift reaches Position.RAISED so the state updates properly
         if(gamepad2.a) {
-            if (drive.glyph.currentY.getEncoderVal() < GlyphPlacementSystem.Position.RAISED.getEncoderVal() + 10) {
+            if (drive.verticalDriveCurrPos() < GlyphPlacementSystem.Position.RAISED.getEncoderVal() + 5) {
                 drive.glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
-            } else if (drive.glyph.timer.milliseconds() <= drive.glyph.HORIZONTAL_TRANSLATION_TIME && drive.glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
+            } else if(timerState && drive.glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
+                timer.reset();
+                timerState = false;
+            } else if (timer.milliseconds() <= drive.glyph.HORIZONTAL_TRANSLATION_TIME && drive.glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
                 //TODO: add the horizontal translation servo code
-            } else if (drive.glyph.timer.milliseconds() > drive.glyph.HORIZONTAL_TRANSLATION_TIME && drive.glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
+            } else if (timer.milliseconds() > drive.glyph.HORIZONTAL_TRANSLATION_TIME && drive.glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
                 drive.glyph.setTargetPosition(target);
             }
         }
         else {
             drive.glyph.setHomeTarget();
+            timerState = true;
         }
 
 
@@ -184,7 +193,11 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("hand is open", drive.isHandOpen());
         telemetry.addData("target", target.toString());
         telemetry.addData("encoder target pos", drive.verticalDriveTargetPos());
-        telemetry.addData("timer", drive.glyph.timer.milliseconds());
+        if(timer != null) {
+            telemetry.addData("timer", timer.milliseconds());
+        } else {
+            telemetry.addData("timer", "not initialized");
+        }
         if (Drive.useGyro) {
             telemetry.addData("gyro", drive.gyro.updateHeading());
         }
