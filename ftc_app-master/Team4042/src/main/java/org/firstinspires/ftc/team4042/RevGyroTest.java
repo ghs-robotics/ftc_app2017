@@ -55,7 +55,7 @@ public class RevGyroTest extends LinearOpMode {
             telemetry.addData("pitch", drive.gyro.getPitch());
             telemetry.addData("roll", drive.gyro.getRoll());
             telemetry.update();
-            
+
             if (gamepad1.a) {
                 drive.setUseGyro(!Drive.useGyro);
             }
