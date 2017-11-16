@@ -59,7 +59,6 @@ public abstract class Auto extends LinearVisionOpMode {
 
         //drive.setUseGyro(true);
         //telemetry.addData("glyph", drive.glyph.getTargetPositionAsString());
-        telemetry.update();
 
         log = telemetry.log();
         vuMarkIdentifier.initialize(telemetry, hardwareMap);
@@ -68,13 +67,6 @@ public abstract class Auto extends LinearVisionOpMode {
         file = new File("./storage/emulated/0/DCIM/" + filePath);
 
         loadFile();
-
-        telemetry.addData("wowoww", "help");
-
-        telemetry.addData("startRoll", startRoll);
-        telemetry.addData("startPitch", startPitch);
-
-        telemetry.update();
 
         this.setCamera(Cameras.PRIMARY);
         this.setFrameSize(new Size(900, 900));
@@ -86,8 +78,6 @@ public abstract class Auto extends LinearVisionOpMode {
         rotation.setActivityOrientationFixed(ScreenOrientation.LANDSCAPE);
         cameraControl.setColorTemperature(CameraControlExtension.ColorTemperature.AUTO);
         cameraControl.setAutoExposureCompensation();
-
-        telemetry.addData("time", timer.seconds());
     }
 
     /**
@@ -100,24 +90,22 @@ public abstract class Auto extends LinearVisionOpMode {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line;
-            double numLines = 0;
             while ((line = bufferedReader.readLine()) != null) { //Reads the lines from the file in order
-                numLines++;
-                log.add("Reading line " + numLines);
-                telemetry.update();
                 if (line.charAt(0) != '#') { //Use a # for a comment
                     HashMap<String, String> parameters = new HashMap<>();
 
                     //x:3 --> k = x, v = 3
                     String[] inputParameters = line.split(" ");
+                    StringBuilder para = new StringBuilder("Parameter: ");
                     for (String parameter : inputParameters) {
                         int colon = parameter.indexOf(':');
                         String k = parameter.substring(0, colon);
                         String v = parameter.substring(colon + 1);
                         parameters.put(k, v); //Gets the next parameter and adds it to the list
-                        log.add("Parameter: " + k + ":" + v);
-                        telemetry.update();
+                        para.append(k + ":" + v + " ");
                     }
+
+                    log.add(para.toString());
 
                     //Stores those values as an instruction
                     AutoInstruction instruction = new AutoInstruction(parameters);
@@ -150,6 +138,9 @@ public abstract class Auto extends LinearVisionOpMode {
         drive.gyro.updateAngles();
         startRoll = drive.gyro.getRoll();
         startPitch = drive.gyro.getPitch();
+        log.add("start roll: " + startRoll);
+        log.add("start pitch: " + startPitch);
+        telemetry.update();
 
         timer.reset();
         //Reads each instruction and acts accordingly
@@ -194,8 +185,6 @@ public abstract class Auto extends LinearVisionOpMode {
                     break;
             }
         }
-        telemetry.addData("jewel time", timer.seconds());
-        telemetry.update();
         SystemClock.sleep(10000);
 
         //autoDrive(new Direction(1, .5), Drive.FULL_SPEED, 1000);
@@ -360,11 +349,11 @@ public abstract class Auto extends LinearVisionOpMode {
      * @param targetTicks The final distance to have travelled, in encoder ticks
      */
     private void autoDrive(Direction direction, double speed, double targetTicks) {
-        log.add("autoDrive invoked with direction " + direction + " speed " + speed + " targetTicks " + targetTicks);
+        //log.add("autoDrive invoked with direction " + direction + " speed " + speed + " targetTicks " + targetTicks);
         boolean done = false;
         while (!done && opModeIsActive()) {
             done = drive.driveWithEncoders(direction, speed, targetTicks);
-            telemetry.update();
+            //telemetry.update();
         }
     }
 

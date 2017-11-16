@@ -22,7 +22,7 @@ import java.util.Locale;
 @Autonomous(name="Rev_Gyro_test", group="K9bot")
 public class RevGyroTest extends LinearOpMode {
 
-    private RevGyro revGyro = new RevGyro();
+    /*private RevGyro revGyro = new RevGyro();
 
     @Override
     public void runOpMode() {
@@ -36,6 +36,29 @@ public class RevGyroTest extends LinearOpMode {
             telemetry.addData("pitch", revGyro.getPitch());
             telemetry.addData("roll", revGyro.getRoll());
             telemetry.update();
+        }
+    }*/
+
+    private MecanumDrive drive = new MecanumDrive();
+
+    public void runOpMode() {
+        drive.initialize(telemetry, hardwareMap);
+        drive.initializeGyro(telemetry, hardwareMap);
+
+        waitForStart();
+
+        while (opModeIsActive()) {
+            telemetry.addData("gyro", drive.gyro);
+            telemetry.addData("useGyro", Drive.useGyro);
+            drive.gyro.updateAngles();
+            telemetry.addData("heading", drive.gyro.getHeading());
+            telemetry.addData("pitch", drive.gyro.getPitch());
+            telemetry.addData("roll", drive.gyro.getRoll());
+            telemetry.update();
+            
+            if (gamepad1.a) {
+                drive.setUseGyro(!Drive.useGyro);
+            }
         }
     }
 }
