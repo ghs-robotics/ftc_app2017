@@ -53,6 +53,8 @@ public abstract class Auto extends LinearVisionOpMode {
         timer = new ElapsedTime();
         this.drive = drive;
 
+        log = telemetry.log();
+
         drive.initialize(telemetry, hardwareMap);
 
         //drive.glyph = new GlyphPlacementSystem(1, 0, hardwareMap, drive, false);
@@ -60,7 +62,6 @@ public abstract class Auto extends LinearVisionOpMode {
         //drive.setUseGyro(true);
         //telemetry.addData("glyph", drive.glyph.getTargetPositionAsString());
 
-        log = telemetry.log();
         vuMarkIdentifier.initialize(telemetry, hardwareMap);
 
         log.add("Reading file " + filePath);
@@ -126,33 +127,41 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     /**
+     * Tries to initialize the gyro until it works
+     */
+    public void gyro() {
+        drive.initializeGyro(telemetry, hardwareMap);
+
+        do {
+            drive.gyro.updateAngles();
+            startRoll = drive.gyro.getRoll();
+            startPitch = drive.gyro.getPitch();
+        } while (startRoll == 0 && startPitch == 0 && opModeIsActive());
+    }
+
+    /**
      * Runs the list of instructions
      */
     public void runAuto() {
+        gyro();
         drive.jewelUp();
         drive.resetEncoders();
         drive.setEncoders(true);
-
-        drive.initializeGyro(telemetry, hardwareMap);
-
-        drive.gyro.updateAngles();
-        startRoll = drive.gyro.getRoll();
-        startPitch = drive.gyro.getPitch();
-        log.add("start roll: " + startRoll);
-        log.add("start pitch: " + startPitch);
-        telemetry.update();
+        drive.setVerbose(false);
 
         timer.reset();
         //Reads each instruction and acts accordingly
         for (AutoInstruction instruction : instructions) {
             String functionName = instruction.getFunctionName();
             HashMap<String, String> parameters = instruction.getParameters();
+            log.add("function: " + functionName);
             switch (functionName) {
                 case "d":
                     autoDrive(parameters);
                     break;
                 case "doff":
                     autoDriveOff(parameters);
+                    break;
                 case "r":
                     autoRotate(parameters);
                     break;
@@ -442,12 +451,14 @@ public abstract class Auto extends LinearVisionOpMode {
         } else {
             double r = drive.useGyro()/180;
 
-            telemetry.addData("currDistance", currDistance);
-            telemetry.addData("Reached target", Math.abs(targetDistance - currDistance) > 2);
-            telemetry.addData("x", direction.getX());
-            telemetry.addData("y", direction.getY());
-            telemetry.addData("r", r);
-            telemetry.update();
+            if (drive.verbose) {
+                telemetry.addData("currDistance", currDistance);
+                telemetry.addData("Reached target", Math.abs(targetDistance - currDistance) > 2);
+                telemetry.addData("x", direction.getX());
+                telemetry.addData("y", direction.getY());
+                telemetry.addData("r", r);
+                telemetry.update();
+            }
 
             //If you're off your target by more than 2 cm, try to adjust
             while ((Math.abs(targetDistance - currDistance) > 2) && opModeIsActive()) {
