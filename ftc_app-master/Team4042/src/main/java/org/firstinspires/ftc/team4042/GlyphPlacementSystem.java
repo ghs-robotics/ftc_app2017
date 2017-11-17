@@ -28,6 +28,10 @@ public class GlyphPlacementSystem {
         public String toString() { return this.name() + this.getEncoderVal(); }
     }
 
+    public enum Stage {
+        HOME, PAUSE1, PAUSE2, PLACE1, PLACE2, RETURN1, RETURN2
+    }
+
     public enum HorizPos {
         LEFT(0.0), CENTER(0.0), RIGHT(0.0);
 
@@ -102,13 +106,19 @@ public class GlyphPlacementSystem {
     }
 
     public void setTargetPosition(Position position) {
-        drive.closeHand();
         drive.setVerticalDrivePos(position.getEncoderVal());
     }
 
     public void setHomeTarget() {
-        drive.openHand();
         drive.setVerticalDrivePos(10);
+    }
+
+    public void moveXAxis(HorizPos pos) {
+
+    }
+
+    public boolean xTargetReached() {
+        return true;
     }
 
     public void runToPosition() {
