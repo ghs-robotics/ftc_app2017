@@ -402,6 +402,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
         double gyro = drive.gyro.updateHeading();
         while (Math.abs(gyro - r) > 10) {
+            log.add("gyro: " + gyro);
             if (gyro > r) {
                 autoRotate(Direction.Rotation.Counterclockwise, speed, 100);
             } else {
