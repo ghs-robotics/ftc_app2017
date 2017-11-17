@@ -97,10 +97,6 @@ public abstract class Drive {
     public abstract void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor);
 
     public Drive() {
-        if (useGyro) {
-            gyro = new RevGyro();
-        }
-
         for(int i = 0; i < shortIr.length; i++){
             shortIr[i] = new AnalogSensor("ir" + i, false);
         }
@@ -131,7 +127,7 @@ public abstract class Drive {
             initializeGyro(telemetry, hardwareMap);
         }
 
-        telemetry.addData("useGyro", useGyro);
+        log.add("useGyro: " + useGyro);
 
         for (int i = 0; i < shortIr.length; i++) {
             shortIr[i].initialize(hardwareMap);

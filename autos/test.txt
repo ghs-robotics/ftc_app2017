@@ -12,9 +12,9 @@
 #p | places glyph (ASSUMES V HAS BEEN CALLED) | parameters - [none]
 #ex: function:d x:1 y:.2 speed:.5 target:1000 will drive right and slightly forward at half speed for 1000 encoder ticks
 #function:s x:0 y:1 speed:.1 target:1000 distance:25
-function:v
-function:jb
-function:up
+#function:v
+#function:jb
+#function:up
 function:doff x:0 y:-1 speed:1 target:1000
 function:d x:0 y:-1 speed:1 target:100
 function:r r:-180 speed:1 target:300

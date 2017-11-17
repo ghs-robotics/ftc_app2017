@@ -228,8 +228,10 @@ public class MecanumDrive extends Drive {
      */
     public boolean driveWithEncoders(Direction direction, double speed, double targetTicks) throws IllegalArgumentException{
         //telemetry data
-        log.add("x " + direction.getX());
-        log.add("y " + direction.getY());
+        if (verbose) {
+            log.add("x " + direction.getX());
+            log.add("y " + direction.getY());
+        }
 
         double scaledSpeed = setUpSpeed(speed, targetTicks);
         if (scaledSpeed == Math.PI) { //The target's been reached
@@ -243,7 +245,9 @@ public class MecanumDrive extends Drive {
         if (useGyro) {
             r = useGyro();
         }
-        log.add("r " + r);
+        if (verbose) {
+            log.add("r " + r);
+        }
 
         //Drives at x
         driveXYR(FULL_SPEED, direction.getX() * scaledSpeed, direction.getY() * scaledSpeed, r, false);

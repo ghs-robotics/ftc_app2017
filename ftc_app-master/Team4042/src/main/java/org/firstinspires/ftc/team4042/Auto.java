@@ -53,28 +53,21 @@ public abstract class Auto extends LinearVisionOpMode {
         timer = new ElapsedTime();
         this.drive = drive;
 
+        log = telemetry.log();
+
         drive.initialize(telemetry, hardwareMap);
 
         //drive.glyph = new GlyphPlacementSystem(1, 0, hardwareMap, drive, false);
 
         //drive.setUseGyro(true);
         //telemetry.addData("glyph", drive.glyph.getTargetPositionAsString());
-        telemetry.update();
 
-        log = telemetry.log();
         vuMarkIdentifier.initialize(telemetry, hardwareMap);
 
         log.add("Reading file " + filePath);
         file = new File("./storage/emulated/0/DCIM/" + filePath);
 
         loadFile();
-
-        telemetry.addData("wowoww", "help");
-
-        telemetry.addData("startRoll", startRoll);
-        telemetry.addData("startPitch", startPitch);
-
-        telemetry.update();
 
         this.setCamera(Cameras.PRIMARY);
         this.setFrameSize(new Size(900, 900));
@@ -86,8 +79,6 @@ public abstract class Auto extends LinearVisionOpMode {
         rotation.setActivityOrientationFixed(ScreenOrientation.LANDSCAPE);
         cameraControl.setColorTemperature(CameraControlExtension.ColorTemperature.AUTO);
         cameraControl.setAutoExposureCompensation();
-
-        telemetry.addData("time", timer.seconds());
     }
 
     /**
@@ -100,24 +91,22 @@ public abstract class Auto extends LinearVisionOpMode {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line;
-            double numLines = 0;
             while ((line = bufferedReader.readLine()) != null) { //Reads the lines from the file in order
-                numLines++;
-                log.add("Reading line " + numLines);
-                telemetry.update();
                 if (line.charAt(0) != '#') { //Use a # for a comment
                     HashMap<String, String> parameters = new HashMap<>();
 
                     //x:3 --> k = x, v = 3
                     String[] inputParameters = line.split(" ");
+                    StringBuilder para = new StringBuilder("Parameter: ");
                     for (String parameter : inputParameters) {
                         int colon = parameter.indexOf(':');
                         String k = parameter.substring(0, colon);
                         String v = parameter.substring(colon + 1);
                         parameters.put(k, v); //Gets the next parameter and adds it to the list
-                        log.add("Parameter: " + k + ":" + v);
-                        telemetry.update();
+                        para.append(k + ":" + v + " ");
                     }
+
+                    log.add(para.toString());
 
                     //Stores those values as an instruction
                     AutoInstruction instruction = new AutoInstruction(parameters);
@@ -138,30 +127,41 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     /**
+     * Tries to initialize the gyro until it works
+     */
+    public void gyro() {
+        drive.initializeGyro(telemetry, hardwareMap);
+
+        do {
+            drive.gyro.updateAngles();
+            startRoll = drive.gyro.getRoll();
+            startPitch = drive.gyro.getPitch();
+        } while (startRoll == 0 && startPitch == 0 && opModeIsActive());
+    }
+
+    /**
      * Runs the list of instructions
      */
     public void runAuto() {
+        gyro();
         drive.jewelUp();
         drive.resetEncoders();
         drive.setEncoders(true);
-
-        drive.initializeGyro(telemetry, hardwareMap);
-
-        drive.gyro.updateAngles();
-        startRoll = drive.gyro.getRoll();
-        startPitch = drive.gyro.getPitch();
+        drive.setVerbose(false);
 
         timer.reset();
         //Reads each instruction and acts accordingly
         for (AutoInstruction instruction : instructions) {
             String functionName = instruction.getFunctionName();
             HashMap<String, String> parameters = instruction.getParameters();
+            log.add("function: " + functionName);
             switch (functionName) {
                 case "d":
                     autoDrive(parameters);
                     break;
                 case "doff":
                     autoDriveOff(parameters);
+                    break;
                 case "r":
                     autoRotate(parameters);
                     break;
@@ -194,9 +194,6 @@ public abstract class Auto extends LinearVisionOpMode {
                     break;
             }
         }
-        telemetry.addData("jewel time", timer.seconds());
-        telemetry.update();
-        SystemClock.sleep(10000);
 
         //autoDrive(new Direction(1, .5), Drive.FULL_SPEED, 1000);
 
@@ -360,11 +357,11 @@ public abstract class Auto extends LinearVisionOpMode {
      * @param targetTicks The final distance to have travelled, in encoder ticks
      */
     private void autoDrive(Direction direction, double speed, double targetTicks) {
-        log.add("autoDrive invoked with direction " + direction + " speed " + speed + " targetTicks " + targetTicks);
+        //log.add("autoDrive invoked with direction " + direction + " speed " + speed + " targetTicks " + targetTicks);
         boolean done = false;
         while (!done && opModeIsActive()) {
             done = drive.driveWithEncoders(direction, speed, targetTicks);
-            telemetry.update();
+            //telemetry.update();
         }
     }
 
@@ -453,12 +450,14 @@ public abstract class Auto extends LinearVisionOpMode {
         } else {
             double r = drive.useGyro()/180;
 
-            telemetry.addData("currDistance", currDistance);
-            telemetry.addData("Reached target", Math.abs(targetDistance - currDistance) > 2);
-            telemetry.addData("x", direction.getX());
-            telemetry.addData("y", direction.getY());
-            telemetry.addData("r", r);
-            telemetry.update();
+            if (drive.verbose) {
+                telemetry.addData("currDistance", currDistance);
+                telemetry.addData("Reached target", Math.abs(targetDistance - currDistance) > 2);
+                telemetry.addData("x", direction.getX());
+                telemetry.addData("y", direction.getY());
+                telemetry.addData("r", r);
+                telemetry.update();
+            }
 
             //If you're off your target by more than 2 cm, try to adjust
             while ((Math.abs(targetDistance - currDistance) > 2) && opModeIsActive()) {
