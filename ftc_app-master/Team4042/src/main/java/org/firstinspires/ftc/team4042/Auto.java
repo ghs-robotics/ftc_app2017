@@ -194,7 +194,6 @@ public abstract class Auto extends LinearVisionOpMode {
                     break;
             }
         }
-        SystemClock.sleep(10000);
 
         //autoDrive(new Direction(1, .5), Drive.FULL_SPEED, 1000);
 
