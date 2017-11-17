@@ -1,7 +1,7 @@
 #function:d|doff|r|s|up|jr|jb|jleft|jright|v|p
 #d | dead-reckoning drive | parameters - x, y, speed, target
 #doff | drives in x, y at speed until target ticks and continues until off the balancing stone | parameters - x, y, speed, target
-#r | gyro rotation until it's rotated to r degrees (-180 to 180) | parameters - r, speed, target
+#r | gyro rotation in steps of step until it's rotated to r degrees (-180 to 180) | parameters - r, speed, step
 #s | sensor drive until name returns distance | parameters - x, y, speed, target
 #up | lifts the jewel probe | parameters - [none]
 #jr | knock red jewel | parameters - [none]
@@ -11,10 +11,11 @@
 #v | identifies vumark | parameters - [none]
 #p | places glyph (ASSUMES V HAS BEEN CALLED) | parameters - [none]
 #ex: function:d x:1 y:.2 speed:.5 target:1000 will drive right and slightly forward at half speed for 1000 encoder ticks
-#function:s x:0 y:1 speed:.1 target:1000 distance:25
+
 #function:v
 #function:jb
 #function:up
-function:doff x:0 y:-1 speed:1 target:1000
-function:d x:0 y:-1 speed:1 target:100
-function:r r:-180 speed:1 target:300
+#function:doff x:0 y:-1 speed:1 target:1000
+#function:d x:0 y:-1 speed:1 target:100
+
+function:r r:-180 speed:1 step:300

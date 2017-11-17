@@ -32,13 +32,13 @@ public class RevGyroTest extends LinearOpMode {
         waitForStart();
 
 // Set up our telemetry dashboard
-        //while (opModeIsActive()) {
+        while (opModeIsActive()) {
             drive.gyro.updateAngles();
             telemetry.addData("heading", drive.gyro.getHeading());
             telemetry.addData("pitch", drive.gyro.getPitch());
             telemetry.addData("roll", drive.gyro.getRoll());
             telemetry.update();
-        //}
+        }
     }
 
     /*private MecanumDrive drive = new MecanumDrive();
