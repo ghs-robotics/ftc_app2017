@@ -1,7 +1,7 @@
 #function:d|doff|r|s|up|jr|jb|jleft|jright|v|p
 #d | dead-reckoning drive | parameters - x, y, speed, target
 #doff | drives in x, y at speed until target ticks and continues until off the balancing stone | parameters - x, y, speed, target
-#r | gyro rotation in steps of step until it's rotated to r degrees (-180 to 180) | parameters - r, speed, step
+#r | gyro rotation until it's rotated to r degrees (-180 to 180) | parameters - r, speed
 #s | sensor drive until name returns distance | parameters - x, y, speed, target
 #up | lifts the jewel probe | parameters - [none]
 #jr | knock red jewel | parameters - [none]

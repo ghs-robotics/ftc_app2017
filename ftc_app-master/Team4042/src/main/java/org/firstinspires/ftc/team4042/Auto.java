@@ -399,7 +399,6 @@ public abstract class Auto extends LinearVisionOpMode {
         }*/
 
         double speed = Double.parseDouble(parameters.get("speed"));
-        double step = Double.parseDouble(parameters.get("step"));
 
         double gyro = drive.gyro.updateHeading();
 
