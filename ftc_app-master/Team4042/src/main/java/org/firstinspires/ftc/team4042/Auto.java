@@ -92,27 +92,29 @@ public abstract class Auto extends LinearVisionOpMode {
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line;
             while ((line = bufferedReader.readLine()) != null) { //Reads the lines from the file in order
-                if (line.length() > 0 && line.charAt(0) != '#') { //Use a # for a comment
-                    HashMap<String, String> parameters = new HashMap<>();
+                if (line.length() > 0) {
+                    if (line.charAt(0) != '#') { //Use a # for a comment
+                        HashMap<String, String> parameters = new HashMap<>();
 
-                    //x:3 --> k = x, v = 3
-                    String[] inputParameters = line.split(" ");
-                    StringBuilder para = new StringBuilder("Parameter: ");
-                    for (String parameter : inputParameters) {
-                        int colon = parameter.indexOf(':');
-                        String k = parameter.substring(0, colon);
-                        String v = parameter.substring(colon + 1);
-                        parameters.put(k, v); //Gets the next parameter and adds it to the list
-                        para.append(k + ":" + v + " ");
+                        //x:3 --> k = x, v = 3
+                        String[] inputParameters = line.split(" ");
+                        StringBuilder para = new StringBuilder("Parameter: ");
+                        for (String parameter : inputParameters) {
+                            int colon = parameter.indexOf(':');
+                            String k = parameter.substring(0, colon);
+                            String v = parameter.substring(colon + 1);
+                            parameters.put(k, v); //Gets the next parameter and adds it to the list
+                            para.append(k + ":" + v + " ");
+                        }
+
+                        log.add(para.toString());
+
+                        //Stores those values as an instruction
+                        AutoInstruction instruction = new AutoInstruction(parameters);
+                        instructions.add(instruction);
+
+                        telemetry.update();
                     }
-
-                    log.add(para.toString());
-
-                    //Stores those values as an instruction
-                    AutoInstruction instruction = new AutoInstruction(parameters);
-                    instructions.add(instruction);
-
-                    telemetry.update();
                 }
             }
             fileReader.close();
@@ -403,13 +405,13 @@ public abstract class Auto extends LinearVisionOpMode {
 
         do {
             if (gyro > r) {
-                drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, speed, step);
+                drive.driveXYR(speed, 0, 0, -1, false);
             } else {
-                drive.rotateWithEncoders(Direction.Rotation.Clockwise, speed, step);
+                drive.driveXYR(speed, 0, 0, 1, false);
             }
 
             gyro = drive.gyro.updateHeading();
-        } while (Math.abs(gyro - r) > 10);
+        } while (Math.abs(gyro - r) > 5);
 
         drive.stopMotors();
 
