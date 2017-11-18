@@ -92,7 +92,7 @@ public abstract class Auto extends LinearVisionOpMode {
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line;
             while ((line = bufferedReader.readLine()) != null) { //Reads the lines from the file in order
-                if (line.charAt(0) != '#') { //Use a # for a comment
+                if (line.length() > 0 && line.charAt(0) != '#') { //Use a # for a comment
                     HashMap<String, String> parameters = new HashMap<>();
 
                     //x:3 --> k = x, v = 3
@@ -410,6 +410,8 @@ public abstract class Auto extends LinearVisionOpMode {
 
             gyro = drive.gyro.updateHeading();
         } while (Math.abs(gyro - r) > 10);
+
+        drive.stopMotors();
 
         /*autoRotate(rotation, speed, targetTicks);
 
