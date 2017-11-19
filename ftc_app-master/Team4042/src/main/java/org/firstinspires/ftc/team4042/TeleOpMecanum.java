@@ -18,7 +18,8 @@ public class TeleOpMecanum extends OpMode {
     private boolean bDown;
     private boolean bLeft;
     private boolean bRight;
-    private boolean aToggle = false;
+    private boolean bA = false;
+    private boolean bAToggle = false;
 
     private GlyphPlacementSystem.Position targetY;
     private GlyphPlacementSystem.HorizPos targetX;
@@ -105,50 +106,59 @@ public class TeleOpMecanum extends OpMode {
         }
         aRightBumper = gamepad1.right_bumper;
 
-        if(gamepad2.a) {
-            aToggle = !aToggle;
+        if(gamepad2.a && !bA) {
+            bAToggle = !bAToggle;
         }
+        bA = gamepad2.a;
 
-        if(aToggle) {
+        if(bAToggle) {
             switch (stage) {
                 case HOME: {
+                    //Close the hand
                     drive.closeHand();
-                }
-                case PAUSE1: {
-                    drive.glyph.moveXAxis(targetX);
-                    if(drive.glyph.xTargetReached()) {
-                        stage = GlyphPlacementSystem.Stage.PLACE2;
-                    }
-                }
-                case PAUSE2: {
-                    drive.glyph.moveXAxis(GlyphPlacementSystem.HorizPos.CENTER);
-                    if(drive.glyph.xTargetReached()) {
-                        stage = GlyphPlacementSystem.Stage.RETURN2;
-                    }
+                    stage = GlyphPlacementSystem.Stage.PLACE1;
                 }
                 case PLACE1: {
+                    //Raise the u-track
                     drive.glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
                     if(drive.glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
                         stage = GlyphPlacementSystem.Stage.PAUSE1;
                     }
                 }
+                case PAUSE1: {
+                    //Move to target X location
+                    drive.glyph.moveXAxis(targetX);
+                    if(drive.glyph.xTargetReached()) {
+                        stage = GlyphPlacementSystem.Stage.PLACE2;
+                    }
+                }
                 case PLACE2:{
+                    //Move to target Y location
                     drive.glyph.setTargetPosition(targetY);
                     if(drive.glyph.currentY.equals(targetY)) {
                         stage = GlyphPlacementSystem.Stage.RETURN1;
                     }
                 }
                 case RETURN1: {
+                    //Open the hand; raise the u-track
                     drive.openHand();
                     drive.glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
                     if(drive.glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
                         stage = GlyphPlacementSystem.Stage.PAUSE2;
                     }
                 }
+                case PAUSE2: {
+                    //Move back to center x location (so the hand fits back in the robot)
+                    drive.glyph.moveXAxis(GlyphPlacementSystem.HorizPos.CENTER);
+                    if(drive.glyph.xTargetReached()) {
+                        stage = GlyphPlacementSystem.Stage.RETURN2;
+                    }
+                }
                 case RETURN2: {
+                    //Move back to the bottom and get ready to do it again
                     drive.glyph.setHomeTarget();
                     stage = GlyphPlacementSystem.Stage.HOME;
-                    aToggle = false;
+                    bAToggle = false;
                 }
             }
         }

@@ -391,12 +391,6 @@ public abstract class Auto extends LinearVisionOpMode {
 
     public void autoRotate(HashMap<String, String> parameters) {
         double r = Double.parseDouble(parameters.get("r"));
-        /*Direction.Rotation rotation;
-        if (r < 0) {
-            rotation = Direction.Rotation.Counterclockwise;
-        } else {
-            rotation = Direction.Rotation.Clockwise;
-        }*/
 
         double speed = Double.parseDouble(parameters.get("speed"));
 
@@ -413,22 +407,6 @@ public abstract class Auto extends LinearVisionOpMode {
         } while (Math.abs(gyro - r) > 5);
 
         drive.stopMotors();
-
-        /*autoRotate(rotation, speed, targetTicks);
-
-
-        while (Math.abs(gyro - r) > 10) {
-            if (gyro > r) {
-                autoRotate(Direction.Rotation.Counterclockwise, speed, 100);
-            } else {
-                autoRotate(Direction.Rotation.Clockwise, speed, 100);
-            }
-
-            gyro = drive.gyro.updateHeading();
-
-            log.add("gyro: " + gyro + ", r: " + r);
-            telemetry.update();
-        }*/
     }
 
     /**
