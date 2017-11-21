@@ -217,11 +217,13 @@ public abstract class Drive {
 
     public void openHand() {
         handIsOpen = true;
+        telemetry.addData("opened hand", "opened hand");
         grabbyBoi.setPosition(.57);
     }
 
     public void closeHand() {
         handIsOpen = false;
+        telemetry.addData("closeHandSays hand is open", handIsOpen);
         grabbyBoi.setPosition(1);
     }
 

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.team4042;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 @TeleOp(name = "Mecanum", group = "Iterative Opmode")
 public class TeleOpMecanum extends OpMode {
@@ -93,6 +94,37 @@ public class TeleOpMecanum extends OpMode {
             drive.useGyro();
         }
 
+        speedModes();
+
+        if(gamepad2.a && !bA) {
+            bAToggle = !bAToggle;
+        }
+        bA = gamepad2.a;
+
+        if(gamepad2.a) {
+            uTrack();
+        }
+
+        //Glyph locate
+        glyphLocate();
+
+        //Right trigger of the b controller runs the right intake forward
+        intakes();
+
+        //Left stick's y drives the u track
+        /*drive.setVerticalDrive(drive.deadZone(-gamepad2.left_stick_y));
+
+        if (gamepad2.b) {
+            drive.closeHand();
+        }
+        else {
+            drive.openHand();
+        }*/
+        drive.glyph.runToPosition();
+        telemetryUpdate();
+    }
+
+    private void speedModes() {
         //If you push the left bumper, dials the speed down
         if (gamepad1.left_bumper && !aLeftBumper && (adjustedSpeed - 0.25) >= 0) {
             adjustedSpeed -= 0.25;
@@ -105,65 +137,70 @@ public class TeleOpMecanum extends OpMode {
             adjustedSpeed += 0.25;
         }
         aRightBumper = gamepad1.right_bumper;
+    }
 
-        if(gamepad2.a && !bA) {
-            bAToggle = !bAToggle;
-        }
-        bA = gamepad2.a;
-
-        if(bAToggle) {
-            switch (stage) {
-                case HOME: {
-                    //Close the hand
-                    drive.closeHand();
-                    stage = GlyphPlacementSystem.Stage.PLACE1;
+    private void uTrack() {
+        switch (stage) {
+            case HOME: {
+                //Close the hand
+                drive.closeHand();
+                telemetry.addData("closed hand", "closed hand");
+                stage = GlyphPlacementSystem.Stage.PLACE1;
+                break;
+            }
+            case PLACE1: {
+                //Raise the u-track
+                drive.glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
+                if(drive.glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
+                    stage = GlyphPlacementSystem.Stage.PAUSE1;
                 }
-                case PLACE1: {
-                    //Raise the u-track
-                    drive.glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
-                    if(drive.glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
-                        stage = GlyphPlacementSystem.Stage.PAUSE1;
-                    }
+                break;
+            }
+            case PAUSE1: {
+                //Move to target X location
+                drive.glyph.moveXAxis(targetX);
+                if(drive.glyph.xTargetReached()) {
+                    stage = GlyphPlacementSystem.Stage.PLACE2;
                 }
-                case PAUSE1: {
-                    //Move to target X location
-                    drive.glyph.moveXAxis(targetX);
-                    if(drive.glyph.xTargetReached()) {
-                        stage = GlyphPlacementSystem.Stage.PLACE2;
-                    }
+                break;
+            }
+            case PLACE2:{
+                //Move to target Y location
+                drive.glyph.setTargetPosition(targetY);
+                if(drive.glyph.currentY.equals(targetY)) {
+                    stage = GlyphPlacementSystem.Stage.RETURN1;
                 }
-                case PLACE2:{
-                    //Move to target Y location
-                    drive.glyph.setTargetPosition(targetY);
-                    if(drive.glyph.currentY.equals(targetY)) {
-                        stage = GlyphPlacementSystem.Stage.RETURN1;
-                    }
+                break;
+            }
+            case RETURN1: {
+                //Open the hand; raise the u-track
+                telemetry.addData("retrning", "returning");
+                drive.openHand();
+                drive.glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
+                if(drive.glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
+                    stage = GlyphPlacementSystem.Stage.PAUSE2;
                 }
-                case RETURN1: {
-                    //Open the hand; raise the u-track
-                    drive.openHand();
-                    drive.glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
-                    if(drive.glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
-                        stage = GlyphPlacementSystem.Stage.PAUSE2;
-                    }
+                break;
+            }
+            case PAUSE2: {
+                //Move back to center x location (so the hand fits back in the robot)
+                drive.glyph.moveXAxis(GlyphPlacementSystem.HorizPos.CENTER);
+                if(drive.glyph.xTargetReached()) {
+                    stage = GlyphPlacementSystem.Stage.RETURN2;
                 }
-                case PAUSE2: {
-                    //Move back to center x location (so the hand fits back in the robot)
-                    drive.glyph.moveXAxis(GlyphPlacementSystem.HorizPos.CENTER);
-                    if(drive.glyph.xTargetReached()) {
-                        stage = GlyphPlacementSystem.Stage.RETURN2;
-                    }
-                }
-                case RETURN2: {
-                    //Move back to the bottom and get ready to do it again
-                    drive.glyph.setHomeTarget();
-                    stage = GlyphPlacementSystem.Stage.HOME;
-                    bAToggle = false;
-                }
+                break;
+            }
+            case RETURN2: {
+                //Move back to the bottom and get ready to do it again
+                drive.glyph.setHomeTarget();
+                stage = GlyphPlacementSystem.Stage.HOME;
+                bAToggle = false;
+                break;
             }
         }
+    }
 
-        //Glyph locate
+    private void glyphLocate() {
         if (gamepad2.dpad_up && !bUp) { targetY = GlyphPlacementSystem.Position.values()[drive.glyph.up() + 2]; }
         bUp = gamepad2.dpad_up;
         if (gamepad2.dpad_down && !bDown) { targetY = GlyphPlacementSystem.Position.values()[drive.glyph.down() + 2]; }
@@ -173,16 +210,9 @@ public class TeleOpMecanum extends OpMode {
         bLeft = gamepad2.dpad_left;
         if (gamepad2.dpad_right && !bRight) { drive.glyph.right(); }
         bRight = gamepad2.dpad_right;
+    }
 
-        //Places glyph
-        //if (gamepad2.a && !bA) {
-        //    drive.glyph.runToPosition();
-        //}
-        //bA = gamepad2.a;
-        //Adjust jewel arm
-        //drive.jewelAdjust(-gamepad2.right_stick_y);
-
-        //Right trigger of the b controller runs the right intake forward
+    private void intakes() {
         double bRightTrigger = drive.deadZone(gamepad2.right_trigger);
         if (bRightTrigger > 0) {
             drive.intakeRight(bRightTrigger);
@@ -207,28 +237,20 @@ public class TeleOpMecanum extends OpMode {
         else {
             drive.intakeLeft(0);
         }
-
-        //Left stick's y drives the u track
-        /*drive.setVerticalDrive(drive.deadZone(-gamepad2.left_stick_y));
-
-        if (gamepad2.b) {
-            drive.closeHand();
-        }
-        else {
-            drive.openHand();
-        }*/
-        drive.glyph.runToPosition();
-        telemetryUpdate();
     }
 
     private void telemetryUpdate() {
         telemetry.addData("Speed mode", adjustedSpeed);
         telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
-        telemetry.addData("encoder", drive.verticalDriveCurrPos());
+        telemetry.addData("encoder currentY pos", drive.verticalDriveCurrPos());
         telemetry.addData("hand is open", drive.isHandOpen());
         telemetry.addData("targetY", targetY.toString());
         telemetry.addData("Current pos", drive.glyph.currentY.toString());
         telemetry.addData("encoder targetY pos", drive.verticalDriveTargetPos());
+        telemetry.addData("stage", stage);
+        telemetry.addData("baToggle", bAToggle);
+        telemetry.addData("gamepad2.a", gamepad2.a);
+        telemetry.addData("bA", bA);
         if (Drive.useGyro) {
             telemetry.addData("gyro", drive.gyro.updateHeading());
         }
