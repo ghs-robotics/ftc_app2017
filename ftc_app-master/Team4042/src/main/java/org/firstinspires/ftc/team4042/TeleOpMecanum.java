@@ -2,7 +2,6 @@ package org.firstinspires.ftc.team4042;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Gamepad;
 
 @TeleOp(name = "Mecanum", group = "Iterative Opmode")
 public class TeleOpMecanum extends OpMode {
@@ -19,11 +18,11 @@ public class TeleOpMecanum extends OpMode {
     private boolean bDown;
     private boolean bLeft;
     private boolean bRight;
-    private boolean bA = false;
-    private boolean bAToggle = false;
+    private boolean bA;
 
     private GlyphPlacementSystem.Position targetY;
     private GlyphPlacementSystem.HorizPos targetX;
+    private boolean uTrackAtBottom = true;
     private GlyphPlacementSystem.Stage stage;
 
     //Declare OpMode members.
@@ -62,6 +61,7 @@ public class TeleOpMecanum extends OpMode {
 
         targetY = GlyphPlacementSystem.Position.TOP;
         stage = GlyphPlacementSystem.Stage.HOME;
+        drive.glyph.setHomeTarget();
 
         adjustedSpeed = MecanumDrive.FULL_SPEED;
     }
@@ -96,14 +96,15 @@ public class TeleOpMecanum extends OpMode {
 
         speedModes();
 
-        if(gamepad2.a && !bA) {
-            bAToggle = !bAToggle;
-        }
-        bA = gamepad2.a;
-
-        if(gamepad2.a) {
+        //If you're at the bottom, haven't been pushing a, and now are pushing a
+        if (uTrackAtBottom && !bA && gamepad2.a) {
             uTrack();
         }
+        //If you're not at the bottom and are pushing a
+        if (!uTrackAtBottom && gamepad2.a) {
+            uTrack();
+        }
+        bA = gamepad2.a;
 
         //Glyph locate
         glyphLocate();
@@ -111,15 +112,6 @@ public class TeleOpMecanum extends OpMode {
         //Right trigger of the b controller runs the right intake forward
         intakes();
 
-        //Left stick's y drives the u track
-        /*drive.setVerticalDrive(drive.deadZone(-gamepad2.left_stick_y));
-
-        if (gamepad2.b) {
-            drive.closeHand();
-        }
-        else {
-            drive.openHand();
-        }*/
         drive.glyph.runToPosition();
         telemetryUpdate();
     }
@@ -146,6 +138,7 @@ public class TeleOpMecanum extends OpMode {
                 drive.closeHand();
                 telemetry.addData("closed hand", "closed hand");
                 stage = GlyphPlacementSystem.Stage.PLACE1;
+                uTrackAtBottom = false;
                 break;
             }
             case PLACE1: {
@@ -174,7 +167,6 @@ public class TeleOpMecanum extends OpMode {
             }
             case RETURN1: {
                 //Open the hand; raise the u-track
-                telemetry.addData("retrning", "returning");
                 drive.openHand();
                 drive.glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
                 if(drive.glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
@@ -194,7 +186,7 @@ public class TeleOpMecanum extends OpMode {
                 //Move back to the bottom and get ready to do it again
                 drive.glyph.setHomeTarget();
                 stage = GlyphPlacementSystem.Stage.HOME;
-                bAToggle = false;
+                uTrackAtBottom = true;
                 break;
             }
         }
@@ -248,9 +240,7 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Current pos", drive.glyph.currentY.toString());
         telemetry.addData("encoder targetY pos", drive.verticalDriveTargetPos());
         telemetry.addData("stage", stage);
-        telemetry.addData("baToggle", bAToggle);
         telemetry.addData("gamepad2.a", gamepad2.a);
-        telemetry.addData("bA", bA);
         if (Drive.useGyro) {
             telemetry.addData("gyro", drive.gyro.updateHeading());
         }

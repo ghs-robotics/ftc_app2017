@@ -130,16 +130,16 @@ public class GlyphPlacementSystem {
         if (pos == 0) {
             currentY = Position.HOME;
         }
-        else if (pos > Position.RAISED.getEncoderVal() - 10 && pos < Position.RAISED.getEncoderVal() + 10) {
+        else if (Math.abs(pos - Position.RAISED.getEncoderVal()) < 30) {
             currentY = Position.RAISED;
         }
-        else if (pos > Position.TOP.getEncoderVal() - 10 && pos < Position.TOP.getEncoderVal() + 10) {
+        else if (Math.abs(pos - Position.TOP.getEncoderVal()) < 10) {
             currentY = Position.TOP;
         }
-        else if (pos > Position.MID.getEncoderVal() - 10 && pos < Position.MID.getEncoderVal() + 10) {
+        else if (Math.abs(pos - Position.MID.getEncoderVal()) < 10) {
             currentY = Position.MID;
         }
-        else if (pos > Position.BOT.getEncoderVal() - 10 && pos < Position.BOT.getEncoderVal() + 10) {
+        else if (Math.abs(pos - Position.BOT.getEncoderVal()) < 10) {
             currentY = Position.BOT;
         }
         else {
