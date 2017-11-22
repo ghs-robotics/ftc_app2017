@@ -21,6 +21,10 @@ public class AnalogSensor {
         sensor = hardwareMap.analogInput.get(name);
     }
 
+    public String getName() {
+        return name;
+    }
+
     public double getCmAvg() {
         double voltage = getVAvg();
         if (isLongRange) {

@@ -1,29 +1,49 @@
 package org.firstinspires.ftc.team4042;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.sun.tools.javac.util.Position;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
- * Created by meme on 11/2/2017.
+ * Created by Ryan on 11/2/2017.
  */
 
 public class GlyphPlacementSystem {
 
-    private Servo hand;
-    private final int BASE_DISP = 900;
-    private final int BLOCK_DISP = 700;
+    public final int HORIZONTAL_TRANSLATION_TIME = 500;
     private int targetX;
     private int targetY;
-    private Position currentY;
+    public Position currentY;
+    public HorizPos currentX;
     private String baseOutput;
-    private MecanumDrive drive;
+    private Drive drive;
 
-    private enum Position{HOME, RAISED, TOP, MID, BOT, ERROR}
+    public enum Position {
+        //HOME(0), RAISED(1200), TOP(1600), MID(2000), BOT(2500), TRANSITION(-1);
+        HOME(0), RAISED(1200), TOP(1600), MID(1600), BOT(1600), TRANSITION(-1);
 
-    public GlyphPlacementSystem(HardwareMap map, MecanumDrive drive) {
+        private final Integer encoderVal;
+        Position(Integer encoderVal) { this.encoderVal = encoderVal; }
+        public Integer getEncoderVal() { return encoderVal; }
+        @Override
+        public String toString() { return this.name() + this.getEncoderVal(); }
+    }
+
+    public enum Stage {
+        HOME, PAUSE1, PAUSE2, PLACE1, PLACE2, RETURN1, RETURN2
+    }
+
+    public enum HorizPos {
+        LEFT(0.0), CENTER(0.0), RIGHT(0.0);
+
+        private final Double power;
+        HorizPos(Double power) { this.power = power; }
+        public Double getPower() { return power; }
+        @Override
+        public String toString() { return this.name() + this.getPower(); }
+    }
+
+    public GlyphPlacementSystem(HardwareMap map, Drive drive) {
         currentY = Position.HOME;
         this.drive = drive;
         this.baseOutput = "[ _ _ _ ]\n[ _ _ _ ]\n[ _ _ _ ]";
@@ -58,62 +78,72 @@ public class GlyphPlacementSystem {
         return "\n" + new String(output);
     }
 
-    public void up() {
+    public int up() {
         if (targetY != 0) {
             targetY -= 1;
         }
+        return targetY;
     }
 
-    public void down() {
+    public int down() {
         if (targetY != 2) {
             targetY += 1;
         }
+        return targetY;
     }
 
-    public void left() {
+    public int left() {
         if (targetX != 0) {
             targetX -= 1;
         }
+        return targetX;
     }
 
-    public void right() {
+    public int right() {
         if (targetX != 2) {
             targetX += 1;
         }
+        return targetX;
     }
 
-    public void setTargetPosition() {
-        drive.closeHand();
-        drive.verticalDrivePos(BASE_DISP + (targetY + 1)*BLOCK_DISP);
+    public void setTargetPosition(Position position) {
+        drive.setVerticalDrivePos(position.getEncoderVal());
     }
 
     public void setHomeTarget() {
-        drive.openHand();
-        drive.verticalDrivePos(10);
+        drive.setVerticalDrivePos(10);
+    }
+
+    public void moveXAxis(HorizPos pos) {
+
+    }
+
+    public boolean xTargetReached() {
+        return true;
     }
 
     public void runToPosition() {
-        drive.verticalDrive((drive.verticalDriveTargetPos() - drive.verticalDriveCurrPos())/ 100);
+        drive.setVerticalDrive((drive.verticalDriveTargetPos() - drive.verticalDriveCurrPos())/ 100);
 
         int pos = drive.verticalDriveCurrPos();
 
         if (pos == 0) {
             currentY = Position.HOME;
         }
-        else if (pos > BASE_DISP - 10 && pos < BASE_DISP + 10) {
+        else if (Math.abs(pos - Position.RAISED.getEncoderVal()) < 30) {
             currentY = Position.RAISED;
         }
-        else if (pos > (BASE_DISP + BLOCK_DISP) - 10 && pos < (BASE_DISP + BLOCK_DISP) + 10) {
+        else if (Math.abs(pos - Position.TOP.getEncoderVal()) < 10) {
             currentY = Position.TOP;
         }
-        else if (pos > (BASE_DISP + 2*BLOCK_DISP) - 10 && pos < (BASE_DISP + 2*BLOCK_DISP) + 10) {
+        else if (Math.abs(pos - Position.MID.getEncoderVal()) < 10) {
             currentY = Position.MID;
         }
-        else if (pos > (BASE_DISP + 3*BLOCK_DISP) - 10 && pos < (BASE_DISP + 3*BLOCK_DISP) + 10) {
+        else if (Math.abs(pos - Position.BOT.getEncoderVal()) < 10) {
             currentY = Position.BOT;
         }
         else {
-            currentY = Position.ERROR;
+            currentY = Position.TRANSITION;
         }
 
 

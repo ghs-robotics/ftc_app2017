@@ -69,7 +69,7 @@ public class Autonomous extends LinearOpMode {
 
     public static final int tile = 1300;
     public static final int turn = 970;
-    public static final double speedy = .6;
+    public static final double speedy = .8;
 
 
     private RelicRecoveryVuMark vuMark;

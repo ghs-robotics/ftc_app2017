@@ -14,6 +14,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 public class RevGyro {
 
+    private static final double OFFSET = 180;
+
     private BNO055IMU imu;
 
     private Orientation angles;
@@ -139,7 +141,7 @@ public class RevGyro {
     }
 
     private double formatAngle(double oldAngle) {
-        double newAngle = Math.round(oldAngle / SCALE) + OmniDrive.OFFSET;
+        double newAngle = Math.round(oldAngle / SCALE) + OFFSET;
         newAngle = ((newAngle % 360) + 360) % 360;
         return newAngle;
     }

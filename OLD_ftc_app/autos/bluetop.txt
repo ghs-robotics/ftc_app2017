@@ -1,1 +1,0 @@
-function:d x:1 y:0 speed:.2 target:1000

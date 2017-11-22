@@ -1,1 +1,0 @@
-function:r r:1 speed:.2 target:1000
