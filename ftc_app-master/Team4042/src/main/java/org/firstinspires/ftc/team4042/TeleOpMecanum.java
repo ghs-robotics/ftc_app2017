@@ -97,7 +97,6 @@ public class TeleOpMecanum extends OpMode {
             adjustedSpeed -= 0.25;
         }
         aLeftBumper = gamepad1.left_bumper;
-
         //Right bumper - dial speed up
         if (gamepad1.right_bumper && !aRightBumper && (adjustedSpeed + 0.25) <= MecanumDrive.FULL_SPEED)
         {
@@ -106,13 +105,10 @@ public class TeleOpMecanum extends OpMode {
         aRightBumper = gamepad1.right_bumper;
 
         if(gamepad2.a) {
-            aToggle = !aToggle;
-        }
-
-        if(aToggle) {
             switch (stage) {
                 case HOME: {
                     drive.closeHand();
+                    stage = GlyphPlacementSystem.Stage.PLACE1;
                 }
                 case PAUSE1: {
                     drive.glyph.moveXAxis(targetX);
@@ -219,6 +215,8 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("targetY", targetY.toString());
         telemetry.addData("Current pos", drive.glyph.currentY.toString());
         telemetry.addData("encoder targetY pos", drive.verticalDriveTargetPos());
+        telemetry.addData("aToggle", aToggle);
+        telemetry.addData("state", stage);
         if (Drive.useGyro) {
             telemetry.addData("gyro", drive.gyro.updateHeading());
         }
