@@ -62,8 +62,8 @@ public class MecanumDrive extends Drive {
          */
         //Sets relative wheel speeds for mecanum drive based on controller inputs
         speedWheel[0] = -x - y - r;
-        speedWheel[1] = -x - y + r;
-        speedWheel[2] = x - y + r;
+        speedWheel[1] = x - y + r;
+        speedWheel[2] = -x - y + r;
         speedWheel[3] = x - y - r;
 
         //sets the wheel powers to the appropriate ratios
