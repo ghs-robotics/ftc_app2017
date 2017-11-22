@@ -145,7 +145,6 @@ public class TeleOpMecanum extends OpMode {
                 } catch(InterruptedException exception) {
                     telemetry.addData("Error!", exception.getStackTrace());
                 }
-                telemetry.addData("closed hand", "closed hand");
                 stage = GlyphPlacementSystem.Stage.PLACE1;
                 uTrackAtBottom = false;
                 break;
@@ -248,13 +247,15 @@ public class TeleOpMecanum extends OpMode {
     private void telemetryUpdate() {
         telemetry.addData("Speed mode", adjustedSpeed);
         telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
-        telemetry.addData("encoder currentY pos", drive.verticalDriveCurrPos());
-        telemetry.addData("hand is open", drive.isHandOpen());
-        telemetry.addData("targetY", targetY.toString());
-        telemetry.addData("Current pos", drive.glyph.currentY.toString());
-        telemetry.addData("encoder targetY pos", drive.verticalDriveTargetPos());
-        telemetry.addData("stage", stage);
-        telemetry.addData("gamepad2.a", gamepad2.a);
+        if (drive.verbose) {
+            telemetry.addData("encoder currentY pos", drive.verticalDriveCurrPos());
+            telemetry.addData("hand is open", drive.isHandOpen());
+            telemetry.addData("targetY", targetY.toString());
+            telemetry.addData("Current pos", drive.glyph.currentY.toString());
+            telemetry.addData("encoder targetY pos", drive.verticalDriveTargetPos());
+            telemetry.addData("stage", stage);
+            telemetry.addData("gamepad2.a", gamepad2.a);
+        }
         if (Drive.useGyro) {
             telemetry.addData("gyro", drive.gyro.updateHeading());
         }
