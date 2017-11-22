@@ -139,6 +139,11 @@ public class TeleOpMecanum extends OpMode {
             case HOME: {
                 //Close the hand
                 drive.closeHand();
+                try {
+                    wait(50);
+                } catch(InterruptedException exception) {
+                    telemetry.addData("Error!", exception.getStackTrace());
+                }
                 telemetry.addData("closed hand", "closed hand");
                 stage = GlyphPlacementSystem.Stage.PLACE1;
                 uTrackAtBottom = false;
@@ -171,6 +176,11 @@ public class TeleOpMecanum extends OpMode {
             case RETURN1: {
                 //Open the hand; raise the u-track
                 drive.openHand();
+                try {
+                    wait(200);
+                } catch(InterruptedException exception) {
+                    telemetry.addData("Error!", exception.getStackTrace());
+                }
                 drive.glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
                 if(drive.glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
                     stage = GlyphPlacementSystem.Stage.PAUSE2;
