@@ -12,34 +12,37 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class AnalogSensor {
     private int ultraCount = 5;
     HardwareMap hardwareMap;
-    AnalogInput infrared;
-    String ir;
+    AnalogInput sensor;
+    String name;
     double[] vals = new double[250];
 
-    public AnalogSensor(String ir) {
-        this.ir = ir;
+    public AnalogSensor(String name) {
+        this.name = name;
     }
 
     public void initialize(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
-        infrared = hardwareMap.analogInput.get(ir);
+        sensor = hardwareMap.analogInput.get(name);
 }
+    public double getVoltage() {
+        return  sensor.getVoltage();
+    }
 
     public double getVoltageAvg() {
-        if (infrared == null) { return -1; }
+        if (sensor == null) { return -1; }
         double sum = 0;
         for (int i = 0; i < vals.length; i++) {
-            sum += infrared.getVoltage();
+            sum += sensor.getVoltage();
         }
         double voltage = sum/vals.length;
         return voltage;
     }
 
     public double getVoltageRept() {
-        if (infrared == null) { return -1; }
+        if (sensor == null) { return -1; }
         SparseIntArray occurrences = new SparseIntArray(); //A list of inches and the number of times they've occurred
         while (true) {
-            double voltage = infrared.getVoltage(); //Gets the voltage
+            double voltage = sensor.getVoltage(); //Gets the voltage
             int inches = getInFromVolt(voltage); //Gets the voltage in inches
             //Gets the number of times the voltage has occurred, or 0 if it hasn't yet
             int count = occurrences.get(inches, 0);
