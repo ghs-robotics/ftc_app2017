@@ -59,6 +59,7 @@ public class TeleOpMecanum extends OpMode {
     @Override
     public void init() {
         drive.initialize(telemetry, hardwareMap);
+        drive.runWithEncoders();
         //drive.glyph = new GlyphPlacementSystem(hardwareMap, drive);
         //drive.glyph = new GlyphPlacementSystem(hardwareMap);
         telemetry.update();
