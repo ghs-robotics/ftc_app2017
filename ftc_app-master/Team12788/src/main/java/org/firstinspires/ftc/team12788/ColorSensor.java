@@ -3,6 +3,7 @@ package org.firstinspires.ftc.team12788;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+import com.qualcomm.robotcore.hardware.SwitchableLight;
 
 /**
  * Created by Gautham on 11/8/2017.
@@ -28,7 +29,9 @@ public class ColorSensor {
     public NormalizedRGBA JewelColor(){
         return colorSensor.getNormalizedColors();
 
-    }
+        }
+
+
 
     /**
      * sets the colorSensor variable equal to the NormalizedColorSensor
