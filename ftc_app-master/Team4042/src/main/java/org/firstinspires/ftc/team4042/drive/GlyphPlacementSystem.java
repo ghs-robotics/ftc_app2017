@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.team4042.drive;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
-import org.firstinspires.ftc.team4042.drive.Drive;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 /**
  * Created by Ryan on 11/2/2017.
@@ -10,13 +10,15 @@ import org.firstinspires.ftc.team4042.drive.Drive;
 
 public class GlyphPlacementSystem {
 
-    public final int HORIZONTAL_TRANSLATION_TIME = 500;
+    public final int HORIZONTAL_TRANSLATION_TIME = 3;
     private int targetX;
     private int targetY;
     public Position currentY;
     public HorizPos currentX;
     private String baseOutput;
     private Drive drive;
+
+    private ElapsedTime horizontalTimer = new ElapsedTime();
 
     public enum Position {
         //HOME(0), RAISED(1200), TOP(1600), MID(2000), BOT(2500), TRANSITION(-1);
@@ -34,11 +36,11 @@ public class GlyphPlacementSystem {
     }
 
     public enum HorizPos {
-        LEFT(0.0), CENTER(0.0), RIGHT(0.0);
+        LEFT(-1), CENTER(0), RIGHT(1);
 
-        private final Double power;
-        HorizPos(Double power) { this.power = power; }
-        public Double getPower() { return power; }
+        private final Integer power;
+        HorizPos(Integer power) { this.power = power; }
+        public Integer getPower() { return power; }
         @Override
         public String toString() { return this.name() + this.getPower(); }
     }
@@ -114,12 +116,27 @@ public class GlyphPlacementSystem {
         drive.setVerticalDrivePos(10);
     }
 
-    public void moveXAxis(HorizPos pos) {
+    public void setXPower(HorizPos targetPos) {
+        //if target = left(-1) and current = right(1)
+        //we want to move left (-1)
+        //so target - current
+        double power = targetPos.getPower() - currentX.getPower();
+        power = Range.clip(power, -1, 1);
 
+        drive.setHorizontalU(power);
+        horizontalTimer.reset();
     }
 
-    public boolean xTargetReached() {
-        return true;
+    public boolean xTargetReached(HorizPos targetPos) {
+        //If you're going left or right, then use the timer to see if you should stop
+        if (((targetPos.equals(HorizPos.LEFT) || targetPos.equals(HorizPos.RIGHT)) && (horizontalTimer.seconds() >= HORIZONTAL_TRANSLATION_TIME)) ||
+                //If you're going to the center and you hit the limit switch, stop
+                (targetPos.equals(HorizPos.CENTER) && drive.getCenterState())) {
+            drive.setHorizontalU(0);
+            currentX = targetPos;
+            return true;
+        }
+        return false;
     }
 
     public void runToPosition() {
