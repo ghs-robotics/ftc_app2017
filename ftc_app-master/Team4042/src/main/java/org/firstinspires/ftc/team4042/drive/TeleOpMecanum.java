@@ -2,10 +2,7 @@ package org.firstinspires.ftc.team4042.drive;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.team4042.drive.Drive;
-import org.firstinspires.ftc.team4042.drive.GlyphPlacementSystem;
-import org.firstinspires.ftc.team4042.drive.MecanumDrive;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name = "Mecanum", group="drive")
 public class TeleOpMecanum extends OpMode {
@@ -22,7 +19,9 @@ public class TeleOpMecanum extends OpMode {
     private boolean bDown;
     private boolean bLeft;
     private boolean bRight;
+
     private boolean bA;
+    private boolean bY;
 
     private GlyphPlacementSystem.Position targetY;
     private GlyphPlacementSystem.HorizPos targetX;
@@ -67,6 +66,8 @@ public class TeleOpMecanum extends OpMode {
         targetY = GlyphPlacementSystem.Position.TOP;
         stage = GlyphPlacementSystem.Stage.HOME;
         drive.glyph.setHomeTarget();
+        drive.raiseBrakes();
+        drive.lockCatches();
 
         adjustedSpeed = MecanumDrive.FULL_SPEED;
     }
@@ -80,11 +81,12 @@ public class TeleOpMecanum extends OpMode {
     @Override
     public void loop() {
 
-        //1 Y - toggle extendo
+        //Both controllers pushing Y - toggle extendo
         if (gamepad1.y && !aY) {
-            Drive.isExtendo = !Drive.isExtendo;
+            toggleExtendo();
         }
         aY = gamepad1.y;
+        bY = gamepad2.y;
 
         //1 A - toggle verbose
         if (gamepad1.a && !aA) {
@@ -135,16 +137,43 @@ public class TeleOpMecanum extends OpMode {
         aRightBumper = gamepad1.right_bumper;
     }
 
+    private void toggleExtendo() {
+        //It's extendo, so put it back together
+        ElapsedTime timer = new ElapsedTime();
+        if (Drive.isExtendo) {
+            timer.reset();
+
+            do {
+                drive.pushRobotTogether();
+                drive.raiseBrakes();
+                drive.lockCatches();
+            } while (timer.seconds() < 2);
+
+            Drive.isExtendo = false;
+        }
+        //Not extendo, so take it apart
+        else {
+            timer.reset();
+
+            do {
+                drive.pushRobotTogether();
+                drive.lowerBrakes();
+                drive.unlockCatches();
+            } while (timer.seconds() < 2);
+
+            Drive.isExtendo = true;
+        }
+    }
+
     private void uTrack() {
+        telemetry.log().add("stage " + stage);
         switch (stage) {
             case HOME: {
                 //Close the hand
                 drive.closeHand();
-                try {
-                    wait(50);
-                } catch(InterruptedException exception) {
-                    telemetry.addData("Error!", exception.getStackTrace());
-                }
+
+                Drive.waitSec(1);
+
                 stage = GlyphPlacementSystem.Stage.PLACE1;
                 uTrackAtBottom = false;
                 break;
@@ -159,8 +188,8 @@ public class TeleOpMecanum extends OpMode {
             }
             case PAUSE1: {
                 //Move to target X location
-                drive.glyph.moveXAxis(targetX);
-                if(drive.glyph.xTargetReached()) {
+                drive.glyph.setXPower(targetX);
+                if(drive.glyph.xTargetReached(targetX)) {
                     stage = GlyphPlacementSystem.Stage.PLACE2;
                 }
                 break;
@@ -176,11 +205,9 @@ public class TeleOpMecanum extends OpMode {
             case RETURN1: {
                 //Open the hand; raise the u-track
                 drive.openHand();
-                try {
-                    wait(200);
-                } catch(InterruptedException exception) {
-                    telemetry.addData("Error!", exception.getStackTrace());
-                }
+
+                Drive.waitSec(1);
+
                 drive.glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
                 if(drive.glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
                     stage = GlyphPlacementSystem.Stage.PAUSE2;
@@ -189,8 +216,8 @@ public class TeleOpMecanum extends OpMode {
             }
             case PAUSE2: {
                 //Move back to center x location (so the hand fits back in the robot)
-                drive.glyph.moveXAxis(GlyphPlacementSystem.HorizPos.CENTER);
-                if(drive.glyph.xTargetReached()) {
+                drive.glyph.setXPower(GlyphPlacementSystem.HorizPos.CENTER);
+                if(drive.glyph.xTargetReached(GlyphPlacementSystem.HorizPos.CENTER)) {
                     stage = GlyphPlacementSystem.Stage.RETURN2;
                 }
                 break;
@@ -210,10 +237,9 @@ public class TeleOpMecanum extends OpMode {
         bUp = gamepad2.dpad_up;
         if (gamepad2.dpad_down && !bDown) { targetY = GlyphPlacementSystem.Position.values()[drive.glyph.down() + 2]; }
         bDown = gamepad2.dpad_down;
-        //TODO: add horizontal targeting code once that exists
-        if (gamepad2.dpad_left && !bLeft) { drive.glyph.left(); }
+        if (gamepad2.dpad_left && !bLeft) { targetX = GlyphPlacementSystem.HorizPos.values()[drive.glyph.left()]; }
         bLeft = gamepad2.dpad_left;
-        if (gamepad2.dpad_right && !bRight) { drive.glyph.right(); }
+        if (gamepad2.dpad_right && !bRight) { targetX = GlyphPlacementSystem.HorizPos.values()[drive.glyph.right()]; }
         bRight = gamepad2.dpad_right;
     }
 
