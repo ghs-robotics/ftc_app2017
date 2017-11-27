@@ -14,7 +14,7 @@ public class TeleOpMecanum extends OpMode {
     // We have these booleans so we only register a button press once.
     // You have to let go of the button and push it again to register a new event.
     private boolean aA = false;
-    private boolean aY = false;
+    private boolean y = false;
 
     private boolean aLeftBumper = false;
     private boolean aRightBumper = false;
@@ -25,7 +25,6 @@ public class TeleOpMecanum extends OpMode {
     private boolean bRight;
 
     private boolean bA;
-    private boolean bY;
     //CONTROL BOOLEANS END
 
     private GlyphPlacementSystem.Position targetY;
@@ -64,8 +63,7 @@ public class TeleOpMecanum extends OpMode {
     public void init() {
         drive.initialize(telemetry, hardwareMap);
         drive.runWithEncoders();
-        //drive.glyph = new GlyphPlacementSystem(hardwareMap, drive);
-        //drive.glyph = new GlyphPlacementSystem(hardwareMap);
+
         telemetry.update();
 
         targetY = GlyphPlacementSystem.Position.TOP;
@@ -89,11 +87,13 @@ public class TeleOpMecanum extends OpMode {
     public void loop() {
 
         //Both controllers pushing Y - toggle extendo
-        if (gamepad1.y && !aY && gamepad2.y && !bY) {
+        if (gamepad1.y && gamepad2.y && !y) {
+            y = true;
             toggleExtendo();
         }
-        aY = gamepad1.y;
-        bY = gamepad2.y;
+        if (!gamepad1.y && !gamepad2.y) {
+            y = false;
+        }
 
         //1 A - toggle verbose
         if (gamepad1.a && !aA) {
