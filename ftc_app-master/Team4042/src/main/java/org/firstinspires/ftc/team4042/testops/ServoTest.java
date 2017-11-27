@@ -10,11 +10,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 @TeleOp(name="Servo Test", group="testops")
 public class ServoTest extends OpMode {
 
-    //up left brake .12
-    //deployed left brake .8
-
-    //left catch engaged .17
-    //left catch released .6
     private Servo servo;
     private double position = 0;
     private boolean y = false;
