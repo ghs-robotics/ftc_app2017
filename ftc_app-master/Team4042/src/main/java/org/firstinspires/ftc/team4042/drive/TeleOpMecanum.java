@@ -46,18 +46,18 @@ public class TeleOpMecanum extends OpMode {
       A - toggle verbose
       B -
       X -
-      Y -
+      Y - toggle extendo (with gamepad2)
 
     GAMEPAD 2:
-      Joystick 1 Y - adjust u-track
-      Joystick 2 Y - servo arm
+      Joystick 1 Y -
+      Joystick 2 Y -
       Bumpers - run intakes backwards
       Triggers - run intakes forwards
       Dpad - placer
       A - places glyph
-      B - opens/closes glyph hand
-      X - u-track reset
-      Y - glyph override
+      B -
+      X -
+      Y - toggle extendo (with gamepad1)
      */
 
     @Override
