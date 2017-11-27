@@ -2,6 +2,7 @@ package org.firstinspires.ftc.team4042.drive;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name = "Mecanum", group="drive")
@@ -30,6 +31,7 @@ public class TeleOpMecanum extends OpMode {
     private GlyphPlacementSystem.Position targetY;
     private GlyphPlacementSystem.HorizPos targetX;
     private boolean uTrackAtBottom = true;
+    private ElapsedTime handDropTimer = new ElapsedTime();
     private GlyphPlacementSystem.Stage stage;
 
     private Drive drive = new MecanumDrive(true);
@@ -174,11 +176,18 @@ public class TeleOpMecanum extends OpMode {
             case HOME: {
                 //Close the hand
                 drive.closeHand();
+                handDropTimer.reset();
 
                 Drive.waitSec(1);
 
-                stage = GlyphPlacementSystem.Stage.PLACE1;
+                stage = GlyphPlacementSystem.Stage.GRAB;
                 uTrackAtBottom = false;
+                break;
+            }
+            case GRAB: {
+                if (handDropTimer.seconds() >= 1) {
+                    stage = GlyphPlacementSystem.Stage.PLACE1;
+                }
                 break;
             }
             case PLACE1: {
@@ -208,12 +217,17 @@ public class TeleOpMecanum extends OpMode {
             case RETURN1: {
                 //Open the hand; raise the u-track
                 drive.openHand();
+                handDropTimer.reset();
 
-                Drive.waitSec(1);
-
-                drive.glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
-                if(drive.glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
-                    stage = GlyphPlacementSystem.Stage.PAUSE2;
+                stage = GlyphPlacementSystem.Stage.RELEASE;
+                break;
+            }
+            case RELEASE: {
+                if (handDropTimer.seconds() >= 1) {
+                    drive.glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
+                    if (drive.glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
+                        stage = GlyphPlacementSystem.Stage.PAUSE2;
+                    }
                 }
                 break;
             }
@@ -284,6 +298,7 @@ public class TeleOpMecanum extends OpMode {
             telemetry.addData("encoder targetY pos", drive.verticalDriveTargetPos());
             telemetry.addData("stage", stage);
             telemetry.addData("gamepad2.a", gamepad2.a);
+            telemetry.addData("handDropTimer seconds", handDropTimer.seconds());
         }
         if (Drive.useGyro) {
             telemetry.addData("gyro", drive.gyro.updateHeading());

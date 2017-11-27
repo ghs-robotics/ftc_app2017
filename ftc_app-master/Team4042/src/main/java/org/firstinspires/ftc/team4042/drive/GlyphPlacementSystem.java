@@ -32,7 +32,7 @@ public class GlyphPlacementSystem {
     }
 
     public enum Stage {
-        HOME, PAUSE1, PAUSE2, PLACE1, PLACE2, RETURN1, RETURN2
+        HOME, PAUSE1, PAUSE2, PLACE1, PLACE2, RETURN1, RETURN2, GRAB, RELEASE
     }
 
     public enum HorizPos {
@@ -120,11 +120,13 @@ public class GlyphPlacementSystem {
         //if target = left(-1) and current = right(1)
         //we want to move left (-1)
         //so target - current
-        double power = targetPos.getPower() - currentX.getPower();
-        power = Range.clip(power, -1, 1);
+        if (!targetPos.equals(HorizPos.CENTER)) {
+            double power = targetPos.getPower() - currentX.getPower();
+            power = Range.clip(power, -1, 1);
 
-        drive.setHorizontalU(power);
-        horizontalTimer.reset();
+            drive.setHorizontalU(power);
+            horizontalTimer.reset();
+        }
     }
 
     public boolean xTargetReached(HorizPos targetPos) {
