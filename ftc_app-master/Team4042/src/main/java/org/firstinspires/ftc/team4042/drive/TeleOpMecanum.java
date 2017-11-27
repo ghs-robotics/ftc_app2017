@@ -71,8 +71,6 @@ public class TeleOpMecanum extends OpMode {
         targetY = GlyphPlacementSystem.Position.TOP;
         stage = GlyphPlacementSystem.Stage.HOME;
         drive.glyph.setHomeTarget();
-        drive.raiseBrakes();
-        drive.lockCatches();
 
         adjustedSpeed = MecanumDrive.FULL_SPEED;
     }
@@ -81,6 +79,10 @@ public class TeleOpMecanum extends OpMode {
     public void start() {
         //Moves the servo to the up position
         drive.jewelUp();
+        //Raises the brakes
+        drive.raiseBrakes();
+        //Locks the catches
+        drive.lockCatches();
     }
     
     @Override
@@ -178,7 +180,7 @@ public class TeleOpMecanum extends OpMode {
                 drive.closeHand();
                 handDropTimer.reset();
 
-                Drive.waitSec(1);
+                drive.glyph.currentY = GlyphPlacementSystem.Position.HOME;
 
                 stage = GlyphPlacementSystem.Stage.GRAB;
                 uTrackAtBottom = false;
@@ -242,8 +244,16 @@ public class TeleOpMecanum extends OpMode {
             case RETURN2: {
                 //Move back to the bottom and get ready to do it again
                 drive.glyph.setHomeTarget();
-                stage = GlyphPlacementSystem.Stage.HOME;
+                stage = GlyphPlacementSystem.Stage.RESET;
                 uTrackAtBottom = true;
+                break;
+            }
+            case RESET: {
+                if (drive.glyph.currentY.equals(GlyphPlacementSystem.Position.HOME)) {
+                    stage = GlyphPlacementSystem.Stage.HOME;
+                    drive.setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+                }
                 break;
             }
         }
