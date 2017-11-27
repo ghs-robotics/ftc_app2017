@@ -22,7 +22,7 @@ public class GlyphPlacementSystem {
 
     public enum Position {
         //HOME(0), RAISED(1200), TOP(1600), MID(2000), BOT(2500), TRANSITION(-1);
-        HOME(0), RAISED(1200), TOP(1600), MID(1600), BOT(1600), TRANSITION(-1);
+        HOME(10), RAISED(1200), TOP(1600), MID(1600), BOT(1600), TRANSITION(-1);
 
         private final Integer encoderVal;
         Position(Integer encoderVal) { this.encoderVal = encoderVal; }
@@ -32,7 +32,7 @@ public class GlyphPlacementSystem {
     }
 
     public enum Stage {
-        HOME, PAUSE1, PAUSE2, PLACE1, PLACE2, RETURN1, RETURN2, GRAB, RELEASE
+        HOME, PAUSE1, PAUSE2, PLACE1, PLACE2, RETURN1, RETURN2, GRAB, RELEASE, RESET
     }
 
     public enum HorizPos {
@@ -113,7 +113,7 @@ public class GlyphPlacementSystem {
     }
 
     public void setHomeTarget() {
-        drive.setVerticalDrivePos(10);
+        drive.setVerticalDrivePos(Position.HOME.getEncoderVal());
     }
 
     public void setXPower(HorizPos targetPos) {
