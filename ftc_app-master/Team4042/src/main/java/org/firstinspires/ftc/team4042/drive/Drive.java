@@ -197,7 +197,7 @@ public abstract class Drive {
 
         verticalDrive = hardwareMap.dcMotor.get("vertical drive");
         verticalDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        verticalDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        verticalDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         //verticalDrive.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
