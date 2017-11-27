@@ -7,10 +7,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name = "Mecanum", group="drive")
 public class TeleOpMecanum extends OpMode {
 
+    private double adjustedSpeed;
+
+    //CONTROL BOOLEANS START
+    // We have these booleans so we only register a button press once.
+    // You have to let go of the button and push it again to register a new event.
     private boolean aA = false;
     private boolean aY = false;
-
-    private double adjustedSpeed;
 
     private boolean aLeftBumper = false;
     private boolean aRightBumper = false;
@@ -22,13 +25,13 @@ public class TeleOpMecanum extends OpMode {
 
     private boolean bA;
     private boolean bY;
+    //CONTROL BOOLEANS END
 
     private GlyphPlacementSystem.Position targetY;
     private GlyphPlacementSystem.HorizPos targetX;
     private boolean uTrackAtBottom = true;
     private GlyphPlacementSystem.Stage stage;
 
-    //Declare OpMode members.
     private Drive drive = new MecanumDrive(true);
 
     /**
@@ -82,7 +85,7 @@ public class TeleOpMecanum extends OpMode {
     public void loop() {
 
         //Both controllers pushing Y - toggle extendo
-        if (gamepad1.y && !aY) {
+        if (gamepad1.y && !aY && gamepad2.y && !bY) {
             toggleExtendo();
         }
         aY = gamepad1.y;
