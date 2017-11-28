@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.Range;
 
 public class GlyphPlacementSystem {
 
-    public final int HORIZONTAL_TRANSLATION_TIME = 3;
+    public final double HORIZONTAL_TRANSLATION_TIME = .25;
     private int targetX;
     private int targetY;
     public Position currentY;
@@ -18,11 +18,11 @@ public class GlyphPlacementSystem {
     private String baseOutput;
     private Drive drive;
 
-    private ElapsedTime horizontalTimer = new ElapsedTime();
+    public ElapsedTime horizontalTimer = new ElapsedTime();
 
     public enum Position {
         //HOME(0), RAISED(1200), TOP(1600), MID(2000), BOT(2500), TRANSITION(-1);
-        HOME(10), RAISED(1200), TOP(1600), MID(1600), BOT(1600), TRANSITION(-1);
+        HOME(10), RAISED(1300), TOP(1600), MID(1600), BOT(1600), TRANSITION(-1);
 
         private final Integer encoderVal;
         Position(Integer encoderVal) { this.encoderVal = encoderVal; }
@@ -36,11 +36,11 @@ public class GlyphPlacementSystem {
     }
 
     public enum HorizPos {
-        LEFT(-1), CENTER(0), RIGHT(1);
+        LEFT(-.5), CENTER(0.0), RIGHT(.5);
 
-        private final Integer power;
-        HorizPos(Integer power) { this.power = power; }
-        public Integer getPower() { return power; }
+        private final Double power;
+        HorizPos(Double power) { this.power = power; }
+        public Double getPower() { return power; }
         @Override
         public String toString() { return this.name() + this.getPower(); }
     }
@@ -149,7 +149,7 @@ public class GlyphPlacementSystem {
         if (pos == 0) {
             currentY = Position.HOME;
         }
-        else if (Math.abs(pos - Position.RAISED.getEncoderVal()) < 30) {
+        else if (Math.abs(pos - Position.RAISED.getEncoderVal()) < 100) {
             currentY = Position.RAISED;
         }
         else if (Math.abs(pos - Position.TOP.getEncoderVal()) < 10) {
