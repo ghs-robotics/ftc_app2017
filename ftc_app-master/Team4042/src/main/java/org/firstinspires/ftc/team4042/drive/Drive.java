@@ -256,6 +256,10 @@ public abstract class Drive {
         horizontalU.setPower(power);
     }
 
+    public double getHorizontalU() {
+        return horizontalU.getPower();
+    }
+
     public boolean isHandOpen() {
         return handIsOpen;
     }
@@ -438,11 +442,11 @@ public abstract class Drive {
         double[] speedWheel = new double[4];
 
         //Front wheels backwards
-        speedWheel[0] = -1;
-        speedWheel[1] = -1;
+        speedWheel[0] = 1;
+        speedWheel[1] = 1;
         //Back wheels forwards
-        speedWheel[2] = 1;
-        speedWheel[3] = 1;
+        speedWheel[2] = -1;
+        speedWheel[3] = -1;
 
         setMotorPower(speedWheel, FULL_SPEED);
     }
