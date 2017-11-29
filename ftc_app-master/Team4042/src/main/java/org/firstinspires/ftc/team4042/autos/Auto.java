@@ -399,10 +399,12 @@ public abstract class Auto extends LinearVisionOpMode {
         double gyro = drive.gyro.updateHeading();
 
         do {
+            double d = Math.abs(gyro - r); //Larger the further you are from your target
             if (gyro > r) {
-                drive.driveXYR(speed, 0, 0, -1, false);
+                //The further you are from your target, the faster you should move
+                drive.driveXYR(speed + d/360, 0, 0, -1, false);
             } else {
-                drive.driveXYR(speed, 0, 0, 1, false);
+                drive.driveXYR(speed + d/360, 0, 0, 1, false);
             }
 
             gyro = drive.gyro.updateHeading();
