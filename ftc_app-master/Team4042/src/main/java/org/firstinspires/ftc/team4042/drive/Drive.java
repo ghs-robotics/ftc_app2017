@@ -6,10 +6,12 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
+import org.firstinspires.ftc.team4042.sensor.DigitalSensor;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -66,9 +68,16 @@ public abstract class Drive {
     private CRServo inLServo;
     private CRServo inRServo;
 
+    private Servo leftBrake;
+    private Servo rightBrake;
+
+    private Servo leftCatch;
+    private Servo rightCatch;
+
     private DcMotor verticalDrive;
 
     private CRServo horizontalU;
+    private DigitalSensor center = new DigitalSensor("center");
 
     private Servo grabbyBoi;
     private boolean handIsOpen = false;
@@ -167,7 +176,14 @@ public abstract class Drive {
 
         grabbyBoi = hardwareMap.servo.get("hand");
 
+        leftBrake = hardwareMap.servo.get("left brake");
+        rightBrake = hardwareMap.servo.get("right brake");
+
+        leftCatch = hardwareMap.servo.get("left catch");
+        rightCatch = hardwareMap.servo.get("right catch");
+
         horizontalU = hardwareMap.crservo.get("horizontal");
+        center.initialize(hardwareMap);
 
         intakeLeft = hardwareMap.dcMotor.get("intake left");
         intakeRight = hardwareMap.dcMotor.get("intake right");
@@ -181,7 +197,7 @@ public abstract class Drive {
 
         verticalDrive = hardwareMap.dcMotor.get("vertical drive");
         verticalDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        verticalDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        verticalDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         //verticalDrive.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
@@ -207,6 +223,12 @@ public abstract class Drive {
         return heading;
     }
 
+    public static void waitSec(double seconds) {
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
+        while (timer.seconds() < seconds) { }
+    }
+
     public void toggleHand() {
         if (isHandOpen()) {
             closeHand();
@@ -216,20 +238,26 @@ public abstract class Drive {
         //The functions toggle the hand variable so we don't need to
     }
 
+    public boolean getCenterState() {
+        return center.getState();
+    }
+
     public void openHand() {
         handIsOpen = true;
-        telemetry.addData("opened hand", "opened hand");
         grabbyBoi.setPosition(.57);
     }
 
     public void closeHand() {
         handIsOpen = false;
-        telemetry.addData("closeHandSays hand is open", handIsOpen);
         grabbyBoi.setPosition(1);
     }
 
     public void setHorizontalU(double power) {
         horizontalU.setPower(power);
+    }
+
+    public double getHorizontalU() {
+        return horizontalU.getPower();
     }
 
     public boolean isHandOpen() {
@@ -287,6 +315,26 @@ public abstract class Drive {
     public void jewelIn() {
         jewelServo.setPosition(.8);
         while (jewelServo.getPosition() != .8) {  }
+    }
+
+    public void lockCatches() {
+        rightCatch.setPosition(.9);
+        leftCatch.setPosition(.17);
+    }
+
+    public void unlockCatches() {
+        rightCatch.setPosition(.46);
+        leftCatch.setPosition(.6);
+    }
+
+    public void lowerBrakes() {
+        leftBrake.setPosition(.8);
+        rightBrake.setPosition(0);
+    }
+
+    public void raiseBrakes() {
+        leftBrake.setPosition(.12);
+        rightBrake.setPosition(.65);
     }
 
     public void jewelAdjust(double adjustAmt) {
@@ -385,6 +433,22 @@ public abstract class Drive {
     public double deadZone(double val) {
         if(Math.abs(val - DEADZONE_SIZE) <= 0) {return 0;}
         else { return val; }
+    }
+
+    /**
+     * Runs the motors really aggressively to push the robot together
+     */
+    public void pushRobotTogether() {
+        double[] speedWheel = new double[4];
+
+        //Front wheels backwards
+        speedWheel[0] = 1;
+        speedWheel[1] = 1;
+        //Back wheels forwards
+        speedWheel[2] = -1;
+        speedWheel[3] = -1;
+
+        setMotorPower(speedWheel, FULL_SPEED);
     }
 
     /**

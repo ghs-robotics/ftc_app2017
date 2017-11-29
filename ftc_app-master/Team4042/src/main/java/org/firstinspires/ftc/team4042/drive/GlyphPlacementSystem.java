@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.team4042.drive;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
-import org.firstinspires.ftc.team4042.drive.Drive;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 /**
  * Created by Ryan on 11/2/2017.
@@ -10,7 +10,7 @@ import org.firstinspires.ftc.team4042.drive.Drive;
 
 public class GlyphPlacementSystem {
 
-    public final int HORIZONTAL_TRANSLATION_TIME = 500;
+    public final double HORIZONTAL_TRANSLATION_TIME = .25;
     private int targetX;
     private int targetY;
     public Position currentY;
@@ -18,9 +18,11 @@ public class GlyphPlacementSystem {
     private String baseOutput;
     private Drive drive;
 
+    public ElapsedTime horizontalTimer = new ElapsedTime();
+
     public enum Position {
         //HOME(0), RAISED(1200), TOP(1600), MID(2000), BOT(2500), TRANSITION(-1);
-        HOME(0), RAISED(1200), TOP(1600), MID(1600), BOT(1600), TRANSITION(-1);
+        HOME(10), RAISED(1300), TOP(1600), MID(1600), BOT(1600), TRANSITION(-1);
 
         private final Integer encoderVal;
         Position(Integer encoderVal) { this.encoderVal = encoderVal; }
@@ -30,11 +32,11 @@ public class GlyphPlacementSystem {
     }
 
     public enum Stage {
-        HOME, PAUSE1, PAUSE2, PLACE1, PLACE2, RETURN1, RETURN2
+        HOME, PAUSE1, PAUSE2, PLACE1, PLACE2, RETURN1, RETURN2, GRAB, RELEASE, RESET
     }
 
     public enum HorizPos {
-        LEFT(0.0), CENTER(0.0), RIGHT(0.0);
+        LEFT(-.5), CENTER(0.0), RIGHT(.5);
 
         private final Double power;
         HorizPos(Double power) { this.power = power; }
@@ -111,15 +113,32 @@ public class GlyphPlacementSystem {
     }
 
     public void setHomeTarget() {
-        drive.setVerticalDrivePos(10);
+        drive.setVerticalDrivePos(Position.HOME.getEncoderVal());
     }
 
-    public void moveXAxis(HorizPos pos) {
+    public void setXPower(HorizPos targetPos) {
+        //if target = left(-1) and current = right(1)
+        //we want to move left (-1)
+        //so target - current
+        if (!targetPos.equals(HorizPos.CENTER)) {
+            double power = targetPos.getPower() - currentX.getPower();
+            power = Range.clip(power, -1, 1);
 
+            drive.setHorizontalU(power);
+            horizontalTimer.reset();
+        }
     }
 
-    public boolean xTargetReached() {
-        return true;
+    public boolean xTargetReached(HorizPos targetPos) {
+        //If you're going left or right, then use the timer to see if you should stop
+        if (((targetPos.equals(HorizPos.LEFT) || targetPos.equals(HorizPos.RIGHT)) && (horizontalTimer.seconds() >= HORIZONTAL_TRANSLATION_TIME)) ||
+                //If you're going to the center and you hit the limit switch, stop
+                (targetPos.equals(HorizPos.CENTER) && drive.getCenterState())) {
+            drive.setHorizontalU(0);
+            currentX = targetPos;
+            return true;
+        }
+        return false;
     }
 
     public void runToPosition() {
@@ -130,7 +149,7 @@ public class GlyphPlacementSystem {
         if (pos == 0) {
             currentY = Position.HOME;
         }
-        else if (Math.abs(pos - Position.RAISED.getEncoderVal()) < 30) {
+        else if (Math.abs(pos - Position.RAISED.getEncoderVal()) < 100) {
             currentY = Position.RAISED;
         }
         else if (Math.abs(pos - Position.TOP.getEncoderVal()) < 10) {

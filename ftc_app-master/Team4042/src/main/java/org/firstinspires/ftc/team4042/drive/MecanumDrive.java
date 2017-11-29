@@ -122,8 +122,8 @@ public class MecanumDrive extends Drive {
         super.setEncoders(useEncoders);
 
         if (isExtendo) {
-            double left = -gamepad1.left_stick_y;
-            double right = -gamepad1.right_stick_y;
+            double left = gamepad1.left_stick_y;
+            double right = gamepad1.right_stick_y;
 
             driveLR(speedFactor, left, right);
         } else {
