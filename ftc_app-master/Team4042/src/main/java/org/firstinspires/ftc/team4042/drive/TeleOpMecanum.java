@@ -14,7 +14,7 @@ public class TeleOpMecanum extends OpMode {
     // We have these booleans so we only register a button press once.
     // You have to let go of the button and push it again to register a new event.
     private boolean aA = false;
-    private boolean y = false;
+    private boolean aY = false;
 
     private boolean aLeftBumper = false;
     private boolean aRightBumper = false;
@@ -88,13 +88,10 @@ public class TeleOpMecanum extends OpMode {
     public void loop() {
 
         //Both controllers pushing Y - toggle extendo
-        if (gamepad1.y && gamepad2.y && !y) {
-            y = true;
+        if (gamepad1.y && !aY) {
             toggleExtendo();
         }
-        if (!gamepad1.y && !gamepad2.y) {
-            y = false;
-        }
+        aY = gamepad1.y;
 
         //1 A - toggle verbose
         if (gamepad1.a && !aA) {
