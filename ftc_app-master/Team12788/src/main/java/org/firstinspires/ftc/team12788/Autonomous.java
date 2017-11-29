@@ -68,7 +68,7 @@ public class Autonomous extends LinearOpMode {
     public Servo grabRight;
 
     public static final int tile = 1300;
-    public static final int turn = 1100;
+    public static final int turn = 949;
     public static final double speedy = .7;
 
 
