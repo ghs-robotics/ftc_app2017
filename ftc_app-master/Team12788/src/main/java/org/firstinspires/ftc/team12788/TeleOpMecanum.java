@@ -18,10 +18,10 @@ public class TeleOpMecanum extends OpMode {
 
     private double adjustedSpeed;
 
-    private DcMotor liftLeft;
-    private DcMotor liftRight;
+    private DcMotor lift;
     private DcMotor intakeRight;
     private DcMotor intakeLeft;
+    private DcMotor relic;
 
     private boolean overide;
 
@@ -42,59 +42,53 @@ public class TeleOpMecanum extends OpMode {
         invert = false;
         overide = false;
     }
-    
+
     @Override
     public void loop() {
-        liftLeft = hardwareMap.dcMotor.get("liftLeft");
-        liftRight = hardwareMap.dcMotor.get("liftRight");
+        lift = hardwareMap.dcMotor.get("lift");
+        relic = hardwareMap.dcMotor.get("relic");
         intakeLeft = hardwareMap.dcMotor.get("intakeLeft");
         intakeRight = hardwareMap.dcMotor.get("intakeRight");
         grabLeft = hardwareMap.servo.get("grabLeft");
         grabRight = hardwareMap.servo.get("grabRight");
-        liftLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        liftRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intakeLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intakeRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        if (gamepad2.dpad_up) {
-            liftLeft.setPower(1);
-            liftRight.setPower(-1);
-        }
-        else if (gamepad2.dpad_down) {
-            liftLeft.setPower(-.5);
-            liftRight.setPower(.5);
-        }else {
-            liftLeft.setPower(0);
-            liftRight.setPower(0);
-        }
-        /*
+
         if (gamepad2.dpad_up) {
             liftPos = 6000;
-        }else if (gamepad2.dpad_down) {
-            liftPos = 3000;
-        }else if (gamepad2.dpad_left || gamepad2.dpad_right) {
+        } else if (gamepad2.dpad_down) {
             liftPos = 0;
+        } else if (gamepad2.dpad_left || gamepad2.dpad_right) {
+            liftPos = 3000;
         }
 
-        if (0 < Math.abs(liftLeft.getCurrentPosition() - liftPos) - 50){
-            if (liftPos < liftLeft.getCurrentPosition()) {
-                liftLeft.setPower(-.5);
-                liftRight.setPower(.5);
-            } else {
-                liftLeft.setPower(1);
-                liftRight.setPower(-1);
+        if (0 < Math.abs(lift.getCurrentPosition() - liftPos) - 100) {
+            if (liftPos < lift.getCurrentPosition()) {
+                lift.setPower(-.5);
+            } else if (liftPos > lift.getCurrentPosition()) {
+                lift.setPower(1);
             }
-        }*/
+        }
+        else {
+            lift .setPower(0);
+        }
+
+        while (gamepad2.start) {
+            relic.setPower(1);
+        }
+        while (gamepad2.back) {
+            relic.setPower(-1);
+        }
 
         if (drive.deadZone(gamepad2.right_trigger) > 0) {
             intakeLeft.setPower(1);
             intakeRight.setPower(-1);
-        }
-        else if (drive.deadZone(gamepad2.left_trigger) > 0) {
+        } else if (drive.deadZone(gamepad2.left_trigger) > 0) {
             intakeLeft.setPower(-1);
             intakeRight.setPower(1);
-        }
-        else{
+        } else {
             intakeLeft.setPower(0);
             intakeRight.setPower(0);
         }
@@ -107,7 +101,7 @@ public class TeleOpMecanum extends OpMode {
             grabLeft.setPosition(.3);
         }
         if (gamepad2.x) {
-            grabRight.setPosition(-1 );
+            grabRight.setPosition(-1);
             grabLeft.setPosition(.8);
         }
         if (gamepad1.a) {
@@ -125,9 +119,9 @@ public class TeleOpMecanum extends OpMode {
         if (gamepad1.left_bumper) {
             invert = true;
         }
-        if (gamepad2.a || overide){
+        if (gamepad2.a || overide) {
             overide = true;
-            if (!drive.driveWithEncoders(Direction.Forward, .5, .2*Autonomous.tile)) {
+            if (!drive.driveWithEncoders(Direction.Forward, .5, .2 * Autonomous.tile)) {
 
             } else {
                 grabLeft.setPosition(-1);
@@ -135,7 +129,7 @@ public class TeleOpMecanum extends OpMode {
                 overide = false;
             }
         } else {
-            drive.drive(false, gamepad1,adjustedSpeed * MecanumDrive.FULL_SPEED, invert);
+            drive.drive(false, gamepad1, adjustedSpeed * MecanumDrive.FULL_SPEED, invert);
         }
     }
 
