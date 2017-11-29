@@ -36,7 +36,7 @@ public class GlyphPlacementSystem {
     }
 
     public enum HorizPos {
-        LEFT(-.5), CENTER(0.0), RIGHT(.5);
+        LEFT(-.82), CENTER(0.0), RIGHT(.82);
 
         private final Double power;
         HorizPos(Double power) { this.power = power; }
