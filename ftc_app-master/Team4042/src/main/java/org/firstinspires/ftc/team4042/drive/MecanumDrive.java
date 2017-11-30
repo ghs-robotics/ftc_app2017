@@ -92,6 +92,7 @@ public class MecanumDrive extends Drive {
             telemetry.addData("NullPointerException", sw.toString());
         }
     }
+
     private void driveLR(double speedFactor, double l, double r) {
 
         double[] speedWheel = new double[4];
@@ -105,11 +106,22 @@ public class MecanumDrive extends Drive {
             telemetry.addData("right", r);
         }
 
-        speedWheel[0] = l;
-        speedWheel[1] = r;
-        //We don't move the back motors, for obvious reasons
-        speedWheel[2] = 0;
-        speedWheel[3] = 0;
+        if (crawl) {
+            //We don't move the front motors
+            speedWheel[0] = 0;
+            speedWheel[1] = 0;
+            //We just want to slightly adjust the back wheels
+            speedWheel[2] = l;
+            speedWheel[3] = r;
+            speedFactor = .2;
+        }
+        else {
+            speedWheel[0] = l;
+            speedWheel[1] = r;
+            //We don't move the back motors, for obvious reasons
+            speedWheel[2] = 0;
+            speedWheel[3] = 0;
+        }
 
         super.setMotorPower(speedWheel, speedFactor);
     }
