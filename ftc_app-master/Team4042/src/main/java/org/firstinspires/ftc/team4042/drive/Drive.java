@@ -50,6 +50,7 @@ public abstract class Drive {
 
     //Whether the robot is attached to itself or not
     public static boolean isExtendo = false;
+    public static boolean crawl = false;
 
     //Set to false to just get outputs as telemetry
     public static boolean useMotors = true;

@@ -15,6 +15,7 @@ public class TeleOpMecanum extends OpMode {
     // You have to let go of the button and push it again to register a new event.
     private boolean aA = false;
     private boolean aY = false;
+    private boolean aX = false;
 
     private boolean aLeftBumper = false;
     private boolean aRightBumper = false;
@@ -44,7 +45,7 @@ public class TeleOpMecanum extends OpMode {
       Dpad -
       A - toggle verbose
       B -
-      X -
+      X - toggle crawl
       Y - toggle extendo (with gamepad2)
 
     GAMEPAD 2:
@@ -87,11 +88,17 @@ public class TeleOpMecanum extends OpMode {
     @Override
     public void loop() {
 
-        //Both controllers pushing Y - toggle extendo
+        //First controller pushing Y - toggle extendo
         if (gamepad1.y && !aY) {
             toggleExtendo();
         }
         aY = gamepad1.y;
+
+        //The X button on the first controller - toggle crawling to let us adjust the back of the robot too
+        if (gamepad1.x && !aX) {
+            Drive.crawl = !Drive.crawl;
+        }
+        aX = gamepad1.x;
 
         //1 A - toggle verbose
         if (gamepad1.a && !aA) {
