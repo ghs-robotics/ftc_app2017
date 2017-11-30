@@ -175,6 +175,7 @@ public class TeleOpMecanum extends OpMode {
             case HOME: {
                 //Close the hand
                 drive.closeHand();
+                drive.jewelOut();
                 handDropTimer.reset();
 
                 drive.glyph.currentY = GlyphPlacementSystem.Position.HOME;
@@ -249,6 +250,7 @@ public class TeleOpMecanum extends OpMode {
             case RESET: {
                 if (drive.glyph.currentY.equals(GlyphPlacementSystem.Position.HOME)) {
                     stage = GlyphPlacementSystem.Stage.HOME;
+                    drive.jewelUp();
                     drive.setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
                 }
