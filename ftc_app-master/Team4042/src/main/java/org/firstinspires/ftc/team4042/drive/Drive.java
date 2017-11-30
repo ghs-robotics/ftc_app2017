@@ -319,6 +319,14 @@ public abstract class Drive {
         while (jewelServo.getPosition() != .8) {  }
     }
 
+    /*
+    Moves the jewel out of the way
+     */
+    public void jewelOut() {
+        jewelServo.setPosition(.43);
+        while (jewelServo.getPosition() != .43) {  }
+    }
+
     public void lockCatches() {
         rightCatch.setPosition(.9);
         leftCatch.setPosition(.17);
