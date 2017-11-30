@@ -182,7 +182,7 @@ public class MecanumDrive extends Drive {
         double yPrime = -x * Math.sin(gyroRadians) + y * Math.cos(gyroRadians);
 
         double magic = isExtendo ? 1 : MAGIC_NUMBER; //Only use the magic number if you're a whole robot
-        magic = x <= .1 ? 1 : magic; //Only use the magic number if you're strafing
+        magic = x <= .1 && x >= -.1 ? 1 : magic; //Only use the magic number if you're strafing
 
         //Sets relative wheel speeds for mecanum drive based on controller inputs
         speedWheel[0] = (-xPrime - yPrime - r) * magic;
