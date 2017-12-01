@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.Range;
 
 public class GlyphPlacementSystem {
 
-    public final double HORIZONTAL_TRANSLATION_TIME = .25;
+    public final double HORIZONTAL_TRANSLATION_TIME = 0.5;
     private int targetX;
     private int targetY;
     public Position currentY;
@@ -124,7 +124,7 @@ public class GlyphPlacementSystem {
             double power = targetPos.getPower() - currentX.getPower();
             power = Range.clip(power, -1, 1);
 
-            drive.setHorizontalU(power);
+            drive.setHorizontalDrive(power);
             horizontalTimer.reset();
         }
     }
@@ -134,7 +134,7 @@ public class GlyphPlacementSystem {
         if (((targetPos.equals(HorizPos.LEFT) || targetPos.equals(HorizPos.RIGHT)) && (horizontalTimer.seconds() >= HORIZONTAL_TRANSLATION_TIME)) ||
                 //If you're going to the center and you hit the limit switch, stop
                 (targetPos.equals(HorizPos.CENTER) && drive.getCenterState())) {
-            drive.setHorizontalU(0);
+            drive.setHorizontalDrive(0);
             currentX = targetPos;
             return true;
         }

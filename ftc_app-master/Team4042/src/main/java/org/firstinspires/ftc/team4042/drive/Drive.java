@@ -76,7 +76,7 @@ public abstract class Drive {
 
     private DcMotor verticalDrive;
 
-    private CRServo horizontalU;
+    private CRServo horizontalDrive;
     private DigitalSensor center = new DigitalSensor("center");
 
     private Servo grabbyBoi;
@@ -182,7 +182,7 @@ public abstract class Drive {
         leftCatch = hardwareMap.servo.get("left catch");
         rightCatch = hardwareMap.servo.get("right catch");
 
-        horizontalU = hardwareMap.crservo.get("horizontal");
+        horizontalDrive = hardwareMap.crservo.get("horizontal");
         center.initialize(hardwareMap);
 
         intakeLeft = hardwareMap.dcMotor.get("intake left");
@@ -252,12 +252,12 @@ public abstract class Drive {
         grabbyBoi.setPosition(1);
     }
 
-    public void setHorizontalU(double power) {
-        horizontalU.setPower(power);
+    public void setHorizontalDrive(double power) {
+        horizontalDrive.setPower(power);
     }
 
-    public double getHorizontalU() {
-        return horizontalU.getPower();
+    public double getHorizontalDrive() {
+        return horizontalDrive.getPower();
     }
 
     public boolean isHandOpen() {

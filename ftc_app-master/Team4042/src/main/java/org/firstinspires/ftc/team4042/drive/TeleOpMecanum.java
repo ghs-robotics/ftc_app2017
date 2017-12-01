@@ -18,6 +18,7 @@ public class TeleOpMecanum extends OpMode {
 
     private boolean aLeftBumper = false;
     private boolean aRightBumper = false;
+    private boolean manual = false;
 
     private boolean bUp;
     private boolean bDown;
@@ -25,6 +26,8 @@ public class TeleOpMecanum extends OpMode {
     private boolean bRight;
 
     private boolean bA;
+    private boolean bX;
+    private boolean bB;
     //CONTROL BOOLEANS END
 
     private GlyphPlacementSystem.Position targetY;
@@ -48,14 +51,14 @@ public class TeleOpMecanum extends OpMode {
       Y - toggle extendo (with gamepad2)
 
     GAMEPAD 2:
-      Joystick 1 Y -
+      Joystick 1 Y - controls placer in manual
       Joystick 2 Y -
       Bumpers - run intakes backwards
       Triggers - run intakes forwards
       Dpad - placer
       A - places glyph
-      B -
-      X -
+      B - manual hand toggle
+      X - toggles manual placement mode
       Y - toggle extendo (with gamepad1)
      */
 
@@ -121,13 +124,28 @@ public class TeleOpMecanum extends OpMode {
         }
         bA = gamepad2.a;
 
-        //Glyph locate
-        glyphLocate();
-
         //Right trigger of the b controller runs the right intake forward
         intakes();
 
-        drive.glyph.runToPosition();
+        if (gamepad2.x && !bX) {
+            manual = !manual;
+        }
+        bX = gamepad2.x;
+
+        if(!manual) {
+            //Glyph locate
+            glyphLocate();
+
+            drive.glyph.runToPosition();
+        } else {
+            drive.setVerticalDrive(gamepad2.left_stick_y);
+            drive.setHorizontalDrive(gamepad2.left_stick_x);
+
+            if (gamepad2.b && ! bB) {
+                drive.toggleHand();
+            }
+            bB = gamepad2.b;
+        }
         telemetryUpdate();
     }
 
@@ -310,7 +328,7 @@ public class TeleOpMecanum extends OpMode {
             telemetry.addData("stage", stage);
             telemetry.addData("gamepad2.a", gamepad2.a);
             telemetry.addData("handDropTimer seconds", handDropTimer.seconds());
-            telemetry.addData("horizontal u", drive.getHorizontalU());
+            telemetry.addData("horizontal u", drive.getHorizontalDrive());
             telemetry.addData("horizontal translate timer", drive.glyph.horizontalTimer.seconds());
             telemetry.addData("target pos",targetX + " horiz time " + drive.glyph.horizontalTimer.seconds() + " horiz trans time " + drive.glyph.HORIZONTAL_TRANSLATION_TIME);
             telemetry.addData("boolean",((targetX.equals(GlyphPlacementSystem.HorizPos.LEFT) ||
