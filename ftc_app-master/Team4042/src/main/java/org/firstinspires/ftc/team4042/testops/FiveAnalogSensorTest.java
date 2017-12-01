@@ -29,9 +29,11 @@ public class FiveAnalogSensorTest extends OpMode{
     @Override
     public void loop() {
         for (AnalogSensor shortRange : shortRange) {
+            shortRange.addReading();
             telemetry.addData(shortRange.getName(), shortRange.getCmAvg());
         }
         for (AnalogSensor longRange : longRange) {
+            longRange.addReading();
             telemetry.addData(longRange.getName(), longRange.getCmAvg());
         }
         telemetry.update();

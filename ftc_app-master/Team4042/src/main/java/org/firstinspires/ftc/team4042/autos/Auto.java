@@ -418,7 +418,7 @@ public abstract class Auto extends LinearVisionOpMode {
             }
 
             realGyro = drive.gyro.updateHeading();
-        } while (Math.abs(realGyro - realR) > 5);
+        } while (Math.abs(realGyro - realR) > 5 && opModeIsActive());
 
         drive.stopMotors();
     }
