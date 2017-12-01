@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.util.Range;
 public class GlyphPlacementSystem {
 
     public final double HORIZONTAL_TRANSLATION_TIME = 0.5;
+    public final int PLACEMENT_ERROR_MARGIN = 50;
     private int targetX;
     private int targetY;
     public Position currentY;
@@ -146,19 +147,19 @@ public class GlyphPlacementSystem {
 
         int pos = drive.verticalDriveCurrPos();
 
-        if (pos < 50) {
+        if (pos < PLACEMENT_ERROR_MARGIN) {
             currentY = Position.HOME;
         }
         else if (Math.abs(pos - Position.RAISED.getEncoderVal()) < 100) {
             currentY = Position.RAISED;
         }
-        else if (Math.abs(pos - Position.TOP.getEncoderVal()) < 10) {
+        else if (Math.abs(pos - Position.TOP.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
             currentY = Position.TOP;
         }
-        else if (Math.abs(pos - Position.MID.getEncoderVal()) < 10) {
+        else if (Math.abs(pos - Position.MID.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
             currentY = Position.MID;
         }
-        else if (Math.abs(pos - Position.BOT.getEncoderVal()) < 10) {
+        else if (Math.abs(pos - Position.BOT.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
             currentY = Position.BOT;
         }
         else {
