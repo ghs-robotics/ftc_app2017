@@ -30,6 +30,8 @@ public abstract class Drive {
     //The power to put to the motors to stop them
     public static final double STOP_SPEED = 0;
 
+    public static final double MAGIC_NUMBER = .6;
+
     public static final boolean THE_FAST_ONES_ARE_THE_FRONT_ONES = true;
     public static final double LOW_SPEED_MOTOR_THINGS = 7;
     public static final double LOW_SPEED_WHEEL_THINGS = 5;
@@ -48,6 +50,7 @@ public abstract class Drive {
 
     //Whether the robot is attached to itself or not
     public static boolean isExtendo = false;
+    public static boolean crawl = false;
 
     //Set to false to just get outputs as telemetry
     public static boolean useMotors = true;
@@ -317,6 +320,14 @@ public abstract class Drive {
         while (jewelServo.getPosition() != .8) {  }
     }
 
+    /*
+    Moves the jewel out of the way
+     */
+    public void jewelOut() {
+        jewelServo.setPosition(.43);
+        while (jewelServo.getPosition() != .43) {  }
+    }
+
     public void lockCatches() {
         rightCatch.setPosition(.9);
         leftCatch.setPosition(.17);
@@ -473,6 +484,7 @@ public abstract class Drive {
 
         if (useMotors) {
             //which ones to scale down? fast ones. if THE_FAST_ONES_ARE_THE_FRONT_ONES, the front.
+            /*
             if(THE_FAST_ONES_ARE_THE_FRONT_ONES) {
                 if (motorLeftFront != null) {
                     motorLeftFront.setPower(deadZone(speedWheel[0]) * HIGH_SPEED_SLOWER_DOWNER_NUMBER);
@@ -499,6 +511,21 @@ public abstract class Drive {
                 if (motorLeftBack != null) {
                     motorLeftBack.setPower(deadZone(speedWheel[3]) * HIGH_SPEED_SLOWER_DOWNER_NUMBER);
                 }
+            }
+            */
+            double magic = isExtendo ? 1 : MAGIC_NUMBER;
+
+            if (motorLeftFront != null) {
+                motorLeftFront.setPower(deadZone(speedWheel[0])*magic);
+            }
+            if (motorRightFront != null) {
+                motorRightFront.setPower(deadZone(-speedWheel[1])*magic);
+            } //The right motors are mounted "upside down", which is why we have to inverse this
+            if (motorRightBack != null) {
+                motorRightBack.setPower(deadZone(-speedWheel[2]));
+            }
+            if (motorLeftBack != null) {
+                motorLeftBack.setPower(deadZone(speedWheel[3]));
             }
         }
 

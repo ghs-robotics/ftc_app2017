@@ -14,7 +14,8 @@ public class TeleOpMecanum extends OpMode {
     // We have these booleans so we only register a button press once.
     // You have to let go of the button and push it again to register a new event.
     private boolean aA = false;
-    private boolean y = false;
+    private boolean aY = false;
+    private boolean aX = false;
 
     private boolean aLeftBumper = false;
     private boolean aRightBumper = false;
@@ -47,7 +48,7 @@ public class TeleOpMecanum extends OpMode {
       Dpad -
       A - toggle verbose
       B -
-      X -
+      X - toggle crawl
       Y - toggle extendo (with gamepad2)
 
     GAMEPAD 2:
@@ -90,14 +91,17 @@ public class TeleOpMecanum extends OpMode {
     @Override
     public void loop() {
 
-        //Both controllers pushing Y - toggle extendo
-        if (gamepad1.y && gamepad2.y && !y) {
-            y = true;
+        //First controller pushing Y - toggle extendo
+        if (gamepad1.y && !aY) {
             toggleExtendo();
         }
-        if (!gamepad1.y && !gamepad2.y) {
-            y = false;
+        aY = gamepad1.y;
+
+        //The X button on the first controller - toggle crawling to let us adjust the back of the robot too
+        if (gamepad1.x && !aX) {
+            Drive.crawl = !Drive.crawl;
         }
+        aX = gamepad1.x;
 
         //1 A - toggle verbose
         if (gamepad1.a && !aA) {
@@ -196,6 +200,7 @@ public class TeleOpMecanum extends OpMode {
             case HOME: {
                 //Close the hand
                 drive.closeHand();
+                drive.jewelOut();
                 handDropTimer.reset();
 
                 drive.glyph.currentY = GlyphPlacementSystem.Position.HOME;
@@ -270,6 +275,7 @@ public class TeleOpMecanum extends OpMode {
             case RESET: {
                 if (drive.glyph.currentY.equals(GlyphPlacementSystem.Position.HOME)) {
                     stage = GlyphPlacementSystem.Stage.HOME;
+                    drive.jewelUp();
                     drive.setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
                 }
