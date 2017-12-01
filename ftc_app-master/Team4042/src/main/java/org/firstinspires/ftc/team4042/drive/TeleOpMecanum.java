@@ -50,6 +50,8 @@ public class TeleOpMecanum extends OpMode {
       B -
       X - toggle crawl
       Y - toggle extendo (with gamepad2)
+      Start -
+      Back -
 
     GAMEPAD 2:
       Joystick 1 Y - controls placer in manual
@@ -60,7 +62,9 @@ public class TeleOpMecanum extends OpMode {
       A - places glyph
       B - manual hand toggle
       X - toggles manual placement mode
-      Y - toggle extendo (with gamepad1)
+      Y -
+      Start -
+      Back -
      */
 
     @Override

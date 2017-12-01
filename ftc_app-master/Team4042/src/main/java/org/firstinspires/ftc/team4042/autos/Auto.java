@@ -106,7 +106,7 @@ public abstract class Auto extends LinearVisionOpMode {
                             String k = parameter.substring(0, colon);
                             String v = parameter.substring(colon + 1);
                             parameters.put(k, v); //Gets the next parameter and adds it to the list
-                            para.append(k + ":" + v + " ");
+                            para.append(k).append(":").append(v).append(" ");
                         }
 
                         log.add(para.toString());
