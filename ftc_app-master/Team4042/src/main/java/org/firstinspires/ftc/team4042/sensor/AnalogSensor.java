@@ -3,6 +3,8 @@ package org.firstinspires.ftc.team4042.sensor;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import java.util.ArrayList;
+
 /**
  * Created by Hazel on 10/13/2017.
  */
@@ -11,6 +13,8 @@ public class AnalogSensor {
     private AnalogInput sensor;
     private String name;
     private boolean isLongRange;
+
+    private ArrayList<Double> readings = new ArrayList();
 
     public AnalogSensor(String name, boolean isLongRange) {
         this.name = name;
@@ -34,13 +38,18 @@ public class AnalogSensor {
         }
     }
 
+    public void addReading() {
+        readings.add(sensor.getVoltage());
+    }
+
     private double getVAvg() {
         if (sensor == null) { return -1; }
         double sum = 0;
-        for (int i = 0; i < 250; i++) {
-            sum += sensor.getVoltage();
+        int numToRead = readings.size() >= 10 ? 10 : readings.size();
+        for (int i = readings.size() - numToRead; i < readings.size(); i++) {
+            sum += readings.get(i);
         }
-        double voltage = sum/250;
+        double voltage = sum/numToRead;
         return voltage;
     }
 
