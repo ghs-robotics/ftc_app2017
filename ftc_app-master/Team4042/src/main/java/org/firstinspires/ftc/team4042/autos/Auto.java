@@ -392,23 +392,33 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void autoRotate(HashMap<String, String> parameters) {
-        double r = Double.parseDouble(parameters.get("r"));
+        double realR = Double.parseDouble(parameters.get("r"));
 
         double speed = Double.parseDouble(parameters.get("speed"));
 
-        double gyro = drive.gyro.updateHeading();
+        double realGyro = drive.gyro.updateHeading();
 
         do {
-            double d = Math.abs(gyro - r); //Larger the further you are from your target
-            if (gyro > r) {
+            double gyro = realGyro;
+            double r = realR;
+
+            while (r < 0) { r += 360; }
+            while (gyro < 0) { gyro += 360; }
+            double d = Math.abs(r - gyro); //Larger the further you are from your target
+            if (d > 180) { d = 360 - d; }
+            //telemetry.addData("d", d + " speed + d/720 " + (speed/2 + d/360));
+            telemetry.addData("d", d + " speed - 5/d " + (speed - 5/d));
+            if (realGyro > realR) {
                 //The further you are from your target, the faster you should move
-                drive.driveXYR(speed + d/360, 0, 0, -1, false);
+                //drive.driveXYR(speed/2 + d/720, 0, 0, -1, false);
+                drive.driveXYR(speed - 5/d, 0, 0, -1, false);
             } else {
-                drive.driveXYR(speed + d/360, 0, 0, 1, false);
+                //drive.driveXYR(speed/2 + d/720, 0, 0, 1, false);
+                drive.driveXYR(speed - 5/d, 0, 0, -1, false);
             }
 
-            gyro = drive.gyro.updateHeading();
-        } while (Math.abs(gyro - r) > 5);
+            realGyro = drive.gyro.updateHeading();
+        } while (Math.abs(realGyro - realR) > 5);
 
         drive.stopMotors();
     }

@@ -92,6 +92,7 @@ public class MecanumDrive extends Drive {
             telemetry.addData("NullPointerException", sw.toString());
         }
     }
+
     private void driveLR(double speedFactor, double l, double r) {
 
         double[] speedWheel = new double[4];
@@ -105,11 +106,22 @@ public class MecanumDrive extends Drive {
             telemetry.addData("right", r);
         }
 
-        speedWheel[0] = l;
-        speedWheel[1] = r;
-        //We don't move the back motors, for obvious reasons
-        speedWheel[2] = 0;
-        speedWheel[3] = 0;
+        if (crawl) {
+            //We don't move the front motors
+            speedWheel[0] = 0;
+            speedWheel[1] = 0;
+            //We just want to slightly adjust the back wheels
+            speedWheel[2] = l;
+            speedWheel[3] = r;
+            speedFactor = .2;
+        }
+        else {
+            speedWheel[0] = l;
+            speedWheel[1] = r;
+            //We don't move the back motors, for obvious reasons
+            speedWheel[2] = 0;
+            speedWheel[3] = 0;
+        }
 
         super.setMotorPower(speedWheel, speedFactor);
     }
@@ -169,9 +181,12 @@ public class MecanumDrive extends Drive {
         double xPrime = x * Math.cos(gyroRadians) + y * Math.sin(gyroRadians);
         double yPrime = -x * Math.sin(gyroRadians) + y * Math.cos(gyroRadians);
 
+        double magic = isExtendo ? 1 : MAGIC_NUMBER; //Only use the magic number if you're a whole robot
+        magic = x <= .1 && x >= -.1 ? 1 : magic; //Only use the magic number if you're strafing
+
         //Sets relative wheel speeds for mecanum drive based on controller inputs
-        speedWheel[0] = -xPrime - yPrime - r;
-        speedWheel[1] = xPrime - yPrime + r;
+        speedWheel[0] = (-xPrime - yPrime - r) * magic;
+        speedWheel[1] = (xPrime - yPrime + r) * magic;
         speedWheel[2] = -xPrime - yPrime + r;
         speedWheel[3] = xPrime - yPrime - r;
 
