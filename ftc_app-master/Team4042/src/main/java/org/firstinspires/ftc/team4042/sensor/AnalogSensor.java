@@ -37,11 +37,7 @@ public class AnalogSensor {
 
     public double getCmAvg() {
         double voltage = getVAvg();
-        if (isLongRange) {
-            return getCmAsLongIR(voltage);
-        } else {
-            return getCmAsShortIR(voltage);
-        }
+        return isLongRange ? getCmAsLongIR(voltage) : getCmAsShortIR(voltage);
     }
 
     public void addReading() {
