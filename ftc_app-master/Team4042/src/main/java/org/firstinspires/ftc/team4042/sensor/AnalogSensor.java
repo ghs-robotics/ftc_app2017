@@ -14,7 +14,13 @@ public class AnalogSensor {
     private String name;
     private boolean isLongRange;
 
-    private ArrayList<Double> readings = new ArrayList();
+    private static final int NUM_OF_READINGS = 10;
+
+    private int curr = 0;
+
+    private boolean firstLoop = true;
+
+    private double[] readings = new double[NUM_OF_READINGS];
 
     public AnalogSensor(String name, boolean isLongRange) {
         this.name = name;
@@ -39,17 +45,23 @@ public class AnalogSensor {
     }
 
     public void addReading() {
-        readings.add(sensor.getVoltage());
+        readings[curr] = sensor.getVoltage();
+        curr++;
+        if (firstLoop && curr >= NUM_OF_READINGS) {
+            firstLoop = false;
+        }
+        curr %= NUM_OF_READINGS;
     }
 
     private double getVAvg() {
         if (sensor == null) { return -1; }
         double sum = 0;
-        int numToRead = readings.size() >= 10 ? 10 : readings.size();
-        for (int i = readings.size() - numToRead; i < readings.size(); i++) {
-            sum += readings.get(i);
+        double numToRead = firstLoop ? curr + 1 : NUM_OF_READINGS;
+
+        for (int i = 0; i < numToRead; i++) {
+            sum += readings[i];
         }
-        double voltage = sum/numToRead;
+        double voltage = sum/NUM_OF_READINGS;
         return voltage;
     }
 
