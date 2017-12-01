@@ -146,7 +146,7 @@ public class GlyphPlacementSystem {
 
         int pos = drive.verticalDriveCurrPos();
 
-        if (pos == 0) {
+        if (pos < 50) {
             currentY = Position.HOME;
         }
         else if (Math.abs(pos - Position.RAISED.getEncoderVal()) < 100) {
