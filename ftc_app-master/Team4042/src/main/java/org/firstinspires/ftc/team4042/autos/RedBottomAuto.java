@@ -4,6 +4,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.team4042.drive.MecanumDrive;
 
+/**
+ * USELESS - Run BlueBottomAuto for parks in the safe zone
+ */
 @Autonomous(name="RedBottomAuto", group="autos")
 public class RedBottomAuto extends Auto {
 
