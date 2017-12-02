@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
+
 /**
  * Created by Ryan on 11/2/2017.
  */
@@ -79,6 +81,25 @@ public class GlyphPlacementSystem {
         }
 
         return "\n" + new String(output);
+    }
+
+    public void setTarget(RelicRecoveryVuMark x, int y) {
+        switch (x) {
+            case LEFT:
+                targetX = 0;
+                break;
+            case CENTER:
+                targetX = 1;
+                break;
+            case RIGHT:
+                targetX = 2;
+                break;
+            default:
+                //when in doubt, place in the middle
+                targetX = 1;
+                break;
+        }
+        targetY = y;
     }
 
     public int up() {

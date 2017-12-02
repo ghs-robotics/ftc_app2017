@@ -5,5 +5,5 @@
 function:doff x:0 y:-1 speed:.5 target:1000
 function:d x:0 y:-1 speed:.5 target:1000
 function:r r:-90 speed:.5
-function:d x:.1 y:1 speed:.5 target:1000
+function:d x:.25 y:1 speed:.5 target:1500
 #function:s x:0 y:1 speed:.5 distance:4.5 target:100
