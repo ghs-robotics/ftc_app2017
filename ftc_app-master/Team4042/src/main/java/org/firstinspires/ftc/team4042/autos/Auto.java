@@ -444,6 +444,8 @@ public abstract class Auto extends LinearOpMode {
         } while (Math.abs(realGyro - realR) > 5 && opModeIsActive());
 
         drive.stopMotors();
+        drive.resetEncoders();
+        drive.runWithEncoders();
     }
 
     /**
