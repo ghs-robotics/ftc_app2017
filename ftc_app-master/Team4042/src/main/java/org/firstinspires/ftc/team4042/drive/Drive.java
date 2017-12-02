@@ -275,6 +275,8 @@ public abstract class Drive {
         verticalDrive.setMode(mode);
     }
 
+    public DcMotor.RunMode getVerticalDriveMode() { return verticalDrive.getMode(); }
+
     public void setVerticalDrivePos(int position) {
         verticalDrive.setTargetPosition(position);
     }
