@@ -41,7 +41,7 @@ public abstract class Auto extends LinearOpMode {
 
     MecanumDrive drive = new MecanumDrive(false);
     private VuMarkIdentifier vuMarkIdentifier = new VuMarkIdentifier();
-    private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
+    private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.CENTER;
 
     private Telemetry.Log log;
 
@@ -298,6 +298,8 @@ public abstract class Auto extends LinearOpMode {
 
     public void placeGlyph(HashMap<String, String> parameters) {
         //TODO: MAKE THIS A USEFUL FUNCTION based on vuMark
+
+        drive.glyph.setTarget(vuMark, 3);
     }
 
     public void jewelUp(HashMap<String, String> parameters) {
