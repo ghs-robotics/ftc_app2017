@@ -137,6 +137,12 @@ public class TeleOpMecanum extends OpMode {
 
         if (gamepad2.x && !bX) {
             manual = !manual;
+
+            if (drive.getVerticalDriveMode().equals(DcMotor.RunMode.RUN_TO_POSITION)) {
+                drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            } else {
+                drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+            }
         }
         bX = gamepad2.x;
 
@@ -332,6 +338,7 @@ public class TeleOpMecanum extends OpMode {
         if (drive.verbose) {
             telemetry.addData("encoder currentY pos", drive.verticalDriveCurrPos());
             telemetry.addData("hand is open", drive.isHandOpen());
+            telemetry.addData("limit switch", drive.getCenterState());
             telemetry.addData("targetY", targetY.toString());
             telemetry.addData("Current pos", drive.glyph.currentY.toString());
             telemetry.addData("encoder targetY pos", drive.verticalDriveTargetPos());
