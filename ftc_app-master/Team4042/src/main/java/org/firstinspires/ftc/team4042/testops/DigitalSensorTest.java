@@ -59,7 +59,7 @@ import org.firstinspires.ftc.team4042.sensor.DigitalSensor;
 @TeleOp(name="Whisker test", group="testops")
 public class DigitalSensorTest extends OpMode
 {
-    private DigitalChannel whisker;
+    /*private DigitalChannel whisker;
 
     @Override
     public void init() {
@@ -72,9 +72,9 @@ public class DigitalSensorTest extends OpMode
     public void loop() {
         telemetry.addData("whisker on?", whisker.getState());
 
-    }
+    }*/
 
-    /*private DigitalSensor sensor;
+    private DigitalSensor sensor;
 
     @Override
     public void init() {
@@ -85,5 +85,5 @@ public class DigitalSensorTest extends OpMode
     @Override
     public void loop() {
         telemetry.addData("sensor", sensor.getState());
-    }*/
+    }
 }
