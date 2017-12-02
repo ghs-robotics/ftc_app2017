@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.Range;
 
 public class GlyphPlacementSystem {
 
-    public final double HORIZONTAL_TRANSLATION_TIME = 0.9;
+    public final double HORIZONTAL_TRANSLATION_TIME = 2;
     public final int PLACEMENT_ERROR_MARGIN = 50;
     private int targetX;
     private int targetY;
@@ -23,7 +23,7 @@ public class GlyphPlacementSystem {
 
     public enum Position {
         //HOME(0), RAISED(1200), TOP(1600), MID(2000), BOT(2500), TRANSITION(-1);
-        HOME(10), RAISED(1300), TOP(1600), MID(1900), BOT(2200), TRANSITION(-1);
+        HOME(10), RAISED(1400), TOP(1600), MID(1900), BOT(2200), TRANSITION(-1);
 
         private final Integer encoderVal;
         Position(Integer encoderVal) { this.encoderVal = encoderVal; }
@@ -121,7 +121,7 @@ public class GlyphPlacementSystem {
         //if target = left(-1) and current = right(1)
         //we want to move left (-1)
         //so target - current
-        if (!targetPos.equals(HorizPos.CENTER)) {
+        if (targetX != 1) {
             double power = targetPos.getPower() - currentX.getPower();
             power = Range.clip(power, -1, 1);
 
@@ -130,12 +130,20 @@ public class GlyphPlacementSystem {
         }
     }
 
-    public boolean xTargetReached(HorizPos targetPos, boolean goingBack) {
+    public void adjustBack() {
+        drive.setHorizontalDrive(-.82);
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
+        while (timer.seconds() < .2) {  }
+        drive.setHorizontalDrive(0);
+    }
+
+    public boolean xTargetReached(HorizPos targetPos) {
         //If you're going left or right, then use the timer to see if you should stop
         if (((targetPos.equals(HorizPos.LEFT) || targetPos.equals(HorizPos.RIGHT)) && (horizontalTimer.seconds() >= HORIZONTAL_TRANSLATION_TIME)) ||
                 //If you're going to the center and you hit the limit switch, stop
-                (goingBack && targetPos.equals(HorizPos.CENTER) && drive.getCenterState()) ||
-                (!goingBack && targetPos.equals(HorizPos.CENTER))) {
+                (targetX != 1 && targetPos.equals(HorizPos.CENTER) && drive.getCenterState()) ||
+                (targetX == 1 && targetPos.equals(HorizPos.CENTER))) {
             drive.setHorizontalDrive(0);
             currentX = targetPos;
             return true;
