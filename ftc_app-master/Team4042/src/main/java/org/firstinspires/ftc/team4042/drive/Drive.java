@@ -295,11 +295,11 @@ public abstract class Drive {
     public void verticalDriveDir(DcMotorSimple.Direction dir) { verticalDrive.setDirection(dir);}
 
     public void intakeLeft(double power) {
-        intakeLeft.setPower(power / 2);
+        intakeLeft.setPower(power * .75);
     }
 
     public void intakeRight(double power) {
-        intakeRight.setPower(power / 2);
+        intakeRight.setPower(power * .75);
     }
 
     public void internalIntakeLeft(double power) {
