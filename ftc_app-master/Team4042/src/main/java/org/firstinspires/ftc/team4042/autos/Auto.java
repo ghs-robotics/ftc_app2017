@@ -32,6 +32,9 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * Parses a file to figure out which instructions to run. CAN NOT ACTUALLY RUN INSTRUCTIONS.
+ */
 @Autonomous(name="Abstract Auto", group="autos")
 public abstract class Auto extends LinearVisionOpMode {
 

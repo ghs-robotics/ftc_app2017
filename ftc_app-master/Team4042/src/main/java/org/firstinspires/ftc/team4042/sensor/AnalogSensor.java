@@ -7,6 +7,8 @@ import java.util.ArrayList;
 
 /**
  * Created by Hazel on 10/13/2017.
+ *
+ * Reads data from an analog input and can return it in centimeters
  */
 
 public class AnalogSensor {

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.team4042.drive;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -11,7 +12,6 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
-import org.firstinspires.ftc.team4042.sensor.DigitalSensor;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -80,7 +80,7 @@ public abstract class Drive {
     private DcMotor verticalDrive;
 
     private CRServo horizontalDrive;
-    private DigitalSensor center = new DigitalSensor("center");
+    private DigitalChannel center;
 
     private Servo grabbyBoi;
     private boolean handIsOpen = false;
@@ -186,7 +186,10 @@ public abstract class Drive {
         rightCatch = hardwareMap.servo.get("right catch");
 
         horizontalDrive = hardwareMap.crservo.get("horizontal");
-        center.initialize(hardwareMap);
+
+        center = hardwareMap.digitalChannel.get("center");
+        center.setState(false);
+        center.setMode(DigitalChannel.Mode.INPUT);
 
         intakeLeft = hardwareMap.dcMotor.get("intake left");
         intakeRight = hardwareMap.dcMotor.get("intake right");
