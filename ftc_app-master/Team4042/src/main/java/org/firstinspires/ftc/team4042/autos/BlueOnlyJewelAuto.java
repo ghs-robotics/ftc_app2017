@@ -13,9 +13,7 @@ public class BlueOnlyJewelAuto extends Auto {
     public void runOpMode() {
 
         super.setUp(drive, "bluejewel.txt");
-        try {
-            waitForStart();
-        } catch (InterruptedException ex) { }
+        waitForStart();
 
         super.runAuto();
         

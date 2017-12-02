@@ -16,10 +16,7 @@ public class ProtoAuto extends Auto {
         try {
 
             super.setUp(drive, "proto.txt");
-            try {
-                waitForStart();
-            } catch (InterruptedException ex) {
-            }
+            waitForStart();
 
             super.runAuto();
         } catch (Exception ex) {

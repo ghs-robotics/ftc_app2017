@@ -16,10 +16,7 @@ public class TestAuto extends Auto {
         try {
 
             super.setUp(drive, "test.txt");
-            try {
-                waitForStart();
-            } catch (InterruptedException ex) {
-            }
+            waitForStart();
 
             super.runAuto();
         } catch (Exception ex) {
