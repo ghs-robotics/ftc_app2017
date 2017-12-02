@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.Range;
 
 public class GlyphPlacementSystem {
 
-    public final double HORIZONTAL_TRANSLATION_TIME = 0.5;
+    public final double HORIZONTAL_TRANSLATION_TIME = 0.9;
     public final int PLACEMENT_ERROR_MARGIN = 50;
     private int targetX;
     private int targetY;
@@ -130,11 +130,12 @@ public class GlyphPlacementSystem {
         }
     }
 
-    public boolean xTargetReached(HorizPos targetPos) {
+    public boolean xTargetReached(HorizPos targetPos, boolean goingBack) {
         //If you're going left or right, then use the timer to see if you should stop
         if (((targetPos.equals(HorizPos.LEFT) || targetPos.equals(HorizPos.RIGHT)) && (horizontalTimer.seconds() >= HORIZONTAL_TRANSLATION_TIME)) ||
                 //If you're going to the center and you hit the limit switch, stop
-                (targetPos.equals(HorizPos.CENTER) && drive.getCenterState())) {
+                (goingBack && targetPos.equals(HorizPos.CENTER) && drive.getCenterState()) ||
+                (!goingBack && targetPos.equals(HorizPos.CENTER))) {
             drive.setHorizontalDrive(0);
             currentX = targetPos;
             return true;
@@ -143,7 +144,7 @@ public class GlyphPlacementSystem {
     }
 
     public void runToPosition() {
-        drive.setVerticalDrive((drive.verticalDriveTargetPos() - drive.verticalDriveCurrPos())/ 100);
+        drive.setVerticalDrive((drive.verticalDriveTargetPos() - drive.verticalDriveCurrPos())/ 50);
 
         int pos = drive.verticalDriveCurrPos();
 

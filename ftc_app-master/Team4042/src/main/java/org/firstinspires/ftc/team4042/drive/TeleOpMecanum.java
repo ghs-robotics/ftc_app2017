@@ -120,7 +120,7 @@ public class TeleOpMecanum extends OpMode {
             drive.useGyro();
         }
 
-        speedModes();
+        //speedModes();
 
         //If you're at the bottom, haven't been pushing a, and now are pushing a
         if (uTrackAtBottom && !bA && gamepad2.a) {
@@ -237,7 +237,7 @@ public class TeleOpMecanum extends OpMode {
             }
             case PAUSE1: {
                 //Move to target X location
-                if(drive.glyph.xTargetReached(targetX)) {
+                if(drive.glyph.xTargetReached(targetX, false)) {
                     stage = GlyphPlacementSystem.Stage.PLACE2;
                 }
                 break;
@@ -270,7 +270,7 @@ public class TeleOpMecanum extends OpMode {
             case PAUSE2: {
                 //Move back to center x location (so the hand fits back in the robot)
                 drive.glyph.setXPower(GlyphPlacementSystem.HorizPos.CENTER);
-                if(drive.glyph.xTargetReached(GlyphPlacementSystem.HorizPos.CENTER)) {
+                if(drive.glyph.xTargetReached(GlyphPlacementSystem.HorizPos.CENTER, true)) {
                     stage = GlyphPlacementSystem.Stage.RETURN2;
                 }
                 break;
@@ -308,23 +308,45 @@ public class TeleOpMecanum extends OpMode {
     private void intakes() {
         double bRightTrigger = drive.deadZone(gamepad2.right_trigger);
         if (bRightTrigger > 0) {
-            drive.intakeRight(bRightTrigger);
+            drive.internalIntakeRight(bRightTrigger);
         }
         //Right bumper of the b controller runs the right intake backwards
         else if (gamepad2.right_bumper) {
+            drive.internalIntakeRight(-1);
+        }
+        else {
+            drive.internalIntakeRight(0);
+        }
+
+        //Left trigger of the b controller runs the left intake forward
+        double bLeftTrigger = drive.deadZone(gamepad2.left_trigger);
+        if (bLeftTrigger > 0) {
+            drive.internalIntakeLeft(bLeftTrigger);
+        }
+        //Left bumper of the b controller runs the left intake backwards
+        else if (gamepad2.left_bumper) {
+            drive.internalIntakeLeft(-1);
+        }
+        else {
+            drive.internalIntakeLeft(0);
+        }
+
+        double aRightTrigger = drive.deadZone(gamepad1.right_trigger);
+        if (aRightTrigger > 0) {
+            drive.intakeRight(aRightTrigger);
+        }
+        else if (gamepad1.right_bumper) {
             drive.intakeRight(-1);
         }
         else {
             drive.intakeRight(0);
         }
 
-        //Left trigger of the b controller runs the left intake forward
-        double bLeftTrigger = drive.deadZone(gamepad2.left_trigger);
-        if (bLeftTrigger > 0) {
-            drive.intakeLeft(bLeftTrigger);
+        double aLeftTrigger = drive.deadZone(gamepad1.left_trigger);
+        if (aLeftTrigger > 0) {
+            drive.intakeLeft(aLeftTrigger);
         }
-        //Left bumper of the b controller runs the left intake backwards
-        else if (gamepad2.left_bumper) {
+        else if (gamepad1.left_bumper) {
             drive.intakeLeft(-1);
         }
         else {
