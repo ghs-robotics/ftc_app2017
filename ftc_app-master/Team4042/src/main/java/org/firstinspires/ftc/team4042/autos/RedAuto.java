@@ -4,6 +4,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.team4042.drive.MecanumDrive;
 
+/**
+ * Knocks off the jewel and parks in the safe zone
+ */
 @Autonomous(name="RedAuto", group="autos")
 public class RedAuto extends Auto {
 
