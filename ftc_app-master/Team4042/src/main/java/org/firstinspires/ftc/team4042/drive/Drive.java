@@ -295,16 +295,22 @@ public abstract class Drive {
     public void verticalDriveDir(DcMotorSimple.Direction dir) { verticalDrive.setDirection(dir);}
 
     public void intakeLeft(double power) {
-        intakeLeft.setPower(power);
-        inLServo.setPower(power);
+        intakeLeft.setPower(power / 2);
+    }
+
+    public void intakeRight(double power) {
+        intakeRight.setPower(power / 2);
+    }
+
+    public void internalIntakeLeft(double power) {
+        inLServo.setPower(power * .82);
         if (verbose) {
             telemetry.addData("cr left servo", inLServo.getPower());
         }
     }
 
-    public void intakeRight(double power) {
-        intakeRight.setPower(power);
-        inRServo.setPower(power);
+    public void internalIntakeRight(double power) {
+        inRServo.setPower(power * .82);
         if (verbose) {
             telemetry.addData("cr right servo", inRServo.getPower());
         }

@@ -197,6 +197,9 @@ public abstract class Auto extends LinearOpMode {
                 case "p":
                     placeGlyph(parameters);
                     break;
+                case "a":
+                    alignHorizontally(parameters);
+                    break;
                 default:
                     System.err.println("Unknown function called from file " + file);
                     break;
@@ -245,6 +248,22 @@ public abstract class Auto extends LinearOpMode {
         telemetry.update();
     }
     */
+
+    public void alignHorizontally(HashMap<String, String> parameters) {
+        double prevMiddle = drive.shortIr[0].getCmAvg();
+        double currMiddle;
+        do {
+            currMiddle = drive.shortIr[0].getCmAvg();
+            if (Math.abs(prevMiddle - currMiddle) > 2) { //Moved too far left
+                drive.driveXYR(.5, 1, 0, 0, false); //Move back right
+            } else {
+                drive.driveXYR(.5, -1, 0, 0, false); //Move left
+            }
+        } while (drive.shortIr[1].getCmAvg() > 15 && drive.shortIr[2].getCmAvg() > 15 && opModeIsActive());
+
+        //When they're both non-infinite readings, stop
+        drive.stopMotors();
+    }
 
     public String getBallColor(Mat frame){
         log.add(frame.height() + " x " + frame.width());
