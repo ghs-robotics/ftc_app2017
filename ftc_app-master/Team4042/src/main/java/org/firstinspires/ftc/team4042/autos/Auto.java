@@ -3,6 +3,7 @@ package org.firstinspires.ftc.team4042.autos;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.team4042.drive.Direction;
@@ -36,7 +37,7 @@ import java.util.HashMap;
  * Parses a file to figure out which instructions to run. CAN NOT ACTUALLY RUN INSTRUCTIONS.
  */
 @Autonomous(name="Abstract Auto", group="autos")
-public abstract class Auto extends LinearVisionOpMode {
+public abstract class Auto extends LinearOpMode {
 
     MecanumDrive drive = new MecanumDrive(false);
     private VuMarkIdentifier vuMarkIdentifier = new VuMarkIdentifier();
@@ -74,7 +75,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
         loadFile();
 
-        this.setCamera(Cameras.PRIMARY);
+        /*this.setCamera(Cameras.PRIMARY);
         this.setFrameSize(new Size(900, 900));
         //enableExtension(Extensions.BEACON);
         enableExtension(Extensions.ROTATION);
@@ -83,7 +84,7 @@ public abstract class Auto extends LinearVisionOpMode {
         rotation.disableAutoRotate();
         rotation.setActivityOrientationFixed(ScreenOrientation.LANDSCAPE);
         cameraControl.setColorTemperature(CameraControlExtension.ColorTemperature.AUTO);
-        cameraControl.setAutoExposureCompensation();
+        cameraControl.setAutoExposureCompensation();*/
     }
 
     /**
@@ -252,7 +253,7 @@ public abstract class Auto extends LinearVisionOpMode {
         Rect left_crop = new Rect(new Point(215,585), new Point(380, 719));
         Rect right_crop = new Rect(new Point(460,585), new Point(620, 719));
 
-        Log.d("stupid", this.getFrameSize().width + " x " + this.getFrameSize().height);
+        //Log.d("stupid", this.getFrameSize().width + " x " + this.getFrameSize().height);
         Mat right = new Mat(frame, right_crop);
         Mat left = new Mat(frame, left_crop);
 
@@ -293,7 +294,7 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void knockRedJewel(HashMap<String, String> parameters) {
-        try {
+        /*try {
             String balls = getBallColor(getFrameRgba());
             discardFrame();
             telemetry.addData("ball orientation", balls);
@@ -321,11 +322,11 @@ public abstract class Auto extends LinearVisionOpMode {
             StringWriter sw = new StringWriter();
             ex.printStackTrace(new PrintWriter(sw));
             telemetry.addData("CvException", sw.toString());
-        }
+        }*/
     }
 
     public void knockBlueJewel(HashMap<String, String> parameters) {
-        String balls = getBallColor(getFrameRgba());
+        /*String balls = getBallColor(getFrameRgba());
         telemetry.addData("ball orientation", balls);
         switch (balls) {
             case "red":
@@ -346,7 +347,7 @@ public abstract class Auto extends LinearVisionOpMode {
             case ", red":
                 drive.jewelLeft();
                 break;
-        }
+        }*/
     }
 
     public void autoDrive(HashMap<String, String> parameters) {
