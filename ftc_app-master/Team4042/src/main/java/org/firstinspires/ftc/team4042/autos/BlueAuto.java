@@ -4,6 +4,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.team4042.drive.MecanumDrive;
 
+/**
+ *
+ */
 @Autonomous(name="BlueAuto", group="autos")
 public class BlueAuto extends Auto {
 
