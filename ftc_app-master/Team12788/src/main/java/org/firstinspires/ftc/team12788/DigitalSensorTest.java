@@ -56,7 +56,7 @@ public class DigitalSensorTest extends OpMode
 
     @Override
     public void init() {
-        whisker = hardwareMap.digitalChannel.get("whisker");
+        whisker = hardwareMap.digitalChannel.get("center");
         whisker.setState(true);
         whisker.setMode(DigitalChannel.Mode.INPUT);
     }
