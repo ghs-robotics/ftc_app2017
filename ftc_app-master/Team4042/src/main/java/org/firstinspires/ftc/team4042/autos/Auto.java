@@ -463,7 +463,7 @@ public abstract class Auto extends LinearOpMode {
 
         double currDistance = ir.getCmAvg();
         if (currDistance == -1) {
-            telemetry.addData("Error", "Couldn't find ultrasonic");
+            telemetry.addData("Error", "Couldn't find sensor");
         } else {
             double r = drive.useGyro()/180;
 
@@ -476,8 +476,19 @@ public abstract class Auto extends LinearOpMode {
                 telemetry.update();
             }
 
+            do {
+                double speedFactor = speed;
+                if (((targetDistance > currDistance) && direction.isForward()) ||
+                        ((targetDistance < currDistance) && direction.isBackward())) { //If you're too far, drive *backwards*
+                    speedFactor *= -1;
+                }
+                drive.driveXYR(speedFactor, direction.getX(), direction.getY(), r, false);
+
+                currDistance = ir.getCmAvg();
+            } while ((Math.abs(targetDistance - currDistance) > 2) && opModeIsActive());
+
             //If you're off your target by more than 2 cm, try to adjust
-            while ((Math.abs(targetDistance - currDistance) > 2) && opModeIsActive()) {
+            /*while ((Math.abs(targetDistance - currDistance) > 2) && opModeIsActive()) {
                 if (((targetDistance > currDistance) && direction.isBackward()) ||
                         ((targetDistance < currDistance) && direction.isForward())) { //If you're not far enough, keep driving
                     drive.driveWithEncoders(direction, .25, 100);
@@ -486,7 +497,7 @@ public abstract class Auto extends LinearOpMode {
                     drive.driveWithEncoders(direction, -.25, 100);
                 }
                 currDistance = ir.getCmAvg();
-            }
+            }*/
 
             //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
             drive.stopMotors();

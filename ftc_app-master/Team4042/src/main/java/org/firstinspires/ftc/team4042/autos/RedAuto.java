@@ -13,9 +13,7 @@ public class RedAuto extends Auto {
     public void runOpMode() {
 
         super.setUp(drive, "red.txt");
-        try {
-            waitForStart();
-        } catch (InterruptedException ex) { }
+        waitForStart();
 
         super.runAuto();
         
