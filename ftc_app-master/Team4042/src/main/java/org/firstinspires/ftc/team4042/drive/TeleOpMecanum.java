@@ -147,6 +147,7 @@ public class TeleOpMecanum extends OpMode {
             if (drive.getVerticalDriveMode().equals(DcMotor.RunMode.RUN_TO_POSITION)) {
                 drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
             } else {
+                drive.stage = GlyphPlacementSystem.Stage.RETURN1;
                 drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
         }
