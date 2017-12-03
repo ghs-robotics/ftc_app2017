@@ -162,11 +162,11 @@ public class MecanumDrive extends Drive {
         y = super.deadZone(y);
         r = super.deadZone(r);
 
-        if (verbose) {
+        /*if (verbose) {
             telemetry.addData("x", x);
             telemetry.addData("y", y);
             telemetry.addData("r", r);
-        }
+        }*/
 
         double heading = OFFSET;
         if (useGyro) {
