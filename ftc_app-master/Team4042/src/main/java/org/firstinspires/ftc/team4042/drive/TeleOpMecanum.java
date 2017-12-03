@@ -38,26 +38,26 @@ public class TeleOpMecanum extends OpMode {
     GAMEPAD 1:
       Joystick 1 X & Y - movement
       Joystick 2 X - rotation
-      Bumpers - speed modes
-      Triggers -
+      Bumpers - external intakes backwards
+      Triggers - external intakes forwards
       Dpad -
       A - toggle verbose
       B -
       X - toggle crawl
-      Y - toggle extendo (with gamepad2)
+      Y - toggle extendo
       Start -
       Back -
 
     GAMEPAD 2:
       Joystick 1 Y - controls placer in manual
       Joystick 2 Y -
-      Bumpers - run intakes backwards
-      Triggers - run intakes forwards
+      Bumpers - internal intakes backwards
+      Triggers - internal intakes forwards
       Dpad - placer
       A - places glyph
       B - manual hand toggle
       X - toggles manual placement mode
-      Y - resets the glyph
+      Y - resets the glyph placer
       Start -
       Back -
      */

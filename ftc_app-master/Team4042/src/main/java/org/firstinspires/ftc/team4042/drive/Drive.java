@@ -457,7 +457,7 @@ public abstract class Drive {
 
     public void raiseBrakes() {
         leftBrake.setPosition(.12);
-        rightBrake.setPosition(.65);
+        rightBrake.setPosition(.68);
     }
 
     public void jewelAdjust(double adjustAmt) {
