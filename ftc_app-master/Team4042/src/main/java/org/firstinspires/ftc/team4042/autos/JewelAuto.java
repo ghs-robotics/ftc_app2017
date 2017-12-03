@@ -17,7 +17,11 @@ public class JewelAuto extends Auto {
     public void runOpMode() {
 
         super.setUp(drive, "jewel.txt");
-        waitForStart();
+        try {
+            waitForStart();
+        } catch (InterruptedException ex) {
+
+        }
 
         super.runAuto();
         

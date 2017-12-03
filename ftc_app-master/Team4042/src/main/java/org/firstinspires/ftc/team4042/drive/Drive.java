@@ -266,8 +266,8 @@ public abstract class Drive {
             }
             case RELEASE: {
                 if (handDropTimer.seconds() >= 1) {
-                    glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
-                    if (glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
+                    glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISEDBACK);
+                    if (glyph.currentY.equals(GlyphPlacementSystem.Position.RAISEDBACK)) {
                         stage = GlyphPlacementSystem.Stage.PAUSE2;
                     }
                 }

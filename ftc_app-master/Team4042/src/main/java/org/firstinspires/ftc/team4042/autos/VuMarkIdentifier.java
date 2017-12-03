@@ -147,7 +147,6 @@ public class VuMarkIdentifier {
         Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true);
         vuforia.setFrameQueueCapacity(1);
 
-        //1280x720
         try {
             frame = vuforia.getFrameQueue().take();
         } catch (InterruptedException e) {
