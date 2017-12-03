@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.team4042.drive.Direction;
+import org.firstinspires.ftc.team4042.drive.GlyphPlacementSystem;
 import org.firstinspires.ftc.team4042.drive.MecanumDrive;
 import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
 import org.lasarobotics.vision.android.Cameras;
@@ -40,7 +41,7 @@ import java.util.HashMap;
 @Autonomous(name="Abstract Auto", group="autos")
 public abstract class Auto extends LinearOpMode {
 
-    MecanumDrive drive = new MecanumDrive(false);
+    MecanumDrive drive = new MecanumDrive(true);
     private VuMarkIdentifier vuMarkIdentifier = new VuMarkIdentifier();
     private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.CENTER;
 
@@ -270,8 +271,8 @@ public abstract class Auto extends LinearOpMode {
         log.add(frame.height() + " x " + frame.width());
         Imgproc.resize(frame, frame, new Size(960, 720));
         telemetry.update();
-        Rect left_crop = new Rect(new Point(215,585), new Point(380, 719));
-        Rect right_crop = new Rect(new Point(460,585), new Point(620, 719));
+        Rect left_crop = new Rect(new Point(867,1621), new Point(1369, 1865));
+        Rect right_crop = new Rect(new Point(1651,1609), new Point(2147, 1865));
 
         //Log.d("stupid", this.getFrameSize().width + " x " + this.getFrameSize().height);
         Mat right = new Mat(frame, right_crop);
@@ -298,34 +299,20 @@ public abstract class Auto extends LinearOpMode {
     }
 
     public void placeGlyph(HashMap<String, String> parameters) {
-        log.add("running glyph place");
         //TODO: MAKE THIS A USEFUL FUNCTION based on vuMark
 
         //drive.glyph.setHomeTarget();
         drive.setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
         drive.glyph.setTarget(vuMark, 0);
+        drive.stage = GlyphPlacementSystem.Stage.HOME;
 
         boolean done = false;
 
         do {
-            log.add("done: " + done);
-            log.add("target: " + drive.glyph.getTargetPositionAsString());
             drive.glyph.runToPosition();
-            log.add("ran to position");
             done = drive.uTrack(); //GETS STUCK IN THIS FUNCTION
-            log.add("ran u track");
         } while (opModeIsActive() && !done);
-
-        log.add("opModeIsActive: " + opModeIsActive());
-        log.add("!done: " + !done);
-
-        ElapsedTime test = new ElapsedTime();
-        test.reset();
-
-        while (test.seconds() < 20) {
-            log.add("seconds: " + test.seconds());
-        }
     }
 
     public void jewelUp(HashMap<String, String> parameters) {
@@ -341,9 +328,8 @@ public abstract class Auto extends LinearOpMode {
     }
 
     public void knockRedJewel(HashMap<String, String> parameters) {
-        /*try {
-            String balls = getBallColor(getFrameRgba());
-            discardFrame();
+        try {
+            String balls = getBallColor(vuMarkIdentifier.getFrameAsMat());
             telemetry.addData("ball orientation", balls);
             switch (balls) {
                 case "red":
@@ -369,12 +355,14 @@ public abstract class Auto extends LinearOpMode {
             StringWriter sw = new StringWriter();
             ex.printStackTrace(new PrintWriter(sw));
             telemetry.addData("CvException", sw.toString());
-        }*/
+        }
     }
 
     public void knockBlueJewel(HashMap<String, String> parameters) {
-        /*String balls = getBallColor(getFrameRgba());
-        telemetry.addData("ball orientation", balls);
+        log.add("blue jewel");
+        Mat mat = vuMarkIdentifier.getFrameAsMat();
+        String balls = getBallColor(mat);
+        log.add("ball orientation: " + balls);
         switch (balls) {
             case "red":
                 drive.jewelRight();
@@ -394,7 +382,7 @@ public abstract class Auto extends LinearOpMode {
             case ", red":
                 drive.jewelLeft();
                 break;
-        }*/
+        }
     }
 
     public void autoDrive(HashMap<String, String> parameters) {
@@ -523,14 +511,14 @@ public abstract class Auto extends LinearOpMode {
         } else {
             double r = drive.useGyro()/180;
 
-            if (drive.verbose) {
+            /*if (drive.verbose) {
                 telemetry.addData("currDistance", currDistance);
                 telemetry.addData("Reached target", Math.abs(targetDistance - currDistance) > 2);
                 telemetry.addData("x", direction.getX());
                 telemetry.addData("y", direction.getY());
                 telemetry.addData("r", r);
                 telemetry.update();
-            }
+            }*/
 
             do {
                 double speedFactor = speed;
