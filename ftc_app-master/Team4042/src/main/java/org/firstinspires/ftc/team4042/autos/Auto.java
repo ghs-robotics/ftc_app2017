@@ -380,8 +380,9 @@ public abstract class Auto extends LinearOpMode {
         Direction direction = new Direction(Double.parseDouble(parameters.get("x")), -Double.parseDouble(parameters.get("y")));
         double speed = Double.parseDouble(parameters.get("speed"));
         double targetTicks = Double.parseDouble(parameters.get("target"));
+        double time = parameters.containsKey("time") ? Double.parseDouble(parameters.get("time")) : -1;
 
-        autoDrive(direction, speed, targetTicks);
+        autoDrive(direction, speed, targetTicks, time);
     }
 
     /**
@@ -390,10 +391,13 @@ public abstract class Auto extends LinearOpMode {
      * @param speed The speed to move at
      * @param targetTicks The final distance to have travelled, in encoder ticks
      */
-    private void autoDrive(Direction direction, double speed, double targetTicks) {
+    private void autoDrive(Direction direction, double speed, double targetTicks, double time) {
         //log.add("autoDrive invoked with direction " + direction + " speed " + speed + " targetTicks " + targetTicks);
         boolean done = false;
-        while (!done && opModeIsActive()) {
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
+        while (opModeIsActive() && (!done && ((time != -1 && timer.seconds() <= time)) || (time == -1 && !done))) {
+            //Keep going if (you're not done and the seconds are less than the target) or (you're not waiting for the timer and you're not done)
             done = drive.driveWithEncoders(direction, speed, targetTicks);
             //telemetry.update();
         }
@@ -405,7 +409,7 @@ public abstract class Auto extends LinearOpMode {
         Direction direction = new Direction(Double.parseDouble(parameters.get("x")), -Double.parseDouble(parameters.get("y")));
         double speed = Double.parseDouble(parameters.get("speed"));
 
-        autoDrive(direction, speed, 500);
+        autoDrive(direction, speed, 500, -1);
 
         double roll;
         double pitch;
@@ -414,7 +418,7 @@ public abstract class Auto extends LinearOpMode {
             drive.gyro.updateAngles();
             roll = drive.gyro.getRoll();
             pitch = drive.gyro.getPitch();
-            autoDrive(direction, speed, 100);
+            autoDrive(direction, speed, 100, -1);
         }
         while ((Math.abs(roll - startRoll) >= 3) ||
                 (Math.abs(pitch - startPitch) >= 3));
@@ -489,7 +493,7 @@ public abstract class Auto extends LinearOpMode {
      */
     private void autoSensorDrive(Direction direction, double speed, double targetDistance, double targetTicks, AnalogSensor ir) {
 
-        autoDrive(direction, speed, targetTicks);
+        autoDrive(direction, speed, targetTicks, -1);
 
         double currDistance = ir.getCmAvg();
         if (currDistance == -1) {
