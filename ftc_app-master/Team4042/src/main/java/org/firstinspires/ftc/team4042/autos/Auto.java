@@ -300,6 +300,11 @@ public abstract class Auto extends LinearOpMode {
         //TODO: MAKE THIS A USEFUL FUNCTION based on vuMark
 
         drive.glyph.setTarget(vuMark, 3);
+
+        do {
+            drive.glyph.runToPosition();
+
+        } while (opModeIsActive() && drive.uTrack());
     }
 
     public void jewelUp(HashMap<String, String> parameters) {
@@ -392,6 +397,8 @@ public abstract class Auto extends LinearOpMode {
             done = drive.driveWithEncoders(direction, speed, targetTicks);
             //telemetry.update();
         }
+        drive.resetEncoders();
+        drive.runWithEncoders();
     }
 
     private void autoDriveOff(HashMap<String, String> parameters) {
