@@ -30,7 +30,7 @@ public abstract class Drive {
     //The power to put to the motors to stop them
     public static final double STOP_SPEED = 0;
 
-    public static final double MAGIC_NUMBER = .6;
+    public static final double MAGIC_NUMBER = .8;
 
     public static final boolean THE_FAST_ONES_ARE_THE_FRONT_ONES = true;
     public static final double LOW_SPEED_MOTOR_THINGS = 7;
@@ -266,8 +266,8 @@ public abstract class Drive {
             }
             case RELEASE: {
                 if (handDropTimer.seconds() >= 1) {
-                    glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
-                    if (glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
+                    glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISEDBACK);
+                    if (glyph.currentY.equals(GlyphPlacementSystem.Position.RAISEDBACK)) {
                         stage = GlyphPlacementSystem.Stage.PAUSE2;
                     }
                 }
