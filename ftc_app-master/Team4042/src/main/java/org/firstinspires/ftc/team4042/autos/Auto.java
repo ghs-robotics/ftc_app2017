@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.team4042.drive.Direction;
@@ -297,14 +298,34 @@ public abstract class Auto extends LinearOpMode {
     }
 
     public void placeGlyph(HashMap<String, String> parameters) {
+        log.add("running glyph place");
         //TODO: MAKE THIS A USEFUL FUNCTION based on vuMark
 
-        drive.glyph.setTarget(vuMark, 3);
+        //drive.glyph.setHomeTarget();
+        drive.setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        drive.glyph.setTarget(vuMark, 0);
+
+        boolean done = false;
 
         do {
+            log.add("done: " + done);
+            log.add("target: " + drive.glyph.getTargetPositionAsString());
             drive.glyph.runToPosition();
+            log.add("ran to position");
+            done = drive.uTrack(); //GETS STUCK IN THIS FUNCTION
+            log.add("ran u track");
+        } while (opModeIsActive() && !done);
 
-        } while (opModeIsActive() && drive.uTrack());
+        log.add("opModeIsActive: " + opModeIsActive());
+        log.add("!done: " + !done);
+
+        ElapsedTime test = new ElapsedTime();
+        test.reset();
+
+        while (test.seconds() < 20) {
+            log.add("seconds: " + test.seconds());
+        }
     }
 
     public void jewelUp(HashMap<String, String> parameters) {
@@ -381,8 +402,9 @@ public abstract class Auto extends LinearOpMode {
         double speed = Double.parseDouble(parameters.get("speed"));
         double targetTicks = Double.parseDouble(parameters.get("target"));
         double time = parameters.containsKey("time") ? Double.parseDouble(parameters.get("time")) : -1;
+        boolean useGyro = parameters.containsKey("gyro");
 
-        autoDrive(direction, speed, targetTicks, time);
+        autoDrive(direction, speed, targetTicks, time, useGyro);
     }
 
     /**
@@ -391,14 +413,14 @@ public abstract class Auto extends LinearOpMode {
      * @param speed The speed to move at
      * @param targetTicks The final distance to have travelled, in encoder ticks
      */
-    private void autoDrive(Direction direction, double speed, double targetTicks, double time) {
+    private void autoDrive(Direction direction, double speed, double targetTicks, double time, boolean useGyro) {
         //log.add("autoDrive invoked with direction " + direction + " speed " + speed + " targetTicks " + targetTicks);
         boolean done = false;
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
         while (opModeIsActive() && (!done && ((time != -1 && timer.seconds() <= time)) || (time == -1 && !done))) {
             //Keep going if (you're not done and the seconds are less than the target) or (you're not waiting for the timer and you're not done)
-            done = drive.driveWithEncoders(direction, speed, targetTicks);
+            done = drive.driveWithEncoders(direction, speed, targetTicks, useGyro);
             //telemetry.update();
         }
         drive.resetEncoders();
@@ -409,7 +431,7 @@ public abstract class Auto extends LinearOpMode {
         Direction direction = new Direction(Double.parseDouble(parameters.get("x")), -Double.parseDouble(parameters.get("y")));
         double speed = Double.parseDouble(parameters.get("speed"));
 
-        autoDrive(direction, speed, 500, -1);
+        autoDrive(direction, speed, 500, -1, false);
 
         double roll;
         double pitch;
@@ -418,7 +440,7 @@ public abstract class Auto extends LinearOpMode {
             drive.gyro.updateAngles();
             roll = drive.gyro.getRoll();
             pitch = drive.gyro.getPitch();
-            autoDrive(direction, speed, 100, -1);
+            autoDrive(direction, speed, 100, -1, false);
         }
         while ((Math.abs(roll - startRoll) >= 3) ||
                 (Math.abs(pitch - startPitch) >= 3));
@@ -493,7 +515,7 @@ public abstract class Auto extends LinearOpMode {
      */
     private void autoSensorDrive(Direction direction, double speed, double targetDistance, double targetTicks, AnalogSensor ir) {
 
-        autoDrive(direction, speed, targetTicks, -1);
+        autoDrive(direction, speed, targetTicks, -1, false);
 
         double currDistance = ir.getCmAvg();
         if (currDistance == -1) {
