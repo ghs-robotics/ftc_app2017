@@ -39,10 +39,10 @@ import java.util.HashMap;
  * Parses a file to figure out which instructions to run. CAN NOT ACTUALLY RUN INSTRUCTIONS.
  */
 @Autonomous(name="Abstract Auto", group="autos")
-public abstract class Auto extends LinearOpMode {
+public abstract class Auto extends LinearVisionOpMode {
 
     MecanumDrive drive = new MecanumDrive(true);
-    private VuMarkIdentifier vuMarkIdentifier = new VuMarkIdentifier();
+    //private VuMarkIdentifier vuMarkIdentifier = new VuMarkIdentifier();
     private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.CENTER;
 
     private Telemetry.Log log;
@@ -70,7 +70,7 @@ public abstract class Auto extends LinearOpMode {
         //drive.setUseGyro(true);
         //telemetry.addData("glyph", drive.glyph.getTargetPositionAsString());
 
-        vuMarkIdentifier.initialize(telemetry, hardwareMap);
+        //vuMarkIdentifier.initialize(telemetry, hardwareMap);
 
         log.add("Reading file " + filePath);
         file = new File("./storage/emulated/0/DCIM/" + filePath);
@@ -228,7 +228,7 @@ public abstract class Auto extends LinearOpMode {
     }
 
     public void getVuMark(HashMap<String, String> parameters) {
-        vuMark = vuMarkIdentifier.getMark();
+        //vuMark = vuMarkIdentifier.getMark();
         telemetry.addData("vuMark", vuMark);
         telemetry.update();
     }
@@ -269,10 +269,10 @@ public abstract class Auto extends LinearOpMode {
 
     public String getBallColor(Mat frame){
         log.add(frame.height() + " x " + frame.width());
-        Imgproc.resize(frame, frame, new Size(960, 720));
+        //Imgproc.resize(frame, frame, new Size(960, 720));
         telemetry.update();
-        Rect left_crop = new Rect(new Point(867,1621), new Point(1369, 1865));
-        Rect right_crop = new Rect(new Point(1651,1609), new Point(2147, 1865));
+        Rect left_crop = new Rect(new Point(215,585), new Point(380, 719));
+        Rect right_crop = new Rect(new Point(460,585), new Point(620, 719));
 
         //Log.d("stupid", this.getFrameSize().width + " x " + this.getFrameSize().height);
         Mat right = new Mat(frame, right_crop);
@@ -329,7 +329,8 @@ public abstract class Auto extends LinearOpMode {
 
     public void knockRedJewel(HashMap<String, String> parameters) {
         try {
-            String balls = getBallColor(vuMarkIdentifier.getFrameAsMat());
+            //String balls = getBallColor(vuMarkIdentifier.getFrameAsMat());
+            String balls = getBallColor(getFrameRgba());
             telemetry.addData("ball orientation", balls);
             switch (balls) {
                 case "red":
@@ -360,7 +361,7 @@ public abstract class Auto extends LinearOpMode {
 
     public void knockBlueJewel(HashMap<String, String> parameters) {
         log.add("blue jewel");
-        Mat mat = vuMarkIdentifier.getFrameAsMat();
+        Mat mat = getFrameRgba();
         String balls = getBallColor(mat);
         log.add("ball orientation: " + balls);
         switch (balls) {
@@ -431,7 +432,7 @@ public abstract class Auto extends LinearOpMode {
             autoDrive(direction, speed, 100, -1, false);
         }
         while ((Math.abs(roll - startRoll) >= 3) ||
-                (Math.abs(pitch - startPitch) >= 3));
+                (Math.abs(pitch - startPitch) >= 3) && opModeIsActive());
             //If too tipped forward/backwards
             //or left/right
             //keep driving
