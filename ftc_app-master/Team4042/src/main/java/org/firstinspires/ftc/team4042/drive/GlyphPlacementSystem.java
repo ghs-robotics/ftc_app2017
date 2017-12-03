@@ -13,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 public class GlyphPlacementSystem {
 
     public final double HORIZONTAL_TRANSLATION_TIME = 2;
-    public final int PLACEMENT_ERROR_MARGIN = 50;
+    public final int PLACEMENT_ERROR_MARGIN = 100;
     private int targetX;
     private int targetY;
     public Position currentY;
@@ -180,10 +180,10 @@ public class GlyphPlacementSystem {
         if (pos < PLACEMENT_ERROR_MARGIN) {
             currentY = Position.HOME;
         }
-        else if (Math.abs(pos - Position.RAISED.getEncoderVal()) < 100) {
+        else if (Math.abs(pos - Position.RAISED.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
             currentY = Position.RAISED;
         }
-        else if (Math.abs(pos - Position.RAISEDBACK.getEncoderVal()) < 100) {
+        else if (Math.abs(pos - Position.RAISEDBACK.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
             currentY = Position.RAISEDBACK;
         }
         else if (Math.abs(pos - Position.TOP.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {

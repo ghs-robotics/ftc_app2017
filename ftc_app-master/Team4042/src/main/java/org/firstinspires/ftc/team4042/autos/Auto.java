@@ -155,7 +155,7 @@ public abstract class Auto extends LinearOpMode {
         drive.jewelUp();
         drive.resetEncoders();
         drive.setEncoders(true);
-        drive.setVerbose(false);
+        drive.setVerbose(true);
 
         timer.reset();
         //Reads each instruction and acts accordingly
