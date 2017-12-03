@@ -31,12 +31,6 @@ public class TeleOpMecanum extends OpMode {
     private boolean bB;
     //CONTROL BOOLEANS END
 
-    private GlyphPlacementSystem.Position targetY;
-    private GlyphPlacementSystem.HorizPos targetX;
-    private boolean uTrackAtBottom = true;
-    private ElapsedTime handDropTimer = new ElapsedTime();
-    private GlyphPlacementSystem.Stage stage;
-
     private Drive drive = new MecanumDrive(true);
 
     /**
@@ -74,9 +68,9 @@ public class TeleOpMecanum extends OpMode {
 
         telemetry.update();
 
-        targetY = GlyphPlacementSystem.Position.TOP;
-        targetX = GlyphPlacementSystem.HorizPos.LEFT;
-        stage = GlyphPlacementSystem.Stage.HOME;
+        drive.targetY = GlyphPlacementSystem.Position.TOP;
+        drive.targetX = GlyphPlacementSystem.HorizPos.LEFT;
+        drive.stage = GlyphPlacementSystem.Stage.HOME;
         drive.glyph.setHomeTarget();
 
         adjustedSpeed = MecanumDrive.FULL_SPEED;
@@ -123,12 +117,12 @@ public class TeleOpMecanum extends OpMode {
         //speedModes();
 
         //If you're at the bottom, haven't been pushing a, and now are pushing a
-        if (uTrackAtBottom && !bA && gamepad2.a) {
-            uTrack();
+        if (drive.uTrackAtBottom && !bA && gamepad2.a) {
+            drive.uTrack();
         }
         //If you're not at the bottom and are pushing a
-        if (!uTrackAtBottom && gamepad2.a) {
-            uTrack();
+        if (!drive.uTrackAtBottom && gamepad2.a) {
+            drive.uTrack();
         }
         bA = gamepad2.a;
 
@@ -205,106 +199,14 @@ public class TeleOpMecanum extends OpMode {
         }
     }
 
-    private void uTrack() {
-        switch (stage) {
-            case HOME: {
-                //Close the hand
-                drive.closeHand();
-                drive.jewelOut();
-                handDropTimer.reset();
-
-                drive.glyph.currentY = GlyphPlacementSystem.Position.HOME;
-                drive.glyph.currentX = GlyphPlacementSystem.HorizPos.CENTER;
-
-                stage = GlyphPlacementSystem.Stage.GRAB;
-                uTrackAtBottom = false;
-                break;
-            }
-            case GRAB: {
-                if (handDropTimer.seconds() >= 1) {
-                    stage = GlyphPlacementSystem.Stage.PLACE1;
-                }
-                break;
-            }
-            case PLACE1: {
-                //Raise the u-track
-                drive.glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
-                if(drive.glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
-                    stage = GlyphPlacementSystem.Stage.PAUSE1;
-                    drive.glyph.setXPower(targetX);
-                }
-                break;
-            }
-            case PAUSE1: {
-                //Move to target X location
-                if(drive.glyph.xTargetReached(targetX)) {
-                    stage = GlyphPlacementSystem.Stage.PLACE2;
-                }
-                break;
-            }
-            case PLACE2:{
-                //Move to target Y location
-                drive.glyph.setTargetPosition(targetY);
-                if(drive.glyph.currentY.equals(targetY)) {
-                    stage = GlyphPlacementSystem.Stage.RETURN1;
-                }
-                break;
-            }
-            case RETURN1: {
-                //Open the hand; raise the u-track
-                drive.openHand();
-                handDropTimer.reset();
-
-                stage = GlyphPlacementSystem.Stage.RELEASE;
-                break;
-            }
-            case RELEASE: {
-                if (handDropTimer.seconds() >= 1) {
-                    drive.glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
-                    if (drive.glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
-                        stage = GlyphPlacementSystem.Stage.PAUSE2;
-                    }
-                }
-                break;
-            }
-            case PAUSE2: {
-                //Move back to center x location (so the hand fits back in the robot)
-                drive.glyph.setXPower(GlyphPlacementSystem.HorizPos.CENTER);
-                if(drive.glyph.xTargetReached(GlyphPlacementSystem.HorizPos.CENTER)) {
-                    stage = GlyphPlacementSystem.Stage.RETURN2;
-                    if (targetX.equals(GlyphPlacementSystem.HorizPos.LEFT)) {
-                        drive.glyph.adjustBack();
-                    }
-                }
-                break;
-            }
-            case RETURN2: {
-                //Move back to the bottom and get ready to do it again
-                drive.glyph.setHomeTarget();
-                stage = GlyphPlacementSystem.Stage.RESET;
-                uTrackAtBottom = true;
-                break;
-            }
-            case RESET: {
-                if (drive.glyph.currentY.equals(GlyphPlacementSystem.Position.HOME)) {
-                    stage = GlyphPlacementSystem.Stage.HOME;
-                    drive.jewelUp();
-                    drive.setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
-                }
-                break;
-            }
-        }
-    }
-
     private void glyphLocate() {
-        if (gamepad2.dpad_up && !bUp) { targetY = GlyphPlacementSystem.Position.values()[drive.glyph.up() + 2]; }
+        if (gamepad2.dpad_up && !bUp) { drive.targetY = GlyphPlacementSystem.Position.values()[drive.glyph.up() + 2]; }
         bUp = gamepad2.dpad_up;
-        if (gamepad2.dpad_down && !bDown) { targetY = GlyphPlacementSystem.Position.values()[drive.glyph.down() + 2]; }
+        if (gamepad2.dpad_down && !bDown) { drive.targetY = GlyphPlacementSystem.Position.values()[drive.glyph.down() + 2]; }
         bDown = gamepad2.dpad_down;
-        if (gamepad2.dpad_left && !bLeft) { targetX = GlyphPlacementSystem.HorizPos.values()[drive.glyph.left()]; }
+        if (gamepad2.dpad_left && !bLeft) { drive.targetX = GlyphPlacementSystem.HorizPos.values()[drive.glyph.left()]; }
         bLeft = gamepad2.dpad_left;
-        if (gamepad2.dpad_right && !bRight) { targetX = GlyphPlacementSystem.HorizPos.values()[drive.glyph.right()]; }
+        if (gamepad2.dpad_right && !bRight) { drive.targetX = GlyphPlacementSystem.HorizPos.values()[drive.glyph.right()]; }
         bRight = gamepad2.dpad_right;
     }
 
@@ -383,17 +285,17 @@ public class TeleOpMecanum extends OpMode {
             telemetry.addData("encoder currentY pos", drive.verticalDriveCurrPos());
             telemetry.addData("hand is open", drive.isHandOpen());
             telemetry.addData("limit switch", drive.getCenterState());
-            telemetry.addData("targetY", targetY.toString());
+            telemetry.addData("targetY", drive.targetY.toString());
             telemetry.addData("Current pos", drive.glyph.currentY.toString());
             telemetry.addData("encoder targetY pos", drive.verticalDriveTargetPos());
-            telemetry.addData("stage", stage);
+            telemetry.addData("stage", drive.stage);
             telemetry.addData("gamepad2.a", gamepad2.a);
-            telemetry.addData("handDropTimer seconds", handDropTimer.seconds());
+            telemetry.addData("handDropTimer seconds", drive.handDropTimer.seconds());
             telemetry.addData("horizontal u", drive.getHorizontalDrive());
             telemetry.addData("horizontal translate timer", drive.glyph.horizontalTimer.seconds());
-            telemetry.addData("target pos",targetX + " horiz time " + drive.glyph.horizontalTimer.seconds() + " horiz trans time " + drive.glyph.HORIZONTAL_TRANSLATION_TIME);
-            telemetry.addData("boolean",((targetX.equals(GlyphPlacementSystem.HorizPos.LEFT) ||
-                    targetX.equals(GlyphPlacementSystem.HorizPos.RIGHT)) + " bool " + (drive.glyph.horizontalTimer.seconds() >= drive.glyph.HORIZONTAL_TRANSLATION_TIME)));
+            telemetry.addData("target pos",drive.targetX + " horiz time " + drive.glyph.horizontalTimer.seconds() + " horiz trans time " + drive.glyph.HORIZONTAL_TRANSLATION_TIME);
+            telemetry.addData("boolean",((drive.targetX.equals(GlyphPlacementSystem.HorizPos.LEFT) ||
+                    drive.targetX.equals(GlyphPlacementSystem.HorizPos.RIGHT)) + " bool " + (drive.glyph.horizontalTimer.seconds() >= drive.glyph.HORIZONTAL_TRANSLATION_TIME)));
         }
         if (Drive.useGyro) {
             telemetry.addData("gyro", drive.gyro.updateHeading());

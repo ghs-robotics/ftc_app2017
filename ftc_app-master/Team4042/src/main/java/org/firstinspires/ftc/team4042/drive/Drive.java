@@ -86,7 +86,11 @@ public abstract class Drive {
     private boolean handIsOpen = false;
 
     public GlyphPlacementSystem glyph;
-
+    public GlyphPlacementSystem.Stage stage;
+    public ElapsedTime handDropTimer = new ElapsedTime();
+    public boolean uTrackAtBottom = true;
+    public GlyphPlacementSystem.Position targetY;
+    public GlyphPlacementSystem.HorizPos targetX;
 
 
     Telemetry telemetry;
@@ -205,6 +209,99 @@ public abstract class Drive {
         verticalDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         verticalDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         //verticalDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+    }
+
+    public boolean uTrack() {
+        switch (stage) {
+            case HOME: {
+                //Close the hand
+                closeHand();
+                jewelOut();
+                handDropTimer.reset();
+
+                glyph.currentY = GlyphPlacementSystem.Position.HOME;
+                glyph.currentX = GlyphPlacementSystem.HorizPos.CENTER;
+
+                stage = GlyphPlacementSystem.Stage.GRAB;
+                uTrackAtBottom = false;
+                return false;
+            }
+            case GRAB: {
+                if (handDropTimer.seconds() >= 1) {
+                    stage = GlyphPlacementSystem.Stage.PLACE1;
+                }
+                return false;
+            }
+            case PLACE1: {
+                //Raise the u-track
+                glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
+                if(glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
+                    stage = GlyphPlacementSystem.Stage.PAUSE1;
+                    glyph.setXPower(targetX);
+                }
+                return false;
+            }
+            case PAUSE1: {
+                //Move to target X location
+                if(glyph.xTargetReached(targetX)) {
+                    stage = GlyphPlacementSystem.Stage.PLACE2;
+                }
+                return false;
+            }
+            case PLACE2:{
+                //Move to target Y location
+                glyph.setTargetPosition(targetY);
+                if(glyph.currentY.equals(targetY)) {
+                    stage = GlyphPlacementSystem.Stage.RETURN1;
+                }
+                return false;
+            }
+            case RETURN1: {
+                //Open the hand; raise the u-track
+                openHand();
+                handDropTimer.reset();
+
+                stage = GlyphPlacementSystem.Stage.RELEASE;
+                return false;
+            }
+            case RELEASE: {
+                if (handDropTimer.seconds() >= 1) {
+                    glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
+                    if (glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
+                        stage = GlyphPlacementSystem.Stage.PAUSE2;
+                    }
+                }
+                return false;
+            }
+            case PAUSE2: {
+                //Move back to center x location (so the hand fits back in the robot)
+                glyph.setXPower(GlyphPlacementSystem.HorizPos.CENTER);
+                if(glyph.xTargetReached(GlyphPlacementSystem.HorizPos.CENTER)) {
+                    stage = GlyphPlacementSystem.Stage.RETURN2;
+                    if (targetX.equals(GlyphPlacementSystem.HorizPos.LEFT)) {
+                        glyph.adjustBack();
+                    }
+                }
+                return false;
+            }
+            case RETURN2: {
+                //Move back to the bottom and get ready to do it again
+                glyph.setHomeTarget();
+                stage = GlyphPlacementSystem.Stage.RESET;
+                uTrackAtBottom = true;
+                return false;
+            }
+            case RESET: {
+                if (glyph.currentY.equals(GlyphPlacementSystem.Position.HOME)) {
+                    stage = GlyphPlacementSystem.Stage.HOME;
+                    jewelUp();
+                    setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
