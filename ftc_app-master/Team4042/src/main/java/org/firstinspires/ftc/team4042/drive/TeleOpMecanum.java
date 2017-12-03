@@ -29,6 +29,7 @@ public class TeleOpMecanum extends OpMode {
     private boolean bA;
     private boolean bX;
     private boolean bB;
+    private boolean bY;
     //CONTROL BOOLEANS END
 
     private Drive drive = new MecanumDrive(true);
@@ -56,7 +57,7 @@ public class TeleOpMecanum extends OpMode {
       A - places glyph
       B - manual hand toggle
       X - toggles manual placement mode
-      Y -
+      Y - resets the glyph
       Start -
       Back -
      */
@@ -94,6 +95,12 @@ public class TeleOpMecanum extends OpMode {
             toggleExtendo();
         }
         aY = gamepad1.y;
+
+        if (gamepad2.y && !bY) {
+            //glyph reset
+            drive.resetUTrack();
+        }
+        bY = gamepad2.y;
 
         //The X button on the first controller - toggle crawling to let us adjust the back of the robot too
         if (gamepad1.x && !aX) {

@@ -293,15 +293,19 @@ public abstract class Drive {
             }
             case RESET: {
                 if (glyph.currentY.equals(GlyphPlacementSystem.Position.HOME)) {
-                    stage = GlyphPlacementSystem.Stage.HOME;
-                    jewelUp();
-                    setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    resetUTrack();
                 }
                 return true;
             }
         }
         return false;
+    }
+
+    public void resetUTrack() {
+        stage = GlyphPlacementSystem.Stage.HOME;
+        jewelUp();
+        setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
     /**
