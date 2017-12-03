@@ -14,6 +14,7 @@ public class GlyphPlacementSystem {
 
     public final double HORIZONTAL_TRANSLATION_TIME = 2;
     public final int PLACEMENT_ERROR_MARGIN = 100;
+    private final int SPEED_FACTOR_CONSTANT = 100;
     private int targetX;
     private int targetY;
     public Position currentY;
@@ -173,7 +174,7 @@ public class GlyphPlacementSystem {
     }
 
     public void runToPosition() {
-        drive.setVerticalDrive((drive.verticalDriveTargetPos() - drive.verticalDriveCurrPos())/ 50);
+        drive.setVerticalDrive((drive.verticalDriveTargetPos() - drive.verticalDriveCurrPos())/ SPEED_FACTOR_CONSTANT);
 
         int pos = drive.verticalDriveCurrPos();
 
