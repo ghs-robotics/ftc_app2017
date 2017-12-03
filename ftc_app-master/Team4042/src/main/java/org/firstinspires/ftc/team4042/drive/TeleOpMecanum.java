@@ -132,6 +132,11 @@ public class TeleOpMecanum extends OpMode {
         if (gamepad2.x && !bX) {
             manual = !manual;
 
+            if (!manual) {
+                drive.resetEncoders();
+                drive.runWithEncoders();
+            }
+
             if (drive.getVerticalDriveMode().equals(DcMotor.RunMode.RUN_TO_POSITION)) {
                 drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
             } else {

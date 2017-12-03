@@ -25,7 +25,7 @@ public class GlyphPlacementSystem {
 
     public enum Position {
         //HOME(0), RAISED(1200), TOP(1600), MID(2000), BOT(2500), TRANSITION(-1);
-        HOME(10), RAISED(1400), TOP(1600), MID(1900), BOT(2200), TRANSITION(-1);
+        HOME(10), RAISEDBACK(1200), RAISED(1400), TOP(1600), MID(1900), BOT(2200), TRANSITION(-1);
 
         private final Integer encoderVal;
         Position(Integer encoderVal) { this.encoderVal = encoderVal; }
@@ -152,7 +152,7 @@ public class GlyphPlacementSystem {
     }
 
     public void adjustBack() {
-        drive.setHorizontalDrive(-.82);
+        drive.setHorizontalDrive(-.2);
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
         while (timer.seconds() < .2) {  }
@@ -182,6 +182,9 @@ public class GlyphPlacementSystem {
         }
         else if (Math.abs(pos - Position.RAISED.getEncoderVal()) < 100) {
             currentY = Position.RAISED;
+        }
+        else if (Math.abs(pos - Position.RAISEDBACK.getEncoderVal()) < 100) {
+            currentY = Position.RAISEDBACK;
         }
         else if (Math.abs(pos - Position.TOP.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
             currentY = Position.TOP;
