@@ -1,0 +1,9 @@
+BlueAuto - knocks off the jewel and parks in the safe zone
+BlueBottomAuto - parks in the safe zone
+BlueOnlyJewelAuto - knocks off the jewel
+BlueTopAuto - parks in the safe zone, but does so badly
+JewelTest - reads the vuforia mark
+RedAuto - knocks off the jewel and parks in the safe zone
+RedBottomAuto - USELESS (run BlueBottomAuto instead)
+RedOnlyJewelAuto - knocks off the jewel
+RedTopAuto - parks in the safe zone, but does so badly
