@@ -99,7 +99,7 @@ public abstract class Auto extends LinearVisionOpMode {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line;
-            while ((line = bufferedReader.readLine()) != null) { //Reads the lines from the file in order
+            while ((line = bufferedReader.readLine()) != null && opModeIsActive()) { //Reads the lines from the file in order
                 if (line.length() > 0) {
                     if (line.charAt(0) != '#') { //Use a # for a comment
                         HashMap<String, String> parameters = new HashMap<>();
@@ -107,12 +107,15 @@ public abstract class Auto extends LinearVisionOpMode {
                         //x:3 --> k = x, v = 3
                         String[] inputParameters = line.split(" ");
                         StringBuilder para = new StringBuilder("Parameter: ");
-                        for (String parameter : inputParameters) {
+                        int i = 0;
+                        while (i < inputParameters.length && opModeIsActive()) {
+                            String parameter = inputParameters[i];
                             int colon = parameter.indexOf(':');
                             String k = parameter.substring(0, colon);
                             String v = parameter.substring(colon + 1);
                             parameters.put(k, v); //Gets the next parameter and adds it to the list
                             para.append(k).append(":").append(v).append(" ");
+                            i++;
                         }
 
                         log.add(para.toString());
@@ -161,7 +164,9 @@ public abstract class Auto extends LinearVisionOpMode {
 
         timer.reset();
         //Reads each instruction and acts accordingly
-        for (AutoInstruction instruction : instructions) {
+        int i = 0;
+        while (i < instructions.size() && opModeIsActive()) {
+            AutoInstruction instruction = instructions.get(i);
             String functionName = instruction.getFunctionName();
             HashMap<String, String> parameters = instruction.getParameters();
             log.add("function: " + functionName);
@@ -206,6 +211,7 @@ public abstract class Auto extends LinearVisionOpMode {
                     System.err.println("Unknown function called from file " + file);
                     break;
             }
+            i++;
         }
 
         //autoDrive(new Direction(1, .5), Drive.FULL_SPEED, 1000);
@@ -449,8 +455,8 @@ public abstract class Auto extends LinearVisionOpMode {
             double gyro = realGyro;
             double r = realR;
 
-            while (r < 0) { r += 360; }
-            while (gyro < 0) { gyro += 360; }
+            while (r < 0 && opModeIsActive()) { r += 360; }
+            while (gyro < 0 && opModeIsActive()) { gyro += 360; }
             double d = Math.abs(r - gyro); //Larger the further you are from your target
             if (d > 180) { d = 360 - d; }
             //telemetry.addData("d", d + " speed + d/720 " + (speed/2 + d/360));
