@@ -90,6 +90,8 @@ public class TeleOpMecanum extends OpMode {
     @Override
     public void loop() {
 
+        drive.glyph.updateEncoderDeriv();
+
         //First controller pushing Y - toggle extendo
         if (gamepad1.y && !aY) {
             toggleExtendo();
