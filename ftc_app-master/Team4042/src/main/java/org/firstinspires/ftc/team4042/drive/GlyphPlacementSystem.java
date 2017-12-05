@@ -14,8 +14,8 @@ public class GlyphPlacementSystem {
 
     public final double HORIZONTAL_TRANSLATION_TIME = 2;
     public final int PLACEMENT_ERROR_MARGIN = 50;
-    private final int PPROPORTIONAL_CONSTANT = 30;
-    private final int DERIV_CONSTANT = 3;
+    private final double PROPORTIONAL_CONSTANT = 30;
+    private final double DERIV_CONSTANT = 2.5;
     private int targetX;
     private int targetY;
     public Position currentY;
@@ -181,7 +181,9 @@ public class GlyphPlacementSystem {
     }
 
     public void runToPosition() {
-        drive.setVerticalDrive((drive.verticalDriveTargetPos() - drive.verticalDriveCurrPos())/ PPROPORTIONAL_CONSTANT + getEncoderDeriv() * DERIV_CONSTANT);
+        double power = ((double)drive.verticalDriveTargetPos() - (double)drive.verticalDriveCurrPos())/ PROPORTIONAL_CONSTANT + getEncoderDeriv() * DERIV_CONSTANT;
+        power = power < 0.1 ? 0 : power;
+        drive.setVerticalDrive(power);
 
         int pos = drive.verticalDriveCurrPos();
 
@@ -214,10 +216,10 @@ public class GlyphPlacementSystem {
     }
 
     public double getEncoderDeriv() {
-        if(drive.derivCycle == 0) {
-            return drive.deriv[drive.derivCycle] - drive.deriv[drive.deriv.length - 1];
+        if(drive.derivCycle == drive.deriv.length - 1) {
+            return drive.deriv[drive.derivCycle] - drive.deriv[0];
         } else {
-            return drive.deriv[drive.derivCycle] - drive.deriv[drive.derivCycle - 1];
+            return drive.deriv[drive.derivCycle] - drive.deriv[drive.derivCycle + 1];
         }
     }
 
