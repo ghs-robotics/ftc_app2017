@@ -92,8 +92,8 @@ public abstract class Drive {
     public GlyphPlacementSystem.Position targetY;
     public GlyphPlacementSystem.HorizPos targetX;
 
-    public int[] deriv = new int[6];
-    public int derivCycle = 0;
+    public int[] deriv = new int[3];
+    public int derivCycle = 0; 
 
 
     Telemetry telemetry;
