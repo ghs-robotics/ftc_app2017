@@ -92,6 +92,9 @@ public abstract class Drive {
     public GlyphPlacementSystem.Position targetY;
     public GlyphPlacementSystem.HorizPos targetX;
 
+    public int[] deriv = new int[6];
+    public int derivCycle = 0;
+
 
     Telemetry telemetry;
 
@@ -266,8 +269,8 @@ public abstract class Drive {
             }
             case RELEASE: {
                 if (handDropTimer.seconds() >= 1) {
-                    glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISEDBACK);
-                    if (glyph.currentY.equals(GlyphPlacementSystem.Position.RAISEDBACK)) {
+                    glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
+                    if (glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
                         stage = GlyphPlacementSystem.Stage.PAUSE2;
                     }
                 }
