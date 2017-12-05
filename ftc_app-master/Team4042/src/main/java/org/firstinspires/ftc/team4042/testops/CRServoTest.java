@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.CRServoImpl;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 /**
  * Created by Hazel on 10/30/2017.
@@ -15,6 +16,7 @@ public class CRServoTest extends OpMode {
     private double power = 0;
     private boolean y = false;
     private boolean a = false;
+    private DigitalChannel center;
 
     private static final double STEP = .1;
 
@@ -22,6 +24,9 @@ public class CRServoTest extends OpMode {
     public void init() {
         crServo = hardwareMap.crservo.get("horizontal");
         crServo.setPower(power);
+        center = hardwareMap.digitalChannel.get("center");
+        center.setState(false);
+        center.setMode(DigitalChannel.Mode.INPUT);
     }
 
     @Override
@@ -39,6 +44,7 @@ public class CRServoTest extends OpMode {
         a = gamepad1.a;
 
         telemetry.addData("power", power);
+        telemetry.addData("limit hit", center.getState());
         telemetry.update();
     }
 }

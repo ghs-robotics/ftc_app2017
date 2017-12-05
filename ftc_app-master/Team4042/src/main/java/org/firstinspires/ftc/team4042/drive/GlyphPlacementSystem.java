@@ -13,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 public class GlyphPlacementSystem {
 
     public final double HORIZONTAL_TRANSLATION_TIME = 2;
-    public final int PLACEMENT_ERROR_MARGIN = 100;
+    public final int PLACEMENT_ERROR_MARGIN = 50;
     private final int SPEED_FACTOR_CONSTANT = 100;
     private int targetX;
     private int targetY;
@@ -26,7 +26,7 @@ public class GlyphPlacementSystem {
 
     public enum Position {
         //HOME(0), RAISED(1200), TOP(1600), MID(2000), BOT(2500), TRANSITION(-1);
-        HOME(10), RAISEDBACK(1150), RAISED(1350), TOP(1600), MID(1900), BOT(2200), TRANSITION(-1);
+        HOME(10), RAISED(1275), TOP(1600), MID(1900), BOT(2200), TRANSITION(-1);
 
         private final Integer encoderVal;
         Position(Integer encoderVal) { this.encoderVal = encoderVal; }
@@ -180,7 +180,7 @@ public class GlyphPlacementSystem {
     }
 
     public void runToPosition() {
-        drive.setVerticalDrive((drive.verticalDriveTargetPos() - drive.verticalDriveCurrPos())/ SPEED_FACTOR_CONSTANT);
+        drive.setVerticalDrive((drive.verticalDriveTargetPos() - drive.verticalDriveCurrPos())/ SPEED_FACTOR_CONSTANT );
 
         int pos = drive.verticalDriveCurrPos();
 
@@ -189,9 +189,6 @@ public class GlyphPlacementSystem {
         }
         else if (Math.abs(pos - Position.RAISED.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
             currentY = Position.RAISED;
-        }
-        else if (Math.abs(pos - Position.RAISEDBACK.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
-            currentY = Position.RAISEDBACK;
         }
         else if (Math.abs(pos - Position.TOP.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
             currentY = Position.TOP;
@@ -208,4 +205,15 @@ public class GlyphPlacementSystem {
 
 
     }
+    /*
+    public void updateEncoderDeriv() {
+        drive.derivCycle++;
+        if(drive.derivCycle == drive.deriv.length) drive.derivCycle = 0;
+        drive.deriv[drive.derivCycle] = drive.verticalDriveCurrPos()
+    }
+
+    public double getEncoderDeriv() {
+        return
+    }
+    */
 }
