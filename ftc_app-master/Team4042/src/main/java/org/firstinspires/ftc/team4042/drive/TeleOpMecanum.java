@@ -17,8 +17,8 @@ public class TeleOpMecanum extends OpMode {
     private boolean aY = false;
     private boolean aX = false;
 
-    private boolean aLeftBumper = false;
-    private boolean aRightBumper = false;
+    private boolean aDown = false;
+    private boolean aUp = false;
     private boolean manual = false;
 
     private boolean bUp;
@@ -40,7 +40,7 @@ public class TeleOpMecanum extends OpMode {
       Joystick 2 X - rotation
       Bumpers - external intakes backwards
       Triggers - external intakes forwards
-      Dpad -
+      Dpad up/down - speed modes
       A - toggle verbose
       B -
       X - toggle crawl
@@ -121,7 +121,7 @@ public class TeleOpMecanum extends OpMode {
             drive.useGyro();
         }
 
-        //speedModes();
+        speedModes();
 
         //If you're at the bottom, haven't been pushing a, and now are pushing a
         if (drive.uTrackAtBottom && !bA && gamepad2.a) {
@@ -172,16 +172,16 @@ public class TeleOpMecanum extends OpMode {
 
     private void speedModes() {
         //If you push the left bumper, dials the speed down
-        if (gamepad1.left_bumper && !aLeftBumper && (adjustedSpeed - 0.25) >= 0) {
+        if (gamepad1.dpad_down && !aDown && (adjustedSpeed - 0.25) >= 0) {
             adjustedSpeed -= 0.25;
         }
-        aLeftBumper = gamepad1.left_bumper;
+        aDown = gamepad1.dpad_down;
         //Right bumper - dial speed up
-        if (gamepad1.right_bumper && !aRightBumper && (adjustedSpeed + 0.25) <= MecanumDrive.FULL_SPEED)
+        if (gamepad1.dpad_up && !aUp && (adjustedSpeed + 0.25) <= MecanumDrive.FULL_SPEED)
         {
             adjustedSpeed += 0.25;
         }
-        aRightBumper = gamepad1.right_bumper;
+        aUp = gamepad1.dpad_up;
     }
 
     private void toggleExtendo() {

@@ -180,7 +180,7 @@ public class GlyphPlacementSystem {
     }
 
     public void runToPosition() {
-        drive.setVerticalDrive((drive.verticalDriveTargetPos() - drive.verticalDriveCurrPos())/ SPEED_FACTOR_CONSTANT);
+        drive.setVerticalDrive((drive.verticalDriveTargetPos() - drive.verticalDriveCurrPos() - 50)/ SPEED_FACTOR_CONSTANT);
 
         int pos = drive.verticalDriveCurrPos();
 
