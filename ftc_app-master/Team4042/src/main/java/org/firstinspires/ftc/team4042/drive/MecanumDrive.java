@@ -113,7 +113,7 @@ public class  MecanumDrive extends Drive {
             //We just want to slightly adjust the back wheels
             speedWheel[2] = l;
             speedWheel[3] = r;
-            speedFactor = .75;
+            speedFactor = .75 * speedFactor;
         }
         else {
             speedWheel[0] = l;

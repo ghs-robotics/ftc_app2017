@@ -297,6 +297,7 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Manual", manual);
         telemetry.addData("Crawl", Drive.crawl);
         telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
+        telemetry.addData("Speed factor", adjustedSpeed);
         if (drive.verbose) {
             telemetry.addData("encoder currentY pos", drive.verticalDriveCurrPos());
             telemetry.addData("hand is open", drive.isHandOpen());
