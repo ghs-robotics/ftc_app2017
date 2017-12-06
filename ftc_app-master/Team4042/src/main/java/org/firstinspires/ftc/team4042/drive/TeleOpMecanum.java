@@ -49,8 +49,8 @@ public class TeleOpMecanum extends OpMode {
       Back -
 
     GAMEPAD 2:
-      Joystick 1 Y - controls placer in manual
-      Joystick 2 Y -
+      Joystick 1 Y - controls placer vertical in manual
+      Joystick 2 X - controls place horizontal in manual
       Bumpers - internal intakes backwards
       Triggers - internal intakes forwards
       Dpad - placer
@@ -98,11 +98,11 @@ public class TeleOpMecanum extends OpMode {
         }
         aY = gamepad1.y;
 
-        if (gamepad2.y && !bY) {
-            //glyph reset
+        if (gamepad2.y) {
+            drive.setVerticalDrive(-0.5);
             drive.resetUTrack();
         }
-        bY = gamepad2.y;
+
 
         //The X button on the first controller - toggle crawling to let us adjust the back of the robot too
         if (gamepad1.x && !aX) {
