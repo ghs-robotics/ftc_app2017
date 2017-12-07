@@ -309,6 +309,7 @@ public abstract class Drive {
         jewelUp();
         setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+        uTrackAtBottom = true;
     }
 
     /**
