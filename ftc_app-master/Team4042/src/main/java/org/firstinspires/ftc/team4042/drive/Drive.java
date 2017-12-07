@@ -631,10 +631,10 @@ public abstract class Drive {
             double magic = isExtendo ? 1 : MAGIC_NUMBER;
 
             if (motorLeftFront != null) {
-                motorLeftFront.setPower(deadZone(speedWheel[0])*magic);
+                motorLeftFront.setPower(deadZone(speedWheel[0]));
             }
             if (motorRightFront != null) {
-                motorRightFront.setPower(deadZone(-speedWheel[1])*magic);
+                motorRightFront.setPower(deadZone(-speedWheel[1]));
             } //The right motors are mounted "upside down", which is why we have to inverse this
             if (motorRightBack != null) {
                 motorRightBack.setPower(deadZone(-speedWheel[2]));
