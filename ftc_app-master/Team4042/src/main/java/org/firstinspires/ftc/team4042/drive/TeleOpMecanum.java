@@ -98,12 +98,6 @@ public class TeleOpMecanum extends OpMode {
         }
         aY = gamepad1.y;
 
-        if (gamepad2.y) {
-            drive.setVerticalDrive(-0.5);
-            drive.resetUTrack();
-        }
-
-
         //The X button on the first controller - toggle crawling to let us adjust the back of the robot too
         if (gamepad1.x && !aX) {
             Drive.crawl = !Drive.crawl;
@@ -125,15 +119,25 @@ public class TeleOpMecanum extends OpMode {
 
         speedModes();
 
+        /*if (!bY && gamepad1.y) { //When you first push the button
+
+        }
+        else if (bY && !gamepad2.y) { //When you release the button, reset the utrack
+            drive.resetUTrack();
+        }
+        else if (gamepad2.y) { //Runs the utrack downwards
+            drive.setVerticalDrive(-0.5);
+        }
         //If you're at the bottom, haven't been pushing a, and now are pushing a
-        if (drive.uTrackAtBottom && !bA && gamepad2.a) {
+        else*/ if (drive.uTrackAtBottom && !bA && gamepad2.a) {
             drive.uTrack();
         }
         //If you're not at the bottom and are pushing a
-        if (!drive.uTrackAtBottom && gamepad2.a) {
+        else if (!drive.uTrackAtBottom && gamepad2.a) {
             drive.uTrack();
         }
         bA = gamepad2.a;
+        bY = gamepad2.y;
 
         //Right trigger of the b controller runs the right intake forward
         intakes();
