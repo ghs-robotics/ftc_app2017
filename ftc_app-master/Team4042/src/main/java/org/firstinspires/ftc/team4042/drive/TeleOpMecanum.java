@@ -13,7 +13,7 @@ public class TeleOpMecanum extends OpMode {
     //CONTROL BOOLEANS START
     // We have these booleans so we only register a button press once.
     // You have to let go of the button and push it again to register a new event.
-    private boolean aA = false;
+    private boolean bStart = false;
     private boolean aY = false;
     private boolean aX = false;
 
@@ -41,7 +41,7 @@ public class TeleOpMecanum extends OpMode {
       Bumpers - external intakes backwards
       Triggers - external intakes forwards
       Dpad up/down - speed modes
-      A - toggle verbose
+      A -
       B -
       X - toggle crawl
       Y - toggle extendo
@@ -58,7 +58,7 @@ public class TeleOpMecanum extends OpMode {
       B - manual hand toggle
       X - toggles manual placement mode
       Y - resets the glyph placer
-      Start -
+      Start - toggle verbose
       Back -
      */
 
@@ -105,10 +105,10 @@ public class TeleOpMecanum extends OpMode {
         aX = gamepad1.x;
 
         //1 A - toggle verbose
-        if (gamepad1.a && !aA) {
+        if (gamepad2.start && !bStart) {
             drive.toggleVerbose();
         }
-        aA = gamepad1.a;
+        bStart = gamepad2.start;
 
         //Drives the robot
         drive.drive(false, gamepad1, gamepad2, adjustedSpeed * MecanumDrive.FULL_SPEED);
