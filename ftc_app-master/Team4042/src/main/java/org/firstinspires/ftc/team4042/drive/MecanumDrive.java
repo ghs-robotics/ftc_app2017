@@ -10,7 +10,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-public class MecanumDrive extends Drive {
+public class  MecanumDrive extends Drive {
 
     /**
      * Constructor for Drive, it creates the motors and the gyro objects
@@ -27,70 +27,6 @@ public class MecanumDrive extends Drive {
 
     public MecanumDrive(boolean verbose) {
         super(verbose);
-    }
-
-    public void jewelLeft() {
-        try {
-            resetEncoders();
-            runWithEncoders();
-            ElapsedTime timer = new ElapsedTime();
-
-            timer.reset();
-            jewelDown();
-
-            while (timer.seconds() < 1) {
-            }
-            timer.reset();
-
-            //Moves the robot left
-            while (!driveWithEncoders(Direction.Backward, Drive.FULL_SPEED, 200)) {
-            }
-
-            while (timer.seconds() < 1) {
-            }
-            timer.reset();
-
-            jewelUp();
-
-            while (timer.seconds() < 1) {
-            }
-        } catch (NullPointerException ex) {
-            StringWriter sw = new StringWriter();
-            ex.printStackTrace(new PrintWriter(sw));
-            telemetry.addData("NullPointerException", sw.toString());
-        }
-    }
-
-    public void jewelRight() {
-        try {
-            resetEncoders();
-            runWithEncoders();
-            ElapsedTime timer = new ElapsedTime();
-
-            timer.reset();
-            jewelDown();
-
-            while (timer.seconds() < 1) {
-            }
-            timer.reset();
-
-            //Moves the robot right
-            while (!driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 200)) {
-            }
-
-            while (timer.seconds() < 1) {
-            }
-            timer.reset();
-
-            jewelUp();
-
-            while (timer.seconds() < 1) {
-            }
-        } catch (NullPointerException ex) {
-            StringWriter sw = new StringWriter();
-            ex.printStackTrace(new PrintWriter(sw));
-            telemetry.addData("NullPointerException", sw.toString());
-        }
     }
 
     private void driveLR(double speedFactor, double l, double r) {
@@ -113,7 +49,7 @@ public class MecanumDrive extends Drive {
             //We just want to slightly adjust the back wheels
             speedWheel[2] = l;
             speedWheel[3] = r;
-            speedFactor = .2;
+            speedFactor = .75 * speedFactor;
         }
         else {
             speedWheel[0] = l;
@@ -162,11 +98,11 @@ public class MecanumDrive extends Drive {
         y = super.deadZone(y);
         r = super.deadZone(r);
 
-        if (verbose) {
+        /*if (verbose) {
             telemetry.addData("x", x);
             telemetry.addData("y", y);
             telemetry.addData("r", r);
-        }
+        }*/
 
         double heading = OFFSET;
         if (useGyro) {
@@ -181,12 +117,12 @@ public class MecanumDrive extends Drive {
         double xPrime = x * Math.cos(gyroRadians) + y * Math.sin(gyroRadians);
         double yPrime = -x * Math.sin(gyroRadians) + y * Math.cos(gyroRadians);
 
-        double magic = isExtendo ? 1 : MAGIC_NUMBER; //Only use the magic number if you're a whole robot
-        magic = x <= .1 && x >= -.1 ? 1 : magic; //Only use the magic number if you're strafing
+        double wimpo = isExtendo ? 1 : MAGIC_NUMBER; //Only use the magic number if you're a whole robot
+        wimpo = x <= .1 && x >= -.1 ? 1 : wimpo; //Only use the magic number if you're strafing
 
         //Sets relative wheel speeds for mecanum drive based on controller inputs
-        speedWheel[0] = (-xPrime - yPrime - r) * magic;
-        speedWheel[1] = (xPrime - yPrime + r) * magic;
+        speedWheel[0] = (-xPrime - yPrime - r);
+        speedWheel[1] = (xPrime - yPrime + r);
         speedWheel[2] = -xPrime - yPrime + r;
         speedWheel[3] = xPrime - yPrime - r;
 
@@ -205,10 +141,10 @@ public class MecanumDrive extends Drive {
      */
     public boolean rotateWithEncoders(Direction.Rotation rotation, double speed, double targetTicks) throws IllegalArgumentException {
         //telemetry data
-        telemetry.addData("Left Back", motorLeftBack.getCurrentPosition());
+        /*telemetry.addData("Left Back", motorLeftBack.getCurrentPosition());
         telemetry.addData("Left Front", motorLeftFront.getCurrentPosition());
         telemetry.addData("Right Back", motorRightBack.getCurrentPosition());
-        telemetry.addData("Right Front", motorRightFront.getCurrentPosition());
+        telemetry.addData("Right Front", motorRightFront.getCurrentPosition());*/
 
         double scaledSpeed = setUpSpeed(speed, targetTicks);
         if (scaledSpeed == Math.PI) { //The target's been reached
@@ -237,7 +173,7 @@ public class MecanumDrive extends Drive {
      * @param direction which direction to go
      * @return returns if it is completed (true if has reached target, false if it hasn't)
      */
-    public boolean driveWithEncoders(Direction direction, double speed, double targetTicks) throws IllegalArgumentException{
+    public boolean driveWithEncoders(Direction direction, double speed, double targetTicks, boolean useGyro) throws IllegalArgumentException{
         //telemetry data
         if (verbose) {
             log.add("x " + direction.getX());

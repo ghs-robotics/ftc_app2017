@@ -17,7 +17,7 @@ public class ServoTest extends OpMode {
 
     @Override
     public void init() {
-        servo = hardwareMap.servo.get("jewel");
+        servo = hardwareMap.servo.get("servo");
         servo.setPosition(position);
     }
 

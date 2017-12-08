@@ -1,8 +1,2 @@
-#function:v
-#function:jb
-#function:up
-
-function:doff x:0 y:-1 speed:.5 target:1000
-function:d x:0 y:-1 speed:.5 target:300
-function:r r:90 speed:.5
-function;d x:0 y:1 speed:.5 target:300
+function:r r:15 speed:.5
+#function:r r:1 speed:.5
