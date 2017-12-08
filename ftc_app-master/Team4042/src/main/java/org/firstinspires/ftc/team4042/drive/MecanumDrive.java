@@ -117,12 +117,12 @@ public class  MecanumDrive extends Drive {
         double xPrime = x * Math.cos(gyroRadians) + y * Math.sin(gyroRadians);
         double yPrime = -x * Math.sin(gyroRadians) + y * Math.cos(gyroRadians);
 
-        double magic = isExtendo ? 1 : MAGIC_NUMBER; //Only use the magic number if you're a whole robot
-        magic = x <= .1 && x >= -.1 ? 1 : magic; //Only use the magic number if you're strafing
+        double wimpo = isExtendo ? 1 : MAGIC_NUMBER; //Only use the magic number if you're a whole robot
+        wimpo = x <= .1 && x >= -.1 ? 1 : wimpo; //Only use the magic number if you're strafing
 
         //Sets relative wheel speeds for mecanum drive based on controller inputs
-        speedWheel[0] = (-xPrime - yPrime - r) * magic;
-        speedWheel[1] = (xPrime - yPrime + r) * magic;
+        speedWheel[0] = (-xPrime - yPrime - r);
+        speedWheel[1] = (xPrime - yPrime + r);
         speedWheel[2] = -xPrime - yPrime + r;
         speedWheel[3] = xPrime - yPrime - r;
 
@@ -141,10 +141,10 @@ public class  MecanumDrive extends Drive {
      */
     public boolean rotateWithEncoders(Direction.Rotation rotation, double speed, double targetTicks) throws IllegalArgumentException {
         //telemetry data
-        telemetry.addData("Left Back", motorLeftBack.getCurrentPosition());
+        /*telemetry.addData("Left Back", motorLeftBack.getCurrentPosition());
         telemetry.addData("Left Front", motorLeftFront.getCurrentPosition());
         telemetry.addData("Right Back", motorRightBack.getCurrentPosition());
-        telemetry.addData("Right Front", motorRightFront.getCurrentPosition());
+        telemetry.addData("Right Front", motorRightFront.getCurrentPosition());*/
 
         double scaledSpeed = setUpSpeed(speed, targetTicks);
         if (scaledSpeed == Math.PI) { //The target's been reached
