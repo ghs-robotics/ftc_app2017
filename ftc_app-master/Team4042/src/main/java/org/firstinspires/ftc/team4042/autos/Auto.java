@@ -459,7 +459,9 @@ public abstract class Auto extends LinearVisionOpMode {
      * @param speed The speed to rotate at
      */
     private void autoRotate(double realR, double speed) {
-        double realGyro = drive.gyro.updateHeading();
+        /*double realGyro = drive.gyro.updateHeading();
+
+        log.add("r: " + realR + " speed: " + speed);
 
         do {
             double gyro = realGyro;
@@ -467,21 +469,36 @@ public abstract class Auto extends LinearVisionOpMode {
 
             while (r < 0 && opModeIsActive()) { r += 360; }
             while (gyro < 0 && opModeIsActive()) { gyro += 360; }
-            double d = Math.abs(r - gyro); //Larger the further you are from your target
-            if (d > 180) { d = 360 - d; }
+            double diff = Math.abs(r - gyro); //Larger the further you are from your target
+            if (diff > 180) { diff = 360 - diff; }
             //telemetry.addData("d", d + " speed + d/720 " + (speed/2 + d/360));
-            telemetry.addData("d", d + " speed - 5/d " + (speed - 5/d));
+            telemetry.addData("diff", diff + " diff/200 " + diff/200);
+            telemetry.addData("real gyro", realGyro + " gyro " + gyro + " real r " + realR + " r " + r);
             if (realGyro > realR) {
                 //The further you are from your target, the faster you should move
-                //drive.driveXYR(speed/2 + d/720, 0, 0, -1, false);
-                drive.driveXYR(speed - 5/d, 0, 0, -1, false);
+                drive.driveXYR(diff/200, 0, 0, -1, false);
             } else {
                 //drive.driveXYR(speed/2 + d/720, 0, 0, 1, false);
-                drive.driveXYR(speed - 5/d, 0, 0, 1, false);
+                drive.driveXYR(diff/200, 0, 0, 1, false);
             }
 
             realGyro = drive.gyro.updateHeading();
-        } while (Math.abs(realGyro - realR) > 5 && opModeIsActive());
+        } while (Math.abs(realGyro - realR) > 5 && opModeIsActive());*/
+
+        double gyro;
+        do {
+            gyro = drive.gyro.updateHeading();
+            double diff = realR - gyro;
+            telemetry.addData("gyro",gyro + " realR: " + realR + " diff: " + diff);
+            telemetry.update();
+            if (diff > 270) { diff -= 360; }
+            if (diff < -270) { diff += 360; }
+            if (diff > 5) {
+                drive.driveXYR(speed, 0, 0, -180/diff, false);
+            } else if (diff < -5){
+                drive.driveXYR(speed, 0, 0, 180/diff, false);
+            }
+        } while (Math.abs(gyro - realR) > 5 && opModeIsActive());
 
         drive.stopMotors();
         drive.resetEncoders();

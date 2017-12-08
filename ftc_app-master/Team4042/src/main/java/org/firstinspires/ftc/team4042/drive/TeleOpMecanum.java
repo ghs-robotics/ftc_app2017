@@ -124,6 +124,7 @@ public class TeleOpMecanum extends OpMode {
         }
         else if (bY && !gamepad2.y) { //When you release the button, reset the utrack
             drive.resetUTrack();
+            drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         }
         else if (gamepad2.y) { //Runs the utrack downwards
