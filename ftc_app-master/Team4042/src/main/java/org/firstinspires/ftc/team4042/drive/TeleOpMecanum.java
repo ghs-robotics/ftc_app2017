@@ -119,7 +119,7 @@ public class TeleOpMecanum extends OpMode {
 
         speedModes();
 
-        /*if (!bY && gamepad1.y) { //When you first push the button
+        if (!bY && gamepad1.y) { //When you first push the button
 
         }
         else if (bY && !gamepad2.y) { //When you release the button, reset the utrack
@@ -129,7 +129,7 @@ public class TeleOpMecanum extends OpMode {
             drive.setVerticalDrive(-0.5);
         }
         //If you're at the bottom, haven't been pushing a, and now are pushing a
-        else*/ if (drive.uTrackAtBottom && !bA && gamepad2.a) {
+        else if (drive.uTrackAtBottom && !bA && gamepad2.a) {
             drive.uTrack();
         }
         //If you're not at the bottom and are pushing a
