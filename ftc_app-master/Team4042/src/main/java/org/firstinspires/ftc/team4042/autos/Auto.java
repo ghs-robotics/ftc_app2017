@@ -327,7 +327,7 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void knockLeftJewel(HashMap<String, String> parameters) {
-        drive.jewelLeft();
+        jewelLeft();
     }
 
     public void knockRightJewel(HashMap<String, String> parameters) {
@@ -449,7 +449,7 @@ public abstract class Auto extends LinearVisionOpMode {
         double realR = Double.parseDouble(parameters.get("r"));
 
         double speed = Double.parseDouble(parameters.get("speed"));
-        
+
         autoRotate(realR, speed);
     }
 
