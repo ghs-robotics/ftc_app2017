@@ -119,17 +119,19 @@ public class TeleOpMecanum extends OpMode {
 
         speedModes();
 
-        /*if (!bY && gamepad1.y) { //When you first push the button
-
+        if (!bY && gamepad1.y) { //When you first push the button
+            drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
         else if (bY && !gamepad2.y) { //When you release the button, reset the utrack
             drive.resetUTrack();
+
         }
         else if (gamepad2.y) { //Runs the utrack downwards
             drive.setVerticalDrive(-0.5);
         }
+
         //If you're at the bottom, haven't been pushing a, and now are pushing a
-        else*/ if (drive.uTrackAtBottom && !bA && gamepad2.a) {
+        if (drive.uTrackAtBottom && !bA && gamepad2.a) {
             drive.uTrack();
         }
         //If you're not at the bottom and are pushing a
@@ -167,7 +169,7 @@ public class TeleOpMecanum extends OpMode {
             drive.glyph.runToPosition();
         } else {
             drive.setVerticalDrive(gamepad2.left_stick_y);
-            drive.setHorizontalDrive(gamepad2.left_stick_x);
+            drive.setHorizontalDrive(gamepad2.right_stick_x);
 
             if (gamepad2.b && ! bB) {
                 drive.toggleHand();
