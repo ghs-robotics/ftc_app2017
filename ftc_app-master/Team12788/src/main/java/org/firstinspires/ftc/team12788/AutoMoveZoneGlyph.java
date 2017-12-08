@@ -9,12 +9,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class AutoMoveZoneGlyph extends LinearOpMode {
 
     private MecanumDrive drive = new MecanumDrive();
-    private VuMarkIdentifier mark = new VuMarkIdentifier();
+    //private VuMarkIdentifier mark = new VuMarkIdentifier();
 
-    private DcMotor liftLeft;
-    private DcMotor liftRight;
-    private DcMotor intakeRight;
-    private DcMotor intakeLeft;
+    private DcMotor lift;
+    //private DcMotor intakeRight;
+    //private DcMotor intakeLeft;
 
     public Servo grabLeft;
     public Servo grabRight;
@@ -32,29 +31,26 @@ public class AutoMoveZoneGlyph extends LinearOpMode {
     public void runOpMode() {
         drive.initialize(telemetry, hardwareMap);
 
-        liftLeft = hardwareMap.dcMotor.get("liftLeft");
-        liftRight = hardwareMap.dcMotor.get("liftRight");
-        intakeLeft = hardwareMap.dcMotor.get("intakeLeft");
-        intakeRight = hardwareMap.dcMotor.get("intakeRight");
+        lift = hardwareMap.dcMotor.get("lift");
+        /*intakeLeft = hardwareMap.dcMotor.get("intakeLeft");
+        intakeRight = hardwareMap.dcMotor.get("intakeRight");*/
         drive.runWithoutEncoders();
         grabLeft = hardwareMap.servo.get("grabLeft");
         grabRight = hardwareMap.servo.get("grabRight");
         //mark.initialize(telemetry, hardwareMap);
         waitForStart();
-        grabLeft.setPosition(-1);
-        grabRight.setPosition(1);
+        grabLeft.setPosition(1);
+        grabRight.setPosition(.2);
         sleep(1000);
-        liftLeft.setPower(.3);
-        liftRight.setPower(-.3 );
-        sleep(250);
-        liftLeft.setPower(0);
-        liftRight.setPower(0);
+        lift.setPower(1);
+        sleep(500);
+        lift.setPower(0);
         sleep(1000);
         while(!drive.driveWithEncoders(Direction.Backward, Autonomous.speedy-.2, 1.5*Autonomous.tile) && opModeIsActive());
         sleep(2000);
         reset();
-        grabLeft.setPosition(1);
-        grabRight.setPosition(-1);
+        grabLeft.setPosition(.6);
+        grabRight.setPosition(.7);
         sleep(1000);
         while(!drive.driveWithEncoders(Direction.Forward, Autonomous.speedy, .3*Autonomous.tile) && opModeIsActive());
         reset();
