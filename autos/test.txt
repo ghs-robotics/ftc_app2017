@@ -1,2 +1,2 @@
 function:r r:15 speed:.5
-function:r r:1 speed:.5
+#function:r r:1 speed:.5
