@@ -149,14 +149,12 @@ public class TeleOpMecanum extends OpMode {
         }
         bX = gamepad2.x;
 
-        if (!bY && gamepad1.y) { //When you first push the button
-            drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        }
-        else if (bY && !gamepad2.y) { //When you release the button, reset the utrack
+        if (bY && !gamepad2.y) { //When you release the button, reset the utrack
             drive.resetUTrack();
             drive.glyph.setHomeTarget();
         }
         else if (gamepad2.y) { //Runs the utrack downwards
+            drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
             drive.setVerticalDrive(-0.5);
         }
         //TODO: manual is done broked
