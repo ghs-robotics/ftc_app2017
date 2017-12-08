@@ -10,7 +10,7 @@ public abstract class Drive {
     //Initializes a factor for the speed of movement to a position when driving with encoders
     public static final double BASE_SPEED = .5;
     //The deadzone size for the joystick inputs
-    public static final double DEADZONE_SIZE = .01;
+    public static final double DEADZONE_SIZE = .005;
     //The largest speed factor possible
     public static final double FULL_SPEED = 1;
     //The power to put to the motors to stop them

@@ -4,13 +4,18 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
+
 /**
  * Created by Ryan on 11/2/2017.
  */
 
 public class GlyphPlacementSystem {
 
-    public final double HORIZONTAL_TRANSLATION_TIME = .25;
+    public final double HORIZONTAL_TRANSLATION_TIME = 2;
+    public final int PLACEMENT_ERROR_MARGIN = 50;
+    private final double PROPORTIONAL_CONSTANT = 30;
+    private final double DERIV_CONSTANT = 2.5;
     private int targetX;
     private int targetY;
     public Position currentY;
@@ -22,7 +27,7 @@ public class GlyphPlacementSystem {
 
     public enum Position {
         //HOME(0), RAISED(1200), TOP(1600), MID(2000), BOT(2500), TRANSITION(-1);
-        HOME(10), RAISED(1300), TOP(1600), MID(1600), BOT(1600), TRANSITION(-1);
+        HOME(10), RAISED(1275), TOP(1600), MID(1900), BOT(2200), TRANSITION(-1);
 
         private final Integer encoderVal;
         Position(Integer encoderVal) { this.encoderVal = encoderVal; }
@@ -36,7 +41,7 @@ public class GlyphPlacementSystem {
     }
 
     public enum HorizPos {
-        LEFT(-.82), CENTER(0.0), RIGHT(.82);
+        LEFT(-.8), CENTER(0.0), RIGHT(.8);
 
         private final Double power;
         HorizPos(Double power) { this.power = power; }
@@ -80,6 +85,30 @@ public class GlyphPlacementSystem {
         return "\n" + new String(output);
     }
 
+    public void setTarget(RelicRecoveryVuMark x, int y) {
+        drive.targetY = GlyphPlacementSystem.Position.TOP;
+        switch (x) {
+            case LEFT:
+                targetX = 0;
+                drive.targetX = HorizPos.LEFT;
+                break;
+            case CENTER:
+                targetX = 1;
+                drive.targetX = HorizPos.CENTER;
+                break;
+            case RIGHT:
+                targetX = 2;
+                drive.targetX = HorizPos.RIGHT;
+                break;
+            default:
+                //when in doubt, place in the middle
+                targetX = 1;
+                drive.targetX = HorizPos.CENTER;
+                break;
+        }
+        targetY = y;
+    }
+
     public int up() {
         if (targetY != 0) {
             targetY -= 1;
@@ -120,21 +149,31 @@ public class GlyphPlacementSystem {
         //if target = left(-1) and current = right(1)
         //we want to move left (-1)
         //so target - current
-        if (!targetPos.equals(HorizPos.CENTER)) {
+        if (targetX != 1) {
             double power = targetPos.getPower() - currentX.getPower();
             power = Range.clip(power, -1, 1);
 
-            drive.setHorizontalU(power);
+            drive.setHorizontalDrive(power);
             horizontalTimer.reset();
         }
     }
 
+    public void adjustBack() {
+        drive.setHorizontalDrive(-.2);
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
+        while (timer.seconds() < .2) {  }
+        drive.setHorizontalDrive(0);
+    }
+
     public boolean xTargetReached(HorizPos targetPos) {
         //If you're going left or right, then use the timer to see if you should stop
+        drive.log.add("target x " + targetX + " targetPos " + targetPos);
         if (((targetPos.equals(HorizPos.LEFT) || targetPos.equals(HorizPos.RIGHT)) && (horizontalTimer.seconds() >= HORIZONTAL_TRANSLATION_TIME)) ||
                 //If you're going to the center and you hit the limit switch, stop
-                (targetPos.equals(HorizPos.CENTER) && drive.getCenterState())) {
-            drive.setHorizontalU(0);
+                (targetX != 1 && targetPos.equals(HorizPos.CENTER) && drive.getCenterState()) ||
+                (targetX == 1 && targetPos.equals(HorizPos.CENTER))) {
+            drive.setHorizontalDrive(0);
             currentX = targetPos;
             return true;
         }
@@ -142,23 +181,25 @@ public class GlyphPlacementSystem {
     }
 
     public void runToPosition() {
-        drive.setVerticalDrive((drive.verticalDriveTargetPos() - drive.verticalDriveCurrPos())/ 100);
+        double power = ((double)drive.verticalDriveTargetPos() - (double)drive.verticalDriveCurrPos())/ PROPORTIONAL_CONSTANT + getEncoderDeriv() * DERIV_CONSTANT;
+        power = Math.abs(power) < 0.2 ? 0 : power;
+        drive.setVerticalDrive(power);
 
         int pos = drive.verticalDriveCurrPos();
 
-        if (pos == 0) {
+        if (pos < PLACEMENT_ERROR_MARGIN) {
             currentY = Position.HOME;
         }
-        else if (Math.abs(pos - Position.RAISED.getEncoderVal()) < 100) {
+        else if (Math.abs(pos - Position.RAISED.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
             currentY = Position.RAISED;
         }
-        else if (Math.abs(pos - Position.TOP.getEncoderVal()) < 10) {
+        else if (Math.abs(pos - Position.TOP.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
             currentY = Position.TOP;
         }
-        else if (Math.abs(pos - Position.MID.getEncoderVal()) < 10) {
+        else if (Math.abs(pos - Position.MID.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
             currentY = Position.MID;
         }
-        else if (Math.abs(pos - Position.BOT.getEncoderVal()) < 10) {
+        else if (Math.abs(pos - Position.BOT.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
             currentY = Position.BOT;
         }
         else {
@@ -167,4 +208,19 @@ public class GlyphPlacementSystem {
 
 
     }
+
+    public void updateEncoderDeriv() {
+        drive.derivCycle++;
+        if(drive.derivCycle == drive.deriv.length) drive.derivCycle = 0;
+        drive.deriv[drive.derivCycle] = drive.verticalDriveCurrPos();
+    }
+
+    public double getEncoderDeriv() {
+        if(drive.derivCycle == drive.deriv.length - 1) {
+            return drive.deriv[drive.derivCycle] - drive.deriv[0];
+        } else {
+            return drive.deriv[drive.derivCycle] - drive.deriv[drive.derivCycle + 1];
+        }
+    }
+
 }

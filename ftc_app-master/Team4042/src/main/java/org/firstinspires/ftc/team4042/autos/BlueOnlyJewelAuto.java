@@ -4,6 +4,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.team4042.drive.MecanumDrive;
 
+/**
+ * Knocks off the jewel
+ */
 @Autonomous(name="Blue Only Jewel Auto", group="autos")
 public class BlueOnlyJewelAuto extends Auto {
 
@@ -15,7 +18,9 @@ public class BlueOnlyJewelAuto extends Auto {
         super.setUp(drive, "bluejewel.txt");
         try {
             waitForStart();
-        } catch (InterruptedException ex) { }
+        } catch (InterruptedException ex) {
+
+        }
 
         super.runAuto();
         

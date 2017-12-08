@@ -28,9 +28,14 @@
  */
 package org.firstinspires.ftc.team4042.autos;
 
+import android.graphics.Bitmap;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.vuforia.Image;
+import com.vuforia.PIXEL_FORMAT;
+import com.vuforia.Vuforia;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.ConceptVuforiaNavigation;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -48,6 +53,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.robotcore.internal.vuforia.VuforiaLocalizerImpl;
+import org.opencv.android.Utils;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -129,5 +137,52 @@ public class VuMarkIdentifier {
         } while (relicRecoveryVuMark.equals(RelicRecoveryVuMark.UNKNOWN));
 
         return relicRecoveryVuMark;
+    }
+
+    public Mat getFrameAsMat() {
+        VuforiaLocalizer.CloseableFrame frame = null;
+        Image rgb = null;
+
+        telemetry.log().add("a");
+        Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true);
+        vuforia.setFrameQueueCapacity(1);
+
+        try {
+            frame = vuforia.getFrameQueue().take();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        telemetry.log().add("b");
+
+        long numImages = frame.getNumImages();
+
+        for (int i = 0; i < numImages; i++) {
+            telemetry.log().add("format " + frame.getImage(i).getFormat());
+            if (frame.getImage(i).getFormat() == PIXEL_FORMAT.RGB565) {
+                rgb = frame.getImage(i);
+                break;
+            }
+        }
+
+        telemetry.log().add("rgb " + rgb);
+        telemetry.log().add("width " + rgb.getWidth() + " height " + rgb.getHeight());
+
+        Bitmap bm = Bitmap.createBitmap(rgb.getWidth(), rgb.getHeight(), Bitmap.Config.ARGB_8888);
+        telemetry.log().add("alkdflja");
+        bm.copyPixelsFromBuffer(rgb.getPixels());
+
+        telemetry.log().add("e");
+
+        Mat tmp = new Mat(rgb.getWidth(), rgb.getHeight(), CvType.CV_8UC4);
+        Utils.bitmapToMat(bm, tmp);
+
+        telemetry.log().add("f");
+
+        frame.close();
+
+        telemetry.log().add("d");
+
+        return tmp;
     }
 }
