@@ -571,11 +571,11 @@ public abstract class Auto extends LinearVisionOpMode {
             log.add("rotate left");
 
             //Moves the robot left
-            autoRotate(10, Drive.FULL_SPEED/2);
+            autoRotate(-10, Drive.FULL_SPEED);
 
             log.add("rotate right");
 
-            autoRotate(0, Drive.FULL_SPEED/2);
+            autoRotate(0, Drive.FULL_SPEED);
 
             log.add("jewel up");
 
@@ -604,9 +604,9 @@ public abstract class Auto extends LinearVisionOpMode {
             }
             timer.reset();
 
-            autoRotate(-10, Drive.FULL_SPEED/2);
+            autoRotate(10, Drive.FULL_SPEED);
 
-            autoRotate(0, Drive.FULL_SPEED/2);
+            autoRotate(0, Drive.FULL_SPEED);
 
             drive.jewelUp();
 
