@@ -119,18 +119,6 @@ public class TeleOpMecanum extends OpMode {
 
         speedModes();
 
-        if (!bY && gamepad1.y) { //When you first push the button
-            drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        }
-        else if (bY && !gamepad2.y) { //When you release the button, reset the utrack
-            drive.resetUTrack();
-            drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        }
-        else if (gamepad2.y) { //Runs the utrack downwards
-            drive.setVerticalDrive(-0.5);
-        }
-
         //If you're at the bottom, haven't been pushing a, and now are pushing a
         if (drive.uTrackAtBottom && !bA && gamepad2.a) {
             drive.uTrack();
@@ -140,7 +128,6 @@ public class TeleOpMecanum extends OpMode {
             drive.uTrack();
         }
         bA = gamepad2.a;
-        bY = gamepad2.y;
 
         //Right trigger of the b controller runs the right intake forward
         intakes();
@@ -162,8 +149,18 @@ public class TeleOpMecanum extends OpMode {
         }
         bX = gamepad2.x;
 
+        if (!bY && gamepad1.y) { //When you first push the button
+            drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+        else if (bY && !gamepad2.y) { //When you release the button, reset the utrack
+            drive.resetUTrack();
+            drive.glyph.setHomeTarget();
+        }
+        else if (gamepad2.y) { //Runs the utrack downwards
+            drive.setVerticalDrive(-0.5);
+        }
         //TODO: manual is done broked
-        if(!manual) {
+        else if(!manual) {
             //Glyph locate
             glyphLocate();
 
@@ -177,6 +174,8 @@ public class TeleOpMecanum extends OpMode {
             }
             bB = gamepad2.b;
         }
+        bY = gamepad2.y;
+        
         telemetryUpdate();
     }
 
@@ -306,6 +305,7 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
         telemetry.addData("Speed factor", adjustedSpeed);
         if (drive.verbose) {
+            telemetry.addData("vertical mode", drive.getVerticalDriveMode());
             telemetry.addData("encoder currentY pos", drive.verticalDriveCurrPos());
             telemetry.addData("hand is open", drive.isHandOpen());
             telemetry.addData("limit switch", drive.getCenterState());
