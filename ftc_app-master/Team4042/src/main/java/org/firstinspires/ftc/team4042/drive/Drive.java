@@ -422,8 +422,8 @@ public abstract class Drive {
     }
 
     public void jewelDown() {
-        jewelServo.setPosition(0);
-        while (jewelServo.getPosition() != 0) {  }
+        jewelServo.setPosition(.1);
+        while (jewelServo.getPosition() != .1) {  }
     }
 
     public void jewelUp() {
@@ -432,8 +432,8 @@ public abstract class Drive {
     }
 
     public void jewelIn() {
-        jewelServo.setPosition(.8);
-        while (jewelServo.getPosition() != .8) {  }
+        jewelServo.setPosition(.83);
+        while (jewelServo.getPosition() != .83) {  }
     }
 
     /*

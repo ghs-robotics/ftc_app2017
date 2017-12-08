@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.team4042.drive.Direction;
+import org.firstinspires.ftc.team4042.drive.Drive;
 import org.firstinspires.ftc.team4042.drive.GlyphPlacementSystem;
 import org.firstinspires.ftc.team4042.drive.MecanumDrive;
 import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
@@ -99,7 +100,7 @@ public abstract class Auto extends LinearVisionOpMode {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line;
-            while ((line = bufferedReader.readLine()) != null && opModeIsActive()) { //Reads the lines from the file in order
+            while ((line = bufferedReader.readLine()) != null) { //Reads the lines from the file in order
                 if (line.length() > 0) {
                     if (line.charAt(0) != '#') { //Use a # for a comment
                         HashMap<String, String> parameters = new HashMap<>();
@@ -108,7 +109,7 @@ public abstract class Auto extends LinearVisionOpMode {
                         String[] inputParameters = line.split(" ");
                         StringBuilder para = new StringBuilder("Parameter: ");
                         int i = 0;
-                        while (i < inputParameters.length && opModeIsActive()) {
+                        while (i < inputParameters.length) {
                             String parameter = inputParameters[i];
                             int colon = parameter.indexOf(':');
                             String k = parameter.substring(0, colon);
@@ -330,7 +331,7 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void knockRightJewel(HashMap<String, String> parameters) {
-        drive.jewelRight();
+        jewelRight();
     }
 
     public void knockRedJewel(HashMap<String, String> parameters) {
@@ -340,22 +341,22 @@ public abstract class Auto extends LinearVisionOpMode {
             telemetry.addData("ball orientation", balls);
             switch (balls) {
                 case "red":
-                    drive.jewelLeft();
+                    jewelLeft();
                     break;
                 case "blue":
-                    drive.jewelRight();
+                    jewelRight();
                     break;
                 case "red, blue":
-                    drive.jewelLeft();
+                    jewelLeft();
                     break;
                 case "blue, red":
-                    drive.jewelRight();
+                    jewelRight();
                     break;
                 case ", blue":
-                    drive.jewelLeft();
+                    jewelLeft();
                     break;
                 case ", red":
-                    drive.jewelRight();
+                    jewelRight();
                     break;
             }
         } catch (CvException ex) {
@@ -372,22 +373,22 @@ public abstract class Auto extends LinearVisionOpMode {
         log.add("ball orientation: " + balls);
         switch (balls) {
             case "red":
-                drive.jewelRight();
+                jewelRight();
                 break;
             case "blue":
-                drive.jewelLeft();
+                jewelLeft();
                 break;
             case "red, blue":
-                drive.jewelRight();
+                jewelRight();
                 break;
             case "blue, red":
-                drive.jewelLeft();
+                jewelLeft();
                 break;
             case ", blue":
-                drive.jewelRight();
+                jewelRight();
                 break;
             case ", red":
-                drive.jewelLeft();
+                jewelLeft();
                 break;
         }
     }
@@ -448,7 +449,16 @@ public abstract class Auto extends LinearVisionOpMode {
         double realR = Double.parseDouble(parameters.get("r"));
 
         double speed = Double.parseDouble(parameters.get("speed"));
+        
+        autoRotate(realR, speed);
+    }
 
+    /**
+     * Drives in the given Rotation at the given speed until targetTicks is reached
+     * @param realR The degree to rotate to
+     * @param speed The speed to rotate at
+     */
+    private void autoRotate(double realR, double speed) {
         double realGyro = drive.gyro.updateHeading();
 
         do {
@@ -467,7 +477,7 @@ public abstract class Auto extends LinearVisionOpMode {
                 drive.driveXYR(speed - 5/d, 0, 0, -1, false);
             } else {
                 //drive.driveXYR(speed/2 + d/720, 0, 0, 1, false);
-                drive.driveXYR(speed - 5/d, 0, 0, -1, false);
+                drive.driveXYR(speed - 5/d, 0, 0, 1, false);
             }
 
             realGyro = drive.gyro.updateHeading();
@@ -476,20 +486,6 @@ public abstract class Auto extends LinearVisionOpMode {
         drive.stopMotors();
         drive.resetEncoders();
         drive.runWithEncoders();
-    }
-
-    /**
-     * Drives in the given Rotation at the given speed until targetTicks is reached
-     * @param rotation The rotation to rotate in
-     * @param speed The speed to rotate at
-     * @param targetTicks The final distance to have travelled, in encoder ticks
-     */
-    private void autoRotate(Direction.Rotation rotation, double speed, double targetTicks) {
-        boolean done = false;
-        while (!done && opModeIsActive()) {
-            done = drive.rotateWithEncoders(rotation, speed, targetTicks);
-            telemetry.update();
-        }
     }
 
     public void autoSensorDrive(HashMap<String, String> parameters) {
@@ -557,5 +553,70 @@ public abstract class Auto extends LinearVisionOpMode {
 
     private void autoSensorDrive(Direction direction, double speed, double targetDistance, double targetTicks) {
         autoSensorDrive(direction, speed, targetDistance, targetTicks, drive.shortIr[0]);
+    }
+
+    public void jewelLeft() {
+        try {
+            drive.resetEncoders();
+            drive.runWithEncoders();
+            ElapsedTime timer = new ElapsedTime();
+
+            timer.reset();
+            drive.jewelDown();
+
+            while (timer.seconds() < 1) {
+            }
+            timer.reset();
+
+            log.add("rotate left");
+
+            //Moves the robot left
+            autoRotate(10, Drive.FULL_SPEED/2);
+
+            log.add("rotate right");
+
+            autoRotate(0, Drive.FULL_SPEED/2);
+
+            log.add("jewel up");
+
+            drive.jewelUp();
+
+            timer.reset();
+            while (timer.seconds() < 1) {
+            }
+        } catch (NullPointerException ex) {
+            StringWriter sw = new StringWriter();
+            ex.printStackTrace(new PrintWriter(sw));
+            telemetry.addData("NullPointerException", sw.toString());
+        }
+    }
+
+    public void jewelRight() {
+        try {
+            drive.resetEncoders();
+            drive.runWithEncoders();
+            ElapsedTime timer = new ElapsedTime();
+
+            timer.reset();
+            drive.jewelDown();
+
+            while (timer.seconds() < 1) {
+            }
+            timer.reset();
+
+            autoRotate(-10, Drive.FULL_SPEED/2);
+
+            autoRotate(0, Drive.FULL_SPEED/2);
+
+            drive.jewelUp();
+
+            timer.reset();
+            while (timer.seconds() < 1) {
+            }
+        } catch (NullPointerException ex) {
+            StringWriter sw = new StringWriter();
+            ex.printStackTrace(new PrintWriter(sw));
+            telemetry.addData("NullPointerException", sw.toString());
+        }
     }
 }
