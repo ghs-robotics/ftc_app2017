@@ -162,7 +162,7 @@ public class TeleOpMecanum extends OpMode {
         bX = gamepad2.x;
 
         //TODO: manual is done broked
-        if(!manual) {
+        if(!manual && !gamepad2.y) {
             //Glyph locate
             glyphLocate();
 
