@@ -590,6 +590,8 @@ public abstract class Drive {
     public void setMotorPower(double[] speedWheel, double speedFactor) {
         //Scales wheel speeds to fit motors
         double max = max(speedWheel[0], speedWheel[1], speedWheel[2], speedWheel[3]);
+        speedFactor = speedFactor > 1 ? 1 : speedFactor;
+        speedFactor = speedFactor < -1 ? -1 : speedFactor;
         //Since max is an absolute value function, this also accounts for a data set like [3, 1, 0, -5], since max will be 5
         for(int i = 0; i < 4; i++) {
             speedWheel[i] *= speedFactor;
@@ -645,13 +647,13 @@ public abstract class Drive {
             }
         }
 
-        if (verbose || !useMotors) {
+        /*if (verbose || !useMotors) {
             //Prints power
             telemetry.addData("Left Front", speedWheel[0]);
             telemetry.addData("Right Front", -speedWheel[1]);
             telemetry.addData("Right Back", -speedWheel[2]);
             telemetry.addData("Left Back", speedWheel[3]);
-        }
+        }*/
     }
 
     public void setVerbose(boolean verbose) {

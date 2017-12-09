@@ -1,14 +1,2 @@
-#function:v
-#function:jb
-#function:up
-
-function:jr
-function:doff x:0 y:1 speed:.5 target:1000
-function:d x:0 y:1 speed:.5 target:900
-function:r r:-90 speed:.5
-function:d x:0 y:1 speed:.5 target:500
-function:d x:1 y:-.9 speed:.5 target:3000 time:9
-function:d x:0 y:1 speed:.5 target:300 useGyro:alkfdljadglkhagdlkhfdlkhfdslkjsf
-function:p
-function:d x:0 y:1 speed:.5 target:300
-#function:s x:0 y:1 speed:.5 distance:4.5 target:100
+function:r r:15 speed:.5
+#function:r r:1 speed:.5
