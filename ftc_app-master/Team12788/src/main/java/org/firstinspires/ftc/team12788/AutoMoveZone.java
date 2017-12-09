@@ -39,7 +39,7 @@ public class AutoMoveZone extends LinearOpMode {
         //grabRight = hardwareMap.servo.get("grabRight");
         //mark.initialize(telemetry, hardwareMap);
         waitForStart();
-        while(!drive.rotateWithEncoders(Direction.Rotation.Counterclockwise, Autonomous.speedy-.2, 4*Autonomous.turn) && opModeIsActive());
+        while(!drive.driveWithEncoders(Direction.Forward, Autonomous.speedy-.2, Autonomous.tile) && opModeIsActive());
         sleep(2000);
 
     }
