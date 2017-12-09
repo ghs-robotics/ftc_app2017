@@ -13,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 public class GlyphPlacementSystem {
 
     public final double HORIZONTAL_TRANSLATION_TIME = 2;
-    public final int PLACEMENT_ERROR_MARGIN = 50;
+    public final int PLACEMENT_ERROR_MARGIN = 25;
     private final double PROPORTIONAL_CONSTANT = 30;
     private final double DERIV_CONSTANT = 2.5;
     private int targetX;
@@ -158,8 +158,8 @@ public class GlyphPlacementSystem {
         }
     }
 
-    public void adjustBack() {
-        drive.setHorizontalDrive(-.2);
+    public void adjustBack(double mulch) {
+        drive.setHorizontalDrive(mulch * .2);
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
         while (timer.seconds() < .2) {  }
