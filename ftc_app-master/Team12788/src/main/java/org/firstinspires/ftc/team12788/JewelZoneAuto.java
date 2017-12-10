@@ -85,7 +85,10 @@ public class JewelZoneAuto extends LinearOpMode {
     public void reset() {
         drive.resetEncoders();
         sleep(500);
-        drive.runWithEncoders();
+        drive.runWithoutEncoders();
+    }
+    public void urmom() {
+        jewel.setPosition(.15);
     }
 
     public void move(Direction direction, double speed, double targetTicks) {
@@ -110,25 +113,27 @@ public class JewelZoneAuto extends LinearOpMode {
 
     public void jewelKnock(boolean isRed) {
         telemetry.addData("lol", "1");
-        jewel.setPosition(.95);
+        jewel.setPosition(.85);
         sleep(1000);
         if (isRed) {
             if (color.SenseRed()) {
                 move(Direction.Forward, Autonomous.speedy - .4, Autonomous.tile / 8);
-                jewel.setPosition(.63);
+                jewel.setPosition(.15);
             } else {
-                move(Direction.Backward, Autonomous.speedy - .5, 145);
+                move(Direction.Backward, Autonomous.speedy - .5, Autonomous.tile / 8);
                 sleep(200);
-                jewel.setPosition(.5);
+                jewel.setPosition(.15);
+                move(Direction.Forward, Autonomous.speedy - .4, Autonomous.tile / 4);
             }
         } else {
             if (color.SenseBlue()) {
                 move(Direction.Forward, Autonomous.speedy - .4, Autonomous.tile / 8);
                 sleep(200);
-                jewel.setPosition(.5);
+                jewel.setPosition(.15);
+                move(Direction.Backward, Autonomous.speedy - .4, Autonomous.tile / 4);
             } else {
                 move(Direction.Backward, Autonomous.speedy - .4, 2 * Autonomous.tile / 8);
-                jewel.setPosition(.63);
+                jewel.setPosition(.15);
             }
 
         }
@@ -154,11 +159,11 @@ public class JewelZoneAuto extends LinearOpMode {
         reset();
         //vuMark = mark.getMark();
         vuMark = RelicRecoveryVuMark.CENTER;
-        jewelKnock(isRed);
-        if (isRed && !isTop) {
 
+        if (isRed && !isTop) {
+            jewelKnock(isRed);
             timer.reset();
-            jewel.setPosition(.55);
+            jewel.setPosition(.769);
             sleep(499);
             move(Direction.Forward, Autonomous.speedy - .2, 12 * Autonomous.tile / 24);
             while (whisker.getVoltage() < 2 && timer.seconds() < 5 && opModeIsActive()) {
@@ -171,7 +176,7 @@ public class JewelZoneAuto extends LinearOpMode {
             }
             drive.stopMotors();
             reset();
-            jewel.setPosition(.1);
+            jewel.setPosition(.15);
             sleep(500);
             rotate(Direction.Rotation.Counterclockwise, Autonomous.speedy - .2, Autonomous.turn);
 
@@ -194,25 +199,26 @@ public class JewelZoneAuto extends LinearOpMode {
 
         }
         if (!isRed && !isTop) {
-
+            jewelKnock(isRed);
             timer.reset();
-
+            jewel.setPosition(.769);
             sleep(499);
-            move(Direction.Backward, Autonomous.speedy - .2, 12 * Autonomous.tile / 24);
+            move(Direction.Backward, Autonomous.speedy - .4, 8 * Autonomous.tile / 24);
             while (whisker.getVoltage() < 2 && timer.seconds() < 5 && opModeIsActive()) {
                 drive.driveXYR(.3, 1, 0, 0);
             }
+            reset();
             drive.stopMotors();
-            move(Direction.Left, Autonomous.speedy - .2, 1 * Autonomous.tile / 24);
+            move(Direction.Left, Autonomous.speedy - .2, 6 * Autonomous.tile / 24);
+            timer.reset();
             while (whisker.getVoltage() < 2 && timer.seconds() < 5 && opModeIsActive()) {
                 drive.driveXYR(.3, 0, -1, 0);
             }
             drive.stopMotors();
             reset();
-            jewel.setPosition(.1);
+            jewel.setPosition(.15);
             sleep(500);
             rotate(Direction.Rotation.Counterclockwise, Autonomous.speedy - .2, Autonomous.turn);
-            jewel.setPosition(1);
             if (vuMark == RelicRecoveryVuMark.LEFT) {
                 move(Direction.Left, Autonomous.speedy, 1 * Autonomous.tile / 6);
                 dropoff();
@@ -227,11 +233,13 @@ public class JewelZoneAuto extends LinearOpMode {
                 dropoff();
                 move(Direction.Right, Autonomous.speedy, 1 * Autonomous.tile / 3);
             }
+            urmom();
         }
 
         if (isRed && isTop) {
+            jewelKnock(isRed);
             timer.reset();
-            jewel.setPosition(.55);
+            jewel.setPosition(.769);
             sleep(499);
             move(Direction.Backward, Autonomous.speedy - .2, 12 * Autonomous.tile / 24);
 
@@ -245,10 +253,9 @@ public class JewelZoneAuto extends LinearOpMode {
             }
             drive.stopMotors();
             reset();
-            jewel.setPosition(.1);
+            jewel.setPosition(.15);
             sleep(500);
             rotate(Direction.Rotation.Clockwise, Autonomous.speedy - .2, Autonomous.turn);
-            jewel.setPosition(1);
             rotate(Direction.Rotation.Clockwise, Autonomous.speedy - .2, Autonomous.turn);
             if (vuMark == RelicRecoveryVuMark.LEFT) {
                 move(Direction.Right, Autonomous.speedy, 5 * Autonomous.tile / 6);
@@ -266,8 +273,9 @@ public class JewelZoneAuto extends LinearOpMode {
             }
         }
         if (!isRed && isTop) {
+            jewelKnock(isRed);
             timer.reset();
-            jewel.setPosition(.55);
+            jewel.setPosition(.769);
             sleep(499);
             move(Direction.Backward, Autonomous.speedy - .2, 12 * Autonomous.tile / 24);
             while (whisker.getVoltage() < 2 && timer.seconds() < 5 && opModeIsActive()) {
@@ -280,7 +288,7 @@ public class JewelZoneAuto extends LinearOpMode {
             }
             drive.stopMotors();
             reset();
-            jewel.setPosition(.1);
+            jewel.setPosition(.15);
             sleep(500);
             rotate(Direction.Rotation.Counterclockwise, Autonomous.speedy - .2, Autonomous.turn);
             if (vuMark == RelicRecoveryVuMark.LEFT) {
@@ -308,7 +316,7 @@ public class JewelZoneAuto extends LinearOpMode {
         lift = hardwareMap.dcMotor.get("lift");
         intakeLeft = hardwareMap.dcMotor.get("intakeLeft");
         intakeRight = hardwareMap.dcMotor.get("intakeRight");
-        drive.runWithEncoders();
+        drive.runWithoutEncoders();
 
         jewel = hardwareMap.servo.get("jewel");
         grabLeft = hardwareMap.servo.get("grabLeft");
@@ -320,7 +328,7 @@ public class JewelZoneAuto extends LinearOpMode {
 
         boolean isRed = false;
         boolean isTop = false;
-        while (opModeIsActive() && !isStarted()) {
+        /*while (opModeIsActive() && !isStarted()) {
             if (gamepad1.x) {
                 isRed = false;
             }
@@ -333,10 +341,11 @@ public class JewelZoneAuto extends LinearOpMode {
             if (gamepad1.a) {
                 isTop = false;
             }
-        }
+        }*/
         waitForStart();
         JewelWhisker(isRed, isTop);
 
     }
 }
+
 

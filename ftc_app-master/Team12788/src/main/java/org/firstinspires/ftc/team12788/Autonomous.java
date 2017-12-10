@@ -123,7 +123,7 @@ public class Autonomous extends LinearOpMode {
     public void reset(){
         drive.resetEncoders();
         sleep(500);
-        drive.runWithEncoders();
+        drive.runWithoutEncoders();
     }
 
 

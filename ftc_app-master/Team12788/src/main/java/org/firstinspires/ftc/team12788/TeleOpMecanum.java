@@ -50,6 +50,8 @@ public class TeleOpMecanum extends OpMode {
         a = false;
         x = false;
 
+        //lul
+
         lift = hardwareMap.dcMotor.get("lift");
         relic = hardwareMap.dcMotor.get("relic");
         intakeLeft = hardwareMap.dcMotor.get("intakeLeft");
@@ -71,9 +73,12 @@ public class TeleOpMecanum extends OpMode {
 
     @Override
     public void loop() {
-        jewel.setPosition(.9);
-
-
+        if (gamepad1.dpad_right){
+            jewel.setPosition(.769);
+        }
+        if (gamepad1.dpad_left){
+            jewel.setPosition(.3);
+        }
         if (gamepad2.dpad_up) {
             liftPos = 12000;
         } else if (gamepad2.dpad_down) {
