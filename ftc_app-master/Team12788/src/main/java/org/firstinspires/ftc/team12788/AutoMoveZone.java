@@ -34,6 +34,7 @@ public class AutoMoveZone extends LinearOpMode {
         //liftRight = hardwareMap.dcMotor.get("liftRight");
         //intakeLeft = hardwareMap.dcMotor.get("intakeLeft");
         //intakeRight = hardwareMap.dcMotor.get("intakeRight");
+
         drive.runWithoutEncoders();
         //grabLeft = hardwareMap.servo.get("grabLeft");
         //grabRight = hardwareMap.servo.get("grabRight");
