@@ -36,30 +36,30 @@ public class TeleOpMecanum extends OpMode {
 
     /**
     GAMEPAD 1:
-      Joystick 1 X & Y - movement
-      Joystick 2 X - rotation
-      Bumpers - external intakes backwards
-      Triggers - external intakes forwards
-      Dpad up/down - speed modes
-      A -
-      B -
-      X - toggle crawl
-      Y - toggle extendo
-      Start -
-      Back -
+      Joystick 1 X & Y      movement
+      Joystick 2 X          rotation
+      Bumpers               (extendo) external intakes backwards    (normal) both intakes backwards
+      Triggers              (extendo) external intakes forwards     (normal) both intakes forwards
+      Dpad up/down          speed modes
+      A
+      B
+      X                     toggle crawl
+      Y                     toggle extendo
+      Start
+      Back
 
     GAMEPAD 2:
-      Joystick 1 Y - controls placer vertical in manual
-      Joystick 2 X - controls place horizontal in manual
-      Bumpers - internal intakes backwards
-      Triggers - internal intakes forwards
-      Dpad - placer
-      A - places glyph
-      B - manual hand toggle
-      X - toggles manual placement mode
-      Y - resets the glyph placer
-      Start - toggle verbose
-      Back -
+      Joystick 1 Y          (manual) controls placer vertical
+      Joystick 2 X          (manual) controls place horizontal
+      Bumpers               (extendo) internal intakes backwards
+      Triggers              (extendo) internal intakes forwards
+      Dpad                  placer
+      A                     places glyph
+      B                     manual hand toggle
+      X                     toggles manual placement mode
+      Y                     resets the glyph placer
+      Start                 toggle verbose
+      Back
      */
 
     @Override
@@ -91,6 +91,7 @@ public class TeleOpMecanum extends OpMode {
     public void loop() {
 
         drive.glyph.updateEncoderDeriv();
+        drive.updateRates();
 
         //First controller pushing Y - toggle extendo
         if (gamepad1.y && !aY) {

@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.team4042.drive;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -81,6 +81,54 @@ public class  MecanumDrive extends Drive {
 
             driveXYR(speedFactor, x, y, r, useGyro);
         }
+    }
+
+    public void driveXYR(double speedFactor, double x, double y, double r, boolean useGyro, double pConstant) {
+        double[] targSpeedWheel = new double[4];
+
+        //Deadzone for joysticks
+        x = super.deadZone(x);
+        y = super.deadZone(y);
+        r = super.deadZone(r);
+
+        /*if (verbose) {
+            telemetry.addData("x", x);
+            telemetry.addData("y", y);
+            telemetry.addData("r", r);
+        }*/
+
+        double velFeedForwardConstant = 0.03;
+
+        double heading = OFFSET;
+        if (useGyro) {
+            heading = super.gyro.updateHeading();
+            telemetry.addData("heading", heading);
+        }
+
+        /*
+        Adjust x, y for gyro values
+         */
+        double gyroRadians = Math.toRadians(heading);
+        double xPrime = x * Math.cos(gyroRadians) + y * Math.sin(gyroRadians);
+        double yPrime = -x * Math.sin(gyroRadians) + y * Math.cos(gyroRadians);
+
+        double wimpo = isExtendo ? 1 : MAGIC_NUMBER; //Only use the magic number if you're a whole robot
+        wimpo = x <= .1 && x >= -.1 ? 1 : wimpo; //Only use the magic number if you're strafing
+
+        //Sets relative target wheel speeds for mecanum drive based on controller inputs
+        targSpeedWheel[0] = 27*(-xPrime - yPrime - r);
+        targSpeedWheel[1] = 27*(xPrime - yPrime + r);
+        targSpeedWheel[2] = 43*(-xPrime - yPrime + r);
+        targSpeedWheel[3] = 43*(xPrime - yPrime - r);
+
+        //Sets control factors based on target speeds and actual speeds
+        double[] speedWheel = new double[4];
+        for(int i = 0; i < speedWheel.length; i++) {
+            speedWheel[i] = (targSpeedWheel[i] - encoderRates[i]) * pConstant /*+ targSpeedWheel[i] * velFeedForwardConstant*/;
+        }
+
+        //sets the wheel powers to the appropriate ratios
+        super.setMotorPower(speedWheel, speedFactor);
     }
 
     /**
