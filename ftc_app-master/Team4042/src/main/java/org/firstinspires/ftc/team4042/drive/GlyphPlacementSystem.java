@@ -162,7 +162,7 @@ public class GlyphPlacementSystem {
         drive.setHorizontalDrive(-.2);
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
-        while (timer.seconds() < .2) {  }
+        while (timer.seconds() < .3) {  }
         drive.setHorizontalDrive(0);
     }
 

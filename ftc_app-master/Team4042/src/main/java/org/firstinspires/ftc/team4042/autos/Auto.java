@@ -490,19 +490,20 @@ public abstract class Auto extends LinearVisionOpMode {
             gyro = drive.gyro.updateHeading();
             double diff = realR - gyro;
             telemetry.addData("gyro",gyro + " realR: " + realR + " diff: " + diff);
-            telemetry.update();
             if (diff > 270) { diff -= 360; }
             if (diff < -270) { diff += 360; }
-            if (diff > 5) {
+            if (Math.abs(diff) > 5) {
                 drive.driveXYR(speed, 0, 0, -180/diff, false);
-            } else if (diff < -5){
+            } /*else if (diff < -5){
                 drive.driveXYR(speed, 0, 0, 180/diff, false);
-            }
+                telemetry.addData("r", 180/diff); //     180/-15
+            }*/
         } while (Math.abs(gyro - realR) > 5 && opModeIsActive());
 
         drive.stopMotors();
         drive.resetEncoders();
         drive.runWithEncoders();
+        telemetry.update();
     }
 
     public void autoSensorDrive(HashMap<String, String> parameters) {
@@ -588,7 +589,7 @@ public abstract class Auto extends LinearVisionOpMode {
             log.add("rotate left");
 
             //Moves the robot left
-            autoRotate(-10, Drive.FULL_SPEED);
+            autoRotate(-15, Drive.FULL_SPEED);
 
             log.add("rotate right");
 
@@ -621,7 +622,7 @@ public abstract class Auto extends LinearVisionOpMode {
             }
             timer.reset();
 
-            autoRotate(10, Drive.FULL_SPEED);
+            autoRotate(15, Drive.FULL_SPEED);
 
             autoRotate(0, Drive.FULL_SPEED);
 
