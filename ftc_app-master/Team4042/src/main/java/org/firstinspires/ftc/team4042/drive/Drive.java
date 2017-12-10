@@ -284,9 +284,9 @@ public abstract class Drive {
                     if (targetX.equals(GlyphPlacementSystem.HorizPos.LEFT)) {
                         glyph.adjustBack(-1);
                     }
-                    else if (targetX.equals(GlyphPlacementSystem.HorizPos.RIGHT)) {
+                    /*else if (targetX.equals(GlyphPlacementSystem.HorizPos.RIGHT)) {
                         glyph.adjustBack(1);
-                    }
+                    }*/
                 }
                 return false;
             }
