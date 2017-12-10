@@ -282,7 +282,10 @@ public abstract class Drive {
                 if(glyph.xTargetReached(GlyphPlacementSystem.HorizPos.CENTER)) {
                     stage = GlyphPlacementSystem.Stage.RETURN2;
                     if (targetX.equals(GlyphPlacementSystem.HorizPos.LEFT)) {
-                        glyph.adjustBack();
+                        glyph.adjustBack(-1);
+                    }
+                    else if (targetX.equals(GlyphPlacementSystem.HorizPos.RIGHT)) {
+                        glyph.adjustBack(1);
                     }
                 }
                 return false;

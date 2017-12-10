@@ -157,7 +157,6 @@ public class TeleOpMecanum extends OpMode {
             drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
             drive.setVerticalDrive(-0.5);
         }
-        //TODO: manual is done broked
         else if(!manual) {
             //Glyph locate
             glyphLocate();
