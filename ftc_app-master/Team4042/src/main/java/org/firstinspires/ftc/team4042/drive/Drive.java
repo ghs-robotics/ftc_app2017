@@ -214,6 +214,33 @@ public abstract class Drive {
         //verticalDrive.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
+    private double[] lastEncoders = new double[4];
+    private double lastMilli = 0;
+    public double[] encoderRates = new double[4];
+
+    private double lastGyro = 0;
+    public double gyroRate = 0;
+
+    public void updateRates() {
+        double[] currEncoders = new double[4];
+        currEncoders[0] = motorLeftFront.getCurrentPosition();
+        currEncoders[1] = motorRightFront.getCurrentPosition();
+        currEncoders[2] = motorRightBack.getCurrentPosition();
+        currEncoders[3] = motorLeftBack.getCurrentPosition();
+        double currMilli = System.currentTimeMillis();
+        double currGyro = gyro.updateHeading();
+
+        for (int i = 0; i < currEncoders.length; i++) {
+            encoderRates[i] = (currEncoders[i] - lastEncoders[i]) / (currMilli - lastMilli);
+        }
+        lastEncoders = currEncoders;
+
+        gyroRate = (currGyro - lastGyro) / (currMilli - lastMilli);
+        lastGyro = currGyro;
+
+        lastMilli = currMilli;
+    }
+
     public boolean uTrack() {
         switch (stage) {
             case HOME: {
@@ -595,6 +622,7 @@ public abstract class Drive {
         double max = max(speedWheel[0], speedWheel[1], speedWheel[2], speedWheel[3]);
         speedFactor = speedFactor > 1 ? 1 : speedFactor;
         speedFactor = speedFactor < -1 ? -1 : speedFactor;
+
         //Since max is an absolute value function, this also accounts for a data set like [3, 1, 0, -5], since max will be 5
         for(int i = 0; i < 4; i++) {
             speedWheel[i] *= speedFactor;

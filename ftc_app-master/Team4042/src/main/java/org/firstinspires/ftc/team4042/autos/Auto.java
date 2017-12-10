@@ -459,31 +459,31 @@ public abstract class Auto extends LinearVisionOpMode {
      * @param speed The speed to rotate at
      */
     private void autoRotate(double realR, double speed) {
-        /*double realGyro = drive.gyro.updateHeading();
-
-        log.add("r: " + realR + " speed: " + speed);
-
+        /*double gyro;
         do {
-            double gyro = realGyro;
-            double r = realR;
-
-            while (r < 0 && opModeIsActive()) { r += 360; }
-            while (gyro < 0 && opModeIsActive()) { gyro += 360; }
-            double diff = Math.abs(r - gyro); //Larger the further you are from your target
-            if (diff > 180) { diff = 360 - diff; }
-            //telemetry.addData("d", d + " speed + d/720 " + (speed/2 + d/360));
-            telemetry.addData("diff", diff + " diff/200 " + diff/200);
-            telemetry.addData("real gyro", realGyro + " gyro " + gyro + " real r " + realR + " r " + r);
-            if (realGyro > realR) {
-                //The further you are from your target, the faster you should move
-                drive.driveXYR(diff/200, 0, 0, -1, false);
-            } else {
-                //drive.driveXYR(speed/2 + d/720, 0, 0, 1, false);
-                drive.driveXYR(diff/200, 0, 0, 1, false);
+            drive.updateRates();
+            gyro = drive.gyro.getHeading();
+            double diff = realR - gyro;
+            telemetry.addData("gyro",gyro + " realR: " + realR + " diff: " + diff);
+            if (diff > 270) { diff -= 360; }
+            if (diff < -270) { diff += 360; }
+            if (Math.abs(diff) > 2 || true) {
+                double controlFactor = -.025*diff/* + drive.gyroRate * 0.5;
+                telemetry.addData("controlFactor", controlFactor);
+                telemetry.addData("gyroRate", drive.gyroRate);
+                telemetry.update();
+                drive.driveXYR(speed, 0, 0, controlFactor, false, 0.025);
+            } /*else if (diff < -5){
+                drive.driveXYR(speed, 0, 0, 180/diff, false);
+                telemetry.addData("r", 180/diff); //     180/-15
             }
+        } while ((Math.abs(gyro - realR) > 2 || (drive.gyroRate > .0001) || true) && opModeIsActive());
 
-            realGyro = drive.gyro.updateHeading();
-        } while (Math.abs(realGyro - realR) > 5 && opModeIsActive());*/
+        drive.stopMotors();
+        drive.resetEncoders();
+        drive.runWithEncoders();
+        telemetry.update();*/
+
 
         double gyro;
         do {
@@ -492,13 +492,13 @@ public abstract class Auto extends LinearVisionOpMode {
             telemetry.addData("gyro",gyro + " realR: " + realR + " diff: " + diff);
             if (diff > 270) { diff -= 360; }
             if (diff < -270) { diff += 360; }
-            if (Math.abs(diff) > 5) {
-                drive.driveXYR(speed, 0, 0, -180/diff, false);
+            if (Math.abs(diff) > 2) {
+                drive.driveXYR(speed, 0, 0, -180/diff, false, 0.025);
             } /*else if (diff < -5){
                 drive.driveXYR(speed, 0, 0, 180/diff, false);
                 telemetry.addData("r", 180/diff); //     180/-15
             }*/
-        } while (Math.abs(gyro - realR) > 5 && opModeIsActive());
+        } while (Math.abs(gyro - realR) > 2 && opModeIsActive());
 
         drive.stopMotors();
         drive.resetEncoders();

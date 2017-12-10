@@ -13,4 +13,5 @@
 #a | aligns horizontally with the cryptobox | parameters - [none]
 #ex: function:d x:1 y:.2 speed:.5 target:1000 will drive right and slightly forward at half speed for 1000 encoder ticks
 
-function:r r:-15 speed:.5
+function:r r:-15 speed:.25
+function:r r:0 speed:.25
