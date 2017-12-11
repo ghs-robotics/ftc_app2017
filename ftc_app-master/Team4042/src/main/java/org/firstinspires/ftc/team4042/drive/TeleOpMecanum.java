@@ -161,6 +161,11 @@ public class TeleOpMecanum extends OpMode {
         }
         bX = gamepad2.x;
 
+        if (gamepad2.b && !bB) {
+            drive.toggleHand();
+        }
+        bB = gamepad2.b;
+
         if (bY && !gamepad2.y) { //When you release the button, reset the utrack
             drive.resetUTrack();
             drive.glyph.setHomeTarget();
@@ -177,11 +182,6 @@ public class TeleOpMecanum extends OpMode {
         } else {
             drive.setVerticalDrive(gamepad2.left_stick_y);
             drive.setHorizontalDrive(gamepad2.right_stick_x);
-
-            if (gamepad2.b && ! bB) {
-                drive.toggleHand();
-            }
-            bB = gamepad2.b;
         }
         bY = gamepad2.y;
         
