@@ -91,7 +91,7 @@ public class TeleOpMecanum extends OpMode {
     public void loop() {
 
         drive.glyph.updateEncoderDeriv();
-        drive.updateRates();
+        //drive.updateRates();
 
         //First controller pushing Y - toggle extendo
         if (gamepad1.y && !aY) {
@@ -102,6 +102,11 @@ public class TeleOpMecanum extends OpMode {
         //The X button on the first controller - toggle crawling to let us adjust the back of the robot too
         if (gamepad1.x && !aX) {
             Drive.crawl = !Drive.crawl;
+            if (Drive.crawl) {
+                drive.freezeBack();
+            } else {
+                drive.runBackWithEncoders();
+            }
         }
         aX = gamepad1.x;
 
@@ -115,7 +120,7 @@ public class TeleOpMecanum extends OpMode {
         drive.drive(false, gamepad1, gamepad2, adjustedSpeed * MecanumDrive.FULL_SPEED);
 
         if (Drive.useGyro) {
-            drive.useGyro();
+            drive.useGyro(0);
         }
 
         speedModes();
@@ -199,8 +204,9 @@ public class TeleOpMecanum extends OpMode {
 
             //do {
                 //drive.pushRobotTogether();
-                drive.raiseBrakes();
-                drive.lockCatches();
+            drive.raiseBrakes();
+            drive.lockCatches();
+            drive.freezeBack();
             //} while (timer.seconds() < 2);
 
             Drive.isExtendo = false;
@@ -211,8 +217,9 @@ public class TeleOpMecanum extends OpMode {
 
             //do {
                 //drive.pushRobotTogether();
-                drive.lowerBrakes();
-                drive.unlockCatches();
+            drive.lowerBrakes();
+            drive.unlockCatches();
+            drive.runBackWithEncoders();
             //} while (timer.seconds() < 2);
 
             Drive.isExtendo = true;
