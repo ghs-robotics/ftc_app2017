@@ -176,7 +176,7 @@ public class TeleOpMecanum extends OpMode {
         }
         else if(!manual) {
             //Glyph locate
-            glyphLocate();
+            glyphUI();
 
             drive.glyph.runToPosition();
         } else {
@@ -232,14 +232,14 @@ public class TeleOpMecanum extends OpMode {
         }
     }
 
-    private void glyphLocate() {
-        if (gamepad2.dpad_up && !bUp) { drive.targetY = GlyphPlacementSystem.Position.values()[drive.glyph.up() + 2]; }
+    private void glyphUI() {
+        if (gamepad2.dpad_up && !bUp) { drive.glyph.uiUp(); }
         bUp = gamepad2.dpad_up;
-        if (gamepad2.dpad_down && !bDown) { drive.targetY = GlyphPlacementSystem.Position.values()[drive.glyph.down() + 2]; }
+        if (gamepad2.dpad_down && !bDown) { drive.glyph.uiDown(); }
         bDown = gamepad2.dpad_down;
-        if (gamepad2.dpad_left && !bLeft) { drive.targetX = GlyphPlacementSystem.HorizPos.values()[drive.glyph.left()]; }
+        if (gamepad2.dpad_left && !bLeft) { drive.glyph.uiLeft(); }
         bLeft = gamepad2.dpad_left;
-        if (gamepad2.dpad_right && !bRight) { drive.targetX = GlyphPlacementSystem.HorizPos.values()[drive.glyph.right()]; }
+        if (gamepad2.dpad_right && !bRight) { drive.glyph.uiRight(); }
         bRight = gamepad2.dpad_right;
     }
 
