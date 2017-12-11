@@ -346,8 +346,8 @@ public abstract class Drive {
      * uses the gyro, first reading from the gyro then setting rotation to
      * auto correct if the robot gets off
      */
-    public double useGyro() {
-        double heading = gyro.updateHeading(); //hopefully still 0
+    public double useGyro(double targetGyro) {
+        double heading = gyro.updateHeading() - targetGyro; //hopefully still 0
         //If you're moving forwards and you drift, this should correct it.
         //Accounts for if you go from -180 degrees to 180 degrees
         // which is only a difference of one degree,
@@ -522,6 +522,40 @@ public abstract class Drive {
             }
             if (motorRightFront != null) {
                 motorRightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+        }
+    }
+
+    public void freezeBack() {
+        runBackToPosition();
+        if (useMotors) {
+            if (motorLeftBack != null) {
+                motorLeftBack.setTargetPosition(0);
+            }
+            if (motorRightBack != null) {
+                motorRightBack.setTargetPosition(0);
+            }
+        }
+    }
+
+    public void runBackToPosition() {
+        if (useMotors) {
+            if (motorLeftBack != null) {
+                motorLeftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            }
+            if (motorRightBack != null) {
+                motorRightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            }
+        }
+    }
+
+    public void runBackWithEncoders() {
+        if (useMotors) {
+            if (motorLeftBack != null) {
+                motorLeftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+            if (motorRightBack != null) {
+                motorRightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
         }
     }

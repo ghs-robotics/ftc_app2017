@@ -97,7 +97,7 @@ public class  MecanumDrive extends Drive {
             telemetry.addData("r", r);
         }*/
 
-        double velFeedForwardConstant = 0.03;
+        double velFeedForwardConstant = 0.01;
 
         double heading = OFFSET;
         if (useGyro) {
@@ -124,7 +124,7 @@ public class  MecanumDrive extends Drive {
         //Sets control factors based on target speeds and actual speeds
         double[] speedWheel = new double[4];
         for(int i = 0; i < speedWheel.length; i++) {
-            speedWheel[i] = (targSpeedWheel[i] - encoderRates[i]) * pConstant /*+ targSpeedWheel[i] * velFeedForwardConstant*/;
+            speedWheel[i] = (targSpeedWheel[i] - encoderRates[i]) * pConstant + targSpeedWheel[i] * velFeedForwardConstant;
         }
 
         //sets the wheel powers to the appropriate ratios
@@ -221,12 +221,12 @@ public class  MecanumDrive extends Drive {
      * @param direction which direction to go
      * @return returns if it is completed (true if has reached target, false if it hasn't)
      */
-    public boolean driveWithEncoders(Direction direction, double speed, double targetTicks, boolean useGyro) throws IllegalArgumentException{
+    public boolean driveWithEncoders(Direction direction, double speed, double targetTicks, boolean useGyro, double targetGyro) throws IllegalArgumentException{
         //telemetry data
-        if (verbose) {
+        /*if (verbose) {
             log.add("x " + direction.getX());
             log.add("y " + direction.getY());
-        }
+        }*/
 
         double scaledSpeed = setUpSpeed(speed, targetTicks);
         if (scaledSpeed == Math.PI) { //The target's been reached
@@ -238,10 +238,10 @@ public class  MecanumDrive extends Drive {
 
         double r = 0;
         if (useGyro) {
-            r = useGyro();
+            r = useGyro(targetGyro);
         }
         if (verbose) {
-            log.add("r " + r);
+            log.add("useGyro " + useGyro + " r " + r);
         }
 
         //Drives at x
