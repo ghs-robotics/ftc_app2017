@@ -29,6 +29,26 @@ public class  MecanumDrive extends Drive {
         super(verbose);
     }
 
+    private void driveTank(double speedFactor, double l, double r) {
+        double[] speedWheel = new double[4];
+
+        //Deadzone for joysticks
+        l = super.deadZone(l);
+        r = super.deadZone(r);
+
+        if (verbose) {
+            telemetry.addData("tank left", l);
+            telemetry.addData("tank right", r);
+        }
+
+        speedWheel[0] = l;
+        speedWheel[1] = r;
+        speedWheel[2] = r;
+        speedWheel[3] = l;
+
+        super.setMotorPower(speedWheel, speedFactor);
+    }
+
     private void driveLR(double speedFactor, double l, double r) {
 
         double[] speedWheel = new double[4];
@@ -74,6 +94,11 @@ public class  MecanumDrive extends Drive {
             double right = gamepad1.right_stick_y;
 
             driveLR(speedFactor, left, right);
+        } else if (tank) {
+            double left = gamepad1.left_stick_y;
+            double right = gamepad1.right_stick_y;
+
+            driveTank(speedFactor, left, right);
         } else {
             double x = gamepad1.left_stick_x;
             double y = -gamepad1.left_stick_y; //Y is the opposite direction of what's intuitive: forward is -1, backwards is 1

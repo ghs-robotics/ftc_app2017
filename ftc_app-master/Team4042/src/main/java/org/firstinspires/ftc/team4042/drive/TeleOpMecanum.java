@@ -16,6 +16,7 @@ public class TeleOpMecanum extends OpMode {
     private boolean bStart = false;
     private boolean aY = false;
     private boolean aX = false;
+    private boolean aB = false;
 
     private boolean aDown = false;
     private boolean aUp = false;
@@ -42,7 +43,7 @@ public class TeleOpMecanum extends OpMode {
       Triggers              (extendo) external intakes forwards     (normal) both intakes forwards
       Dpad up/down          speed modes
       A
-      B
+      B                     toggle tank
       X                     toggle crawl
       Y                     toggle extendo
       Start
@@ -118,6 +119,11 @@ public class TeleOpMecanum extends OpMode {
 
         //Drives the robot
         drive.drive(false, gamepad1, gamepad2, adjustedSpeed * MecanumDrive.FULL_SPEED);
+
+        if (gamepad1.b && !aB) {
+            Drive.tank = !Drive.tank;
+        }
+        aB = gamepad1.b;
 
         if (Drive.useGyro) {
             drive.useGyro(0);
@@ -309,6 +315,7 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Crawl", Drive.crawl);
         telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
         telemetry.addData("Speed factor", adjustedSpeed);
+        telemetry.addData("Tank", Drive.tank);
         if (drive.verbose) {
             telemetry.addData("vertical mode", drive.getVerticalDriveMode());
             telemetry.addData("encoder currentY pos", drive.verticalDriveCurrPos());
