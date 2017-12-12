@@ -16,7 +16,7 @@ public class AnalogSensor {
     private String name;
     private boolean isLongRange;
 
-    private static final int NUM_OF_READINGS = 10;
+    public static final int NUM_OF_READINGS = 10;
 
     private int curr = 0;
 

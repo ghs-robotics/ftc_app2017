@@ -265,9 +265,9 @@ public class  MecanumDrive extends Drive {
         if (useGyro) {
             r = useGyro(targetGyro);
         }
-        if (verbose) {
+        /*if (verbose) {
             log.add("useGyro " + useGyro + " r " + r);
-        }
+        }*/
 
         //Drives at x
         driveXYR(FULL_SPEED, direction.getX() * scaledSpeed, direction.getY() * scaledSpeed, r, false);

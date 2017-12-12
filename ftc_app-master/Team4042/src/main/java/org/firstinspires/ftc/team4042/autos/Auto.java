@@ -522,57 +522,54 @@ public abstract class Auto extends LinearVisionOpMode {
      * @param direction The direction to move in
      * @param speed The speed to move at
      * @param targetDistance The final distance to have travelled, in encoder ticks
-     * @param ir The sensor to read a distance from
+     * @param irId The sensor to read a distance from
+     * @param isLongRange Whether the sensor is long-range or not
+     * @param targetGyro The gyro to rotate to, if applicable. Otherwise, 0.
+     * @param targetTicks Unused
      */
-    private void autoSensorDrive(Direction direction, double speed, double targetDistance, double targetTicks, AnalogSensor ir, double targetGyro) {
+    private void autoSensorDrive(Direction direction, double speed, double targetDistance, double targetTicks, int irId, boolean isLongRange, double targetGyro) {
 
-        autoDrive(direction, speed, targetTicks, -1, false, targetGyro);
+        //autoDrive(direction, speed, targetTicks, -1, false, targetGyro);
+
+        AnalogSensor ir = isLongRange ? drive.longIr[irId] : drive.shortIr[irId];
 
         double currDistance = ir.getCmAvg();
-        if (currDistance == -1) {
-            telemetry.addData("Error", "Couldn't find sensor");
-        } else {
+        int i = 0;
+        while (i < AnalogSensor.NUM_OF_READINGS && opModeIsActive()) {
+            ir.addReading();
+            //telemetry.addData("Error", "Couldn't find sensor");
+            //telemetry.update();
+            currDistance = ir.getCmAvg();
+            telemetry.addData("currDistance", currDistance);
+            telemetry.update();
+            i++;
+        } //else {
             double r = drive.useGyro(0)/180;
-
-            /*if (drive.verbose) {
-                telemetry.addData("currDistance", currDistance);
-                telemetry.addData("Reached target", Math.abs(targetDistance - currDistance) > 2);
-                telemetry.addData("x", direction.getX());
-                telemetry.addData("y", direction.getY());
-                telemetry.addData("r", r);
-                telemetry.update();
-            }*/
 
             do {
                 double speedFactor = speed;
-                if (((targetDistance > currDistance) && direction.isForward()) ||
-                        ((targetDistance < currDistance) && direction.isBackward())) { //If you're too far, drive *backwards*
+                if (((targetDistance > currDistance) && direction.isBackward()) ||
+                        ((targetDistance < currDistance) && direction.isForward())) { //If you're too far, drive *backwards*
                     speedFactor *= -1;
                 }
-                drive.driveXYR(speedFactor, direction.getX(), direction.getY(), r, false);
+                double derivValue = isLongRange ? drive.longIrRates[irId] : drive.shortIrRates[irId];
+                drive.driveXYR(speedFactor, direction.getX(), direction.getY(), r - .02 * derivValue, false);
 
+                drive.updateRates();
                 currDistance = ir.getCmAvg();
-            } while ((Math.abs(targetDistance - currDistance) > 2) && opModeIsActive());
-
-            //If you're off your target by more than 2 cm, try to adjust
-            /*while ((Math.abs(targetDistance - currDistance) > 2) && opModeIsActive()) {
-                if (((targetDistance > currDistance) && direction.isBackward()) ||
-                        ((targetDistance < currDistance) && direction.isForward())) { //If you're not far enough, keep driving
-                    drive.driveWithEncoders(direction, .25, 100);
-                } else if (((targetDistance > currDistance) && direction.isForward()) ||
-                        ((targetDistance < currDistance) && direction.isBackward())) { //If you're too far, drive backwards slightly
-                    drive.driveWithEncoders(direction, -.25, 100);
-                }
-                currDistance = ir.getCmAvg();
-            }*/
+                telemetry.addData("currDistance", currDistance);
+                telemetry.update();
+            } while (((Math.abs(targetDistance - currDistance) > 2) || true) && opModeIsActive());
 
             //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
             drive.stopMotors();
-        }
+        //}
     }
 
     private void autoSensorDrive(Direction direction, double speed, double targetDistance, double targetTicks, double targetGyro) {
-        autoSensorDrive(direction, speed, targetDistance, targetTicks, drive.shortIr[0], targetGyro);
+        telemetry.addData("ir", drive.shortIr[0]);
+        telemetry.update();
+        autoSensorDrive(direction, speed, targetDistance, targetTicks, 0, false, targetGyro);
     }
 
     public void jewelLeft() {
