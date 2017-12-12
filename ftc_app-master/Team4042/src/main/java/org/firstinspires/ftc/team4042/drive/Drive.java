@@ -123,7 +123,7 @@ public abstract class Drive {
         }
 
         for(int i = 0; i < longIr.length; i++){
-            shortIr[i] = new AnalogSensor("longir" + i, true);
+            longIr[i] = new AnalogSensor("longir" + i, true);
         }
 
         verbose = false;
@@ -222,13 +222,21 @@ public abstract class Drive {
     private double lastGyro = 0;
     public double gyroRate = 0;
 
+    private double[] lastShortIr = new double[3];
+    private double[] lastLongIr = new double[2];
+    public double[] shortIrRates = new double[3];
+    public double[] longIrRates = new double[2];
+
     public void updateRates() {
+        //System time
+        double currMilli = System.currentTimeMillis();
+
+        //Encoder rates
         double[] currEncoders = new double[4];
         currEncoders[0] = motorLeftFront.getCurrentPosition();
         currEncoders[1] = motorRightFront.getCurrentPosition();
         currEncoders[2] = motorRightBack.getCurrentPosition();
         currEncoders[3] = motorLeftBack.getCurrentPosition();
-        double currMilli = System.currentTimeMillis();
         double currGyro = gyro.updateHeading();
 
         for (int i = 0; i < currEncoders.length; i++) {
@@ -236,8 +244,30 @@ public abstract class Drive {
         }
         lastEncoders = currEncoders;
 
+        //IR rates
+        double[] currShortIr = new double[3];
+        for (int i = 0; i < currShortIr.length; i++) {
+            AnalogSensor sIr = shortIr[i];
+            sIr.addReading();
+            currShortIr[i] = sIr.getCmAvg();
+            shortIrRates[i] = (currShortIr[i] - lastShortIr[i]) / (currMilli - lastMilli);
+        }
+
+        double[] currLongIr = new double[2];
+        for (int i = 0; i < currLongIr.length; i++) {
+            AnalogSensor lIr = longIr[i];
+            lIr.addReading();
+            currLongIr[i] = lIr.getCmAvg();
+            longIrRates[i] = (currLongIr[i] - lastLongIr[i]) / (currMilli - lastMilli);
+        }
+
+        //Gyro rates
         gyroRate = (currGyro - lastGyro) / (currMilli - lastMilli);
+
+        //Update last to current
         lastGyro = currGyro;
+        lastShortIr = currShortIr;
+        lastLongIr = currLongIr;
 
         lastMilli = currMilli;
     }
@@ -486,12 +516,12 @@ public abstract class Drive {
     }
 
     public void lowerBrakes() {
-        leftBrake.setPosition(.8);
+        leftBrake.setPosition(.9);
         rightBrake.setPosition(0);
     }
 
     public void raiseBrakes() {
-        leftBrake.setPosition(.12);
+        leftBrake.setPosition(.1);
         rightBrake.setPosition(.68);
     }
 
