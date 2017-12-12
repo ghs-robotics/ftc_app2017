@@ -272,12 +272,18 @@ public abstract class Drive {
         lastMilli = currMilli;
     }
 
+    private void glyphLocate() {
+        targetY = GlyphPlacementSystem.Position.values()[glyph.uiTargetX];
+        targetX = GlyphPlacementSystem.HorizPos.values()[glyph.uiTargetY];
+    }
+
     public boolean uTrack() {
         switch (stage) {
             case HOME: {
                 //Close the hand
                 closeHand();
                 jewelOut();
+                glyphLocate();
                 handDropTimer.reset();
 
                 glyph.currentY = GlyphPlacementSystem.Position.HOME;
