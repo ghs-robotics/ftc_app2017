@@ -83,6 +83,7 @@ public abstract class Drive {
     private CRServo horizontalDrive;
     private DigitalChannel center;
     private DigitalChannel bottom;
+    private DigitalChannel raised;
 
     private Servo grabbyBoi;
     private boolean handIsOpen = false;
@@ -208,6 +209,10 @@ public abstract class Drive {
         bottom.setState(false);
         bottom.setMode(DigitalChannel.Mode.INPUT);
 
+        raised = hardwareMap.digitalChannel.get("raised");
+        raised.setState(false);
+        raised.setMode(DigitalChannel.Mode.INPUT);
+
         intakeLeft = hardwareMap.dcMotor.get("intake left");
         intakeRight = hardwareMap.dcMotor.get("intake right");
         //The left intake is mounted "backwards"
@@ -312,7 +317,7 @@ public abstract class Drive {
             case PLACE1: {
                 //Raise the u-track
                 glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
-                if(glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
+                if(verticalDriveCurrPos() > GlyphPlacementSystem.Position.RAISED.getEncoderVal() && getRaisedState()) {
                     stage = GlyphPlacementSystem.Stage.PAUSE1;
                     glyph.setXPower(targetX);
                 }
@@ -432,6 +437,10 @@ public abstract class Drive {
 
     public boolean getBottomState() {
         return bottom.getState();
+    }
+
+    public boolean getRaisedState() {
+        return raised.getState();
     }
 
     public void openHand() {
