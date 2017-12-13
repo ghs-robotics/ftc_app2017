@@ -82,6 +82,7 @@ public abstract class Drive {
 
     private CRServo horizontalDrive;
     private DigitalChannel center;
+    private DigitalChannel bottom;
 
     private Servo grabbyBoi;
     private boolean handIsOpen = false;
@@ -150,8 +151,12 @@ public abstract class Drive {
 
         log.add("useGyro: " + useGyro);
 
-        for (int i = 0; i < shortIr.length; i++) {
-            shortIr[i].initialize(hardwareMap);
+        for (AnalogSensor aShortIr : shortIr) {
+            aShortIr.initialize(hardwareMap);
+        }
+
+        for (AnalogSensor aLongIr : shortIr) {
+            aLongIr.initialize(hardwareMap);
         }
 
         try {
@@ -198,6 +203,10 @@ public abstract class Drive {
         center = hardwareMap.digitalChannel.get("center");
         center.setState(false);
         center.setMode(DigitalChannel.Mode.INPUT);
+
+        bottom = hardwareMap.digitalChannel.get("bottom");
+        bottom.setState(false);
+        bottom.setMode(DigitalChannel.Mode.INPUT);
 
         intakeLeft = hardwareMap.dcMotor.get("intake left");
         intakeRight = hardwareMap.dcMotor.get("intake right");
@@ -273,11 +282,12 @@ public abstract class Drive {
     }
 
     private void glyphLocate() {
-        targetY = GlyphPlacementSystem.Position.values()[glyph.uiTargetX];
-        targetX = GlyphPlacementSystem.HorizPos.values()[glyph.uiTargetY];
+        targetY = GlyphPlacementSystem.Position.values()[glyph.uiTargetY];
+        targetX = GlyphPlacementSystem.HorizPos.values()[glyph.uiTargetX];
     }
 
     public boolean uTrack() {
+        telemetry.addData("stage", stage);
         switch (stage) {
             case HOME: {
                 //Close the hand
@@ -362,7 +372,7 @@ public abstract class Drive {
                 return false;
             }
             case RESET: {
-                if (glyph.currentY.equals(GlyphPlacementSystem.Position.HOME)) {
+                if (getBottomState()) {
                     resetUTrack();
                 }
                 return true;
@@ -418,6 +428,10 @@ public abstract class Drive {
 
     public boolean getCenterState() {
         return center.getState();
+    }
+
+    public boolean getBottomState() {
+        return bottom.getState();
     }
 
     public void openHand() {

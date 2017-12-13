@@ -511,10 +511,10 @@ public abstract class Auto extends LinearVisionOpMode {
         Direction direction = new Direction(Double.parseDouble(parameters.get("x")), Double.parseDouble(parameters.get("y")));
         double speed = Double.parseDouble(parameters.get("speed"));
         double targetDistance = Double.parseDouble(parameters.get("distance"));
-        double targetTicks = Double.parseDouble(parameters.get("target"));
-        double targetGyro = parameters.containsKey("gyro") ? Double.parseDouble(parameters.get("gyro")) : 0;
+        int ir = Integer.parseInt(parameters.get("ir"));
+        boolean longIr = Boolean.parseBoolean(parameters.get("long"));
 
-        autoSensorDrive(direction, speed, targetDistance, targetTicks, targetGyro);
+        autoSensorDrive(direction, speed, targetDistance, ir, longIr);
     }
 
     /**
@@ -524,10 +524,8 @@ public abstract class Auto extends LinearVisionOpMode {
      * @param targetDistance The final distance to have travelled, in encoder ticks
      * @param irId The sensor to read a distance from
      * @param isLongRange Whether the sensor is long-range or not
-     * @param targetGyro The gyro to rotate to, if applicable. Otherwise, 0.
-     * @param targetTicks Unused
      */
-    private void autoSensorDrive(Direction direction, double speed, double targetDistance, double targetTicks, int irId, boolean isLongRange, double targetGyro) {
+    private void autoSensorDrive(Direction direction, double speed, double targetDistance, int irId, boolean isLongRange) {
 
         //autoDrive(direction, speed, targetTicks, -1, false, targetGyro);
 
@@ -537,8 +535,6 @@ public abstract class Auto extends LinearVisionOpMode {
         int i = 0;
         while (i < AnalogSensor.NUM_OF_READINGS && opModeIsActive()) {
             ir.addReading();
-            //telemetry.addData("Error", "Couldn't find sensor");
-            //telemetry.update();
             currDistance = ir.getCmAvg();
             telemetry.addData("currDistance", currDistance);
             telemetry.update();
@@ -552,12 +548,16 @@ public abstract class Auto extends LinearVisionOpMode {
                         ((targetDistance < currDistance) && direction.isForward())) { //If you're too far, drive *backwards*
                     speedFactor *= -1;
                 }
-                double derivValue = isLongRange ? drive.longIrRates[irId] : drive.shortIrRates[irId];
-                drive.driveXYR(speedFactor, direction.getX(), direction.getY(), r - .02 * derivValue, false);
-
                 drive.updateRates();
                 currDistance = ir.getCmAvg();
-                telemetry.addData("currDistance", currDistance);
+                double derivValue = isLongRange ? drive.longIrRates[irId] : drive.shortIrRates[irId];
+                //drive.driveXYR(speedFactor * factor, direction.getX(), direction.getY(), r + .2 * derivValue, false);
+                double a = derivValue * -.02;
+                double b = (currDistance - targetDistance)*.1;
+                double factor = (a + b);
+                telemetry.addData("derivValue", a);
+                telemetry.addData("currDistance - targetDistance", b);
+                telemetry.addData("y",speedFactor * factor);
                 telemetry.update();
             } while (((Math.abs(targetDistance - currDistance) > 2) || true) && opModeIsActive());
 
@@ -566,10 +566,10 @@ public abstract class Auto extends LinearVisionOpMode {
         //}
     }
 
-    private void autoSensorDrive(Direction direction, double speed, double targetDistance, double targetTicks, double targetGyro) {
+    private void autoSensorDrive(Direction direction, double speed, double targetDistance) {
         telemetry.addData("ir", drive.shortIr[0]);
         telemetry.update();
-        autoSensorDrive(direction, speed, targetDistance, targetTicks, 0, false, targetGyro);
+        autoSensorDrive(direction, speed, targetDistance, 0, false);
     }
 
     public void jewelLeft() {
