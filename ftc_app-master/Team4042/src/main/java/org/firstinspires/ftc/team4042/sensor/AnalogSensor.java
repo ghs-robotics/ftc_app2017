@@ -43,7 +43,8 @@ public class AnalogSensor {
     }
 
     public void addReading() {
-        readings[curr] = sensor.getVoltage();
+        if (sensor == null) { readings[curr] = 0; }
+        else { readings[curr] = sensor.getVoltage(); }
         curr++;
         if (firstLoop && curr >= NUM_OF_READINGS) {
             firstLoop = false;
