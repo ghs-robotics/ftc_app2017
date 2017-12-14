@@ -510,56 +510,79 @@ public abstract class Auto extends LinearVisionOpMode {
     public void autoSensorDrive(HashMap<String, String> parameters) {
         Direction direction = new Direction(Double.parseDouble(parameters.get("x")), Double.parseDouble(parameters.get("y")));
         double speed = Double.parseDouble(parameters.get("speed"));
-        double targetDistance = Double.parseDouble(parameters.get("distance"));
-        int ir = Integer.parseInt(parameters.get("ir"));
-        boolean longIr = Boolean.parseBoolean(parameters.get("long"));
 
-        autoSensorDrive(direction, speed, targetDistance, ir, longIr);
+        double yTargetDistance = Double.parseDouble(parameters.get("ydistance"));
+        int yIr = Integer.parseInt(parameters.get("yir"));
+        boolean yLongIr = Boolean.parseBoolean(parameters.get("ylong"));
+
+        if (parameters.containsKey("xdistance")) {
+            double xTargetDistance = Double.parseDouble(parameters.get("xdistance"));
+            int xIr = Integer.parseInt(parameters.get("xir"));
+            boolean xLongIr = Boolean.parseBoolean(parameters.get("xlong"));
+            autoSensorDrive(direction, speed, xTargetDistance, xIr, xLongIr, yTargetDistance, yIr, yLongIr);
+        }
+        else {
+            autoSensorDrive(direction, speed, 0, 0, false, yTargetDistance, yIr, yLongIr);
+        }
     }
 
     /**
      * Drives in the given Direction until a sensor returns a given value
      * @param direction The direction to move in
      * @param speed The speed to move at
-     * @param targetDistance The final distance to have travelled, in encoder ticks
-     * @param irId The sensor to read a distance from
-     * @param isLongRange Whether the sensor is long-range or not
+     * @param xTargetDistance The final distance to have travelled, in encoder ticks
+     * @param xIrId The sensor to read a distance from
+     * @param xIsLongRange Whether the sensor is long-range or not
      */
-    private void autoSensorDrive(Direction direction, double speed, double targetDistance, int irId, boolean isLongRange) {
+    private void autoSensorDrive(Direction direction, double speed, double xTargetDistance, int xIrId, boolean xIsLongRange,
+                                 double yTargetDistance, int yIrId, boolean yIsLongRange) {
 
         //autoDrive(direction, speed, targetTicks, -1, false, targetGyro);
 
-        AnalogSensor ir = isLongRange ? drive.longIr[irId] : drive.shortIr[irId];
+        AnalogSensor xIr = xIsLongRange ? drive.longIr[xIrId] : drive.shortIr[xIrId];
+        AnalogSensor yIr = yIsLongRange ? drive.longIr[yIrId] : drive.shortIr[yIrId];
 
-        double currDistance = ir.getCmAvg();
+        double xCurrDistance;
+        double yCurrDistance;
         int i = 0;
         while (i < AnalogSensor.NUM_OF_READINGS && opModeIsActive()) {
-            ir.addReading();
-            currDistance = ir.getCmAvg();
-            telemetry.addData("currDistance", currDistance);
-            telemetry.update();
+            xIr.addReading();
+            yIr.addReading();
+            //xCurrDistance = xIr.getCmAvg();
+            //yCurrDistance = yIr.getCmAvg();
+            //telemetry.addData("xCurrDistance", xCurrDistance);
+            //telemetry.update();
             i++;
         } //else {
             double r = drive.useGyro(0)/180;
 
             do {
                 double speedFactor = speed;
-                if (((targetDistance > currDistance) && direction.isBackward()) ||
-                        ((targetDistance < currDistance) && direction.isForward())) { //If you're too far, drive *backwards*
+                /*if (((xTargetDistance > xCurrDistance) && direction.isBackward()) ||
+                        ((xTargetDistance < xCurrDistance) && direction.isForward())) { //If you're too far, drive *backwards*
                     speedFactor *= -1;
-                }
+                }*/
                 drive.updateRates();
-                currDistance = ir.getCmAvg();
-                double derivValue = isLongRange ? drive.longIrRates[irId] : drive.shortIrRates[irId];
-                //drive.driveXYR(speedFactor * factor, direction.getX(), direction.getY(), r + .2 * derivValue, false);
-                double a = derivValue * -.02;
-                double b = (currDistance - targetDistance)*.1;
-                double factor = (a + b);
-                telemetry.addData("derivValue", a);
-                telemetry.addData("currDistance - targetDistance", b);
-                telemetry.addData("y",speedFactor * factor);
+                xCurrDistance = xIr.getCmAvg();
+                yCurrDistance = yIr.getCmAvg();
+                double xDerivValue = xIsLongRange ? drive.longIrRates[xIrId] : drive.shortIrRates[xIrId];
+                double yDerivValue = yIsLongRange ? drive.longIrRates[yIrId] : drive.shortIrRates[yIrId];
+
+                double xDeriv = xDerivValue * -.02;
+                double xProportional = (xCurrDistance - xTargetDistance)*.1;
+
+                double yDeriv = yDerivValue * -.02;
+                double yProportional = (yCurrDistance - yTargetDistance)*.1;
+
+                double xFactor = (xDeriv + xProportional);
+                double yFactor = (yDeriv + yProportional);
+                telemetry.addData("yDerivValue", yDeriv);
+                telemetry.addData("yCurrDistance - yTargetDistance", yProportional);
+                telemetry.addData("y", yFactor * speedFactor);
                 telemetry.update();
-            } while (((Math.abs(targetDistance - currDistance) > 2) || true) && opModeIsActive());
+
+                drive.driveXYR(speedFactor, xFactor, yFactor, r, false);
+            } while (((Math.abs(xTargetDistance - xCurrDistance) > 2) || true) && opModeIsActive());
 
             //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
             drive.stopMotors();
@@ -569,7 +592,7 @@ public abstract class Auto extends LinearVisionOpMode {
     private void autoSensorDrive(Direction direction, double speed, double targetDistance) {
         telemetry.addData("ir", drive.shortIr[0]);
         telemetry.update();
-        autoSensorDrive(direction, speed, targetDistance, 0, false);
+        autoSensorDrive(direction, speed, 0, 0, false, targetDistance, 0, false);
     }
 
     public void jewelLeft() {
