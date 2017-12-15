@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.team4042.drive.Direction;
 import org.firstinspires.ftc.team4042.drive.Drive;
@@ -534,12 +535,14 @@ public abstract class Auto extends LinearOpMode {
             i++;
         }
 
-        double r = drive.useGyro(0) / 180;
-
         do {
             double speedFactor = speed;
 
             drive.updateRates();
+
+            double r = drive.useGyro(0) * .75 + 5 * drive.gyroRate;
+            r = r < .05 && r > 0 ? 0 : r;
+            r = r > -.05 && r < 0 ? 0 : r;
 
             //Get the distances and derivative terms
             xCurrDistance = xIr.getCmAvg();
@@ -557,16 +560,24 @@ public abstract class Auto extends LinearOpMode {
             //Apply the controller
             double xFactor = (xProportional - xDeriv);
             double yFactor = (yProportional - yDeriv);
-            telemetry.addData("yDerivValue", yDeriv);
-            telemetry.addData("yCurrDistance - yTargetDistance", yProportional);
-            telemetry.addData("y", yFactor * speedFactor);
+            telemetry.addData("xIr cm", xCurrDistance);
+            telemetry.addData("yIr cm", yCurrDistance);
+            telemetry.addData("x", xFactor);
+            telemetry.addData("y", yFactor);
+            telemetry.addData("r", r);
             telemetry.update();
+
+            xFactor = Range.clip(xFactor, -1, 1);
+            yFactor = Range.clip(yFactor, -1, 1);
+            r = Range.clip(r, -1, 1);
 
             //Actually drives
             if (useX) {
-                drive.driveXYR(speedFactor, xFactor, -yFactor, r, false);
+                //drive.driveXYR(speedFactor, xFactor/2, -yFactor/2, r, false);
+                drive.driveXYR(speedFactor, xFactor/2, 0, r, false);
             } else {
-                drive.driveXYR(speedFactor, 0, -yFactor, r, false);
+                //drive.driveXYR(speedFactor, 0, -yFactor/2, r, false);
+                drive.driveXYR(speedFactor, 0, -yFactor/2, 0, false);
             }
         } while (((Math.abs(xTargetDistance - xCurrDistance) > 2) || true) && opModeIsActive());
 
