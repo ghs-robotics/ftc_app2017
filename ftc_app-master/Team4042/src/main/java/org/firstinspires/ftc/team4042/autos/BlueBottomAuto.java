@@ -16,11 +16,7 @@ public class BlueBottomAuto extends Auto {
     public void runOpMode() {
 
         super.setUp(drive, "bluebottom.txt");
-        try {
-            waitForStart();
-        } catch (InterruptedException ex) {
-
-        }
+                    waitForStart();
 
         super.runAuto();
         
