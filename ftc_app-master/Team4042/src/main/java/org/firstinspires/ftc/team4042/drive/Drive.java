@@ -21,6 +21,10 @@ import java.io.StringWriter;
  */
 
 public abstract class Drive {
+
+    //Require drive() in subclasses
+    public abstract void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor);
+
     //Initializes a factor for the speed of movement to a position when driving with encoders
     public static final double BASE_SPEED = .3;
     //The deadzone size for the joystick inputs
@@ -115,9 +119,6 @@ public abstract class Drive {
         ex.printStackTrace(new PrintWriter(sw));
         return sw.toString();
     }
-
-    //Require drive() in subclasses
-    public abstract void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor);
 
     public Drive() {
         for(int i = 0; i < shortIr.length; i++){

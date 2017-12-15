@@ -83,7 +83,7 @@ public class  MecanumDrive extends Drive {
     }
 
     /**
-     * uses joystick inputs to set motor speeds for mecanum drive
+     * Uses joystick inputs to set motor speeds for mecanum drive. Speeds partially depend on the drive mode.
      * @param useEncoders determines whether or not the motors use encoders
      */
     public void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor) {
@@ -157,7 +157,7 @@ public class  MecanumDrive extends Drive {
     }
 
     /**
-     * Drives an inputted amount
+     * Drives an inputted amount in regular drive mode
      * @param speedFactor the amount to scale the drive by
      * @param x x component
      * @param y y component
@@ -171,13 +171,9 @@ public class  MecanumDrive extends Drive {
         y = super.deadZone(y);
         r = super.deadZone(r);
 
-        /*if (verbose) {
-            telemetry.addData("x", x);
-            telemetry.addData("y", y);
-            telemetry.addData("r", r);
-        }*/
-
+        //Use the gyro, or ignore it.
         double heading = OFFSET;
+        //Note that OFFSET = 0, but we could make it 180 if we wanted to drive backwards, or 45 if we were using omni drive
         if (useGyro) {
             heading = super.gyro.updateHeading();
             telemetry.addData("heading", heading);
@@ -189,9 +185,6 @@ public class  MecanumDrive extends Drive {
         double gyroRadians = Math.toRadians(heading);
         double xPrime = x * Math.cos(gyroRadians) + y * Math.sin(gyroRadians);
         double yPrime = -x * Math.sin(gyroRadians) + y * Math.cos(gyroRadians);
-
-        double wimpo = isExtendo ? 1 : MAGIC_NUMBER; //Only use the magic number if you're a whole robot
-        wimpo = x <= .1 && x >= -.1 ? 1 : wimpo; //Only use the magic number if you're strafing
 
         //Sets relative wheel speeds for mecanum drive based on controller inputs
         speedWheel[0] = (-xPrime - yPrime - r);
