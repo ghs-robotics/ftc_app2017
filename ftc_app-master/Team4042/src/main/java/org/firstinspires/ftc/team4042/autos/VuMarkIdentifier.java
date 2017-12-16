@@ -160,6 +160,7 @@ public class VuMarkIdentifier {
         }
         telemetry.log().add("give me one more second");
 
+        telemetry.log().add(bm.getWidth() + " x x" + bm.getHeight());
         Mat tmp = new Mat(bm.getWidth(), bm.getHeight(), CvType.CV_8UC4);
         Utils.bitmapToMat(bm, tmp);
 
