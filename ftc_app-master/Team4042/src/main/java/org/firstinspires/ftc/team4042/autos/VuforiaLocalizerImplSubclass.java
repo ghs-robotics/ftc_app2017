@@ -47,6 +47,11 @@ public class VuforiaLocalizerImplSubclass extends VuforiaLocalizerImpl {
                     rgb = frame.getImage(i);
                 }
             }
+            
+            if(rgb == null){
+                throw new NullPointerException("message");
+            }
+
             frame.close();
         }
     }
