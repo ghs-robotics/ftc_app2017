@@ -140,7 +140,7 @@ public class VuMarkIdentifier {
     }
 
     public Mat getJewel() {
-/*        relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
+/*       relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
         relicTemplate = relicTrackables.get(0);
 
         relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
