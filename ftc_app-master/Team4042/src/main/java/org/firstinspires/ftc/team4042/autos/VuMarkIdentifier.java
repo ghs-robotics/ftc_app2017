@@ -163,7 +163,7 @@ public class VuMarkIdentifier {
         Mat tmp = new Mat(bm.getWidth(), bm.getHeight(), CvType.CV_8UC4);
         Utils.bitmapToMat(bm, tmp);
 
-        telemetry.log().add("hazel has seizures lets make fun of her");
+        telemetry.log().add("NOOOO");
         return tmp;
     }
 }
