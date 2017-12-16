@@ -312,7 +312,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
         do {
             drive.uTrackUpdate();
-            drive.glyph.runToPosition(34, -15);
+            drive.glyph.runToPosition(25, 10);
             done = drive.uTrack(); //GETS STUCK IN THIS FUNCTION
         } while (opModeIsActive() && !done);
     }
