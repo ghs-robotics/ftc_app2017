@@ -110,7 +110,7 @@ public class VuMarkIdentifier {
 
             //We also indicate which camera on the RC that we wish to use. Here we chose the back (HiRes) camera.
             parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-            this.vuforia = new VuforiaLocalizerImplSubclass(parameters);
+            this.vuforia = new VuforiaLocalizerImplSubclass(parameters, telemetry);
 
         } catch (VuforiaLocalizerImpl.FailureException ex) {
             StringWriter sw = new StringWriter();
@@ -140,25 +140,30 @@ public class VuMarkIdentifier {
     }
 
     public Mat getJewel() {
-/*       relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
+        relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
         relicTemplate = relicTrackables.get(0);
 
         relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
 
-        relicTrackables.activate();*/
+        relicTrackables.activate();
         //ElapsedTime timeout = new ElapsedTime();
+
+        telemetry.log().add("hey we got herreeeeeeee");
         Bitmap bm = null;
         while(bm == null) {
             if (this.vuforia.rgb != null) {
                 bm = Bitmap.createBitmap(this.vuforia.rgb.getWidth(),
                         this.vuforia.rgb.getHeight(),
-                        Bitmap.Config.ARGB_8888);
+                        Bitmap.Config.RGB_565);
                 bm.copyPixelsFromBuffer(vuforia.rgb.getPixels());
             }
         }
+        telemetry.log().add("give me one more second");
 
         Mat tmp = new Mat(bm.getWidth(), bm.getHeight(), CvType.CV_8UC4);
         Utils.bitmapToMat(bm, tmp);
+
+        telemetry.log().add("hazel has seizures lets make fun of her");
         return tmp;
     }
 }

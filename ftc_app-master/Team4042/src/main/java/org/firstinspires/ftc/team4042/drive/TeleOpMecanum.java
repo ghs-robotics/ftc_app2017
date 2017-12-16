@@ -117,7 +117,7 @@ public class TeleOpMecanum extends OpMode {
     }
 
     private void setUpDrive() {
-        drive.glyph.updateEncoderDeriv();
+        drive.uTrackUpdate();
         //drive.updateRates();
 
         //First controller pushing Y - toggle extendo
@@ -192,7 +192,9 @@ public class TeleOpMecanum extends OpMode {
             //Glyph locate
             glyphUI();
 
-            drive.glyph.runToPosition();
+            if (!drive.stage.equals(GlyphPlacementSystem.Stage.RETURN2) && !drive.stage.equals(GlyphPlacementSystem.Stage.RESET)) {
+                drive.glyph.runToPosition(10);
+            }
         } else {
             drive.setVerticalDrive(gamepad2.left_stick_y);
             drive.setHorizontalDrive(gamepad2.right_stick_x);

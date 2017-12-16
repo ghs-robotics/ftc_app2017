@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.team4042.autos;
 
-import android.util.Log;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -13,21 +11,15 @@ import org.firstinspires.ftc.team4042.drive.Drive;
 import org.firstinspires.ftc.team4042.drive.GlyphPlacementSystem;
 import org.firstinspires.ftc.team4042.drive.MecanumDrive;
 import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
-import org.lasarobotics.vision.android.Cameras;
-import org.lasarobotics.vision.opmode.LinearVisionOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
-import org.lasarobotics.vision.opmode.extensions.CameraControlExtension;
-import org.lasarobotics.vision.util.ScreenOrientation;
 import org.opencv.core.Core;
 import org.opencv.core.CvException;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
-import org.opencv.core.Size;
-import org.opencv.imgproc.Imgproc;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -318,7 +310,8 @@ public abstract class Auto extends LinearOpMode {
         boolean done = false;
 
         do {
-            drive.glyph.runToPosition();
+            drive.uTrackUpdate();
+            drive.glyph.runToPosition(20);
             done = drive.uTrack(); //GETS STUCK IN THIS FUNCTION
         } while (opModeIsActive() && !done);
     }
@@ -488,16 +481,17 @@ public abstract class Auto extends LinearOpMode {
         double yTargetDistance = Double.parseDouble(parameters.get("ydistance"));
         int yIr = Integer.parseInt(parameters.get("yir"));
         boolean yLongIr = Boolean.parseBoolean(parameters.get("ylong"));
+        double targetGyro = Double.parseDouble(parameters.get("gyro"));
 
         log.add("" + parameters.containsKey("xdistance"));
         if (parameters.containsKey("xdistance")) {
             double xTargetDistance = Double.parseDouble(parameters.get("xdistance"));
             int xIr = Integer.parseInt(parameters.get("xir"));
             boolean xLongIr = Boolean.parseBoolean(parameters.get("xlong"));
-            autoSensorDrive(speed, xTargetDistance, xIr, xLongIr, true, yTargetDistance, yIr, yLongIr);
+            autoSensorDrive(speed, xTargetDistance, xIr, xLongIr, true, yTargetDistance, yIr, yLongIr, targetGyro);
         }
         else {
-            autoSensorDrive(speed, 0, 0, false, false, yTargetDistance, yIr, yLongIr);
+            autoSensorDrive(speed, 0, 0, false, false, yTargetDistance, yIr, yLongIr, targetGyro);
         }
     }
 
@@ -513,7 +507,7 @@ public abstract class Auto extends LinearOpMode {
      */
     //35, 33 diagonal
     private void autoSensorDrive(double speed, double xTargetDistance, int xIrId, boolean xIsLongRange, boolean useX,
-                                 double yTargetDistance, int yIrId, boolean yIsLongRange) {
+                                 double yTargetDistance, int yIrId, boolean yIsLongRange, double targetGyro) {
 
         //autoDrive(direction, speed, targetTicks, -1, false, targetGyro);
 
@@ -535,12 +529,15 @@ public abstract class Auto extends LinearOpMode {
             i++;
         }
 
+        ElapsedTime timeout = new ElapsedTime();
+        timeout.reset();
+
         do {
             double speedFactor = speed;
 
             drive.updateRates();
 
-            double r = drive.useGyro(0) * .75 + 5 * drive.gyroRate;
+            double r = drive.useGyro(-90) * .75 + 5 * drive.gyroRate;
             r = r < .05 && r > 0 ? 0 : r;
             r = r > -.05 && r < 0 ? 0 : r;
 
@@ -575,12 +572,12 @@ public abstract class Auto extends LinearOpMode {
             if (useX) {
                 //drive.driveXYR(speedFactor, xFactor/2, -yFactor/2, r, false);
                 drive.runWithoutEncoders();
-                drive.driveXYR(speedFactor * 16, xFactor, 0, r, false);
+                drive.driveXYR(1, xFactor * 4.5, -yFactor / 2, r, false);
             } else {
                 //drive.driveXYR(speedFactor, 0, -yFactor/2, r, false);
                 drive.driveXYR(speedFactor, 0, -yFactor, 0, false);
             }
-        } while (((Math.abs(xTargetDistance - xCurrDistance) > 2) || true) && opModeIsActive());
+        } while (((Math.abs(xTargetDistance - xCurrDistance) > 2)) && timeout.seconds() < 5 && opModeIsActive());
 
         //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
         drive.stopMotors();
@@ -590,7 +587,7 @@ public abstract class Auto extends LinearOpMode {
     private void autoSensorDrive(double speed, double targetDistance) {
         telemetry.addData("ir", drive.shortIr[0]);
         telemetry.update();
-        autoSensorDrive(speed, 0, 0, false, false, targetDistance, 0, false);
+        autoSensorDrive(speed, 0, 0, false, false, targetDistance, 0, false, 0);
     }
 
     public void jewelLeft() {
