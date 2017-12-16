@@ -132,6 +132,7 @@ public class VuMarkIdentifier {
 
         RelicRecoveryVuMark relicRecoveryVuMark;
 
+
         do {
             relicRecoveryVuMark = RelicRecoveryVuMark.from(relicTemplate);
         } while (relicRecoveryVuMark.equals(RelicRecoveryVuMark.UNKNOWN));
@@ -139,13 +140,13 @@ public class VuMarkIdentifier {
         return relicRecoveryVuMark;
     }
 
-    public void getJewel(Mat img) {
-        relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
+    public Mat getJewel() {
+        /*relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
         relicTemplate = relicTrackables.get(0);
 
         relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
 
-        relicTrackables.activate();
+        relicTrackables.activate();*/
         //ElapsedTime timeout = new ElapsedTime();
 
         telemetry.log().add("hey we got herreeeeeeee");
@@ -158,12 +159,15 @@ public class VuMarkIdentifier {
                 bm.copyPixelsFromBuffer(vuforia.rgb.getPixels());
             }
         }
+
         telemetry.log().add("give me one more second");
 
         telemetry.log().add(bm.getWidth() + " x " + bm.getHeight());
-        img = new Mat(bm.getWidth(), bm.getHeight(), CvType.CV_8SC4);
+        Mat tmp = new Mat(bm.getWidth(), bm.getHeight(), CvType.CV_8SC4);
         telemetry.log().add("wee wooooooooooooooo");
-        Utils.bitmapToMat(bm, img);
+        Utils.bitmapToMat(bm, tmp);
         telemetry.log().add("NOOOO");
+
+        return tmp;
     }
 }
