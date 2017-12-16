@@ -271,8 +271,8 @@ public abstract class Auto extends LinearOpMode {
         log.add(frame.height() + " x " + frame.width());
         //Imgproc.resize(frame, frame, new Size(960, 720));
         telemetry.update();
-        Rect left_crop = new Rect(new Point(215,585), new Point(380, 719));
-        Rect right_crop = new Rect(new Point(460,585), new Point(620, 719));
+        Rect left_crop = new Rect(new Point(867,1621), new Point(1369, 1865));
+        Rect right_crop = new Rect(new Point(1651,1609), new Point(2147, 1865));
 
         //Log.d("stupid", this.getFrameSize().width + " x " + this.getFrameSize().height);
         Mat right = new Mat(frame, right_crop);
