@@ -152,7 +152,7 @@ public class VuMarkIdentifier {
             if (this.vuforia.rgb != null) {
                 bm = Bitmap.createBitmap(this.vuforia.rgb.getWidth(),
                         this.vuforia.rgb.getHeight(),
-                        Bitmap.Config.RGB_565);
+                        Bitmap.Config.ARGB_8888);
                 bm.copyPixelsFromBuffer(vuforia.rgb.getPixels());
             }
         }

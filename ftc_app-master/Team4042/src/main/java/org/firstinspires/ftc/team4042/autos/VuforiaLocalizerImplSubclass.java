@@ -43,7 +43,7 @@ public class VuforiaLocalizerImplSubclass extends VuforiaLocalizerImpl {
             long num = frame.getNumImages();
 
             for (int i = 0; i < num; i++) {
-                if(frame.getImage(i).getFormat() == PIXEL_FORMAT.RGB565){
+                if(frame.getImage(i).getFormat() == PIXEL_FORMAT.RGB888){
                     rgb = frame.getImage(i);
                 }
             }
@@ -60,7 +60,7 @@ public class VuforiaLocalizerImplSubclass extends VuforiaLocalizerImpl {
         startAR();
 
         // Optional: set the pixel format(s) that you want to have in the callback
-        Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true);
+        Vuforia.setFrameFormat(PIXEL_FORMAT.RGB888, true);
         this.setFrameQueueCapacity(1);
 
     }
