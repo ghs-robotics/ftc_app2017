@@ -72,7 +72,7 @@ public abstract class Auto extends LinearOpMode {
         //drive.setUseGyro(true);
         //telemetry.addData("glyph", drive.glyph.getTargetPositionAsString());
 
-        //vuMarkIdentifier.initialize(telemetry, hardwareMap);
+        vuMarkIdentifier.initialize(telemetry, hardwareMap);
 
         log.add("Reading file " + filePath);
         file = new File("./storage/emulated/0/DCIM/" + filePath);
