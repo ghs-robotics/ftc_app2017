@@ -538,7 +538,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
             drive.updateRates();
 
-            double r = drive.useGyro(-90) * .75 + 5 * drive.gyroRate;
+            double r = drive.useGyro(targetGyro) * .75 + 5 * drive.gyroRate;
             r = r < .05 && r > 0 ? 0 : r;
             r = r > -.05 && r < 0 ? 0 : r;
 
@@ -576,7 +576,7 @@ public abstract class Auto extends LinearVisionOpMode {
                 drive.driveXYR(1, xFactor * 4.5, -yFactor / 2, r, false);
             } else {
                 //drive.driveXYR(speedFactor, 0, -yFactor/2, r, false);
-                drive.driveXYR(speedFactor, 0, -yFactor, 0, false);
+                drive.driveXYR(1, 0, -yFactor / 2, r, false);
             }
         } while (((Math.abs(xTargetDistance - xCurrDistance) > 2)) && timeout.seconds() < 5 && opModeIsActive());
 
