@@ -574,16 +574,17 @@ public abstract class Auto extends LinearOpMode {
             //Actually drives
             if (useX) {
                 //drive.driveXYR(speedFactor, xFactor/2, -yFactor/2, r, false);
-                drive.driveXYR(speedFactor, xFactor/2, 0, r, false);
+                drive.runWithoutEncoders();
+                drive.driveXYR(speedFactor * 16, xFactor, 0, r, false);
             } else {
                 //drive.driveXYR(speedFactor, 0, -yFactor/2, r, false);
-                drive.driveXYR(speedFactor, 0, -yFactor/2, 0, false);
+                drive.driveXYR(speedFactor, 0, -yFactor, 0, false);
             }
         } while (((Math.abs(xTargetDistance - xCurrDistance) > 2) || true) && opModeIsActive());
 
         //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
         drive.stopMotors();
-
+        drive.runWithEncoders();
     }
 
     private void autoSensorDrive(double speed, double targetDistance) {

@@ -283,7 +283,7 @@ public abstract class Drive {
     }
 
     private void glyphLocate() {
-        targetY = GlyphPlacementSystem.Position.values()[glyph.uiTargetY];
+        targetY = GlyphPlacementSystem.Position.values()[glyph.uiTargetY + 3];
         targetX = GlyphPlacementSystem.HorizPos.values()[glyph.uiTargetX];
     }
 
@@ -364,7 +364,7 @@ public abstract class Drive {
             }
             case RETURN2: {
                 //Move back to the bottom and get ready to do it again
-                glyph.setHomeTarget();
+                setVerticalDrive(-1);
                 stage = GlyphPlacementSystem.Stage.RESET;
                 uTrackAtBottom = true;
                 return false;
@@ -372,6 +372,7 @@ public abstract class Drive {
             case RESET: {
                 if (getBottomState()) {
                     resetUTrack();
+                    setVerticalDrive(0);
                 }
                 return true;
             }
