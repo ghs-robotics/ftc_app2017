@@ -237,6 +237,8 @@ public abstract class Drive {
     public double[] shortIrRates = new double[3];
     public double[] longIrRates = new double[2];
 
+    private double lastUTrack = 0;
+    public double uTrackRate = 0;
     public void updateRates() {
         //System time
         double currMilli = System.currentTimeMillis();
@@ -280,6 +282,15 @@ public abstract class Drive {
         lastLongIr = currLongIr;
 
         lastMilli = currMilli;
+    }
+
+    public void uTrackUpdate() {
+        //Vertical drive
+        double currUTrack = verticalDriveCurrPos();
+        double currMilli = System.currentTimeMillis();
+        uTrackRate = (currUTrack - lastUTrack) / (currMilli - lastMilli);
+
+        lastUTrack = currUTrack;
     }
 
     private void glyphLocate() {
@@ -364,6 +375,8 @@ public abstract class Drive {
             }
             case RETURN2: {
                 //Move back to the bottom and get ready to do it again
+                glyph.setHomeTarget();
+                setVerticalDriveMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 setVerticalDrive(-1);
                 stage = GlyphPlacementSystem.Stage.RESET;
                 uTrackAtBottom = true;
@@ -373,6 +386,7 @@ public abstract class Drive {
                 if (getBottomState()) {
                     resetUTrack();
                     setVerticalDrive(0);
+                    setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
                 }
                 return true;
             }

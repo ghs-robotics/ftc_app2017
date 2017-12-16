@@ -6,6 +6,7 @@ import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.State;
 import com.vuforia.Vuforia;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.internal.vuforia.VuforiaLocalizerImpl;
 
@@ -16,6 +17,7 @@ import org.firstinspires.ftc.robotcore.internal.vuforia.VuforiaLocalizerImpl;
 public class VuforiaLocalizerImplSubclass extends VuforiaLocalizerImpl {
 
     public Image rgb;
+    private Telemetry telemetry;
 
     class CloseableFrame extends Frame {
         public CloseableFrame(Frame other) { // clone the frame so we can be useful beyond callback
@@ -38,12 +40,11 @@ public class VuforiaLocalizerImplSubclass extends VuforiaLocalizerImpl {
             // non-garbage-collected heap). Note that both of this concerns are independent of
             // how the Frame is obtained in the first place.
             CloseableFrame frame = new CloseableFrame(state.getFrame());
-            Image rgb = null;
 
             long num = frame.getNumImages();
 
             for (int i = 0; i < num; i++) {
-                if(frame.getImage(i).getFormat() == PIXEL_FORMAT.RGB888){
+                if(frame.getImage(i).getFormat() == PIXEL_FORMAT.RGB565){
                     rgb = frame.getImage(i);
                 }
             }
@@ -52,10 +53,11 @@ public class VuforiaLocalizerImplSubclass extends VuforiaLocalizerImpl {
             }
 
             frame.close();
+            telemetry.log().add("gilton has stupid kicks");
         }
     }
 
-    public VuforiaLocalizerImplSubclass(VuforiaLocalizer.Parameters parameters) {
+    public VuforiaLocalizerImplSubclass(VuforiaLocalizer.Parameters parameters, Telemetry telemetry) {
         super(parameters);
         stopAR();
         clearGlSurface();
@@ -64,9 +66,10 @@ public class VuforiaLocalizerImplSubclass extends VuforiaLocalizerImpl {
         startAR();
 
         // Optional: set the pixel format(s) that you want to have in the callback
-        Vuforia.setFrameFormat(PIXEL_FORMAT.RGB888, true);
+        Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true);
         this.setFrameQueueCapacity(1);
 
+        this.telemetry = telemetry;
     }
 
     public void clearGlSurface() {
