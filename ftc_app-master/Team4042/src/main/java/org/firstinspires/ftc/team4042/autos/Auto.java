@@ -14,6 +14,7 @@ import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
+import org.lasarobotics.vision.opmode.LinearVisionOpMode;
 import org.opencv.core.Core;
 import org.opencv.core.CvException;
 import org.opencv.core.Mat;
@@ -33,7 +34,7 @@ import java.util.HashMap;
  * Parses a file to figure out which instructions to run. CAN NOT ACTUALLY RUN INSTRUCTIONS.
  */
 @Autonomous(name="Abstract Auto", group="autos")
-public abstract class Auto extends LinearOpMode {
+public abstract class Auto extends LinearVisionOpMode {
 
     MecanumDrive drive = new MecanumDrive(true);
     private VuMarkIdentifier vuMarkIdentifier = new VuMarkIdentifier();
@@ -64,7 +65,7 @@ public abstract class Auto extends LinearOpMode {
         //drive.setUseGyro(true);
         //telemetry.addData("glyph", drive.glyph.getTargetPositionAsString());
 
-        vuMarkIdentifier.initialize(telemetry, hardwareMap);
+        //vuMarkIdentifier.initialize(telemetry, hardwareMap);
 
         log.add("Reading file " + filePath);
         file = new File("./storage/emulated/0/DCIM/" + filePath);
@@ -274,7 +275,7 @@ public abstract class Auto extends LinearOpMode {
         Rect left_crop = new Rect(new Point(215,585), new Point(380, 719));
         Rect right_crop = new Rect(new Point(460,585), new Point(620, 719));
 
-        //Log.d("stupid", this.getFrameSize().width + " x " + this.getFrameSize().height);
+        //Log.d("A", this.getFrameSize().width + " x " + this.getFrameSize().height);
         Mat right = new Mat(frame, right_crop);
         Mat left = new Mat(frame, left_crop);
 
@@ -331,8 +332,8 @@ public abstract class Auto extends LinearOpMode {
     public void knockRedJewel(HashMap<String, String> parameters) {
         try {
             //String balls = getBallColor(vuMarkIdentifier.getFrameAsMat());
-            //String balls = getBallColor(getFrameRgba());
-            String balls = getBallColor(vuMarkIdentifier.getJewel());
+            String balls = getBallColor(getFrameRgba());
+            //String balls = getBallColor(vuMarkIdentifier.getJewel());
             //String balls = "red, blue";
             telemetry.addData("ball orientation", balls);
             switch (balls) {
@@ -365,8 +366,8 @@ public abstract class Auto extends LinearOpMode {
     public void knockBlueJewel(HashMap<String, String> parameters) {
         log.add("blue jewel");
         //Mat mat = getFrameRgba();
-        //String balls = getBallColor(mat);
-        String balls = "red, blue";
+        String balls = getBallColor(getFrameRgba());
+        //String balls = "red, blue";
         log.add("ball orientation: " + balls);
         switch (balls) {
             case "red":
