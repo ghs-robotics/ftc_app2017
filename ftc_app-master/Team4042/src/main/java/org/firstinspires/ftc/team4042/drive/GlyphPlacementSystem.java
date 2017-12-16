@@ -180,8 +180,10 @@ public class GlyphPlacementSystem {
         return false;
     }
 
-    public void runToPosition(double derivConstant) {
-        double power = ((double)drive.verticalDriveTargetPos() - (double)drive.verticalDriveCurrPos())/ PROPORTIONAL_CONSTANT + drive.uTrackRate * derivConstant;
+    public void runToPosition(double proportionalConst, double derivConstant) {
+        double power = ((double)drive.verticalDriveTargetPos() - (double)drive.verticalDriveCurrPos())/ proportionalConst + drive.uTrackRate * derivConstant;
+        drive.telemetry.addData("power", power);
+        drive.telemetry.update();
         power = Math.abs(power) < 0.2 ? 0 : power;
         drive.setVerticalDrive(power);
 

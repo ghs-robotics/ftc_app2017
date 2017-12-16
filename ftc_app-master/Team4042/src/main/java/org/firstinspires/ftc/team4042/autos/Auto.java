@@ -304,7 +304,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
         //drive.glyph.setHomeTarget();
         drive.setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
         drive.glyph.setTarget(vuMark, 0);
         drive.stage = GlyphPlacementSystem.Stage.HOME;
 
@@ -312,7 +312,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
         do {
             drive.uTrackUpdate();
-            drive.glyph.runToPosition(-10);
+            drive.glyph.runToPosition(34, -15);
             done = drive.uTrack(); //GETS STUCK IN THIS FUNCTION
         } while (opModeIsActive() && !done);
     }
