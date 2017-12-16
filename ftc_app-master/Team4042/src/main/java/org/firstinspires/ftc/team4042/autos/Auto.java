@@ -366,7 +366,8 @@ public abstract class Auto extends LinearOpMode {
         log.add("blue jewel");
         //Mat mat = getFrameRgba();
         //String balls = getBallColor(mat);
-        String balls = "red, blue";
+        //String balls = "red, blue";
+        String balls = getBallColor(vuMarkIdentifier.getJewel());
         log.add("ball orientation: " + balls);
         switch (balls) {
             case "red":

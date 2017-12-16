@@ -160,10 +160,12 @@ public class VuMarkIdentifier {
         }
         telemetry.log().add("give me one more second");
 
+        telemetry.log().add(bm.getWidth() + " x " + bm.getHeight());
         Mat tmp = new Mat(bm.getWidth(), bm.getHeight(), CvType.CV_8UC4);
+        telemetry.log().add("wee wooooooooooooooo");
         Utils.bitmapToMat(bm, tmp);
 
-        telemetry.log().add("hazel has seizures lets make fun of her");
+        telemetry.log().add("NOOOO");
         return tmp;
     }
 }
