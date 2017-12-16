@@ -37,6 +37,7 @@ public abstract class Auto extends LinearOpMode {
 
     MecanumDrive drive = new MecanumDrive(true);
     private VuMarkIdentifier vuMarkIdentifier = new VuMarkIdentifier();
+    private Mat img;
     private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.CENTER;
 
     private Telemetry.Log log;

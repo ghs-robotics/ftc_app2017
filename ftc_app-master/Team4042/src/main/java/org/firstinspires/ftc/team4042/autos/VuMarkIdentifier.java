@@ -139,7 +139,7 @@ public class VuMarkIdentifier {
         return relicRecoveryVuMark;
     }
 
-    public Mat getJewel() {
+    public void getJewel(Mat img) {
         relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
         relicTemplate = relicTrackables.get(0);
 
@@ -161,11 +161,9 @@ public class VuMarkIdentifier {
         telemetry.log().add("give me one more second");
 
         telemetry.log().add(bm.getWidth() + " x " + bm.getHeight());
-        Mat tmp = new Mat(bm.getWidth(), bm.getHeight(), CvType.CV_8UC4);
+        img = new Mat(bm.getWidth(), bm.getHeight(), CvType.CV_8SC4);
         telemetry.log().add("wee wooooooooooooooo");
-        Utils.bitmapToMat(bm, tmp);
-
+        Utils.bitmapToMat(bm, img);
         telemetry.log().add("NOOOO");
-        return tmp;
     }
 }
