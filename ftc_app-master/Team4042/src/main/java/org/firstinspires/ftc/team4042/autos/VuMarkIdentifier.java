@@ -158,10 +158,11 @@ public class VuMarkIdentifier {
                 bm.copyPixelsFromBuffer(vuforia.rgb.getPixels());
             }
         }
-        telemetry.log().add("give me one more second");
 
-        telemetry.log().add(bm.getWidth() + " x x" + bm.getHeight());
+
+        telemetry.log().add(bm.getWidth() + " x " + bm.getHeight());
         Mat tmp = new Mat(bm.getWidth(), bm.getHeight(), CvType.CV_8UC4);
+        telemetry.log().add("give me one more second");
         Utils.bitmapToMat(bm, tmp);
 
         telemetry.log().add("NOOOO");

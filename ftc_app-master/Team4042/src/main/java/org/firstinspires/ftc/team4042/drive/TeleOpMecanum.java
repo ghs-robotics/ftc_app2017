@@ -164,6 +164,7 @@ public class TeleOpMecanum extends OpMode {
             if (!manual) {
                 drive.resetEncoders();
                 drive.runWithEncoders();
+                drive.glyph.setHomeTarget();
             }
 
             if (drive.getVerticalDriveMode().equals(DcMotor.RunMode.RUN_TO_POSITION)) {
