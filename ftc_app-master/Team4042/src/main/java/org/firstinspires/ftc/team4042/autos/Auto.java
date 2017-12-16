@@ -311,7 +311,7 @@ public abstract class Auto extends LinearOpMode {
 
         do {
             drive.uTrackUpdate();
-            drive.glyph.runToPosition(20);
+            drive.glyph.runToPosition(-10);
             done = drive.uTrack(); //GETS STUCK IN THIS FUNCTION
         } while (opModeIsActive() && !done);
     }

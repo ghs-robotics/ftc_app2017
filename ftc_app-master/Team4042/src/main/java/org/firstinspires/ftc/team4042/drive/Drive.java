@@ -291,6 +291,7 @@ public abstract class Drive {
         uTrackRate = (currUTrack - lastUTrack) / (currMilli - lastMilli);
 
         lastUTrack = currUTrack;
+        lastMilli = currMilli;
     }
 
     private void glyphLocate() {
