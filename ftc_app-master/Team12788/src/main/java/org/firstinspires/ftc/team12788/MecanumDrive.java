@@ -62,8 +62,8 @@ public class MecanumDrive extends Drive {
          */
         //Sets relative wheel speeds for mecanum drive based on controller inputs
         speedWheel[0] = -x - y - r;
-        speedWheel[1] = -x - y + r;
-        speedWheel[2] = x - y + r;
+        speedWheel[1] = x - y + r;
+        speedWheel[2] = -x - y + r;
         speedWheel[3] = x - y - r;
 
         //sets the wheel powers to the appropriate ratios
@@ -189,7 +189,7 @@ public class MecanumDrive extends Drive {
         //if it has not reached the target, it tests if it is in the
         // last or first fourth of the way there, and
         // scales the speed such that it speeds up and slows down
-        // to BASE_SPEED as it reaches the target
+        // to BASE_SPEED as it reaches the target+
         if (currentTicks <= targetTicks) {
             double difference = targetTicks / 4;
             if (currentTicks / targetTicks > .75) { //last fourth
@@ -202,7 +202,7 @@ public class MecanumDrive extends Drive {
             //if it has reached target, stop moving, reset encoders, and return PI
             stopMotors(); //stops the motors
             this.resetEncoders();
-            this.runWithoutEncoders();
+            this.runWithEncoders();
             return Math.PI;
         }
         return speed;

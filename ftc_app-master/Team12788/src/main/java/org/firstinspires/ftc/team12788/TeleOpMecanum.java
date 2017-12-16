@@ -22,15 +22,21 @@ public class TeleOpMecanum extends OpMode {
     private DcMotor liftRight;
     private DcMotor intakeRight;
     private DcMotor intakeLeft;
+    private DcMotor arm;
+
 
     private boolean overide;
+    private boolean aToggle;
 
     private int liftPos;
 
     public Servo grabLeft;
     public Servo grabRight;
+    public Servo relic;
 
     private boolean invert;
+
+    private double num;
 
     @Override
     public void init() {
@@ -39,8 +45,11 @@ public class TeleOpMecanum extends OpMode {
 
         adjustedSpeed = MecanumDrive.FULL_SPEED;
 
+        num = 0;
+
         invert = false;
         overide = false;
+        aToggle = false;
     }
     
     @Override
@@ -67,7 +76,7 @@ public class TeleOpMecanum extends OpMode {
             liftLeft.setPower(0);
             liftRight.setPower(0);
         }
-        /*
+
         if (gamepad2.dpad_up) {
             liftPos = 6000;
         }else if (gamepad2.dpad_down) {
@@ -84,7 +93,7 @@ public class TeleOpMecanum extends OpMode {
                 liftLeft.setPower(1);
                 liftRight.setPower(-1);
             }
-        }*/
+        }
 
         if (drive.deadZone(gamepad2.right_trigger) > 0) {
             intakeLeft.setPower(1);
@@ -125,6 +134,32 @@ public class TeleOpMecanum extends OpMode {
         if (gamepad1.left_bumper) {
             invert = true;
         }
+        if (gamepad2.right_bumper) {
+            arm.setPower(.25);
+        }
+        else if (gamepad2.left_bumper){
+            arm.setPower(-.25);
+        }
+        else {
+            arm.setPower(0);
+        }
+        if (gamepad2.a) {
+            aToggle = !aToggle;
+        }
+            /*num ++;
+            if(num % 2 == 1) {
+                relic.setPosition(1);
+            }
+            else{
+                relic.setPosition(-1);
+            }*/
+
+        if(aToggle){
+            relic.setPosition(1);
+        } else {
+            relic.setPosition(-1);
+        }
+
         if (gamepad2.a || overide){
             overide = true;
             if (!drive.driveWithEncoders(Direction.Forward, .5, .2*Autonomous.tile)) {
