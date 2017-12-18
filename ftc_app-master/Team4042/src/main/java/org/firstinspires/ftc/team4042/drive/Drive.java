@@ -470,6 +470,8 @@ public abstract class Drive {
         return handIsOpen;
     }
 
+    public double getVerticalDrive() { return verticalDrive.getPower(); }
+
     public void setVerticalDrive(double power) {
         verticalDrive.setPower(power);
     }
