@@ -334,8 +334,10 @@ public class TeleOpMecanum extends OpMode {
         if (drive.verbose) {
             telemetry.addData("vertical mode", drive.getVerticalDriveMode());
             telemetry.addData("encoder currentY pos", drive.verticalDriveCurrPos());
+            telemetry.addData("vertical drive power", drive.getVerticalDrive());
             telemetry.addData("hand is open", drive.isHandOpen());
-            telemetry.addData("limit switch", drive.getCenterState());
+            telemetry.addData("center limit switch", drive.getCenterState());
+            telemetry.addData("bottom limit switch", drive.getBottomState());
             telemetry.addData("targetY", drive.targetY.toString());
             telemetry.addData("Current pos", drive.glyph.currentY.toString());
             telemetry.addData("encoder targetY pos", drive.verticalDriveTargetPos());

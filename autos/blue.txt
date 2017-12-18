@@ -11,9 +11,10 @@
 
 function:jr
 function:doff x:0 y:-1 speed:.5 target:1000
-function:d x:0 y:-1 speed:.5 target:1500 gyro:0
+function:d x:0 y:-1 speed:.5 target:1000 gyro:0
 function:r r:-80 speed:.5
 function:d x:0 y:1 speed:.5 target:700
+function:s x:0 y:-1 speed:.5 ydistance:35 yir:0 ylong:false gyro:-90
 function:s x:0 y:-1 speed:.5 xdistance:33 xir:1 xlong:false ydistance:35 yir:0 ylong:false gyro:-90
 function:p
 
