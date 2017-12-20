@@ -24,6 +24,7 @@ public abstract class Drive {
 
     //Require drive() in subclasses
     public abstract void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor);
+    public abstract void driveXYR(double speedFactor, double x, double y, double r, boolean useGyro);
 
     //Initializes a factor for the speed of movement to a position when driving with encoders
     public static final double BASE_SPEED = .3;
@@ -374,13 +375,13 @@ public abstract class Drive {
                 //Move back to the bottom and get ready to do it again
                 glyph.setHomeTarget();
                 stage = GlyphPlacementSystem.Stage.RESET;
-                uTrackAtBottom = true;
                 return false;
             }
             case RESET: {
                 if (getBottomState()) {
                     resetUTrack();
                 }
+                uTrackAtBottom = true;
                 return true;
             }
         }

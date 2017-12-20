@@ -508,9 +508,6 @@ public abstract class Auto extends LinearVisionOpMode {
      */
     private void autoSensorDrive(double speed, double xTargetDistance, int xIrId, boolean xIsLongRange,
                                  double yTargetDistance, int yIrId, boolean yIsLongRange) {
-
-        //autoDrive(direction, speed, targetTicks, -1, false, targetGyro);
-
         AnalogSensor xIr = xIsLongRange ? drive.longIr[xIrId] : drive.shortIr[xIrId];
         AnalogSensor yIr = yIsLongRange ? drive.longIr[yIrId] : drive.shortIr[yIrId];
 
@@ -547,14 +544,10 @@ public abstract class Auto extends LinearVisionOpMode {
             //Apply the controller
             double xFactor = (xDeriv + xProportional);
             double yFactor = (yDeriv + yProportional);
-            telemetry.addData("yDerivValue", yDeriv);
-            telemetry.addData("yCurrDistance - yTargetDistance", yProportional);
-            telemetry.addData("y", yFactor * speedFactor);
-            telemetry.update();
 
             //Actually drives
             drive.driveXYR(speedFactor, xFactor, yFactor, r, false);
-        } while (((Math.abs(xTargetDistance - xCurrDistance) > 2) || true) && opModeIsActive());
+        } while (((Math.abs(xTargetDistance - xCurrDistance) > 2)) && opModeIsActive());
 
         //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
         drive.stopMotors();
