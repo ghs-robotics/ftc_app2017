@@ -21,6 +21,10 @@ import java.io.StringWriter;
  */
 
 public abstract class Drive {
+
+    //Require drive() in subclasses
+    public abstract void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor);
+
     //Initializes a factor for the speed of movement to a position when driving with encoders
     public static final double BASE_SPEED = .3;
     //The deadzone size for the joystick inputs
@@ -51,6 +55,7 @@ public abstract class Drive {
     //Whether the robot is attached to itself or not
     public static boolean isExtendo = false;
     public static boolean crawl = false;
+    public static boolean tank = false;
 
     //Set to false to just get outputs as telemetry
     public static boolean useMotors = true;
@@ -81,6 +86,7 @@ public abstract class Drive {
 
     private CRServo horizontalDrive;
     private DigitalChannel center;
+    private DigitalChannel bottom;
 
     private Servo grabbyBoi;
     private boolean handIsOpen = false;
@@ -113,16 +119,13 @@ public abstract class Drive {
         return sw.toString();
     }
 
-    //Require drive() in subclasses
-    public abstract void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor);
-
     public Drive() {
         for(int i = 0; i < shortIr.length; i++){
             shortIr[i] = new AnalogSensor("ir" + i, false);
         }
 
         for(int i = 0; i < longIr.length; i++){
-            shortIr[i] = new AnalogSensor("longir" + i, true);
+            longIr[i] = new AnalogSensor("longir" + i, true);
         }
 
         verbose = false;
@@ -149,8 +152,12 @@ public abstract class Drive {
 
         log.add("useGyro: " + useGyro);
 
-        for (int i = 0; i < shortIr.length; i++) {
-            shortIr[i].initialize(hardwareMap);
+        for (AnalogSensor aShortIr : shortIr) {
+            aShortIr.initialize(hardwareMap);
+        }
+
+        for (AnalogSensor aLongIr : shortIr) {
+            aLongIr.initialize(hardwareMap);
         }
 
         try {
@@ -198,6 +205,10 @@ public abstract class Drive {
         center.setState(false);
         center.setMode(DigitalChannel.Mode.INPUT);
 
+        bottom = hardwareMap.digitalChannel.get("bottom");
+        bottom.setState(false);
+        bottom.setMode(DigitalChannel.Mode.INPUT);
+
         intakeLeft = hardwareMap.dcMotor.get("intake left");
         intakeRight = hardwareMap.dcMotor.get("intake right");
         //The left intake is mounted "backwards"
@@ -214,12 +225,88 @@ public abstract class Drive {
         //verticalDrive.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
+    private double[] lastEncoders = new double[4];
+    private double lastMilli = 0;
+    public double[] encoderRates = new double[4];
+
+    private double lastGyro = 0;
+    public double gyroRate = 0;
+
+    private double[] lastShortIr = new double[3];
+    private double[] lastLongIr = new double[2];
+    public double[] shortIrRates = new double[3];
+    public double[] longIrRates = new double[2];
+
+    private double lastUTrack = 0;
+    public double uTrackRate = 0;
+    public void updateRates() {
+        //System time
+        double currMilli = System.currentTimeMillis();
+
+        //Encoder rates
+        double[] currEncoders = new double[4];
+        currEncoders[0] = motorLeftFront.getCurrentPosition();
+        currEncoders[1] = motorRightFront.getCurrentPosition();
+        currEncoders[2] = motorRightBack.getCurrentPosition();
+        currEncoders[3] = motorLeftBack.getCurrentPosition();
+        double currGyro = gyro.updateHeading();
+
+        for (int i = 0; i < currEncoders.length; i++) {
+            encoderRates[i] = (currEncoders[i] - lastEncoders[i]) / (currMilli - lastMilli);
+        }
+        lastEncoders = currEncoders;
+
+        //IR rates
+        double[] currShortIr = new double[3];
+        for (int i = 0; i < currShortIr.length; i++) {
+            AnalogSensor sIr = shortIr[i];
+            sIr.addReading();
+            currShortIr[i] = sIr.getCmAvg();
+            shortIrRates[i] = (currShortIr[i] - lastShortIr[i]) / (currMilli - lastMilli);
+        }
+
+        double[] currLongIr = new double[2];
+        for (int i = 0; i < currLongIr.length; i++) {
+            AnalogSensor lIr = longIr[i];
+            lIr.addReading();
+            currLongIr[i] = lIr.getCmAvg();
+            longIrRates[i] = (currLongIr[i] - lastLongIr[i]) / (currMilli - lastMilli);
+        }
+
+        //Gyro rates
+        gyroRate = (currGyro - lastGyro) / (currMilli - lastMilli);
+
+        //Update last to current
+        lastGyro = currGyro;
+        lastShortIr = currShortIr;
+        lastLongIr = currLongIr;
+
+        lastMilli = currMilli;
+    }
+
+    public void uTrackUpdate() {
+        //Vertical drive
+        double currUTrack = verticalDriveCurrPos();
+        double currMilli = System.currentTimeMillis();
+        uTrackRate = (currUTrack - lastUTrack) / (currMilli - lastMilli);
+
+        lastUTrack = currUTrack;
+        lastMilli = currMilli;
+    }
+
+    private void glyphLocate() {
+        targetY = GlyphPlacementSystem.Position.values()[glyph.uiTargetY + 3];
+        targetX = GlyphPlacementSystem.HorizPos.values()[glyph.uiTargetX];
+    }
+
     public boolean uTrack() {
+        telemetry.addData("stage", stage);
         switch (stage) {
             case HOME: {
                 //Close the hand
                 closeHand();
                 jewelOut();
+                glyphLocate();
                 handDropTimer.reset();
 
                 glyph.currentY = GlyphPlacementSystem.Position.HOME;
@@ -269,8 +356,8 @@ public abstract class Drive {
             }
             case RELEASE: {
                 if (handDropTimer.seconds() >= 1) {
-                    glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
-                    if (glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
+                    glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISEDBACK);
+                    if (glyph.currentY.equals(GlyphPlacementSystem.Position.RAISEDBACK)) {
                         stage = GlyphPlacementSystem.Stage.PAUSE2;
                     }
                 }
@@ -284,22 +371,23 @@ public abstract class Drive {
                     if (targetX.equals(GlyphPlacementSystem.HorizPos.LEFT)) {
                         glyph.adjustBack(-1);
                     }
-                    else if (targetX.equals(GlyphPlacementSystem.HorizPos.RIGHT)) {
-                        glyph.adjustBack(1);
-                    }
                 }
                 return false;
             }
             case RETURN2: {
                 //Move back to the bottom and get ready to do it again
                 glyph.setHomeTarget();
+                setVerticalDriveMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                setVerticalDrive(-1);
                 stage = GlyphPlacementSystem.Stage.RESET;
                 uTrackAtBottom = true;
                 return false;
             }
             case RESET: {
-                if (glyph.currentY.equals(GlyphPlacementSystem.Position.HOME)) {
+                if (getBottomState()) {
                     resetUTrack();
+                    setVerticalDrive(0);
+                    setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
                 }
                 return true;
             }
@@ -319,8 +407,8 @@ public abstract class Drive {
      * uses the gyro, first reading from the gyro then setting rotation to
      * auto correct if the robot gets off
      */
-    public double useGyro() {
-        double heading = gyro.updateHeading(); //hopefully still 0
+    public double useGyro(double targetGyro) {
+        double heading = gyro.updateHeading() - targetGyro; //hopefully still 0
         //If you're moving forwards and you drift, this should correct it.
         //Accounts for if you go from -180 degrees to 180 degrees
         // which is only a difference of one degree,
@@ -356,6 +444,10 @@ public abstract class Drive {
         return center.getState();
     }
 
+    public boolean getBottomState() {
+        return bottom.getState();
+    }
+
     public void openHand() {
         handIsOpen = true;
         grabbyBoi.setPosition(.57);
@@ -377,6 +469,8 @@ public abstract class Drive {
     public boolean isHandOpen() {
         return handIsOpen;
     }
+
+    public double getVerticalDrive() { return verticalDrive.getPower(); }
 
     public void setVerticalDrive(double power) {
         verticalDrive.setPower(power);
@@ -458,12 +552,12 @@ public abstract class Drive {
     }
 
     public void lowerBrakes() {
-        leftBrake.setPosition(.8);
+        leftBrake.setPosition(.9);
         rightBrake.setPosition(0);
     }
 
     public void raiseBrakes() {
-        leftBrake.setPosition(.12);
+        leftBrake.setPosition(.1);
         rightBrake.setPosition(.68);
     }
 
@@ -495,6 +589,40 @@ public abstract class Drive {
             }
             if (motorRightFront != null) {
                 motorRightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+        }
+    }
+
+    public void freezeBack() {
+        runBackToPosition();
+        if (useMotors) {
+            if (motorLeftBack != null) {
+                motorLeftBack.setTargetPosition(0);
+            }
+            if (motorRightBack != null) {
+                motorRightBack.setTargetPosition(0);
+            }
+        }
+    }
+
+    public void runBackToPosition() {
+        if (useMotors) {
+            if (motorLeftBack != null) {
+                motorLeftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            }
+            if (motorRightBack != null) {
+                motorRightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            }
+        }
+    }
+
+    public void runBackWithEncoders() {
+        if (useMotors) {
+            if (motorLeftBack != null) {
+                motorLeftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+            if (motorRightBack != null) {
+                motorRightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
         }
     }
@@ -595,6 +723,7 @@ public abstract class Drive {
         double max = max(speedWheel[0], speedWheel[1], speedWheel[2], speedWheel[3]);
         speedFactor = speedFactor > 1 ? 1 : speedFactor;
         speedFactor = speedFactor < -1 ? -1 : speedFactor;
+
         //Since max is an absolute value function, this also accounts for a data set like [3, 1, 0, -5], since max will be 5
         for(int i = 0; i < 4; i++) {
             speedWheel[i] *= speedFactor;
@@ -604,59 +733,24 @@ public abstract class Drive {
         }
 
         if (useMotors) {
-            //which ones to scale down? fast ones. if THE_FAST_ONES_ARE_THE_FRONT_ONES, the front.
-            /*
-            if(THE_FAST_ONES_ARE_THE_FRONT_ONES) {
-                if (motorLeftFront != null) {
-                    motorLeftFront.setPower(deadZone(speedWheel[0]) * HIGH_SPEED_SLOWER_DOWNER_NUMBER);
-                }
-                if (motorRightFront != null) {
-                    motorRightFront.setPower(deadZone(-speedWheel[1]) * HIGH_SPEED_SLOWER_DOWNER_NUMBER);
-                } //The right motors are mounted "upside down", which is why we have to inverse this
-                if (motorRightBack != null) {
-                    motorRightBack.setPower(deadZone(-speedWheel[2]));
-                }
-                if (motorLeftBack != null) {
-                    motorLeftBack.setPower(deadZone(speedWheel[3]));
-                }
-            } else {
-                if (motorLeftFront != null) {
-                    motorLeftFront.setPower(deadZone(speedWheel[0]));
-                }
-                if (motorRightFront != null) {
-                    motorRightFront.setPower(deadZone(-speedWheel[1]));
-                } //The right motors are mounted "upside down", which is why we have to inverse this
-                if (motorRightBack != null) {
-                    motorRightBack.setPower(deadZone(-speedWheel[2]) * HIGH_SPEED_SLOWER_DOWNER_NUMBER);
-                }
-                if (motorLeftBack != null) {
-                    motorLeftBack.setPower(deadZone(speedWheel[3]) * HIGH_SPEED_SLOWER_DOWNER_NUMBER);
-                }
-            }
-            */
-            double magic = isExtendo ? 1 : MAGIC_NUMBER;
-
             if (motorLeftFront != null) {
                 motorLeftFront.setPower(deadZone(speedWheel[0]));
+                telemetry.addData("left front", motorLeftFront.getPower());
             }
             if (motorRightFront != null) {
                 motorRightFront.setPower(deadZone(-speedWheel[1]));
+                telemetry.addData("right front", motorRightFront.getPower());
+                motorRightFront.getPower();
             } //The right motors are mounted "upside down", which is why we have to inverse this
             if (motorRightBack != null) {
                 motorRightBack.setPower(deadZone(-speedWheel[2]));
+                telemetry.addData("right back", motorRightBack.getPower());
             }
             if (motorLeftBack != null) {
                 motorLeftBack.setPower(deadZone(speedWheel[3]));
+                telemetry.addData("left back", motorLeftBack.getPower());
             }
         }
-
-        /*if (verbose || !useMotors) {
-            //Prints power
-            telemetry.addData("Left Front", speedWheel[0]);
-            telemetry.addData("Right Front", -speedWheel[1]);
-            telemetry.addData("Right Back", -speedWheel[2]);
-            telemetry.addData("Left Back", speedWheel[3]);
-        }*/
     }
 
     public void setVerbose(boolean verbose) {

@@ -19,8 +19,8 @@ public class JewelAuto extends Auto {
         super.setUp(drive, "jewel.txt");
         try {
             waitForStart();
-        } catch (InterruptedException ex) {
-
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         super.runAuto();

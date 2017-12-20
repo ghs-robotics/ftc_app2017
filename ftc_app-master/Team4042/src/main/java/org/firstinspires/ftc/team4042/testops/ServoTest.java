@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 /**
  * Created by Hazel on 10/30/2017.
+ * Runs a servo a given amount, as inputted by the controller.
  */
 @TeleOp(name="Servo Test", group="testops")
 public class ServoTest extends OpMode {
