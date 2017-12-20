@@ -54,7 +54,7 @@ public class GlyphPlacementSystem {
         currentY = Position.HOME;
         this.drive = drive;
         this.baseOutput = "[ _ _ _ ]\n[ _ _ _ ]\n[ _ _ _ ]";
-    }
+}
 
     public String getTargetPositionAsString()
     {
