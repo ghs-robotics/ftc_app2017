@@ -10,17 +10,20 @@ public class TeleOpMecanum extends OpMode {
 
     private double adjustedSpeed;
 
+    private boolean manual = false;
+    private boolean onBalancingStone = false;
+
     //CONTROL BOOLEANS START
     // We have these booleans so we only register a button press once.
     // You have to let go of the button and push it again to register a new event.
-    private boolean bStart = false;
     private boolean aY = false;
     private boolean aX = false;
     private boolean aB = false;
 
+    private boolean bStart = false;
+
     private boolean aDown = false;
     private boolean aUp = false;
-    private boolean manual = false;
 
     private boolean bUp;
     private boolean bDown;
@@ -35,6 +38,9 @@ public class TeleOpMecanum extends OpMode {
 
     private Drive drive = new MecanumDrive(true);
 
+    private double startRoll;
+    private double startPitch;
+
     /**
     GAMEPAD 1:
       Joystick 1 X & Y      movement
@@ -47,7 +53,7 @@ public class TeleOpMecanum extends OpMode {
       X                     toggle crawl
       Y                     toggle extendo
       Start
-      Back
+      Back                  balance
 
     GAMEPAD 2:
       Joystick 1 Y          (manual) controls placer vertical
@@ -67,6 +73,9 @@ public class TeleOpMecanum extends OpMode {
     public void init() {
         drive.initialize(telemetry, hardwareMap);
         drive.runWithEncoders();
+
+        drive.initializeGyro(telemetry, hardwareMap);
+        gyro();
 
         telemetry.update();
 
@@ -97,6 +106,12 @@ public class TeleOpMecanum extends OpMode {
         }
         bStart = gamepad2.start;
 
+        if (gamepad1.back) {
+            balance();
+        } else if (onBalancingStone) {
+            //reset?
+        }
+
         //Adjust drive modes, speeds, etc
         setUpDrive();
 
@@ -114,6 +129,36 @@ public class TeleOpMecanum extends OpMode {
 
         //Updates the telemetry output
         telemetryUpdate();
+    }
+
+    public void gyro() {
+        do {
+            drive.gyro.updateAngles();
+            startRoll = drive.gyro.getRoll();
+            startPitch = drive.gyro.getPitch();
+        } while (startRoll == 0 && startPitch == 0);
+    }
+
+    private void balance() {
+        drive.gyro.updateAngles();
+        double currRoll = drive.gyro.getRoll();
+        double currPitch = drive.gyro.getPitch();
+
+        boolean flat = Math.abs(currRoll - startRoll) > 2 || Math.abs(currPitch - startPitch) > 2;
+
+        if (!onBalancingStone) {
+            if (flat) {
+                onBalancingStone = true;
+            } else {
+                //drive backwards
+                drive.driveXYR(1,0,-1,0,true);
+            }
+        } else if (flat) {
+            //adjust
+            double x = startPitch - currPitch;
+            double y = startRoll - currRoll;
+            drive.driveXYR(1, x, y, 0, true);
+        }
     }
 
     private void setUpDrive() {
