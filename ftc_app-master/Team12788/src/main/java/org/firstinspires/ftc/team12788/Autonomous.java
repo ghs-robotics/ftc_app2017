@@ -66,8 +66,8 @@ public class Autonomous extends LinearOpMode {
     public Servo grabLeft;
     public Servo grabRight;
 
-    public static final int tile = 1300;
-    public static final int turn = 949;
+    public static final int tile = 1351;
+    public static final int turn = 950;
     public static final double speedy = .7;
 
 
@@ -83,7 +83,7 @@ public class Autonomous extends LinearOpMode {
         grabLeft = hardwareMap.servo.get("grabLeft");
         grabRight = hardwareMap.servo.get("grabRight");
         mark.initialize(telemetry, hardwareMap);
-        boolean isRed = false;
+        boolean isRed = true;
         boolean isTop = false;
 
         while (!isStarted() && opModeIsActive()) {

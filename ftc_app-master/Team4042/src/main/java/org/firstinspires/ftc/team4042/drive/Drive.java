@@ -158,7 +158,7 @@ public abstract class Drive {
         } catch (IllegalArgumentException ex) {
             telemetry.addData("Front Left", "Could not find.");
             useMotors = false;
-        }
+    }
 
         try {
             motorRightFront = hardwareMap.dcMotor.get("front right");
