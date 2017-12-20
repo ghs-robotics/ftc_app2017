@@ -16,6 +16,7 @@ public class TeleOpMecanum extends OpMode {
     private boolean bStart = false;
     private boolean aY = false;
     private boolean aX = false;
+    private boolean aB = false;
 
     private boolean aDown = false;
     private boolean aUp = false;
@@ -36,30 +37,30 @@ public class TeleOpMecanum extends OpMode {
 
     /**
     GAMEPAD 1:
-      Joystick 1 X & Y - movement
-      Joystick 2 X - rotation
-      Bumpers - external intakes backwards
-      Triggers - external intakes forwards
-      Dpad up/down - speed modes
-      A -
-      B -
-      X - toggle crawl
-      Y - toggle extendo
-      Start -
-      Back -
+      Joystick 1 X & Y      movement
+      Joystick 2 X          rotation
+      Bumpers               (extendo) external intakes backwards    (normal) both intakes backwards
+      Triggers              (extendo) external intakes forwards     (normal) both intakes forwards
+      Dpad up/down          speed modes
+      A
+      B                     toggle tank
+      X                     toggle crawl
+      Y                     toggle extendo
+      Start
+      Back
 
     GAMEPAD 2:
-      Joystick 1 Y - controls placer vertical in manual
-      Joystick 2 X - controls place horizontal in manual
-      Bumpers - internal intakes backwards
-      Triggers - internal intakes forwards
-      Dpad - placer
-      A - places glyph
-      B - manual hand toggle
-      X - toggles manual placement mode
-      Y - resets the glyph placer
-      Start - toggle verbose
-      Back -
+      Joystick 1 Y          (manual) controls placer vertical
+      Joystick 2 X          (manual) controls place horizontal
+      Bumpers               (extendo) internal intakes backwards
+      Triggers              (extendo) internal intakes forwards
+      Dpad                  placer
+      A                     places glyph
+      B                     manual hand toggle
+      X                     toggles manual placement mode
+      Y                     resets the glyph placer
+      Start                 toggle verbose
+      Back
      */
 
     @Override
@@ -90,7 +91,34 @@ public class TeleOpMecanum extends OpMode {
     @Override
     public void loop() {
 
-        drive.glyph.updateEncoderDeriv();
+        //Toggles verbose
+        if (gamepad2.start && !bStart) {
+            drive.toggleVerbose();
+        }
+        bStart = gamepad2.start;
+
+        //Adjust drive modes, speeds, etc
+        setUpDrive();
+
+        //Sets up speed modes
+        speedModes();
+
+        //Drives the robot
+        drive.drive(false, gamepad1, gamepad2, adjustedSpeed * MecanumDrive.FULL_SPEED);
+
+        //Runs the intakes
+        intakes();
+
+        //Runs the glyph placer
+        glyphPlacer();
+
+        //Updates the telemetry output
+        telemetryUpdate();
+    }
+
+    private void setUpDrive() {
+        drive.uTrackUpdate();
+        //drive.updateRates();
 
         //First controller pushing Y - toggle extendo
         if (gamepad1.y && !aY) {
@@ -101,24 +129,25 @@ public class TeleOpMecanum extends OpMode {
         //The X button on the first controller - toggle crawling to let us adjust the back of the robot too
         if (gamepad1.x && !aX) {
             Drive.crawl = !Drive.crawl;
+            if (Drive.crawl) {
+                drive.freezeBack();
+            } else {
+                drive.runBackWithEncoders();
+            }
         }
         aX = gamepad1.x;
 
-        //1 A - toggle verbose
-        if (gamepad2.start && !bStart) {
-            drive.toggleVerbose();
+        if (gamepad1.b && !aB) {
+            Drive.tank = !Drive.tank;
         }
-        bStart = gamepad2.start;
-
-        //Drives the robot
-        drive.drive(false, gamepad1, gamepad2, adjustedSpeed * MecanumDrive.FULL_SPEED);
+        aB = gamepad1.b;
 
         if (Drive.useGyro) {
-            drive.useGyro();
+            drive.useGyro(0);
         }
+    }
 
-        speedModes();
-
+    private void glyphPlacer() {
         //If you're at the bottom, haven't been pushing a, and now are pushing a
         if (drive.uTrackAtBottom && !bA && gamepad2.a) {
             drive.uTrack();
@@ -129,15 +158,13 @@ public class TeleOpMecanum extends OpMode {
         }
         bA = gamepad2.a;
 
-        //Right trigger of the b controller runs the right intake forward
-        intakes();
-
         if (gamepad2.x && !bX) {
             manual = !manual;
 
             if (!manual) {
                 drive.resetEncoders();
                 drive.runWithEncoders();
+                drive.glyph.setHomeTarget();
             }
 
             if (drive.getVerticalDriveMode().equals(DcMotor.RunMode.RUN_TO_POSITION)) {
@@ -149,31 +176,31 @@ public class TeleOpMecanum extends OpMode {
         }
         bX = gamepad2.x;
 
-        if (bY && !gamepad2.y) { //When you release the button, reset the utrack
+        if (gamepad2.b && !bB) {
+            drive.toggleHand();
+        }
+        bB = gamepad2.b;
+
+        if (bY && !gamepad2.y) { //When you release Y, reset the utrack
             drive.resetUTrack();
             drive.glyph.setHomeTarget();
         }
-        else if (gamepad2.y) { //Runs the utrack downwards
+        else if (gamepad2.y) { //If you're holding y, run the utrack downwards
             drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
             drive.setVerticalDrive(-0.5);
         }
         else if(!manual) {
             //Glyph locate
-            glyphLocate();
+            glyphUI();
 
-            drive.glyph.runToPosition();
+            if (!drive.stage.equals(GlyphPlacementSystem.Stage.RETURN2) && !drive.stage.equals(GlyphPlacementSystem.Stage.RESET)) {
+                drive.glyph.runToPosition(25, 10);
+            }
         } else {
             drive.setVerticalDrive(gamepad2.left_stick_y);
             drive.setHorizontalDrive(gamepad2.right_stick_x);
-
-            if (gamepad2.b && ! bB) {
-                drive.toggleHand();
-            }
-            bB = gamepad2.b;
         }
         bY = gamepad2.y;
-        
-        telemetryUpdate();
     }
 
     private void speedModes() {
@@ -198,8 +225,9 @@ public class TeleOpMecanum extends OpMode {
 
             //do {
                 //drive.pushRobotTogether();
-                drive.raiseBrakes();
-                drive.lockCatches();
+            drive.raiseBrakes();
+            drive.lockCatches();
+            drive.freezeBack();
             //} while (timer.seconds() < 2);
 
             Drive.isExtendo = false;
@@ -210,22 +238,23 @@ public class TeleOpMecanum extends OpMode {
 
             //do {
                 //drive.pushRobotTogether();
-                drive.lowerBrakes();
-                drive.unlockCatches();
+            drive.lowerBrakes();
+            drive.unlockCatches();
+            drive.runBackWithEncoders();
             //} while (timer.seconds() < 2);
 
             Drive.isExtendo = true;
         }
     }
 
-    private void glyphLocate() {
-        if (gamepad2.dpad_up && !bUp) { drive.targetY = GlyphPlacementSystem.Position.values()[drive.glyph.up() + 2]; }
+    private void glyphUI() {
+        if (gamepad2.dpad_up && !bUp) { drive.glyph.uiUp(); }
         bUp = gamepad2.dpad_up;
-        if (gamepad2.dpad_down && !bDown) { drive.targetY = GlyphPlacementSystem.Position.values()[drive.glyph.down() + 2]; }
+        if (gamepad2.dpad_down && !bDown) { drive.glyph.uiDown(); }
         bDown = gamepad2.dpad_down;
-        if (gamepad2.dpad_left && !bLeft) { drive.targetX = GlyphPlacementSystem.HorizPos.values()[drive.glyph.left()]; }
+        if (gamepad2.dpad_left && !bLeft) { drive.glyph.uiLeft(); }
         bLeft = gamepad2.dpad_left;
-        if (gamepad2.dpad_right && !bRight) { drive.targetX = GlyphPlacementSystem.HorizPos.values()[drive.glyph.right()]; }
+        if (gamepad2.dpad_right && !bRight) { drive.glyph.uiRight(); }
         bRight = gamepad2.dpad_right;
     }
 
@@ -301,11 +330,14 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Crawl", Drive.crawl);
         telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
         telemetry.addData("Speed factor", adjustedSpeed);
+        telemetry.addData("Tank", Drive.tank);
         if (drive.verbose) {
             telemetry.addData("vertical mode", drive.getVerticalDriveMode());
             telemetry.addData("encoder currentY pos", drive.verticalDriveCurrPos());
+            telemetry.addData("vertical drive power", drive.getVerticalDrive());
             telemetry.addData("hand is open", drive.isHandOpen());
-            telemetry.addData("limit switch", drive.getCenterState());
+            telemetry.addData("center limit switch", drive.getCenterState());
+            telemetry.addData("bottom limit switch", drive.getBottomState());
             telemetry.addData("targetY", drive.targetY.toString());
             telemetry.addData("Current pos", drive.glyph.currentY.toString());
             telemetry.addData("encoder targetY pos", drive.verticalDriveTargetPos());
@@ -314,7 +346,7 @@ public class TeleOpMecanum extends OpMode {
             telemetry.addData("handDropTimer seconds", drive.handDropTimer.seconds());
             telemetry.addData("horizontal u", drive.getHorizontalDrive());
             telemetry.addData("horizontal translate timer", drive.glyph.horizontalTimer.seconds());
-            telemetry.addData("target pos",drive.targetX + " horiz time " + drive.glyph.horizontalTimer.seconds() + " horiz trans time " + drive.glyph.HORIZONTAL_TRANSLATION_TIME);
+            telemetry.addData("TARGET POS",drive.targetX + " ui target pos " + drive.glyph.uiTargetX);
             telemetry.addData("boolean",((drive.targetX.equals(GlyphPlacementSystem.HorizPos.LEFT) ||
                     drive.targetX.equals(GlyphPlacementSystem.HorizPos.RIGHT)) + " bool " + (drive.glyph.horizontalTimer.seconds() >= drive.glyph.HORIZONTAL_TRANSLATION_TIME)));
         }

@@ -18,8 +18,8 @@ public class BlueOnlyJewelAuto extends Auto {
         super.setUp(drive, "bluejewel.txt");
         try {
             waitForStart();
-        } catch (InterruptedException ex) {
-
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         super.runAuto();

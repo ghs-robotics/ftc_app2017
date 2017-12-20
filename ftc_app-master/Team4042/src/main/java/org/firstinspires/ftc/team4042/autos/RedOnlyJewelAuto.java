@@ -18,8 +18,8 @@ public class RedOnlyJewelAuto extends Auto {
         super.setUp(drive, "redjewel.txt");
         try {
             waitForStart();
-        } catch (InterruptedException ex) {
-
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         super.runAuto();

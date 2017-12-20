@@ -16,7 +16,7 @@ public class AnalogSensor {
     private String name;
     private boolean isLongRange;
 
-    private static final int NUM_OF_READINGS = 10;
+    public static final int NUM_OF_READINGS = 6;
 
     private int curr = 0;
 
@@ -43,7 +43,8 @@ public class AnalogSensor {
     }
 
     public void addReading() {
-        readings[curr] = sensor.getVoltage();
+        if (sensor == null) { readings[curr] = 0; }
+        else { readings[curr] = sensor.getVoltage(); }
         curr++;
         if (firstLoop && curr >= NUM_OF_READINGS) {
             firstLoop = false;

@@ -45,7 +45,7 @@ public class AutoEncoderTest extends LinearOpMode {
     private void autoDrive(Direction direction, double speed, double targetTicks, boolean useGyro) {
         boolean done = false;
         while (opModeIsActive() && !done) {
-            done = drive.driveWithEncoders(direction, speed, targetTicks, useGyro);
+            done = drive.driveWithEncoders(direction, speed, targetTicks, useGyro, 0);
             telemetry.update();
         }
     }

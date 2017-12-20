@@ -90,7 +90,7 @@ public class VuMarkIdentifier {
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
      * localization engine.
      */
-    private VuforiaLocalizer vuforia;
+    private VuforiaLocalizerImplSubclass vuforia;
 
     private VuforiaTrackable relicTemplate;
     private VuforiaTrackables relicTrackables;
@@ -111,7 +111,7 @@ public class VuMarkIdentifier {
 
             //We also indicate which camera on the RC that we wish to use. Here we chose the back (HiRes) camera.
             parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-            this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
+            this.vuforia = new VuforiaLocalizerImplSubclass(parameters, telemetry);
 
         } catch (VuforiaLocalizerImpl.FailureException ex) {
             StringWriter sw = new StringWriter();
@@ -145,50 +145,33 @@ public class VuMarkIdentifier {
         return relicRecoveryVuMark;
     }
 
-    public Mat getFrameAsMat() {
-        VuforiaLocalizer.CloseableFrame frame = null;
-        Image rgb = null;
+    public Mat getJewel() {
+        relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
+        relicTemplate = relicTrackables.get(0);
 
-        telemetry.log().add("a");
-        Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true);
-        vuforia.setFrameQueueCapacity(1);
+        relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
 
-        try {
-            frame = vuforia.getFrameQueue().take();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        relicTrackables.activate();
+        //ElapsedTime timeout = new ElapsedTime();
 
-        telemetry.log().add("b");
-
-        long numImages = frame.getNumImages();
-
-        for (int i = 0; i < numImages; i++) {
-            telemetry.log().add("format " + frame.getImage(i).getFormat());
-            if (frame.getImage(i).getFormat() == PIXEL_FORMAT.RGB565) {
-                rgb = frame.getImage(i);
-                break;
+        telemetry.log().add("hey we got herreeeeeeee");
+        Bitmap bm = null;
+        while(bm == null) {
+            if (this.vuforia.rgb != null) {
+                bm = Bitmap.createBitmap(this.vuforia.rgb.getWidth(),
+                        this.vuforia.rgb.getHeight(),
+                        Bitmap.Config.RGB_565);
+                bm.copyPixelsFromBuffer(vuforia.rgb.getPixels());
             }
         }
 
-        telemetry.log().add("rgb " + rgb);
-        telemetry.log().add("width " + rgb.getWidth() + " height " + rgb.getHeight());
 
-        Bitmap bm = Bitmap.createBitmap(rgb.getWidth(), rgb.getHeight(), Bitmap.Config.ARGB_8888);
-        telemetry.log().add("alkdflja");
-        bm.copyPixelsFromBuffer(rgb.getPixels());
-
-        telemetry.log().add("e");
-
-        Mat tmp = new Mat(rgb.getWidth(), rgb.getHeight(), CvType.CV_8UC4);
+        telemetry.log().add(bm.getWidth() + " x " + bm.getHeight());
+        Mat tmp = new Mat(bm.getWidth(), bm.getHeight(), CvType.CV_8UC4);
+        telemetry.log().add("give me one more second");
         Utils.bitmapToMat(bm, tmp);
 
-        telemetry.log().add("f");
-
-        frame.close();
-
-        telemetry.log().add("d");
-
+        telemetry.log().add("NOOOO");
         return tmp;
     }
 }
