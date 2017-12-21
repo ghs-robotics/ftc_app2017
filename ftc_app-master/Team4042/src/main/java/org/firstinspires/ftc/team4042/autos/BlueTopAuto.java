@@ -18,8 +18,8 @@ public class BlueTopAuto extends Auto {
         super.setUp(drive, "bluetop.txt");
         try {
             waitForStart();
-        } catch (InterruptedException ex) {
-
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         super.runAuto();

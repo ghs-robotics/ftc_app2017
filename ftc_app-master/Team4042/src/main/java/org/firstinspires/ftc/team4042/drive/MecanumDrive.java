@@ -137,19 +137,17 @@ public class  MecanumDrive extends Drive {
         double xPrime = x * Math.cos(gyroRadians) + y * Math.sin(gyroRadians);
         double yPrime = -x * Math.sin(gyroRadians) + y * Math.cos(gyroRadians);
 
-        double wimpo = isExtendo ? 1 : MAGIC_NUMBER; //Only use the magic number if you're a whole robot
-        wimpo = x <= .1 && x >= -.1 ? 1 : wimpo; //Only use the magic number if you're strafing
-
         //Sets relative target wheel speeds for mecanum drive based on controller inputs
-        targSpeedWheel[0] = 27*(-xPrime - yPrime - r);
-        targSpeedWheel[1] = 27*(xPrime - yPrime + r);
-        targSpeedWheel[2] = 43*(-xPrime - yPrime + r);
-        targSpeedWheel[3] = 43*(xPrime - yPrime - r);
+        targSpeedWheel[0] = 27*Range.clip((-xPrime - yPrime - r), -1, 1);
+        targSpeedWheel[1] = 27*Range.clip((xPrime - yPrime + r), -1, 1);
+        targSpeedWheel[2] = 43*Range.clip((-xPrime - yPrime + r), -1, 1);
+        targSpeedWheel[3] = 43*Range.clip((xPrime - yPrime - r), -1, 1);
 
         //Sets control factors based on target speeds and actual speeds
         double[] speedWheel = new double[4];
         for(int i = 0; i < speedWheel.length; i++) {
             speedWheel[i] = (targSpeedWheel[i] - encoderRates[i]) * pConstant + targSpeedWheel[i] * velFeedForwardConstant;
+            telemetry.addData("" + i, targSpeedWheel[i] + " " + encoderRates[i]);
         }
 
         //sets the wheel powers to the appropriate ratios
@@ -164,7 +162,6 @@ public class  MecanumDrive extends Drive {
      * @param r rotate component
      */
     public void driveXYR(double speedFactor, double x, double y, double r, boolean useGyro) {
-        double[] speedWheel = new double[4];
 
         //Deadzone for joysticks
         x = super.deadZone(x);
@@ -186,9 +183,71 @@ public class  MecanumDrive extends Drive {
         double xPrime = x * Math.cos(gyroRadians) + y * Math.sin(gyroRadians);
         double yPrime = -x * Math.sin(gyroRadians) + y * Math.cos(gyroRadians);
 
+        setMotorNormal(xPrime, yPrime, r, speedFactor);
+    }
+
+    public void driveXYRWimpo(double speedFactor, double x, double y, double r, boolean useGyro) {
+        //Deadzone for joysticks
+        x = super.deadZone(x);
+        y = super.deadZone(y);
+        r = super.deadZone(r);
+
+        //Use the gyro, or ignore it.
+        double heading = OFFSET;
+        //Note that OFFSET = 0, but we could make it 180 if we wanted to drive backwards, or 45 if we were using omni drive
+        if (useGyro) {
+            heading = super.gyro.updateHeading();
+            telemetry.addData("heading", heading);
+        }
+
+        /*
+        Adjust x, y for gyro values
+         */
+        double gyroRadians = Math.toRadians(heading);
+        double xPrime = x * Math.cos(gyroRadians) + y * Math.sin(gyroRadians);
+        double yPrime = -x * Math.sin(gyroRadians) + y * Math.cos(gyroRadians);
+
+        setMotorWimpo(xPrime, yPrime, r, speedFactor);
+    }
+
+    private void setMotorNormal(double xPrime, double yPrime, double r, double speedFactor) {
         //Sets relative wheel speeds for mecanum drive based on controller inputs
+        double[] speedWheel = new double[4];
         speedWheel[0] = (-xPrime - yPrime - r);
         speedWheel[1] = (xPrime - yPrime + r);
+        speedWheel[2] = -xPrime - yPrime + r;
+        speedWheel[3] = xPrime - yPrime - r;
+
+        /*for (int i = 0; i < speedWheel.length; i++) {
+            telemetry.addData("" + i, speedWheel[i]);
+        }
+        //telemetry.addData("xPrime", xPrime + " yPrime: " + yPrime + " r: " + r);
+        //telemetry.addData("speedFactor", speedFactor);*/
+
+        //sets the wheel powers to the appropriate ratios
+
+        super.setMotorPower(speedWheel, speedFactor);
+
+        /*motorLeftFront.setPower(deadZone(speedWheel[0]));
+        telemetry.addData("left front", deadZone(speedWheel[0]));
+        motorLeftFront.getPower();
+
+        motorRightFront.setPower(deadZone(-speedWheel[1]));
+        telemetry.addData("right front", deadZone(-speedWheel[1]));
+        motorRightFront.getPower();
+
+        motorRightBack.setPower(deadZone(-speedWheel[2]));
+
+        motorLeftBack.setPower(deadZone(speedWheel[3]));*/
+
+
+    }
+
+    private void setMotorWimpo(double xPrime, double yPrime, double r, double speedFactor) {
+        //Sets relative wheel speeds for mecanum drive based on controller inputs
+        double[] speedWheel = new double[4];
+        speedWheel[0] = MAGIC_NUMBER * (-xPrime - yPrime - r);
+        speedWheel[1] = MAGIC_NUMBER * (xPrime - yPrime + r);
         speedWheel[2] = -xPrime - yPrime + r;
         speedWheel[3] = xPrime - yPrime - r;
 
