@@ -162,7 +162,7 @@ public class TeleOpMecanum extends OpMode {
     }
 
     private void setUpDrive() {
-        drive.glyph.updateEncoderDeriv();
+        drive.uTrackUpdate();
         //drive.updateRates();
 
         //First controller pushing Y - toggle extendo
@@ -209,6 +209,7 @@ public class TeleOpMecanum extends OpMode {
             if (!manual) {
                 drive.resetEncoders();
                 drive.runWithEncoders();
+                drive.glyph.setHomeTarget();
             }
 
             if (drive.getVerticalDriveMode().equals(DcMotor.RunMode.RUN_TO_POSITION)) {
@@ -237,7 +238,9 @@ public class TeleOpMecanum extends OpMode {
             //Glyph locate
             glyphUI();
 
-            drive.glyph.runToPosition();
+            if (!drive.stage.equals(GlyphPlacementSystem.Stage.RETURN2) && !drive.stage.equals(GlyphPlacementSystem.Stage.RESET)) {
+                drive.glyph.runToPosition(25, 10);
+            }
         } else {
             drive.setVerticalDrive(gamepad2.left_stick_y);
             drive.setHorizontalDrive(gamepad2.right_stick_x);
@@ -376,8 +379,10 @@ public class TeleOpMecanum extends OpMode {
         if (drive.verbose) {
             telemetry.addData("vertical mode", drive.getVerticalDriveMode());
             telemetry.addData("encoder currentY pos", drive.verticalDriveCurrPos());
+            telemetry.addData("vertical drive power", drive.getVerticalDrive());
             telemetry.addData("hand is open", drive.isHandOpen());
-            telemetry.addData("limit switch", drive.getCenterState());
+            telemetry.addData("center limit switch", drive.getCenterState());
+            telemetry.addData("bottom limit switch", drive.getBottomState());
             telemetry.addData("targetY", drive.targetY.toString());
             telemetry.addData("Current pos", drive.glyph.currentY.toString());
             telemetry.addData("encoder targetY pos", drive.verticalDriveTargetPos());

@@ -88,7 +88,6 @@ public abstract class Drive {
     private CRServo horizontalDrive;
     private DigitalChannel center;
     private DigitalChannel bottom;
-    private DigitalChannel raised;
 
     private Servo grabbyBoi;
     private boolean handIsOpen = false;
@@ -167,7 +166,7 @@ public abstract class Drive {
         } catch (IllegalArgumentException ex) {
             telemetry.addData("Front Left", "Could not find.");
             useMotors = false;
-        }
+    }
 
         try {
             motorRightFront = hardwareMap.dcMotor.get("front right");
@@ -211,10 +210,6 @@ public abstract class Drive {
         bottom.setState(false);
         bottom.setMode(DigitalChannel.Mode.INPUT);
 
-        raised = hardwareMap.digitalChannel.get("raised");
-        raised.setState(false);
-        raised.setMode(DigitalChannel.Mode.INPUT);
-
         intakeLeft = hardwareMap.dcMotor.get("intake left");
         intakeRight = hardwareMap.dcMotor.get("intake right");
         //The left intake is mounted "backwards"
@@ -243,6 +238,8 @@ public abstract class Drive {
     public double[] shortIrRates = new double[3];
     public double[] longIrRates = new double[2];
 
+    private double lastUTrack = 0;
+    public double uTrackRate = 0;
     public void updateRates() {
         //System time
         double currMilli = System.currentTimeMillis();
@@ -288,8 +285,18 @@ public abstract class Drive {
         lastMilli = currMilli;
     }
 
+    public void uTrackUpdate() {
+        //Vertical drive
+        double currUTrack = verticalDriveCurrPos();
+        double currMilli = System.currentTimeMillis();
+        uTrackRate = (currUTrack - lastUTrack) / (currMilli - lastMilli);
+
+        lastUTrack = currUTrack;
+        lastMilli = currMilli;
+    }
+
     private void glyphLocate() {
-        targetY = GlyphPlacementSystem.Position.values()[glyph.uiTargetY];
+        targetY = GlyphPlacementSystem.Position.values()[glyph.uiTargetY + 3];
         targetX = GlyphPlacementSystem.HorizPos.values()[glyph.uiTargetX];
     }
 
@@ -319,7 +326,7 @@ public abstract class Drive {
             case PLACE1: {
                 //Raise the u-track
                 glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
-                if(verticalDriveCurrPos() > GlyphPlacementSystem.Position.RAISED.getEncoderVal() && getRaisedState()) {
+                if(glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
                     stage = GlyphPlacementSystem.Stage.PAUSE1;
                     glyph.setXPower(targetX);
                 }
@@ -365,21 +372,22 @@ public abstract class Drive {
                     if (targetX.equals(GlyphPlacementSystem.HorizPos.LEFT)) {
                         glyph.adjustBack(-1);
                     }
-                    /*else if (targetX.equals(GlyphPlacementSystem.HorizPos.RIGHT)) {
-                        glyph.adjustBack(1);
-                    }*/
                 }
                 return false;
             }
             case RETURN2: {
                 //Move back to the bottom and get ready to do it again
                 glyph.setHomeTarget();
+                setVerticalDriveMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                setVerticalDrive(-1);
                 stage = GlyphPlacementSystem.Stage.RESET;
                 return false;
             }
             case RESET: {
                 if (getBottomState()) {
                     resetUTrack();
+                    setVerticalDrive(0);
+                    setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
                 }
                 uTrackAtBottom = true;
                 return true;
@@ -441,10 +449,6 @@ public abstract class Drive {
         return bottom.getState();
     }
 
-    public boolean getRaisedState() {
-        return raised.getState();
-    }
-
     public void openHand() {
         handIsOpen = true;
         grabbyBoi.setPosition(.57);
@@ -466,6 +470,8 @@ public abstract class Drive {
     public boolean isHandOpen() {
         return handIsOpen;
     }
+
+    public double getVerticalDrive() { return verticalDrive.getPower(); }
 
     public void setVerticalDrive(double power) {
         verticalDrive.setPower(power);
@@ -728,59 +734,24 @@ public abstract class Drive {
         }
 
         if (useMotors) {
-            //which ones to scale down? fast ones. if THE_FAST_ONES_ARE_THE_FRONT_ONES, the front.
-            /*
-            if(THE_FAST_ONES_ARE_THE_FRONT_ONES) {
-                if (motorLeftFront != null) {
-                    motorLeftFront.setPower(deadZone(speedWheel[0]) * HIGH_SPEED_SLOWER_DOWNER_NUMBER);
-                }
-                if (motorRightFront != null) {
-                    motorRightFront.setPower(deadZone(-speedWheel[1]) * HIGH_SPEED_SLOWER_DOWNER_NUMBER);
-                } //The right motors are mounted "upside down", which is why we have to inverse this
-                if (motorRightBack != null) {
-                    motorRightBack.setPower(deadZone(-speedWheel[2]));
-                }
-                if (motorLeftBack != null) {
-                    motorLeftBack.setPower(deadZone(speedWheel[3]));
-                }
-            } else {
-                if (motorLeftFront != null) {
-                    motorLeftFront.setPower(deadZone(speedWheel[0]));
-                }
-                if (motorRightFront != null) {
-                    motorRightFront.setPower(deadZone(-speedWheel[1]));
-                } //The right motors are mounted "upside down", which is why we have to inverse this
-                if (motorRightBack != null) {
-                    motorRightBack.setPower(deadZone(-speedWheel[2]) * HIGH_SPEED_SLOWER_DOWNER_NUMBER);
-                }
-                if (motorLeftBack != null) {
-                    motorLeftBack.setPower(deadZone(speedWheel[3]) * HIGH_SPEED_SLOWER_DOWNER_NUMBER);
-                }
-            }
-            */
-            double magic = isExtendo ? 1 : MAGIC_NUMBER;
-
             if (motorLeftFront != null) {
                 motorLeftFront.setPower(deadZone(speedWheel[0]));
+                telemetry.addData("left front", motorLeftFront.getPower());
             }
             if (motorRightFront != null) {
                 motorRightFront.setPower(deadZone(-speedWheel[1]));
+                telemetry.addData("right front", motorRightFront.getPower());
+                motorRightFront.getPower();
             } //The right motors are mounted "upside down", which is why we have to inverse this
             if (motorRightBack != null) {
                 motorRightBack.setPower(deadZone(-speedWheel[2]));
+                telemetry.addData("right back", motorRightBack.getPower());
             }
             if (motorLeftBack != null) {
                 motorLeftBack.setPower(deadZone(speedWheel[3]));
+                telemetry.addData("left back", motorLeftBack.getPower());
             }
         }
-
-        /*if (verbose || !useMotors) {
-            //Prints power
-            telemetry.addData("Left Front", speedWheel[0]);
-            telemetry.addData("Right Front", -speedWheel[1]);
-            telemetry.addData("Right Back", -speedWheel[2]);
-            telemetry.addData("Left Back", speedWheel[3]);
-        }*/
     }
 
     public void setVerbose(boolean verbose) {

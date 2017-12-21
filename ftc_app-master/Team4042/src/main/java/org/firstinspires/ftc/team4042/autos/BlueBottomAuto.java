@@ -18,8 +18,8 @@ public class BlueBottomAuto extends Auto {
         super.setUp(drive, "bluebottom.txt");
         try {
             waitForStart();
-        } catch (InterruptedException ex) {
-
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         super.runAuto();

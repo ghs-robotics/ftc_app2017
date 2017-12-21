@@ -15,7 +15,7 @@ public class GlyphPlacementSystem {
     public final double HORIZONTAL_TRANSLATION_TIME = 2;
     public final int PLACEMENT_ERROR_MARGIN = 25;
     private final double PROPORTIONAL_CONSTANT = 25;
-    private final double DERIV_CONSTANT = 4.5;
+    private final double DERIV_CONSTANT = 10;
     public int uiTargetX;
     public int uiTargetY;
     public Position currentY;
@@ -27,7 +27,7 @@ public class GlyphPlacementSystem {
 
     public enum Position {
         //HOME(0), RAISED(1200), TOP(1600), MID(2000), BOT(2500), TRANSITION(-1);
-        HOME(10), RAISEDBACK(1250), RAISED(1301), TOP(1600), MID(1900), BOT(2200), TRANSITION(-1);
+        HOME(10), RAISEDBACK(1350), RAISED(1401), TOP(1600), MID(1900), BOT(2200), TRANSITION(-1);
 
         private final Integer encoderVal;
         Position(Integer encoderVal) { this.encoderVal = encoderVal; }
@@ -54,7 +54,7 @@ public class GlyphPlacementSystem {
         currentY = Position.HOME;
         this.drive = drive;
         this.baseOutput = "[ _ _ _ ]\n[ _ _ _ ]\n[ _ _ _ ]";
-    }
+}
 
     public String getTargetPositionAsString()
     {
@@ -180,8 +180,8 @@ public class GlyphPlacementSystem {
         return false;
     }
 
-    public void runToPosition() {
-        double power = ((double)drive.verticalDriveTargetPos() - (double)drive.verticalDriveCurrPos())/ PROPORTIONAL_CONSTANT + getEncoderDeriv() * DERIV_CONSTANT;
+    public void runToPosition(double proportionalConst, double derivConstant) {
+        double power = ((double)drive.verticalDriveTargetPos() - (double)drive.verticalDriveCurrPos())/ proportionalConst + drive.uTrackRate * derivConstant;
         power = Math.abs(power) < 0.2 ? 0 : power;
         drive.setVerticalDrive(power);
 
@@ -210,20 +210,6 @@ public class GlyphPlacementSystem {
         }
 
 
-    }
-
-    public void updateEncoderDeriv() {
-        drive.derivCycle++;
-        if(drive.derivCycle == drive.deriv.length) drive.derivCycle = 0;
-        drive.deriv[drive.derivCycle] = drive.verticalDriveCurrPos();
-    }
-
-    public double getEncoderDeriv() {
-        if(drive.derivCycle == drive.deriv.length - 1) {
-            return drive.deriv[drive.derivCycle] - drive.deriv[0];
-        } else {
-            return drive.deriv[drive.derivCycle] - drive.deriv[drive.derivCycle + 1];
-        }
     }
 
 }

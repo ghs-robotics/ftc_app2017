@@ -18,8 +18,8 @@ public class RedBottomAuto extends Auto {
         super.setUp(drive, "redbottom.txt");
         try {
             waitForStart();
-        } catch (InterruptedException ex) {
-
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         super.runAuto();
