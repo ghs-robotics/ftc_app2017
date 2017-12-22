@@ -25,6 +25,7 @@ public abstract class Drive {
 
     //Require drive() in subclasses
     public abstract void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor);
+    public abstract void driveXYR(double speedFactor, double x, double y, double r, boolean useGyro);
 
     //Initializes a factor for the speed of movement to a position when driving with encoders
     public static final double BASE_SPEED = .3;
@@ -381,7 +382,6 @@ public abstract class Drive {
                 setVerticalDriveMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 setVerticalDrive(-1);
                 stage = GlyphPlacementSystem.Stage.RESET;
-                uTrackAtBottom = true;
                 return false;
             }
             case RESET: {
@@ -390,6 +390,7 @@ public abstract class Drive {
                     setVerticalDrive(0);
                     setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
                 }
+                uTrackAtBottom = true;
                 return true;
             }
         }
