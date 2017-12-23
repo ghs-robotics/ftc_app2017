@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-ds:.01 base:.3 full:1 stop:0 magic:.8 Deriv:10 Prop:25 TransTime:2 PlaceError:25 PropRot:.008 DerivRot:-.02
-=======
-ds:.01 base:.3 full:1 stop:0 magic:.8
+ds:.01 base:.3 full:1 stop:0 magic:.8 Deriv:10 Prop:25 TransTime:2 PlaceError:25 PropRot:.008 DerivRot:-.02 time:1
 
 #We only read the first line of this file
->>>>>>> 16fc3a41d03f60361ac3e15b1ab164cdd9ca1d17

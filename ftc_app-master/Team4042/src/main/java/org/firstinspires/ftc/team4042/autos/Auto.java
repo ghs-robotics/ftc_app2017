@@ -273,7 +273,7 @@ public abstract class Auto extends LinearVisionOpMode {
                 drive.intakeLeft(1);
                 drive.intakeRight(1);
                 timer.reset();
-            } else if (timer.seconds() < 1){
+            } else if (timer.seconds() < Constants.getInstance().getDouble("time")){
                 drive.intakeLeft(-1);
                 drive.intakeRight(1);
             } else {
