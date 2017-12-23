@@ -39,27 +39,22 @@ public class Constants {
         try {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
-            String line;
-            while ((line = bufferedReader.readLine()) != null) { //Reads the lines from the file in order
-                if (line.length() > 0) {
-                    if (line.charAt(0) != '#') { //Use a # for a comment
-                        HashMap<String, String> parameters = new HashMap<>();
-
-                        //x:3 --> k = x, v = 3
-                        String[] inputParameters = line.split(" ");
-                        int i = 0;
-                        while (i < inputParameters.length) {
-                            String parameter = inputParameters[i];
-                            int colon = parameter.indexOf(':');
-                            String k = parameter.substring(0, colon);
-                            String v = parameter.substring(colon + 1);
-                            parameters.put(k, v); //Gets the next parameter and adds it to the list
-
-                            i++;
-                        }
-                        return parameters;
-                    }
+            String line = bufferedReader.readLine();
+            if (line != null && line.length() > 0 && line.charAt(0) != '#') { //Reads the first line
+                HashMap<String, String> parameters = new HashMap<>();
+                //x:3 --> k = x, v = 3
+                String[] inputParameters = line.split(" ");
+                int i = 0;
+                while (i < inputParameters.length) {
+                    String parameter = inputParameters[i];
+                    int colon = parameter.indexOf(':');
+                    String k = parameter.substring(0, colon);
+                    String v = parameter.substring(colon + 1);
+                    parameters.put(k, v); //Gets the next parameter and adds it to the list
+                    i++;
                 }
+                return parameters;
+
             }
             fileReader.close();
         } catch (Exception ex) {
