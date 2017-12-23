@@ -149,15 +149,12 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("currPitch", currPitch);
 
         boolean flat = Math.abs(currRoll - startRoll) < 2 && Math.abs(currPitch - startPitch) < 2;
-
+        boolean veryTipped = Math.abs(currRoll - startRoll) > 25 || Math.abs(currPitch - startPitch) > 25;
         telemetry.addData("flat", flat);
-        if (!onBalancingStone) {
-            if (!flat) {
-                onBalancingStone = true;
-            } else {
-                //drive backwards
-                drive.driveXYR(1,0,1,0,true);
-            }
+        if (!onBalancingStone && !flat) {
+            onBalancingStone = true;
+        } else if (veryTipped && !onBalancingStone) {
+            drive.driveXYR(1, 0, 1, 0, true);
         } else if (!flat) {
             //adjust
             double degreeP = Constants.getInstance().getDouble("degree");
