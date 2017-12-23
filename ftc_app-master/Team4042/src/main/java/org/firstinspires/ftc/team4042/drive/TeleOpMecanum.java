@@ -376,6 +376,7 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
         telemetry.addData("Speed factor", adjustedSpeed);
         telemetry.addData("Tank", Drive.tank);
+        telemetry.addData("dead zone size test", Drive.DEADZONE_SIZE);
         if (drive.verbose) {
             telemetry.addData("vertical mode", drive.getVerticalDriveMode());
             telemetry.addData("encoder currentY pos", drive.verticalDriveCurrPos());
