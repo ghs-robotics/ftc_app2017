@@ -315,8 +315,6 @@ public abstract class Drive {
                 glyph.currentX = GlyphPlacementSystem.HorizPos.CENTER;
 
                 stage = GlyphPlacementSystem.Stage.GRAB;
-                
-                setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
                 uTrackAtBottom = false;
                 return false;
             }
@@ -328,6 +326,7 @@ public abstract class Drive {
             }
             case PLACE1: {
                 //Raise the u-track
+                setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
                 glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
                 if(glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
                     stage = GlyphPlacementSystem.Stage.PAUSE1;
