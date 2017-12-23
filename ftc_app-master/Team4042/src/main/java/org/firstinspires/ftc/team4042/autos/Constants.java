@@ -65,18 +65,18 @@ public class Constants {
         return null;
     }
 
-    public String getString(String k) {
-        //return c.getString(k);
-        return getInstance().myConstants.get(k);
+    public String getString(String constant) {
+        //return c.getString(constant);
+        return getInstance().myConstants.get(constant);
     }
 
-    public int getInt(String k) {
-        //return c.getInt(k);
-        return Integer.parseInt(getInstance().myConstants.get(k));
+    public int getInt(String constant) {
+        //return c.getInt(constant);
+        return Integer.parseInt(getInstance().myConstants.get(constant));
     }
 
-    public double getDouble(String k) {
-        //return c.getDouble(k);
-        return Double.parseDouble(getInstance().myConstants.get(k));
+    public double getDouble(String constant) {
+        //return c.getDouble(constant);
+        return Double.parseDouble(getInstance().myConstants.get(constant));
     }
 }
