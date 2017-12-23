@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.team4042.autos.Constants;
+
 @TeleOp(name = "Mecanum", group="drive")
 public class TeleOpMecanum extends OpMode {
 
@@ -158,8 +160,9 @@ public class TeleOpMecanum extends OpMode {
             }
         } else if (flat) {
             //adjust
-            double x = startPitch - currPitch;
-            double y = startRoll - currRoll;
+            double degreeP = Constants.getInstance().getDouble("degree");
+            double x = degreeP * (startPitch - currPitch);
+            double y = degreeP * (startRoll - currRoll);
             drive.driveXYR(1, x, y, 0, true);
         }
     }
