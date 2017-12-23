@@ -32,14 +32,11 @@ package org.firstinspires.ftc.team4042.testops;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-<<<<<<< HEAD:ftc_app-master/Team4042/src/main/java/org/firstinspires/ftc/team4042/AnalogSensorTest.java
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-=======
 import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
->>>>>>> 43cfcba99b244e318c57ea892275d047f5e0f2d1:ftc_app-master/Team4042/src/main/java/org/firstinspires/ftc/team4042/testops/AnalogSensorTest.java
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
