@@ -148,7 +148,7 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("currRoll", currRoll);
         telemetry.addData("currPitch", currPitch);
 
-        boolean flat = Math.abs(currRoll - startRoll) > 2 && Math.abs(currPitch - startPitch) > 2;
+        boolean flat = Math.abs(currRoll - startRoll) < 2 && Math.abs(currPitch - startPitch) < 2;
 
         telemetry.addData("flat", flat);
         if (!onBalancingStone) {
@@ -158,7 +158,7 @@ public class TeleOpMecanum extends OpMode {
                 //drive backwards
                 drive.driveXYR(1,0,1,0,true);
             }
-        } else if (flat) {
+        } else if (!flat) {
             //adjust
             double degreeP = Constants.getInstance().getDouble("degree");
             double x = degreeP * (startPitch - currPitch);
