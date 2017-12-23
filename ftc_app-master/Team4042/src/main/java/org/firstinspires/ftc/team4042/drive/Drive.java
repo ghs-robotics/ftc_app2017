@@ -389,7 +389,7 @@ public abstract class Drive {
                 if (getBottomState()) {
                     resetUTrack();
                     setVerticalDrive(0);
-                    setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    //setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
                     uTrackAtBottom = true;
                 }
                 return true;
