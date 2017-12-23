@@ -153,7 +153,7 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("flat", flat);
         if (!onBalancingStone && !flat) {
             onBalancingStone = true;
-        } else if (veryTipped && !onBalancingStone) {
+        } else if (veryTipped || !onBalancingStone) {
             drive.driveXYR(1, 0, 1, 0, true);
         } else if (!flat) {
             //adjust
