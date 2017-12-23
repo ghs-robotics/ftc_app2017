@@ -147,7 +147,7 @@ public class TeleOpMecanum extends OpMode {
         boolean flat = Math.abs(currRoll - startRoll) > 2 || Math.abs(currPitch - startPitch) > 2;
 
         if (!onBalancingStone) {
-            if (flat) {
+            if (!flat) {
                 onBalancingStone = true;
             } else {
                 //drive backwards
