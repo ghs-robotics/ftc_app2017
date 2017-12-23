@@ -1,1 +1,5 @@
 ds:.01
+base:.3
+full:1
+stop:0
+magic:.8
