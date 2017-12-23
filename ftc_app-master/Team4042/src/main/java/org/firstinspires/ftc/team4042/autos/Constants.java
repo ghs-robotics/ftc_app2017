@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.team4042.autos;
 
-import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.team4042.drive.MecanumDrive;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,7 +15,7 @@ import java.util.HashMap;
 
 public class Constants {
     File file;
-    private HashMap<String, String> myContsants;
+    private HashMap<String, String> myConstants;
     private Telemetry.Log log;
     private static Constants c;
 
@@ -32,7 +29,7 @@ public class Constants {
 
     private Constants() {
         file = new File("./storage/emulated/0/DCIM/" + "constants.txt");
-        myContsants = loadFile();
+        myConstants = loadFile();
 
     }
 
@@ -75,19 +72,18 @@ public class Constants {
         return null;
     }
 
-
     public String getString(String k) {
-        return c.getString(k);
-
+        //return c.getString(k);
+        return myConstants.get(k);
     }
 
     public int getInt(String k) {
-        return c.getInt(k);
-
+        //return c.getInt(k);
+        return Integer.parseInt(myConstants.get(k));
     }
 
     public double getDouble(String k) {
-        return c.getDouble(k);
-
+        //return c.getDouble(k);
+        return Double.parseDouble(myConstants.get(k));
     }
 }
