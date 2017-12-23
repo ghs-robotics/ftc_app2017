@@ -29,7 +29,6 @@ public class Constants {
     private Constants() {
         file = new File("./storage/emulated/0/DCIM/" + "constants.txt");
         myConstants = loadFile();
-
     }
 
     private HashMap<String, String> loadFile() {
