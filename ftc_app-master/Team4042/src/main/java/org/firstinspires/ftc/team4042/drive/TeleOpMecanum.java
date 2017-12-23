@@ -151,20 +151,13 @@ public class TeleOpMecanum extends OpMode {
         boolean flat = Math.abs(currRoll - startRoll) < 2 && Math.abs(currPitch - startPitch) < 2;
         boolean veryTipped = Math.abs(currRoll - startRoll) > 25 || Math.abs(currPitch - startPitch) > 25;
         telemetry.addData("flat", flat);
-        if (!onBalancingStone) {
-            if (!flat) {
-                onBalancingStone = true;
-            } else {
-                //drive backwards
-                drive.driveXYR(1,0,-1,0,true);
-            }
         if (!onBalancingStone && !flat) {
             onBalancingStone = true;
         } else if (veryTipped || !onBalancingStone) {
             drive.driveXYR(1, 0, 1, 0, true);
         } else if (!flat) {
             //adjust
-            double degreeP = .09;
+            double degreeP = .05;
             double x = degreeP * (startPitch - currPitch);
             double y = degreeP * (startRoll - currRoll);
             drive.driveXYR(1, x, y, 0, true);
