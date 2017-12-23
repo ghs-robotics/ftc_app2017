@@ -16,7 +16,6 @@ import java.util.HashMap;
 public class Constants {
     File file;
     private HashMap<String, String> myConstants;
-    private Telemetry.Log log;
     private static Constants c;
 
 
