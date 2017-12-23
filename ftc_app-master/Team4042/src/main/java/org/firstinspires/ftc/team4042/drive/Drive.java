@@ -28,15 +28,15 @@ public abstract class Drive {
     public abstract void driveXYR(double speedFactor, double x, double y, double r, boolean useGyro);
 
     //Initializes a factor for the speed of movement to a position when driving with encoders
-    public static final double BASE_SPEED = .3;
+    public static final double BASE_SPEED = Constants.getInstance().getDouble("base");
     //The deadzone size for the joystick inputs
-    public static final double DEADZONE_SIZE = .01;
+    public static final double DEADZONE_SIZE = Constants.getInstance().getDouble("ds");
     //The largest speed factor possible
-    public static final double FULL_SPEED = 1;
+    public static final double FULL_SPEED = Constants.getInstance().getDouble("full");
     //The power to put to the motors to stop them
-    public static final double STOP_SPEED = 0;
+    public static final double STOP_SPEED = Constants.getInstance().getDouble("stop");
 
-    public static final double MAGIC_NUMBER = .8;
+    public static final double MAGIC_NUMBER = Constants.getInstance().getDouble("magic");
 
     public static final boolean THE_FAST_ONES_ARE_THE_FRONT_ONES = true;
     public static final double LOW_SPEED_MOTOR_THINGS = 7;
