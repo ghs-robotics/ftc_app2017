@@ -40,6 +40,9 @@ public abstract class Auto extends LinearVisionOpMode {
     private VuMarkIdentifier vuMarkIdentifier = new VuMarkIdentifier();
     private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.CENTER;
 
+    private double PROPORTIONAL_ROTATE = Constants.getInstance().getDouble("PropRot");
+    private double DERIV_ROTATE = Constants.getInstance().getDouble("DerivRot");
+
     private Telemetry.Log log;
 
     File file;
@@ -312,7 +315,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
         do {
             drive.uTrackUpdate();
-            drive.glyph.runToPosition(25, 10);
+            drive.glyph.runToPosition();
             done = drive.uTrack(); //GETS STUCK IN THIS FUNCTION
         } while (opModeIsActive() && !done);
     }
@@ -466,7 +469,7 @@ public abstract class Auto extends LinearVisionOpMode {
             if (diff > 270) { diff -= 360; }
             if (diff < -270) { diff += 360; }
             if (Math.abs(diff) > 2) {
-                drive.driveXYR(speed, 0, 0, -.02 * diff, false, 0.008);
+                drive.driveXYR(speed, 0, 0, DERIV_ROTATE * diff, false, PROPORTIONAL_ROTATE);
             }
         } while (Math.abs(gyro - realR) > 2 && opModeIsActive());
 
