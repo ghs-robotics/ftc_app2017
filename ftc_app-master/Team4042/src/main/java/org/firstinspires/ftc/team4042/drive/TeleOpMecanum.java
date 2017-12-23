@@ -143,15 +143,18 @@ public class TeleOpMecanum extends OpMode {
         drive.gyro.updateAngles();
         double currRoll = drive.gyro.getRoll();
         double currPitch = drive.gyro.getPitch();
+        telemetry.addData("currRoll", currRoll);
+        telemetry.addData("currPitch", currPitch);
 
         boolean flat = Math.abs(currRoll - startRoll) > 2 && Math.abs(currPitch - startPitch) > 2;
 
+        telemetry.addData("flat", flat);
         if (!onBalancingStone) {
             if (!flat) {
                 onBalancingStone = true;
             } else {
                 //drive backwards
-                drive.driveXYR(1,0,-1,0,true);
+                drive.driveXYR(1,0,1,0,true);
             }
         } else if (flat) {
             //adjust
