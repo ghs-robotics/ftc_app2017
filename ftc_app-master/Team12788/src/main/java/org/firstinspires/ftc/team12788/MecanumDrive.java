@@ -203,7 +203,7 @@ public class MecanumDrive extends Drive {
             //if it has reached target, stop moving, reset encoders, and return PI
             stopMotors(); //stops the motors
             this.resetEncoders();
-            this.runWithoutEncoders();
+            this.runWithEncoders();
             return Math.PI;
         }
         return speed;

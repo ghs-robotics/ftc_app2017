@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import java.util.ArrayList;
 
 @TeleOp(name = "Mecanum", group = "Iterative Opmode")
 public class TeleOpMecanum extends OpMode {
@@ -14,7 +13,6 @@ public class TeleOpMecanum extends OpMode {
     private MecanumDrive drive = new MecanumDrive();
 
     //private UltrasonicI2cRangeSensor sensor;
-    private ArrayList<Integer> rangeData;
 
     private double adjustedSpeed;
 
@@ -73,8 +71,6 @@ public class TeleOpMecanum extends OpMode {
         a = false;
         x = false;
 
-        //lul
-
         lift = hardwareMap.dcMotor.get("lift");
         relic = hardwareMap.dcMotor.get("relic");
 >>>>>>> aceebeb6c4c2cc2777c3c1f94295f2810883d2af
@@ -97,11 +93,11 @@ public class TeleOpMecanum extends OpMode {
 
     @Override
     public void loop() {
-        if (gamepad1.dpad_right){
-            jewel.setPosition(.769);
+        if (gamepad1.right_bumper){
+            jewel.setPosition(.1);
         }
-        if (gamepad1.dpad_left){
-            jewel.setPosition(.3);
+        if (gamepad1.left_bumper){
+            jewel.setPosition(.86);
         }
 <<<<<<< HEAD
 
@@ -119,11 +115,14 @@ public class TeleOpMecanum extends OpMode {
         if (gamepad2.back){
             x = true;
         }
-        if(x == true && gamepad2.dpad_up){
+        if(x && gamepad2.dpad_up){
             lift.setPower(1);
         }
-        if(x == true && gamepad2.dpad_down){
+        else if(x && gamepad2.dpad_down){
             lift.setPower(-.5);
+        }
+        else if (x){
+            lift.setPower(0);
         }
 
 
@@ -155,7 +154,7 @@ public class TeleOpMecanum extends OpMode {
         } else if (!gamepad2.a & a){
             a = false;
         }
-        if (pinchBool == true){
+        if (pinchBool){
             pinch.setPosition(1);
         }
         else {
@@ -187,15 +186,15 @@ public class TeleOpMecanum extends OpMode {
         }
         if (gamepad2.b) {
             grabRight.setPosition(.9);
-            grabLeft.setPosition(.4);
+            grabLeft.setPosition(0);
         }
         if (gamepad2.x) {
-            grabRight.setPosition(.2);
-            grabLeft.setPosition(1);
+            grabRight.setPosition(.1);
+            grabLeft.setPosition(.6);
         }
         if (gamepad2.y) {
-            grabRight.setPosition(.7);
-            grabLeft.setPosition(.6);
+            grabRight.setPosition(.4);
+            grabLeft.setPosition(.4);
         }
         if (gamepad1.a) {
             adjustedSpeed = .5;
@@ -206,11 +205,12 @@ public class TeleOpMecanum extends OpMode {
         if (gamepad1.x) {
             adjustedSpeed = .25;
         }
-        if (gamepad1.right_bumper) {
+        /*if (gamepad1.right_bumper) {
             invert = false;
         }
         if (gamepad1.left_bumper) {
             invert = true;
+<<<<<<< HEAD
         }
 <<<<<<< HEAD
         if (gamepad2.right_bumper) {
@@ -252,6 +252,9 @@ public class TeleOpMecanum extends OpMode {
             drive.drive(false, gamepad1,adjustedSpeed * MecanumDrive.FULL_SPEED, invert);
         }
 =======
+=======
+        }
+>>>>>>> 88208d81d21b3baf45a582bf828a65e656dc505f
         drive.drive(false, gamepad1, adjustedSpeed, false);
 >>>>>>> aceebeb6c4c2cc2777c3c1f94295f2810883d2af
     }

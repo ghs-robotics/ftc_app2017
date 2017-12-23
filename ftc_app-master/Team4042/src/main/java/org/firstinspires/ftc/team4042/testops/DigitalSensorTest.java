@@ -78,7 +78,7 @@ public class DigitalSensorTest extends OpMode
 
     @Override
     public void init() {
-        sensor = new DigitalSensor("center");
+        sensor = new DigitalSensor("bottom");
         sensor.initialize(hardwareMap);
     }
 
