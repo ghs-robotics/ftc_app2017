@@ -110,8 +110,9 @@ public class TeleOpMecanum extends OpMode {
 
         if (gamepad1.back) {
             balance();
-        } else if (onBalancingStone) {
-            //reset?
+        }else {
+            //Drives the robot
+            drive.drive(false, gamepad1, gamepad2, adjustedSpeed * MecanumDrive.FULL_SPEED);
         }
 
         //Adjust drive modes, speeds, etc
@@ -120,8 +121,7 @@ public class TeleOpMecanum extends OpMode {
         //Sets up speed modes
         speedModes();
 
-        //Drives the robot
-        drive.drive(false, gamepad1, gamepad2, adjustedSpeed * MecanumDrive.FULL_SPEED);
+
 
         //Runs the intakes
         intakes();
@@ -160,7 +160,7 @@ public class TeleOpMecanum extends OpMode {
             }
         } else if (!flat) {
             //adjust
-            double degreeP = Constants.getInstance().getDouble("degree");
+            double degreeP = .09;
             double x = degreeP * (startPitch - currPitch);
             double y = degreeP * (startRoll - currRoll);
             drive.driveXYR(1, x, y, 0, true);
