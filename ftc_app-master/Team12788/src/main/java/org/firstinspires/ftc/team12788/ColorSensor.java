@@ -18,7 +18,7 @@ public class ColorSensor {
      * Creates the color sensor
      * @param name name of Sensor in config file
      */
-    public ColorSensor(String name ){
+    public ColorSensor(String name){
         this.name = name;
     }
 
@@ -46,12 +46,9 @@ public class ColorSensor {
      * checks whether red reading of the colorsensor is larger than the blue
      * @return true if red is larger and false if not
      */
-    public boolean SenseRed(){
+    public boolean SenseRed() {
         NormalizedRGBA colors = this.JewelColor();
-        if (colors.red > colors.blue){
-            return true;
-        }
-        return false;
+        return (colors.red > colors.blue);
     }
 
     /**
@@ -60,6 +57,6 @@ public class ColorSensor {
      */
     public boolean SenseBlue(){
         NormalizedRGBA colors = this.JewelColor();
-        return colors.blue > colors.red;
+        return (colors.blue > colors.red);
     }
 }

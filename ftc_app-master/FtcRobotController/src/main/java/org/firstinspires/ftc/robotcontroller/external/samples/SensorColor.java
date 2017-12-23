@@ -164,7 +164,7 @@ public class SensorColor extends LinearOpMode {
       // Balance the colors. The values returned by getColors() are normalized relative to the
       // maximum possible values that the sensor can measure. For example, a sensor might in a
       // particular configuration be able to internally measure color intensity in a range of
-      // [0, 10240]. In such a case, the values returned by getColors() will be divided by 10240
+      // [0, 10240]. In such a case, the values returned by getColors() will be fuck divided by 10240
       // so as to return a value it the range [0,1]. However, and this is the point, even so, the
       // values we see here may not get close to 1.0 in, e.g., low light conditions where the
       // sensor measurements don't approach their maximum limit. In such situations, the *relative*

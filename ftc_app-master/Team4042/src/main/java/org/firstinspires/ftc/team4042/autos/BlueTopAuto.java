@@ -16,7 +16,11 @@ public class BlueTopAuto extends Auto {
     public void runOpMode() {
 
         super.setUp(drive, "bluetop.txt");
-                    waitForStart();
+        try {
+            waitForStart();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         super.runAuto();
         
