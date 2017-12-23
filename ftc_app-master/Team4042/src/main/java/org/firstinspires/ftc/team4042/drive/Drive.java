@@ -315,6 +315,8 @@ public abstract class Drive {
                 glyph.currentX = GlyphPlacementSystem.HorizPos.CENTER;
 
                 stage = GlyphPlacementSystem.Stage.GRAB;
+                
+                setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
                 uTrackAtBottom = false;
                 return false;
             }
@@ -401,7 +403,6 @@ public abstract class Drive {
         stage = GlyphPlacementSystem.Stage.HOME;
         jewelUp();
         setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
         uTrackAtBottom = true;
     }
 
