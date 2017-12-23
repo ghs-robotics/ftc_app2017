@@ -205,6 +205,9 @@ public abstract class Auto extends LinearVisionOpMode {
                 case "a":
                     alignHorizontally(parameters);
                     break;
+                case "g":
+                    grabGlyph(parameters);
+                    break;
                 default:
                     System.err.println("Unknown function called from file " + file);
                     break;
@@ -254,6 +257,32 @@ public abstract class Auto extends LinearVisionOpMode {
         telemetry.update();
     }
     */
+
+    public void grabGlyph(HashMap<String, String> parameters) {
+        double glyphIn = 2;
+        double glyphOut = 6;
+
+        ElapsedTime timer = new ElapsedTime();
+
+        do {
+            double currDistance = 0;
+
+            boolean isGlyphIn = Math.abs(currDistance - glyphIn) > Math.abs(currDistance - glyphOut);
+
+            if (!isGlyphIn) {
+                drive.intakeLeft(1);
+                drive.intakeRight(1);
+                timer.reset();
+            } else if (timer.seconds() < 1){
+                drive.intakeLeft(-1);
+                drive.intakeRight(1);
+            } else {
+                drive.intakeLeft(1);
+                drive.intakeRight(1);
+            }
+
+        } while (opModeIsActive());
+    }
 
     public void alignHorizontally(HashMap<String, String> parameters) {
         double prevMiddle = drive.shortIr[0].getCmAvg();
