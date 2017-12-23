@@ -4,6 +4,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.team4042.drive.MecanumDrive;
 
+/**
+ * Parks in the safe zone, but does so badly
+ */
 @Autonomous(name="RedTopAuto", group="autos")
 public class RedTopAuto extends Auto {
 
@@ -13,9 +16,7 @@ public class RedTopAuto extends Auto {
     public void runOpMode() {
 
         super.setUp(drive, "redtop.txt");
-        try {
-            waitForStart();
-        } catch (InterruptedException ex) { }
+                    waitForStart();
 
         super.runAuto();
         

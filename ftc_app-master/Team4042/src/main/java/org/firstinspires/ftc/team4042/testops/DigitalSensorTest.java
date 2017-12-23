@@ -40,6 +40,8 @@ import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.team4042.sensor.DigitalSensor;
+
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
  * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
@@ -57,25 +59,31 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp(name="Whisker test", group="testops")
 public class DigitalSensorTest extends OpMode
 {
-    DigitalChannel whisker;
-
-
+    /*private DigitalChannel whisker;
 
     @Override
     public void init() {
-        whisker = hardwareMap.digitalChannel.get("limit");
+        whisker = hardwareMap.digitalChannel.get("center");
         whisker.setState(false);
         whisker.setMode(DigitalChannel.Mode.INPUT);
     }
 
-    /*
-     * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
-     */
     @Override
     public void loop() {
         telemetry.addData("whisker on?", whisker.getState());
 
+    }*/
+
+    private DigitalSensor sensor;
+
+    @Override
+    public void init() {
+        sensor = new DigitalSensor("center");
+        sensor.initialize(hardwareMap);
     }
 
-
+    @Override
+    public void loop() {
+        telemetry.addData("sensor", sensor.getState());
+    }
 }

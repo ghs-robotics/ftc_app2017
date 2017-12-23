@@ -163,6 +163,7 @@ public class MecanumDrive extends Drive {
 
         double scaledSpeed = setUpSpeed(speed, targetTicks);
         if (scaledSpeed == Math.PI) { //The target's been reached
+            stopMotors();
             return true;
         }
         //if it hasn't reached the target (it won't have returned yet),
@@ -202,7 +203,7 @@ public class MecanumDrive extends Drive {
             //if it has reached target, stop moving, reset encoders, and return PI
             stopMotors(); //stops the motors
             this.resetEncoders();
-            this.runWithEncoders();
+            this.runWithoutEncoders();
             return Math.PI;
         }
         return speed;

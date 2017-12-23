@@ -20,7 +20,7 @@ public class AutoEncoderTest extends LinearOpMode {
         waitForStart();
 
         drive.setEncoders(true);
-        autoDrive(Direction.Forward, Drive.FULL_SPEED, 1000000);
+        autoDrive(Direction.Forward, Drive.FULL_SPEED, 1000000, true);
         //check sensor sums
         //robot starts facing right
         //scan vision patter
@@ -42,10 +42,10 @@ public class AutoEncoderTest extends LinearOpMode {
      * @param speed The speed to move at
      * @param targetTicks The final distance to have travelled, in encoder ticks
      */
-    private void autoDrive(Direction direction, double speed, double targetTicks) {
+    private void autoDrive(Direction direction, double speed, double targetTicks, boolean useGyro) {
         boolean done = false;
         while (opModeIsActive() && !done) {
-            done = drive.driveWithEncoders(direction, speed, targetTicks);
+            done = drive.driveWithEncoders(direction, speed, targetTicks, useGyro, 0);
             telemetry.update();
         }
     }

@@ -5,6 +5,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.team4042.autos.Auto;
 import org.firstinspires.ftc.team4042.drive.MecanumDrive;
 
+/**
+ * Reads the vuforia mark
+ */
 @Autonomous(name="JewelAuto", group="autos")
 public class JewelAuto extends Auto {
 
@@ -14,9 +17,7 @@ public class JewelAuto extends Auto {
     public void runOpMode() {
 
         super.setUp(drive, "jewel.txt");
-        try {
-            waitForStart();
-        } catch (InterruptedException ex) { }
+                    waitForStart();
 
         super.runAuto();
         

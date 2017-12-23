@@ -4,15 +4,20 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
+
 /**
  * Created by Ryan on 11/2/2017.
  */
 
 public class GlyphPlacementSystem {
 
-    public final double HORIZONTAL_TRANSLATION_TIME = .25;
-    private int targetX;
-    private int targetY;
+    public final double HORIZONTAL_TRANSLATION_TIME = 2;
+    public final int PLACEMENT_ERROR_MARGIN = 25;
+    private final double PROPORTIONAL_CONSTANT = 25;
+    private final double DERIV_CONSTANT = 10;
+    public int uiTargetX;
+    public int uiTargetY;
     public Position currentY;
     public HorizPos currentX;
     private String baseOutput;
@@ -22,7 +27,7 @@ public class GlyphPlacementSystem {
 
     public enum Position {
         //HOME(0), RAISED(1200), TOP(1600), MID(2000), BOT(2500), TRANSITION(-1);
-        HOME(10), RAISED(1300), TOP(1600), MID(1600), BOT(1600), TRANSITION(-1);
+        HOME(10), RAISEDBACK(1350), RAISED(1401), TOP(1600), MID(1900), BOT(2200), TRANSITION(-1);
 
         private final Integer encoderVal;
         Position(Integer encoderVal) { this.encoderVal = encoderVal; }
@@ -36,7 +41,7 @@ public class GlyphPlacementSystem {
     }
 
     public enum HorizPos {
-        LEFT(-.5), CENTER(0.0), RIGHT(.5);
+        LEFT(-.8), CENTER(0.0), RIGHT(.8);
 
         private final Double power;
         HorizPos(Double power) { this.power = power; }
@@ -55,7 +60,7 @@ public class GlyphPlacementSystem {
     {
         char[] output = baseOutput.toCharArray();
 
-        int position = targetX + 3 * targetY;
+        int position = uiTargetX + 3 * uiTargetY;
         switch(position)
         {
             case(0): output[2] = 'X'; break;
@@ -80,32 +85,56 @@ public class GlyphPlacementSystem {
         return "\n" + new String(output);
     }
 
-    public int up() {
-        if (targetY != 0) {
-            targetY -= 1;
+    public void setTarget(RelicRecoveryVuMark x, int y) {
+        drive.targetY = GlyphPlacementSystem.Position.TOP;
+        switch (x) {
+            case LEFT:
+                //uiTargetX = 0;
+                drive.targetX = HorizPos.LEFT;
+                break;
+            case CENTER:
+                //uiTargetX = 1;
+                drive.targetX = HorizPos.CENTER;
+                break;
+            case RIGHT:
+                //uiTargetX = 2;
+                drive.targetX = HorizPos.RIGHT;
+                break;
+            default:
+                //when in doubt, place in the middle
+                //uiTargetX = 1;
+                drive.targetX = HorizPos.CENTER;
+                break;
         }
-        return targetY;
+        //uiTargetY = y;
     }
 
-    public int down() {
-        if (targetY != 2) {
-            targetY += 1;
+    public int uiUp() {
+        if (uiTargetY != 0) {
+            uiTargetY -= 1;
         }
-        return targetY;
+        return uiTargetY;
     }
 
-    public int left() {
-        if (targetX != 0) {
-            targetX -= 1;
+    public int uiDown() {
+        if (uiTargetY != 2) {
+            uiTargetY += 1;
         }
-        return targetX;
+        return uiTargetY;
     }
 
-    public int right() {
-        if (targetX != 2) {
-            targetX += 1;
+    public int uiLeft() {
+        if (uiTargetX != 0) {
+            uiTargetX -= 1;
         }
-        return targetX;
+        return uiTargetX;
+    }
+
+    public int uiRight() {
+        if (uiTargetX != 2) {
+            uiTargetX += 1;
+        }
+        return uiTargetX;
     }
 
     public void setTargetPosition(Position position) {
@@ -120,45 +149,60 @@ public class GlyphPlacementSystem {
         //if target = left(-1) and current = right(1)
         //we want to move left (-1)
         //so target - current
-        if (!targetPos.equals(HorizPos.CENTER)) {
+        if (!drive.targetX.equals(HorizPos.CENTER)) {
             double power = targetPos.getPower() - currentX.getPower();
             power = Range.clip(power, -1, 1);
 
-            drive.setHorizontalU(power);
+            drive.setHorizontalDrive(power);
             horizontalTimer.reset();
         }
     }
 
+    public void adjustBack(double mulch) {
+        drive.setHorizontalDrive(mulch * .2);
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
+        while (timer.seconds() < .3) {  }
+        drive.setHorizontalDrive(0);
+    }
+
     public boolean xTargetReached(HorizPos targetPos) {
         //If you're going left or right, then use the timer to see if you should stop
+        //drive.log.add("target x " + drive.targetX + " targetPos " + targetPos);
         if (((targetPos.equals(HorizPos.LEFT) || targetPos.equals(HorizPos.RIGHT)) && (horizontalTimer.seconds() >= HORIZONTAL_TRANSLATION_TIME)) ||
                 //If you're going to the center and you hit the limit switch, stop
-                (targetPos.equals(HorizPos.CENTER) && drive.getCenterState())) {
-            drive.setHorizontalU(0);
+                (!drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER) && drive.getCenterState()) ||
+                (drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER))) {
+            drive.setHorizontalDrive(0);
             currentX = targetPos;
             return true;
         }
         return false;
     }
 
-    public void runToPosition() {
-        drive.setVerticalDrive((drive.verticalDriveTargetPos() - drive.verticalDriveCurrPos())/ 100);
+    public void runToPosition(double derivConstant) {
+        double power = ((double)drive.verticalDriveTargetPos() - (double)drive.verticalDriveCurrPos())/ PROPORTIONAL_CONSTANT + drive.uTrackRate * derivConstant;
+        power = Math.abs(power) < 0.2 ? 0 : power;
+        drive.setVerticalDrive(power);
 
         int pos = drive.verticalDriveCurrPos();
 
-        if (pos == 0) {
+        if (pos < PLACEMENT_ERROR_MARGIN) {
             currentY = Position.HOME;
         }
-        else if (Math.abs(pos - Position.RAISED.getEncoderVal()) < 100) {
+        else if (Math.abs(pos - Position.RAISED.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
             currentY = Position.RAISED;
         }
-        else if (Math.abs(pos - Position.TOP.getEncoderVal()) < 10) {
+        else if (Math.abs(pos - Position.RAISEDBACK.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
+            currentY = Position.RAISEDBACK;
+        }
+        else if (Math.abs(pos - Position.TOP.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
             currentY = Position.TOP;
         }
-        else if (Math.abs(pos - Position.MID.getEncoderVal()) < 10) {
+        else if (Math.abs(pos - Position.MID.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
             currentY = Position.MID;
         }
-        else if (Math.abs(pos - Position.BOT.getEncoderVal()) < 10) {
+        else if (Math.abs(pos - Position.BOT.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
             currentY = Position.BOT;
         }
         else {
@@ -167,4 +211,5 @@ public class GlyphPlacementSystem {
 
 
     }
+
 }

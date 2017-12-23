@@ -5,6 +5,8 @@ import java.util.HashMap;
 
 /**
  * Created by Hazel on 10/18/2017.
+ *
+ * A single instruction to execute in auto. Stores things like the name of the function and the parametes to it.
  */
 
 public class AutoInstruction {

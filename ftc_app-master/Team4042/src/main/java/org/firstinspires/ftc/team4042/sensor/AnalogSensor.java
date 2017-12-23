@@ -3,14 +3,26 @@ package org.firstinspires.ftc.team4042.sensor;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import java.util.ArrayList;
+
 /**
  * Created by Hazel on 10/13/2017.
+ *
+ * Reads data from an analog input and can return it in centimeters
  */
 
 public class AnalogSensor {
     private AnalogInput sensor;
     private String name;
     private boolean isLongRange;
+
+    public static final int NUM_OF_READINGS = 6;
+
+    private int curr = 0;
+
+    private boolean firstLoop = true;
+
+    private double[] readings = new double[NUM_OF_READINGS];
 
     public AnalogSensor(String name, boolean isLongRange) {
         this.name = name;
@@ -27,20 +39,28 @@ public class AnalogSensor {
 
     public double getCmAvg() {
         double voltage = getVAvg();
-        if (isLongRange) {
-            return getCmAsLongIR(voltage);
-        } else {
-            return getCmAsShortIR(voltage);
+        return isLongRange ? getCmAsLongIR(voltage) : getCmAsShortIR(voltage);
+    }
+
+    public void addReading() {
+        if (sensor == null) { readings[curr] = 0; }
+        else { readings[curr] = sensor.getVoltage(); }
+        curr++;
+        if (firstLoop && curr >= NUM_OF_READINGS) {
+            firstLoop = false;
         }
+        curr %= NUM_OF_READINGS;
     }
 
     private double getVAvg() {
         if (sensor == null) { return -1; }
         double sum = 0;
-        for (int i = 0; i < 250; i++) {
-            sum += sensor.getVoltage();
+        double numToRead = firstLoop ? curr + 1 : NUM_OF_READINGS;
+
+        for (int i = 0; i < numToRead; i++) {
+            sum += readings[i];
         }
-        double voltage = sum/250;
+        double voltage = sum/NUM_OF_READINGS;
         return voltage;
     }
 

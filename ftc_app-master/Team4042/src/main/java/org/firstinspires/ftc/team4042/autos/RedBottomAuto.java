@@ -4,6 +4,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.team4042.drive.MecanumDrive;
 
+/**
+ * USELESS - Run BlueBottomAuto for parks in the safe zone
+ */
 @Autonomous(name="RedBottomAuto", group="autos")
 public class RedBottomAuto extends Auto {
 
@@ -13,9 +16,7 @@ public class RedBottomAuto extends Auto {
     public void runOpMode() {
 
         super.setUp(drive, "redbottom.txt");
-        try {
-            waitForStart();
-        } catch (InterruptedException ex) { }
+                    waitForStart();
 
         super.runAuto();
         
