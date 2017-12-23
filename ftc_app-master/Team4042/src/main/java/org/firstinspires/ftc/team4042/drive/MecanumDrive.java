@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.team4042.drive;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -10,7 +10,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-public class MecanumDrive extends Drive {
+public class  MecanumDrive extends Drive {
 
     /**
      * Constructor for Drive, it creates the motors and the gyro objects
@@ -29,69 +29,26 @@ public class MecanumDrive extends Drive {
         super(verbose);
     }
 
-    public void jewelLeft() {
-        try {
-            resetEncoders();
-            runWithEncoders();
-            ElapsedTime timer = new ElapsedTime();
+    private void driveTank(double speedFactor, double l, double r) {
+        double[] speedWheel = new double[4];
 
-            timer.reset();
-            jewelDown();
+        //Deadzone for joysticks
+        l = super.deadZone(l);
+        r = super.deadZone(r);
 
-            while (timer.seconds() < 1) {
-            }
-            timer.reset();
-
-            //Moves the robot left
-            while (!driveWithEncoders(Direction.Backward, Drive.FULL_SPEED, 200)) {
-            }
-
-            while (timer.seconds() < 1) {
-            }
-            timer.reset();
-
-            jewelUp();
-
-            while (timer.seconds() < 1) {
-            }
-        } catch (NullPointerException ex) {
-            StringWriter sw = new StringWriter();
-            ex.printStackTrace(new PrintWriter(sw));
-            telemetry.addData("NullPointerException", sw.toString());
+        if (verbose) {
+            telemetry.addData("tank left", l);
+            telemetry.addData("tank right", r);
         }
+
+        speedWheel[0] = l;
+        speedWheel[1] = r;
+        speedWheel[2] = r;
+        speedWheel[3] = l;
+
+        super.setMotorPower(speedWheel, speedFactor);
     }
 
-    public void jewelRight() {
-        try {
-            resetEncoders();
-            runWithEncoders();
-            ElapsedTime timer = new ElapsedTime();
-
-            timer.reset();
-            jewelDown();
-
-            while (timer.seconds() < 1) {
-            }
-            timer.reset();
-
-            //Moves the robot right
-            while (!driveWithEncoders(Direction.Forward, Drive.FULL_SPEED, 200)) {
-            }
-
-            while (timer.seconds() < 1) {
-            }
-            timer.reset();
-
-            jewelUp();
-
-            while (timer.seconds() < 1) {
-            }
-        } catch (NullPointerException ex) {
-            StringWriter sw = new StringWriter();
-            ex.printStackTrace(new PrintWriter(sw));
-            telemetry.addData("NullPointerException", sw.toString());
-        }
-    }
     private void driveLR(double speedFactor, double l, double r) {
 
         double[] speedWheel = new double[4];
@@ -105,17 +62,28 @@ public class MecanumDrive extends Drive {
             telemetry.addData("right", r);
         }
 
-        speedWheel[0] = l;
-        speedWheel[1] = r;
-        //We don't move the back motors, for obvious reasons
-        speedWheel[2] = 0;
-        speedWheel[3] = 0;
+        if (crawl) {
+            //We don't move the front motors
+            speedWheel[0] = 0;
+            speedWheel[1] = 0;
+            //We just want to slightly adjust the back wheels
+            speedWheel[2] = l;
+            speedWheel[3] = r;
+            speedFactor = .75 * speedFactor;
+        }
+        else {
+            speedWheel[0] = l;
+            speedWheel[1] = r;
+            //We don't move the back motors, for obvious reasons
+            speedWheel[2] = 0;
+            speedWheel[3] = 0;
+        }
 
         super.setMotorPower(speedWheel, speedFactor);
     }
 
     /**
-     * uses joystick inputs to set motor speeds for mecanum drive
+     * Uses joystick inputs to set motor speeds for mecanum drive. Speeds partially depend on the drive mode.
      * @param useEncoders determines whether or not the motors use encoders
      */
     public void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor) {
@@ -126,6 +94,11 @@ public class MecanumDrive extends Drive {
             double right = gamepad1.right_stick_y;
 
             driveLR(speedFactor, left, right);
+        } else if (tank) {
+            double left = gamepad1.left_stick_y;
+            double right = gamepad1.right_stick_y;
+
+            driveTank(speedFactor, left, right);
         } else {
             double x = gamepad1.left_stick_x;
             double y = -gamepad1.left_stick_y; //Y is the opposite direction of what's intuitive: forward is -1, backwards is 1
@@ -135,26 +108,21 @@ public class MecanumDrive extends Drive {
         }
     }
 
-    /**
-     * Drives an inputted amount
-     * @param speedFactor the amount to scale the drive by
-     * @param x x component
-     * @param y y component
-     * @param r rotate component
-     */
-    public void driveXYR(double speedFactor, double x, double y, double r, boolean useGyro) {
-        double[] speedWheel = new double[4];
+    public void driveXYR(double speedFactor, double x, double y, double r, boolean useGyro, double pConstant) {
+        double[] targSpeedWheel = new double[4];
 
         //Deadzone for joysticks
         x = super.deadZone(x);
         y = super.deadZone(y);
         r = super.deadZone(r);
 
-        if (verbose) {
+        /*if (verbose) {
             telemetry.addData("x", x);
             telemetry.addData("y", y);
             telemetry.addData("r", r);
-        }
+        }*/
+
+        double velFeedForwardConstant = 0.01;
 
         double heading = OFFSET;
         if (useGyro) {
@@ -169,9 +137,117 @@ public class MecanumDrive extends Drive {
         double xPrime = x * Math.cos(gyroRadians) + y * Math.sin(gyroRadians);
         double yPrime = -x * Math.sin(gyroRadians) + y * Math.cos(gyroRadians);
 
+        //Sets relative target wheel speeds for mecanum drive based on controller inputs
+        targSpeedWheel[0] = 27*Range.clip((-xPrime - yPrime - r), -1, 1);
+        targSpeedWheel[1] = 27*Range.clip((xPrime - yPrime + r), -1, 1);
+        targSpeedWheel[2] = 43*Range.clip((-xPrime - yPrime + r), -1, 1);
+        targSpeedWheel[3] = 43*Range.clip((xPrime - yPrime - r), -1, 1);
+
+        //Sets control factors based on target speeds and actual speeds
+        double[] speedWheel = new double[4];
+        for(int i = 0; i < speedWheel.length; i++) {
+            speedWheel[i] = (targSpeedWheel[i] - encoderRates[i]) * pConstant + targSpeedWheel[i] * velFeedForwardConstant;
+            telemetry.addData("" + i, targSpeedWheel[i] + " " + encoderRates[i]);
+        }
+
+        //sets the wheel powers to the appropriate ratios
+        super.setMotorPower(speedWheel, speedFactor);
+    }
+
+    /**
+     * Drives an inputted amount in regular drive mode
+     * @param speedFactor the amount to scale the drive by
+     * @param x x component
+     * @param y y component
+     * @param r rotate component
+     */
+    public void driveXYR(double speedFactor, double x, double y, double r, boolean useGyro) {
+
+        //Deadzone for joysticks
+        x = super.deadZone(x);
+        y = super.deadZone(y);
+        r = super.deadZone(r);
+
+        //Use the gyro, or ignore it.
+        double heading = OFFSET;
+        //Note that OFFSET = 0, but we could make it 180 if we wanted to drive backwards, or 45 if we were using omni drive
+        if (useGyro) {
+            heading = super.gyro.updateHeading();
+            telemetry.addData("heading", heading);
+        }
+
+        /*
+        Adjust x, y for gyro values
+         */
+        double gyroRadians = Math.toRadians(heading);
+        double xPrime = x * Math.cos(gyroRadians) + y * Math.sin(gyroRadians);
+        double yPrime = -x * Math.sin(gyroRadians) + y * Math.cos(gyroRadians);
+
+        setMotorNormal(xPrime, yPrime, r, speedFactor);
+    }
+
+    public void driveXYRWimpo(double speedFactor, double x, double y, double r, boolean useGyro) {
+        //Deadzone for joysticks
+        x = super.deadZone(x);
+        y = super.deadZone(y);
+        r = super.deadZone(r);
+
+        //Use the gyro, or ignore it.
+        double heading = OFFSET;
+        //Note that OFFSET = 0, but we could make it 180 if we wanted to drive backwards, or 45 if we were using omni drive
+        if (useGyro) {
+            heading = super.gyro.updateHeading();
+            telemetry.addData("heading", heading);
+        }
+
+        /*
+        Adjust x, y for gyro values
+         */
+        double gyroRadians = Math.toRadians(heading);
+        double xPrime = x * Math.cos(gyroRadians) + y * Math.sin(gyroRadians);
+        double yPrime = -x * Math.sin(gyroRadians) + y * Math.cos(gyroRadians);
+
+        setMotorWimpo(xPrime, yPrime, r, speedFactor);
+    }
+
+    private void setMotorNormal(double xPrime, double yPrime, double r, double speedFactor) {
         //Sets relative wheel speeds for mecanum drive based on controller inputs
-        speedWheel[0] = -xPrime - yPrime - r;
-        speedWheel[1] = xPrime - yPrime + r;
+        double[] speedWheel = new double[4];
+        speedWheel[0] = (-xPrime - yPrime - r);
+        speedWheel[1] = (xPrime - yPrime + r);
+        speedWheel[2] = -xPrime - yPrime + r;
+        speedWheel[3] = xPrime - yPrime - r;
+
+        /*for (int i = 0; i < speedWheel.length; i++) {
+            telemetry.addData("" + i, speedWheel[i]);
+        }
+        //telemetry.addData("xPrime", xPrime + " yPrime: " + yPrime + " r: " + r);
+        //telemetry.addData("speedFactor", speedFactor);*/
+
+        //sets the wheel powers to the appropriate ratios
+
+        super.setMotorPower(speedWheel, speedFactor);
+
+        /*motorLeftFront.setPower(deadZone(speedWheel[0]));
+        telemetry.addData("left front", deadZone(speedWheel[0]));
+        motorLeftFront.getPower();
+
+        motorRightFront.setPower(deadZone(-speedWheel[1]));
+        telemetry.addData("right front", deadZone(-speedWheel[1]));
+        motorRightFront.getPower();
+
+        motorRightBack.setPower(deadZone(-speedWheel[2]));
+
+        motorLeftBack.setPower(deadZone(speedWheel[3]));*/
+
+
+    }
+
+    private void setMotorWimpo(double xPrime, double yPrime, double r, double speedFactor) {
+        //Sets relative wheel speeds for mecanum drive based on controller inputs
+        double[] speedWheel = new double[4];
+        speedWheel[0] = MAGIC_NUMBER * (-xPrime - yPrime - r);
+        speedWheel[1] = MAGIC_NUMBER * (xPrime - yPrime + r);
         speedWheel[2] = -xPrime - yPrime + r;
         speedWheel[3] = xPrime - yPrime - r;
 
@@ -190,10 +266,10 @@ public class MecanumDrive extends Drive {
      */
     public boolean rotateWithEncoders(Direction.Rotation rotation, double speed, double targetTicks) throws IllegalArgumentException {
         //telemetry data
-        telemetry.addData("Left Back", motorLeftBack.getCurrentPosition());
+        /*telemetry.addData("Left Back", motorLeftBack.getCurrentPosition());
         telemetry.addData("Left Front", motorLeftFront.getCurrentPosition());
         telemetry.addData("Right Back", motorRightBack.getCurrentPosition());
-        telemetry.addData("Right Front", motorRightFront.getCurrentPosition());
+        telemetry.addData("Right Front", motorRightFront.getCurrentPosition());*/
 
         double scaledSpeed = setUpSpeed(speed, targetTicks);
         if (scaledSpeed == Math.PI) { //The target's been reached
@@ -222,12 +298,12 @@ public class MecanumDrive extends Drive {
      * @param direction which direction to go
      * @return returns if it is completed (true if has reached target, false if it hasn't)
      */
-    public boolean driveWithEncoders(Direction direction, double speed, double targetTicks) throws IllegalArgumentException{
+    public boolean driveWithEncoders(Direction direction, double speed, double targetTicks, boolean useGyro, double targetGyro) throws IllegalArgumentException{
         //telemetry data
-        if (verbose) {
+        /*if (verbose) {
             log.add("x " + direction.getX());
             log.add("y " + direction.getY());
-        }
+        }*/
 
         double scaledSpeed = setUpSpeed(speed, targetTicks);
         if (scaledSpeed == Math.PI) { //The target's been reached
@@ -239,11 +315,11 @@ public class MecanumDrive extends Drive {
 
         double r = 0;
         if (useGyro) {
-            r = useGyro();
+            r = useGyro(targetGyro);
         }
-        if (verbose) {
-            log.add("r " + r);
-        }
+        /*if (verbose) {
+            log.add("useGyro " + useGyro + " r " + r);
+        }*/
 
         //Drives at x
         driveXYR(FULL_SPEED, direction.getX() * scaledSpeed, direction.getY() * scaledSpeed, r, false);
