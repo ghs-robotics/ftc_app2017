@@ -73,16 +73,16 @@ public class Constants {
 
     public String getString(String k) {
         //return c.getString(k);
-        return myConstants.get(k);
+        return getInstance().myConstants.get(k);
     }
 
     public int getInt(String k) {
         //return c.getInt(k);
-        return Integer.parseInt(myConstants.get(k));
+        return Integer.parseInt(getInstance().myConstants.get(k));
     }
 
     public double getDouble(String k) {
         //return c.getDouble(k);
-        return Double.parseDouble(myConstants.get(k));
+        return Double.parseDouble(getInstance().myConstants.get(k));
     }
 }
