@@ -376,9 +376,9 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
         telemetry.addData("Speed factor", adjustedSpeed);
         telemetry.addData("Tank", Drive.tank);
-        telemetry.addData("u track at bottom", drive.uTrackAtBottom);
-        telemetry.addData("bA", bA);
-        telemetry.addData("gamepad2.a", gamepad2.a);
+        telemetry.addData("start pitch", startPitch);
+        telemetry.addData("start roll", startRoll);
+        telemetry.addData("onBalancingStone", onBalancingStone);
         //drive.uTrackAtBottom && !bA && gamepad2.a
         //!drive.uTrackAtBottom && gamepad2.a
         if (drive.verbose) {
