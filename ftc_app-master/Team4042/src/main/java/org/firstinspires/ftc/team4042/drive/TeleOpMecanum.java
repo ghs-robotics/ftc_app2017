@@ -144,7 +144,7 @@ public class TeleOpMecanum extends OpMode {
         double currRoll = drive.gyro.getRoll();
         double currPitch = drive.gyro.getPitch();
 
-        boolean flat = Math.abs(currRoll - startRoll) > 2 || Math.abs(currPitch - startPitch) > 2;
+        boolean flat = Math.abs(currRoll - startRoll) > 2 && Math.abs(currPitch - startPitch) > 2;
 
         if (!onBalancingStone) {
             if (!flat) {
