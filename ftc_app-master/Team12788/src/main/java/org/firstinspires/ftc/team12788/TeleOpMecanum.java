@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.team12788;
+/*package org.firstinspires.ftc.team12788;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -19,21 +19,33 @@ public class TeleOpMecanum extends OpMode {
     private DcMotor lift;
     private DcMotor intakeRight;
     private DcMotor intakeLeft;
+<<<<<<< HEAD
+    private DcMotor arm;
+
+=======
     private DcMotor relic;
+>>>>>>> aceebeb6c4c2cc2777c3c1f94295f2810883d2af
 
     private boolean overide;
+    private boolean aToggle;
 
     private int liftPos;
 
     public Servo grabLeft;
     public Servo grabRight;
+<<<<<<< HEAD
+    public Servo relic;
+=======
     public Servo pinch;
     public Servo jewel;
+>>>>>>> aceebeb6c4c2cc2777c3c1f94295f2810883d2af
 
     private boolean invert;
     private boolean pinchBool;
     private boolean a;
     private boolean x;
+
+    private double num;
 
     @Override
     public void init() {
@@ -42,14 +54,26 @@ public class TeleOpMecanum extends OpMode {
 
         adjustedSpeed = MecanumDrive.FULL_SPEED;
 
+        num = 0;
+
         invert = false;
         overide = false;
+<<<<<<< HEAD
+        aToggle = false;
+    }
+    
+    @Override
+    public void loop() {
+        liftLeft = hardwareMap.dcMotor.get("liftLeft");
+        liftRight = hardwareMap.dcMotor.get("liftRight");
+=======
         pinchBool = false;
         a = false;
         x = false;
 
         lift = hardwareMap.dcMotor.get("lift");
         relic = hardwareMap.dcMotor.get("relic");
+>>>>>>> aceebeb6c4c2cc2777c3c1f94295f2810883d2af
         intakeLeft = hardwareMap.dcMotor.get("intakeLeft");
         intakeRight = hardwareMap.dcMotor.get("intakeRight");
         grabLeft = hardwareMap.servo.get("grabLeft");
@@ -75,6 +99,10 @@ public class TeleOpMecanum extends OpMode {
         if (gamepad1.left_bumper){
             jewel.setPosition(.86);
         }
+<<<<<<< HEAD
+
+=======
+>>>>>>> aceebeb6c4c2cc2777c3c1f94295f2810883d2af
         if (gamepad2.dpad_up) {
             liftPos = 12000;
         } else if (gamepad2.dpad_down) {
@@ -105,6 +133,8 @@ public class TeleOpMecanum extends OpMode {
                 lift.setPower(1);
             }
         }
+<<<<<<< HEAD
+=======
         else {
             lift.setPower(0);
         }
@@ -129,7 +159,20 @@ public class TeleOpMecanum extends OpMode {
         }
         else {
             pinch.setPosition(.4);
+
+
+
+
+
+
+
+
+
+
+
+
         }
+>>>>>>> aceebeb6c4c2cc2777c3c1f94295f2810883d2af
 
         if (drive.deadZone(gamepad2.right_trigger) > 0) {
             intakeLeft.setPower(1);
@@ -167,12 +210,57 @@ public class TeleOpMecanum extends OpMode {
         }
         if (gamepad1.left_bumper) {
             invert = true;
-        }*/
+<<<<<<< HEAD
+        }
+<<<<<<< HEAD
+        if (gamepad2.right_bumper) {
+            arm.setPower(.25);
+        }
+        else if (gamepad2.left_bumper){
+            arm.setPower(-.25);
+        }
+        else {
+            arm.setPower(0);
+        }
+        if (gamepad2.a) {
+            aToggle = !aToggle;
+        }
+            /*num ++;
+            if(num % 2 == 1) {
+                relic.setPosition(1);
+            }
+            else{
+                relic.setPosition(-1);
+            }
+
+        if(aToggle){
+            relic.setPosition(1);
+        } else {
+            relic.setPosition(-1);
+        }
+
+        if (gamepad2.a || overide){
+            overide = true;
+            if (!drive.driveWithEncoders(Direction.Forward, .5, .2*Autonomous.tile)) {
+
+            } else {
+                grabLeft.setPosition(-1);
+                grabRight.setPosition(1);
+                overide = false;
+            }
+        } else {
+            drive.drive(false, gamepad1,adjustedSpeed * MecanumDrive.FULL_SPEED, invert);
+        }
+=======
+=======
+        }
+>>>>>>> 88208d81d21b3baf45a582bf828a65e656dc505f
         drive.drive(false, gamepad1, adjustedSpeed, false);
+>>>>>>> aceebeb6c4c2cc2777c3c1f94295f2810883d2af
     }
 
     private void telemetryUpdate() {
         telemetry.addData("Speed mode", adjustedSpeed);
         telemetry.update();
     }
-}
+}*/
