@@ -33,6 +33,7 @@ import android.graphics.Bitmap;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.vuforia.Image;
 import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Vuforia;
@@ -132,10 +133,15 @@ public class VuMarkIdentifier {
 
         RelicRecoveryVuMark relicRecoveryVuMark;
 
+        ElapsedTime timer = new ElapsedTime();
+
         do {
             relicRecoveryVuMark = RelicRecoveryVuMark.from(relicTemplate);
-        } while (relicRecoveryVuMark.equals(RelicRecoveryVuMark.UNKNOWN));
+        } while (relicRecoveryVuMark.equals(RelicRecoveryVuMark.UNKNOWN) && timer.seconds() < 10);
 
+        if (relicRecoveryVuMark == RelicRecoveryVuMark.UNKNOWN) {
+            relicRecoveryVuMark = RelicRecoveryVuMark.CENTER;
+        }
         return relicRecoveryVuMark;
     }
 

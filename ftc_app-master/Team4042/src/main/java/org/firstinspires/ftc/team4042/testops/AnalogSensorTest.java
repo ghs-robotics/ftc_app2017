@@ -32,6 +32,10 @@ package org.firstinspires.ftc.team4042.testops;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
 
 /**
@@ -52,18 +56,18 @@ import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
 public class AnalogSensorTest extends OpMode {
 
     AnalogSensor ultrasonic = new AnalogSensor("ultrasonic", true);
-    /*File file;
-    BufferedWriter writer;*/
+    File file;
+    BufferedWriter writer;
 
     @Override
     public void init() {
         ultrasonic.initialize(hardwareMap);
-        /*file = new File("./storage/emulated/0/DCIM/ir.txt");
+        file = new File("./storage/emulated/0/DCIM/ir.txt");
         try {
             writer = new BufferedWriter(new FileWriter(file, true));
         } catch (IOException ex) {
             telemetry.addData("error", "creating writer");
-        }*/
+        }
     }
 
     /*@Override
@@ -81,23 +85,24 @@ public class AnalogSensorTest extends OpMode {
 
     @Override
     public void loop() {
-        telemetry.addData("cm", ultrasonic.getCmAvg());
+        double cmAvg = ultrasonic.getCmAvg();
+        telemetry.addData("cm", cmAvg);
         telemetry.update();
 
-        /*try {
-            writer.append(Double.toString(voltageAvg)).append("\n");
+        try {
+            writer.append(Double.toString(cmAvg)).append("\n");
         } catch (IOException ex) {
             telemetry.addData("error", "trying to append to file");
-        }*/
+        }
     }
 
     public void stop() {
-        /*try {
+        try {
             writer.append("\n\n");
             writer.close();
         } catch (IOException ex) {
             telemetry.addData("error", "trying to close writer");
-        }*/
+        }
     }
 
 }

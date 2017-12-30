@@ -5,12 +5,16 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.team4042.autos.Constants;
+
 @TeleOp(name = "Mecanum", group="drive")
 public class TeleOpMecanum extends OpMode {
 
     private double adjustedSpeed;
 
     private boolean placerModeInstant = true;
+    private boolean manual = false;
+    private boolean onBalancingStone = false;
 
     //CONTROL BOOLEANS START
     // We have these booleans so we only register a button press once.
@@ -24,7 +28,6 @@ public class TeleOpMecanum extends OpMode {
 
     private boolean aDown = false;
     private boolean aUp = false;
-    private boolean manual = false;
 
     private boolean bUp;
     private boolean bDown;
@@ -39,6 +42,9 @@ public class TeleOpMecanum extends OpMode {
 
     private Drive drive = new MecanumDrive(true);
 
+    private double startRoll;
+    private double startPitch;
+
     /**
     GAMEPAD 1:
       Joystick 1 X & Y      movement
@@ -51,7 +57,7 @@ public class TeleOpMecanum extends OpMode {
       X                     toggle crawl
       Y                     toggle extendo
       Start
-      Back
+      Back                  balance
 
     GAMEPAD 2:
       Joystick 1 Y          (manual) controls placer vertical
@@ -71,6 +77,9 @@ public class TeleOpMecanum extends OpMode {
     public void init() {
         drive.initialize(telemetry, hardwareMap);
         drive.runWithEncoders();
+
+        drive.initializeGyro(telemetry, hardwareMap);
+        gyro();
 
         telemetry.update();
 
@@ -106,6 +115,12 @@ public class TeleOpMecanum extends OpMode {
         }
         bStart = gamepad2.start;
 
+        if (gamepad1.back) {
+            balance();
+        } else if (onBalancingStone) {
+            //reset?
+        }
+
         //Adjust drive modes, speeds, etc
         setUpDrive();
 
@@ -123,6 +138,37 @@ public class TeleOpMecanum extends OpMode {
 
         //Updates the telemetry output
         telemetryUpdate();
+    }
+
+    public void gyro() {
+        do {
+            drive.gyro.updateAngles();
+            startRoll = drive.gyro.getRoll();
+            startPitch = drive.gyro.getPitch();
+        } while (startRoll == 0 && startPitch == 0);
+    }
+
+    private void balance() {
+        drive.gyro.updateAngles();
+        double currRoll = drive.gyro.getRoll();
+        double currPitch = drive.gyro.getPitch();
+        telemetry.addData("currRoll", currRoll);
+        telemetry.addData("currPitch", currPitch);
+
+        boolean flat = Math.abs(currRoll - startRoll) < 2 && Math.abs(currPitch - startPitch) < 2;
+        boolean veryTipped = Math.abs(currRoll - startRoll) > 10 || Math.abs(currPitch - startPitch) > 10;
+        telemetry.addData("flat", flat);
+        if (!onBalancingStone && !flat) {
+            onBalancingStone = true;
+        } else if (veryTipped || (!onBalancingStone && flat)) {
+            drive.driveXYR(1, 0, -1, 0, true);
+        } else if (!flat) {
+            //adjust
+            double degreeP = Constants.getInstance().getDouble("degree");
+            double x = degreeP * (startPitch - currPitch);
+            double y = degreeP * (startRoll - currRoll);
+            drive.driveXYR(1, x, y, 0, true);
+        }
     }
 
     private void setUpDrive() {
@@ -207,7 +253,7 @@ public class TeleOpMecanum extends OpMode {
             }
 
             if (!drive.stage.equals(GlyphPlacementSystem.Stage.RETURN2) && !drive.stage.equals(GlyphPlacementSystem.Stage.RESET)) {
-                drive.glyph.runToPosition(25, 10);
+                drive.glyph.runToPosition();
             }
         } else {
             drive.setVerticalDrive(gamepad2.left_stick_y);
@@ -354,6 +400,11 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Speed factor", adjustedSpeed);
         telemetry.addData("Tank", Drive.tank);
         telemetry.addData("Placer Mode Instant", placerModeInstant);
+        telemetry.addData("start pitch", startPitch);
+        telemetry.addData("start roll", startRoll);
+        telemetry.addData("onBalancingStone", onBalancingStone);
+        //drive.uTrackAtBottom && !bA && gamepad2.a
+        //!drive.uTrackAtBottom && gamepad2.a
         if (drive.verbose) {
             telemetry.addData("vertical mode", drive.getVerticalDriveMode());
             telemetry.addData("encoder currentY pos", drive.verticalDriveCurrPos());
