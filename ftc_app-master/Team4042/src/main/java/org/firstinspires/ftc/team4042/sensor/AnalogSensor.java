@@ -12,7 +12,7 @@ import java.util.ArrayList;
  */
 
 public class AnalogSensor {
-    private AnalogInput sensor;
+    public AnalogInput sensor;
     private String name;
     private boolean isLongRange;
 
@@ -52,7 +52,7 @@ public class AnalogSensor {
         curr %= NUM_OF_READINGS;
     }
 
-    private double getVAvg() {
+    public double getVAvg() {
         if (sensor == null) { return -1; }
         double sum = 0;
         double numToRead = firstLoop ? curr + 1 : NUM_OF_READINGS;
