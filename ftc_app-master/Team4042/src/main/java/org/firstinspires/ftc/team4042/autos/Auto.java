@@ -538,83 +538,88 @@ public abstract class Auto extends LinearVisionOpMode {
      * @param yIrId The sensor to read an y distance from
      * @param yIsLongRange Whether the y sensor is long-range or not
      */
-    //35, 33 diagonal
     private void autoSensorDrive(double speed, double xTargetDistance, int xIrId, boolean xIsLongRange, boolean useX,
                                  double yTargetDistance, int yIrId, boolean yIsLongRange, boolean useY, double targetGyro) {
 
-        //autoDrive(direction, speed, targetTicks, -1, false, targetGyro);
+        if (useX || useY) {
+            //autoDrive(direction, speed, targetTicks, -1, false, targetGyro);
 
-        AnalogSensor xIr = xIsLongRange ? drive.longIr[xIrId] : drive.shortIr[xIrId];
-        AnalogSensor yIr = yIsLongRange ? drive.longIr[yIrId] : drive.shortIr[yIrId];
+            AnalogSensor xIr = xIsLongRange ? drive.longIr[xIrId] : drive.shortIr[xIrId];
+            AnalogSensor yIr = yIsLongRange ? drive.longIr[yIrId] : drive.shortIr[yIrId];
 
-        telemetry.addData("xIr", xIr + " yIr " + yIr);
+            telemetry.addData("xIr", xIr + " yIr " + yIr);
 
-        double xCurrDistance;
-        double yCurrDistance;
-        int i = 0;
-        while (i < AnalogSensor.NUM_OF_READINGS && opModeIsActive()) {
-            //read the IRs just to set them up
-            xIr.addReading();
-            yIr.addReading();
-            telemetry.addData("xIr cm", xIr.getCmAvg());
-            telemetry.addData("yIr cm", yIr.getCmAvg());
-            telemetry.update();
-            i++;
-        }
-
-        ElapsedTime timeout = new ElapsedTime();
-        timeout.reset();
-
-        do {
-            double speedFactor = speed;
-
-            drive.updateRates();
-
-            double r = drive.useGyro(targetGyro) * .75 + 5 * drive.gyroRate;
-            r = r < .05 && r > 0 ? 0 : r;
-            r = r > -.05 && r < 0 ? 0 : r;
-
-            //Get the distances and derivative terms
-            xCurrDistance = xIr.getCmAvg();
-            yCurrDistance = yIr.getCmAvg();
-            double xDerivValue = xIsLongRange ? drive.longIrRates[xIrId] : drive.shortIrRates[xIrId];
-            double yDerivValue = yIsLongRange ? drive.longIrRates[yIrId] : drive.shortIrRates[yIrId];
-
-            //Set up the derivative and proportional terms
-            double xDeriv = xDerivValue * -10;
-            double xProportional = (xCurrDistance - xTargetDistance) * .025;
-
-            double yDeriv = yDerivValue * -10;
-            double yProportional = (yCurrDistance - yTargetDistance) * .025;
-
-            //Apply the controller
-            double xFactor = (xProportional - xDeriv);
-            double yFactor = (yProportional - yDeriv);
-            telemetry.addData("xIr cm", xCurrDistance);
-            telemetry.addData("yIr cm", yCurrDistance);
-            telemetry.addData("x", xFactor);
-            telemetry.addData("y", yFactor);
-            telemetry.addData("r", r);
-            telemetry.update();
-
-            xFactor = Range.clip(xFactor, -1, 1);
-            yFactor = Range.clip(yFactor, -1, 1);
-            r = Range.clip(r, -1, 1);
-
-            //Actually drives
-            if (useX) {
-                //drive.driveXYR(speedFactor, xFactor/2, -yFactor/2, r, false);
-                drive.runWithoutEncoders();
-                drive.driveXYR(1, xFactor * 4.5, -yFactor / 2, r, false);
-            } else {
-                //drive.driveXYR(speedFactor, 0, -yFactor/2, r, false);
-                drive.driveXYR(1, 0, -yFactor / 2, r, false);
+            double xCurrDistance;
+            double yCurrDistance;
+            int i = 0;
+            while (i < AnalogSensor.NUM_OF_READINGS && opModeIsActive()) {
+                //read the IRs just to set them up
+                xIr.addReading();
+                yIr.addReading();
+                telemetry.addData("xIr cm", xIr.getCmAvg());
+                telemetry.addData("yIr cm", yIr.getCmAvg());
+                telemetry.update();
+                i++;
             }
-        } while (((Math.abs(xTargetDistance - xCurrDistance) > 2)) && timeout.seconds() < 5 && opModeIsActive());
 
-        //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
-        drive.stopMotors();
-        drive.runWithEncoders();
+            ElapsedTime timeout = new ElapsedTime();
+            timeout.reset();
+
+            do {
+                double speedFactor = speed;
+
+                drive.updateRates();
+
+                double r = drive.useGyro(targetGyro) * .75 + 5 * drive.gyroRate;
+                r = r < .05 && r > 0 ? 0 : r;
+                r = r > -.05 && r < 0 ? 0 : r;
+
+                //Get the distances and derivative terms
+                xCurrDistance = xIr.getCmAvg();
+                yCurrDistance = yIr.getCmAvg();
+                double xDerivValue = xIsLongRange ? drive.longIrRates[xIrId] : drive.shortIrRates[xIrId];
+                double yDerivValue = yIsLongRange ? drive.longIrRates[yIrId] : drive.shortIrRates[yIrId];
+
+                //Set up the derivative and proportional terms
+                double xDeriv = xDerivValue * -10;
+                double xProportional = (xCurrDistance - xTargetDistance) * .025;
+
+                double yDeriv = yDerivValue * -10;
+                double yProportional = (yCurrDistance - yTargetDistance) * .025;
+
+                //Apply the controller
+                double xFactor = (xProportional - xDeriv);
+                double yFactor = (yProportional - yDeriv);
+                telemetry.addData("xIr cm", xCurrDistance);
+                telemetry.addData("yIr cm", yCurrDistance);
+                telemetry.addData("x", xFactor);
+                telemetry.addData("y", yFactor);
+                telemetry.addData("r", r);
+                telemetry.update();
+
+                xFactor = Range.clip(xFactor, -1, 1);
+                yFactor = Range.clip(yFactor, -1, 1);
+                r = Range.clip(r, -1, 1);
+
+                drive.runWithoutEncoders();
+                //Actually drives
+                if (!useY) {
+                    drive.driveXYRWimpo(1, xFactor * 4.5, 0, r, false);
+                }
+                if (!useX) {
+                    //drive.driveXYR(speedFactor, 0, -yFactor/2, r, false);
+                    drive.driveXYR(1, 0, -yFactor / 2, r, false);
+                } else {
+                    //drive.driveXYR(speedFactor, xFactor/2, -yFactor/2, r, false);
+                    drive.driveXYR(1, xFactor * 4.5, -yFactor / 2, r, false);
+                }
+            }
+            while (((Math.abs(xTargetDistance - xCurrDistance) > 2)) && timeout.seconds() < 5 && opModeIsActive());
+
+            //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
+            drive.stopMotors();
+            drive.runWithEncoders();
+        }
     }
 
     private void autoSensorDrive(double speed, double targetDistance) {
