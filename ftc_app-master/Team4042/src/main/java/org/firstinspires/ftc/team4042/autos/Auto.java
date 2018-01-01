@@ -510,22 +510,22 @@ public abstract class Auto extends LinearVisionOpMode {
 
     public void autoSensorDrive(HashMap<String, String> parameters) {
         double speed = Double.parseDouble(parameters.get("speed"));
-
-        double yTargetDistance = Double.parseDouble(parameters.get("ydistance"));
-        int yIr = Integer.parseInt(parameters.get("yir"));
-        boolean yLongIr = Boolean.parseBoolean(parameters.get("ylong"));
         double targetGyro = Double.parseDouble(parameters.get("gyro"));
 
+        boolean useX = parameters.containsKey("xdistance");
+        boolean useY = parameters.containsKey("ydistance");
+
+        double yTargetDistance = useY ? Double.parseDouble(parameters.get("ydistance")) : 0;
+        int yIr = useY ? Integer.parseInt(parameters.get("yir")) : 0;
+        boolean yLongIr = useY ? Boolean.parseBoolean(parameters.get("ylong")) : false;
+
         log.add("" + parameters.containsKey("xdistance"));
-        if (parameters.containsKey("xdistance")) {
-            double xTargetDistance = Double.parseDouble(parameters.get("xdistance"));
-            int xIr = Integer.parseInt(parameters.get("xir"));
-            boolean xLongIr = Boolean.parseBoolean(parameters.get("xlong"));
-            autoSensorDrive(speed, xTargetDistance, xIr, xLongIr, true, yTargetDistance, yIr, yLongIr, targetGyro);
-        }
-        else {
-            autoSensorDrive(speed, 0, 0, false, false, yTargetDistance, yIr, yLongIr, targetGyro);
-        }
+
+        double xTargetDistance = useX ? Double.parseDouble(parameters.get("xdistance")) : 0;
+        int xIr = useX ? Integer.parseInt(parameters.get("xir")) : 0;
+        boolean xLongIr = useX ? Boolean.parseBoolean(parameters.get("xlong")) : false;
+
+        autoSensorDrive(speed, xTargetDistance, xIr, xLongIr, useX, yTargetDistance, yIr, yLongIr, useY, targetGyro);
     }
 
     /**
@@ -540,7 +540,7 @@ public abstract class Auto extends LinearVisionOpMode {
      */
     //35, 33 diagonal
     private void autoSensorDrive(double speed, double xTargetDistance, int xIrId, boolean xIsLongRange, boolean useX,
-                                 double yTargetDistance, int yIrId, boolean yIsLongRange, double targetGyro) {
+                                 double yTargetDistance, int yIrId, boolean yIsLongRange, boolean useY, double targetGyro) {
 
         //autoDrive(direction, speed, targetTicks, -1, false, targetGyro);
 
@@ -620,7 +620,7 @@ public abstract class Auto extends LinearVisionOpMode {
     private void autoSensorDrive(double speed, double targetDistance) {
         telemetry.addData("ir", drive.shortIr[0]);
         telemetry.update();
-        autoSensorDrive(speed, 0, 0, false, false, targetDistance, 0, false, 0);
+        autoSensorDrive(speed, 0, 0, false, false, targetDistance, 0, false, true, 0);
     }
 
     public void jewelLeft() {
