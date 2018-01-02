@@ -159,11 +159,13 @@ public class TeleOpMecanum extends OpMode {
         boolean veryTipped = Math.abs(currRoll - startRoll) > 10 || Math.abs(currPitch - startPitch) > 10;
         telemetry.addData("flat", flat);
         if (!onBalancingStone && !flat) {
+            //If you get tipped, you must be on the balancing stone and we flag you as such
             onBalancingStone = true;
         } else if (veryTipped || (!onBalancingStone && flat)) {
+            //If you're just getting on or you're on the ground, run back hard
             drive.driveXYR(1, 0, -1, 0, true);
         } else if (!flat) {
-            //adjust
+            //If you're on the balancing stone and not quite flat, then adjust
             double degreeP = Constants.getInstance().getDouble("degree");
             double x = degreeP * (startPitch - currPitch);
             double y = degreeP * (startRoll - currRoll);
