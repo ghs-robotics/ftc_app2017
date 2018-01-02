@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.team4042.autos;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -540,14 +539,9 @@ public abstract class Auto extends LinearVisionOpMode {
      */
     private void autoSensorDrive(double speed, double xTargetDistance, int xIrId, boolean xIsLongRange, boolean useX,
                                  double yTargetDistance, int yIrId, boolean yIsLongRange, boolean useY, double targetGyro) {
-
         if (useX || useY) {
-            //autoDrive(direction, speed, targetTicks, -1, false, targetGyro);
-
             AnalogSensor xIr = xIsLongRange ? drive.longIr[xIrId] : drive.shortIr[xIrId];
             AnalogSensor yIr = yIsLongRange ? drive.longIr[yIrId] : drive.shortIr[yIrId];
-
-            telemetry.addData("xIr", xIr + " yIr " + yIr);
 
             double xCurrDistance;
             double yCurrDistance;
@@ -556,9 +550,6 @@ public abstract class Auto extends LinearVisionOpMode {
                 //read the IRs just to set them up
                 xIr.addReading();
                 yIr.addReading();
-                telemetry.addData("xIr cm", xIr.getCmAvg());
-                telemetry.addData("yIr cm", yIr.getCmAvg());
-                telemetry.update();
                 i++;
             }
 
@@ -566,40 +557,16 @@ public abstract class Auto extends LinearVisionOpMode {
             timeout.reset();
 
             do {
-                double speedFactor = speed;
-
                 drive.updateRates();
 
-                double r = drive.useGyro(targetGyro) * .75 + 5 * drive.gyroRate;
-                r = r < .05 && r > 0 ? 0 : r;
-                r = r > -.05 && r < 0 ? 0 : r;
+                double r = getSensorR(targetGyro);
 
                 //Get the distances and derivative terms
                 xCurrDistance = xIr.getCmAvg();
                 yCurrDistance = yIr.getCmAvg();
-                double xDerivValue = xIsLongRange ? drive.longIrRates[xIrId] : drive.shortIrRates[xIrId];
-                double yDerivValue = yIsLongRange ? drive.longIrRates[yIrId] : drive.shortIrRates[yIrId];
 
-                //Set up the derivative and proportional terms
-                double xDeriv = xDerivValue * -10;
-                double xProportional = (xCurrDistance - xTargetDistance) * .025;
-
-                double yDeriv = yDerivValue * -10;
-                double yProportional = (yCurrDistance - yTargetDistance) * .025;
-
-                //Apply the controller
-                double xFactor = (xProportional - xDeriv);
-                double yFactor = (yProportional - yDeriv);
-                telemetry.addData("xIr cm", xCurrDistance);
-                telemetry.addData("yIr cm", yCurrDistance);
-                telemetry.addData("x", xFactor);
-                telemetry.addData("y", yFactor);
-                telemetry.addData("r", r);
-                telemetry.update();
-
-                xFactor = Range.clip(xFactor, -1, 1);
-                yFactor = Range.clip(yFactor, -1, 1);
-                r = Range.clip(r, -1, 1);
+                double xFactor = getSensorFactor(xIsLongRange, xIrId, xCurrDistance, xTargetDistance);
+                double yFactor = getSensorFactor(yIsLongRange, yIrId, yCurrDistance, yTargetDistance);
 
                 drive.runWithoutEncoders();
                 //Actually drives
@@ -620,6 +587,27 @@ public abstract class Auto extends LinearVisionOpMode {
             drive.stopMotors();
             drive.runWithEncoders();
         }
+    }
+
+    private double getSensorFactor(boolean isLongRange, int irId, double currDistance, double targetDistance) {
+        double derivValue = isLongRange ? drive.longIrRates[irId] : drive.shortIrRates[irId];
+
+        //Set up the derivative and proportional terms
+        double deriv = derivValue * -10;
+        double proportional = (currDistance - targetDistance) * .025;
+
+        //Apply the controller
+        double factor = (proportional - deriv);
+
+        factor = Range.clip(factor, -1, 1);
+        return factor;
+    }
+    private double getSensorR(double targetGyro) {
+        double r = drive.useGyro(targetGyro) * .75 + 5 * drive.gyroRate;
+        r = r < .05 && r > 0 ? 0 : r;
+        r = r > -.05 && r < 0 ? 0 : r;
+        r = Range.clip(r, -1, 1);
+        return r;
     }
 
     private void autoSensorDrive(double speed, double targetDistance) {
