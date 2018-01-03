@@ -265,8 +265,10 @@ public abstract class Auto extends LinearVisionOpMode {
 
         do {
             double currDistance = 0;
+            double backDistance = 0;
 
             boolean isGlyphIn = Math.abs(currDistance - glyphIn) > Math.abs(currDistance - glyphOut);
+            boolean isGlyphBack = Math.abs(backDistance - glyphIn) > Math.abs(backDistance - glyphOut);
 
             if (!isGlyphIn) {
                 drive.intakeLeft(1);
@@ -275,7 +277,7 @@ public abstract class Auto extends LinearVisionOpMode {
             } else if (timer.seconds() < Constants.getInstance().getDouble("time")){
                 drive.intakeLeft(-1);
                 drive.intakeRight(1);
-            } else {
+            } else if (isGlyphBack) {
                 drive.intakeLeft(1);
                 drive.intakeRight(1);
             }
