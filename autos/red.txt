@@ -14,8 +14,8 @@ function:doff x:0 y:1 speed:.5 target:1000
 function:d x:0 y:1 speed:.5 target:900
 function:r r:-80 speed:.5
 function:d x:0 y:1 speed:.5 target:800
-function:s x:0 y:-1 speed:.5 ydistance:35 yir:0 ylong:false gyro:-90
-function:s x:0 y:-1 speed:.5 xdistance:33 xir:1 xlong:false ydistance:35 yir:0 ylong:false gyro:-90
+function:s speed:.5 ydistance:35 yir:0 ylong:false gyro:-90
+function:s speed:.5 xdistance:33 xir:1 xlong:false ydistance:35 yir:0 ylong:false gyro:-90
 function:p
 
 #function:d x:0 y:1 speed:.5 target:500

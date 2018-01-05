@@ -65,10 +65,10 @@ public abstract class Drive {
     //adjusted power for power levels
 
     /***instance variables**/
-    DcMotor motorLeftFront;
-    DcMotor motorRightFront;
-    DcMotor motorLeftBack;
-    DcMotor motorRightBack;
+    public DcMotor motorLeftFront;
+    public DcMotor motorRightFront;
+    public DcMotor motorLeftBack;
+    public DcMotor motorRightBack;
 
     private Servo jewelServo;
 
