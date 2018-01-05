@@ -167,7 +167,10 @@ public class TeleOpMecanum extends OpMode {
             //If you're just getting on or you're on the ground, run back hard
             drive.driveXYR(1, 0, -1, 0, true);
         } else if (veryTipped) {
-            drive.driveXYR(1, 0, oops*2*(Math.ceil((currRoll-startRoll)/100)-.5), 0, true);
+            //Move away from which way you're tipped (should go towards the center)
+            double y = oops*2*(Math.ceil((currRoll-startRoll)/100)-.5);
+            telemetry.addData("y", y);
+            drive.driveXYR(1, 0, y, 0, true);
         } else if (!flat) {
             //If you're on the balancing stone and not quite flat, then adjust
             double degreeP = Constants.getInstance().getDouble("degree");

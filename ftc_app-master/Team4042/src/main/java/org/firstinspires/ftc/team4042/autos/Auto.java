@@ -263,27 +263,40 @@ public abstract class Auto extends LinearVisionOpMode {
 
         ElapsedTime timer = new ElapsedTime();
 
+        boolean isGlyphIn;
+        boolean isGlyphBack;
+
+        drive.intakeLeft(1);
+        drive.intakeRight(1);
+
         do {
             double currDistance = 0;
-            double backDistance = 0;
 
             //If the IR reading is closer to glyphIn than glyphOut, we assume the glyph is in
-            boolean isGlyphIn = Math.abs(currDistance - glyphIn) > Math.abs(currDistance - glyphOut);
-            boolean isGlyphBack = Math.abs(backDistance - glyphIn) > Math.abs(backDistance - glyphOut);
+            isGlyphIn = Math.abs(currDistance - glyphIn) > Math.abs(currDistance - glyphOut);
+        } while (opModeIsActive() && !isGlyphIn);
 
-            if (!isGlyphIn) {
-                drive.intakeLeft(1);
-                drive.intakeRight(1);
-                timer.reset();
-            } else if (timer.seconds() < Constants.getInstance().getDouble("time")){
-                drive.intakeLeft(-1);
-                drive.intakeRight(1);
-            } else if (isGlyphBack) {
-                drive.intakeLeft(1);
-                drive.intakeRight(1);
-            }
+        do {
+            //Rotate the glyph for "time" seconds
+            timer.reset();
+            drive.intakeLeft(-1);
+            drive.intakeRight(1);
 
-        } while (opModeIsActive());
+            while (opModeIsActive() && (timer.seconds() < Constants.getInstance().getDouble("time"))) { }
+
+            //Pull the glyph in for "time" seconds
+            timer.reset();
+            drive.intakeLeft(1);
+            drive.intakeRight(1);
+
+            while (opModeIsActive() && (timer.seconds() < Constants.getInstance().getDouble("time"))) { }
+
+            //See if there's still a glyph in the intake
+            double backDistance = 0;
+            isGlyphBack = Math.abs(backDistance - glyphIn) > Math.abs(backDistance - glyphOut);
+
+            //If there is, repeat.
+        } while (opModeIsActive() && isGlyphBack);
     }
 
     public void alignHorizontally(HashMap<String, String> parameters) {
