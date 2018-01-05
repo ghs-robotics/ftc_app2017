@@ -268,6 +268,7 @@ public abstract class Auto extends LinearVisionOpMode {
             double currDistance = 0;
 
             boolean isGlyphIn = Math.abs(currDistance - glyphIn) > Math.abs(currDistance - glyphOut);
+            //If the IR reading is closer to glyphIn than glyphOut, we assume the glyph is in
 
             if (!isGlyphIn) {
                 drive.intakeLeft(1);
