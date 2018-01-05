@@ -267,6 +267,7 @@ public abstract class Auto extends LinearVisionOpMode {
             double currDistance = 0;
             double backDistance = 0;
 
+            //If the IR reading is closer to glyphIn than glyphOut, we assume the glyph is in
             boolean isGlyphIn = Math.abs(currDistance - glyphIn) > Math.abs(currDistance - glyphOut);
             boolean isGlyphBack = Math.abs(backDistance - glyphIn) > Math.abs(backDistance - glyphOut);
 
@@ -622,6 +623,11 @@ public abstract class Auto extends LinearVisionOpMode {
         try {
             drive.resetEncoders();
             drive.runWithEncoders();
+
+            drive.intakeLeft(1);
+            drive.intakeRight(1);
+            log.add("running intakes in");
+
             ElapsedTime timer = new ElapsedTime();
 
             timer.reset();
@@ -630,23 +636,42 @@ public abstract class Auto extends LinearVisionOpMode {
             while (timer.seconds() < 1) {
             }
             timer.reset();
-
             log.add("rotate left");
 
             //Moves the robot left
             autoRotate(7, Drive.FULL_SPEED/4);
-
             log.add("rotate right");
 
-            autoRotate(0, Drive.FULL_SPEED/4);
-
-            log.add("jewel up");
+            drive.intakeLeft(-1);
+            log.add("reversing left intake");
 
             drive.jewelUp();
-
             timer.reset();
             while (timer.seconds() < 1) {
             }
+            log.add("jewel up");
+
+            drive.intakeLeft(1);
+            log.add("forwarding left intake");
+
+            autoRotate(0, Drive.FULL_SPEED/4);
+
+            drive.intakeLeft(-1);
+            log.add("reverse, reverse!");
+            while (timer.seconds() < 1) {}
+            drive.intakeLeft(1);
+            log.add("turn it up!");
+            while (timer.seconds() < 1) {}
+            drive.intakeLeft(-1);
+            log.add("reverse, reverse! (second time)");
+            while (timer.seconds() < 1) {}
+            drive.intakeLeft(1);
+            log.add("turn it up! (second time)");
+            while (timer.seconds() < 1) {}
+            log.add("intake now maybe deployed, engines shutting down. scotty out");
+            drive.intakeLeft(0);
+            drive.intakeRight(0);
+
             //autoRotate(0, Drive.FULL_SPEED/4);
         } catch (NullPointerException ex) {
             StringWriter sw = new StringWriter();
@@ -659,6 +684,11 @@ public abstract class Auto extends LinearVisionOpMode {
         try {
             drive.resetEncoders();
             drive.runWithEncoders();
+
+            drive.intakeLeft(1);
+            drive.intakeRight(1);
+            log.add("running intakes in");
+
             ElapsedTime timer = new ElapsedTime();
 
             timer.reset();
@@ -670,13 +700,35 @@ public abstract class Auto extends LinearVisionOpMode {
 
             autoRotate(-7, Drive.FULL_SPEED/4);
 
-            autoRotate(0, Drive.FULL_SPEED/4);
+            drive.intakeLeft(-1);
+            log.add("reversing left intake");
 
             drive.jewelUp();
-
             timer.reset();
             while (timer.seconds() < 1) {
             }
+
+            drive.intakeLeft(1);
+            log.add("forwarding left intake");
+
+            autoRotate(0, Drive.FULL_SPEED/4);
+
+            drive.intakeLeft(-1);
+            log.add("reverse, reverse!");
+            while (timer.seconds() < 1) {}
+            drive.intakeLeft(1);
+            log.add("turn it up!");
+            while (timer.seconds() < 1) {}
+            drive.intakeLeft(-1);
+            log.add("reverse, reverse! (second time)");
+            while (timer.seconds() < 1) {}
+            drive.intakeLeft(1);
+            log.add("turn it up! (second time)");
+            while (timer.seconds() < 1) {}
+            log.add("intake now maybe deployed, engines shutting down. scotty out");
+            drive.intakeLeft(0);
+            drive.intakeRight(0);
+
             //autoRotate(0, Drive.FULL_SPEED/4);
         } catch (NullPointerException ex) {
             StringWriter sw = new StringWriter();
