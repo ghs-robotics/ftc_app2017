@@ -17,11 +17,11 @@ public class FiveAnalogSensorTest extends OpMode{
     @Override
     public void init() {
         for (int i = 0; i < shortRange.length; i++) {
-            shortRange[i] = new AnalogSensor("ir" + i, false);
+            shortRange[i] = new AnalogSensor("ir" + i, AnalogSensor.Type.SHORT_RANGE);
             shortRange[i].initialize(hardwareMap);
         }
         for (int i = 0; i < longRange.length; i++) {
-            longRange[i] = new AnalogSensor("longir" + i, true);
+            longRange[i] = new AnalogSensor("longir" + i, AnalogSensor.Type.LONG_RANGE);
             longRange[i].initialize(hardwareMap);
         }
     }

@@ -309,7 +309,7 @@ public class TeleOpMecanum extends OpMode {
     }
 
     private void glyphTarget() {
-        int targetX = gamepad2.x ? 0 : (gamepad2.y ? 1 : (gamepad2.b ? 2 : -1));
+        int targetX = gamepad2.x ? 0 : (gamepad2.y || gamepad2.a ? 1 : (gamepad2.b ? 2 : -1));
         int targetY = gamepad2.dpad_up ? 0 : (gamepad2.dpad_left || gamepad2.dpad_right ? 1 : (gamepad2.dpad_down ? 2 : -1));
         if (targetX != -1 && targetY != -1) {
             drive.glyph.uiTarget(targetX, targetY);
