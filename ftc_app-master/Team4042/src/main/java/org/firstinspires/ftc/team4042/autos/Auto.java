@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.team4042.autos;
 
-import android.util.Log;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -13,21 +10,16 @@ import org.firstinspires.ftc.team4042.drive.Drive;
 import org.firstinspires.ftc.team4042.drive.GlyphPlacementSystem;
 import org.firstinspires.ftc.team4042.drive.MecanumDrive;
 import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
-import org.lasarobotics.vision.android.Cameras;
-import org.lasarobotics.vision.opmode.LinearVisionOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
-import org.lasarobotics.vision.opmode.extensions.CameraControlExtension;
-import org.lasarobotics.vision.util.ScreenOrientation;
+import org.lasarobotics.vision.opmode.LinearVisionOpMode;
 import org.opencv.core.Core;
 import org.opencv.core.CvException;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
-import org.opencv.core.Size;
-import org.opencv.imgproc.Imgproc;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -41,11 +33,14 @@ import java.util.HashMap;
  * Parses a file to figure out which instructions to run. CAN NOT ACTUALLY RUN INSTRUCTIONS.
  */
 @Autonomous(name="Abstract Auto", group="autos")
-public abstract class Auto extends LinearOpMode {
+public abstract class Auto extends LinearVisionOpMode {
 
     MecanumDrive drive = new MecanumDrive(true);
     private VuMarkIdentifier vuMarkIdentifier = new VuMarkIdentifier();
     private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.CENTER;
+
+    private double PROPORTIONAL_ROTATE = Constants.getInstance().getDouble("PropRot");
+    private double DERIV_ROTATE = Constants.getInstance().getDouble("DerivRot");
 
     private Telemetry.Log log;
 
@@ -72,7 +67,7 @@ public abstract class Auto extends LinearOpMode {
         //drive.setUseGyro(true);
         //telemetry.addData("glyph", drive.glyph.getTargetPositionAsString());
 
-        vuMarkIdentifier.initialize(telemetry, hardwareMap);
+        //vuMarkIdentifier.initialize(telemetry, hardwareMap);
 
         log.add("Reading file " + filePath);
         file = new File("./storage/emulated/0/DCIM/" + filePath);
@@ -209,6 +204,9 @@ public abstract class Auto extends LinearOpMode {
                 case "a":
                     alignHorizontally(parameters);
                     break;
+                case "g":
+                    grabGlyph(parameters);
+                    break;
                 default:
                     System.err.println("Unknown function called from file " + file);
                     break;
@@ -259,6 +257,34 @@ public abstract class Auto extends LinearOpMode {
     }
     */
 
+    public void grabGlyph(HashMap<String, String> parameters) {
+        double glyphIn = 2;
+        double glyphOut = 6;
+
+        ElapsedTime timer = new ElapsedTime();
+
+        do {
+            double currDistance = 0;
+            double backDistance = 0;
+
+            boolean isGlyphIn = Math.abs(currDistance - glyphIn) > Math.abs(currDistance - glyphOut);
+            boolean isGlyphBack = Math.abs(backDistance - glyphIn) > Math.abs(backDistance - glyphOut);
+
+            if (!isGlyphIn) {
+                drive.intakeLeft(1);
+                drive.intakeRight(1);
+                timer.reset();
+            } else if (timer.seconds() < Constants.getInstance().getDouble("time")){
+                drive.intakeLeft(-1);
+                drive.intakeRight(1);
+            } else if (isGlyphBack) {
+                drive.intakeLeft(1);
+                drive.intakeRight(1);
+            }
+
+        } while (opModeIsActive());
+    }
+
     public void alignHorizontally(HashMap<String, String> parameters) {
         double prevMiddle = drive.shortIr[0].getCmAvg();
         double currMiddle;
@@ -282,7 +308,7 @@ public abstract class Auto extends LinearOpMode {
         Rect left_crop = new Rect(new Point(215,585), new Point(380, 719));
         Rect right_crop = new Rect(new Point(460,585), new Point(620, 719));
 
-        //Log.d("stupid", this.getFrameSize().width + " x " + this.getFrameSize().height);
+        //Log.d("A", this.getFrameSize().width + " x " + this.getFrameSize().height);
         Mat right = new Mat(frame, right_crop);
         Mat left = new Mat(frame, left_crop);
 
@@ -311,13 +337,14 @@ public abstract class Auto extends LinearOpMode {
 
         //drive.glyph.setHomeTarget();
         drive.setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
         drive.glyph.setTarget(vuMark, 0);
         drive.stage = GlyphPlacementSystem.Stage.HOME;
 
         boolean done = false;
 
         do {
+            drive.uTrackUpdate();
             drive.glyph.runToPosition();
             done = drive.uTrack(); //GETS STUCK IN THIS FUNCTION
         } while (opModeIsActive() && !done);
@@ -338,8 +365,8 @@ public abstract class Auto extends LinearOpMode {
     public void knockRedJewel(HashMap<String, String> parameters) {
         try {
             //String balls = getBallColor(vuMarkIdentifier.getFrameAsMat());
-            //String balls = getBallColor(getFrameRgba());
-            String balls = getBallColor(vuMarkIdentifier.getJewel());
+            String balls = getBallColor(getFrameRgba());
+            //String balls = getBallColor(vuMarkIdentifier.getJewel());
             //String balls = "red, blue";
             telemetry.addData("ball orientation", balls);
             switch (balls) {
@@ -372,8 +399,8 @@ public abstract class Auto extends LinearOpMode {
     public void knockBlueJewel(HashMap<String, String> parameters) {
         log.add("blue jewel");
         //Mat mat = getFrameRgba();
-        //String balls = getBallColor(mat);
-        String balls = "red, blue";
+        String balls = getBallColor(getFrameRgba());
+        //String balls = "red, blue";
         log.add("ball orientation: " + balls);
         switch (balls) {
             case "red":
@@ -472,7 +499,7 @@ public abstract class Auto extends LinearOpMode {
             if (diff > 270) { diff -= 360; }
             if (diff < -270) { diff += 360; }
             if (Math.abs(diff) > 2) {
-                drive.driveXYR(speed, 0, 0, -.02 * diff, false, 0.008);
+                drive.driveXYR(speed, 0, 0, DERIV_ROTATE * diff, false, PROPORTIONAL_ROTATE);
             }
         } while (Math.abs(gyro - realR) > 2 && opModeIsActive());
 
@@ -484,21 +511,22 @@ public abstract class Auto extends LinearOpMode {
 
     public void autoSensorDrive(HashMap<String, String> parameters) {
         double speed = Double.parseDouble(parameters.get("speed"));
+        double targetGyro = Double.parseDouble(parameters.get("gyro"));
 
-        double yTargetDistance = Double.parseDouble(parameters.get("ydistance"));
-        int yIr = Integer.parseInt(parameters.get("yir"));
-        boolean yLongIr = Boolean.parseBoolean(parameters.get("ylong"));
+        boolean useX = parameters.containsKey("xdistance");
+        boolean useY = parameters.containsKey("ydistance");
+
+        double yTargetDistance = useY ? Double.parseDouble(parameters.get("ydistance")) : 0;
+        int yIr = useY ? Integer.parseInt(parameters.get("yir")) : 0;
+        boolean yLongIr = useY ? Boolean.parseBoolean(parameters.get("ylong")) : false;
 
         log.add("" + parameters.containsKey("xdistance"));
-        if (parameters.containsKey("xdistance")) {
-            double xTargetDistance = Double.parseDouble(parameters.get("xdistance"));
-            int xIr = Integer.parseInt(parameters.get("xir"));
-            boolean xLongIr = Boolean.parseBoolean(parameters.get("xlong"));
-            autoSensorDrive(speed, xTargetDistance, xIr, xLongIr, true, yTargetDistance, yIr, yLongIr);
-        }
-        else {
-            autoSensorDrive(speed, 0, 0, false, false, yTargetDistance, yIr, yLongIr);
-        }
+
+        double xTargetDistance = useX ? Double.parseDouble(parameters.get("xdistance")) : 0;
+        int xIr = useX ? Integer.parseInt(parameters.get("xir")) : 0;
+        boolean xLongIr = useX ? Boolean.parseBoolean(parameters.get("xlong")) : false;
+
+        autoSensorDrive(speed, xTargetDistance, xIr, xLongIr, useX, yTargetDistance, yIr, yLongIr, useY, targetGyro);
     }
 
     /**
@@ -511,85 +539,83 @@ public abstract class Auto extends LinearOpMode {
      * @param yIrId The sensor to read an y distance from
      * @param yIsLongRange Whether the y sensor is long-range or not
      */
-    //35, 33 diagonal
     private void autoSensorDrive(double speed, double xTargetDistance, int xIrId, boolean xIsLongRange, boolean useX,
-                                 double yTargetDistance, int yIrId, boolean yIsLongRange) {
+                                 double yTargetDistance, int yIrId, boolean yIsLongRange, boolean useY, double targetGyro) {
+        if (useX || useY) {
+            AnalogSensor xIr = xIsLongRange ? drive.longIr[xIrId] : drive.shortIr[xIrId];
+            AnalogSensor yIr = yIsLongRange ? drive.longIr[yIrId] : drive.shortIr[yIrId];
 
-        //autoDrive(direction, speed, targetTicks, -1, false, targetGyro);
-
-        AnalogSensor xIr = xIsLongRange ? drive.longIr[xIrId] : drive.shortIr[xIrId];
-        AnalogSensor yIr = yIsLongRange ? drive.longIr[yIrId] : drive.shortIr[yIrId];
-
-        telemetry.addData("xIr", xIr + " yIr " + yIr);
-
-        double xCurrDistance;
-        double yCurrDistance;
-        int i = 0;
-        while (i < AnalogSensor.NUM_OF_READINGS && opModeIsActive()) {
-            //read the IRs just to set them up
-            xIr.addReading();
-            yIr.addReading();
-            telemetry.addData("xIr cm", xIr.getCmAvg());
-            telemetry.addData("yIr cm", yIr.getCmAvg());
-            telemetry.update();
-            i++;
-        }
-
-        do {
-            double speedFactor = speed;
-
-            drive.updateRates();
-
-            double r = drive.useGyro(0) * .75 + 5 * drive.gyroRate;
-            r = r < .05 && r > 0 ? 0 : r;
-            r = r > -.05 && r < 0 ? 0 : r;
-
-            //Get the distances and derivative terms
-            xCurrDistance = xIr.getCmAvg();
-            yCurrDistance = yIr.getCmAvg();
-            double xDerivValue = xIsLongRange ? drive.longIrRates[xIrId] : drive.shortIrRates[xIrId];
-            double yDerivValue = yIsLongRange ? drive.longIrRates[yIrId] : drive.shortIrRates[yIrId];
-
-            //Set up the derivative and proportional terms
-            double xDeriv = xDerivValue * -10;
-            double xProportional = (xCurrDistance - xTargetDistance) * .025;
-
-            double yDeriv = yDerivValue * -10;
-            double yProportional = (yCurrDistance - yTargetDistance) * .025;
-
-            //Apply the controller
-            double xFactor = (xProportional - xDeriv);
-            double yFactor = (yProportional - yDeriv);
-            telemetry.addData("xIr cm", xCurrDistance);
-            telemetry.addData("yIr cm", yCurrDistance);
-            telemetry.addData("x", xFactor);
-            telemetry.addData("y", yFactor);
-            telemetry.addData("r", r);
-            telemetry.update();
-
-            xFactor = Range.clip(xFactor, -1, 1);
-            yFactor = Range.clip(yFactor, -1, 1);
-            r = Range.clip(r, -1, 1);
-
-            //Actually drives
-            if (useX) {
-                //drive.driveXYR(speedFactor, xFactor/2, -yFactor/2, r, false);
-                drive.driveXYR(speedFactor, xFactor/2, 0, r, false);
-            } else {
-                //drive.driveXYR(speedFactor, 0, -yFactor/2, r, false);
-                drive.driveXYR(speedFactor, 0, -yFactor/2, 0, false);
+            double xCurrDistance;
+            double yCurrDistance;
+            int i = 0;
+            while (i < AnalogSensor.NUM_OF_READINGS && opModeIsActive()) {
+                //read the IRs just to set them up
+                xIr.addReading();
+                yIr.addReading();
+                i++;
             }
-        } while (((Math.abs(xTargetDistance - xCurrDistance) > 2) || true) && opModeIsActive());
 
-        //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
-        drive.stopMotors();
+            ElapsedTime timeout = new ElapsedTime();
+            timeout.reset();
 
+            do {
+                drive.updateRates();
+
+                double r = getSensorR(targetGyro);
+
+                //Get the distances and derivative terms
+                xCurrDistance = xIr.getCmAvg();
+                yCurrDistance = yIr.getCmAvg();
+
+                double xFactor = getSensorFactor(xIsLongRange, xIrId, xCurrDistance, xTargetDistance);
+                double yFactor = getSensorFactor(yIsLongRange, yIrId, yCurrDistance, yTargetDistance);
+
+                drive.runWithoutEncoders();
+                //Actually drives
+                if (!useY) {
+                    drive.driveXYRWimpo(1, xFactor * 4.5, 0, r, false);
+                }
+                if (!useX) {
+                    //drive.driveXYR(speedFactor, 0, -yFactor/2, r, false);
+                    drive.driveXYR(1, 0, -yFactor / 2, r, false);
+                } else {
+                    //drive.driveXYR(speedFactor, xFactor/2, -yFactor/2, r, false);
+                    drive.driveXYR(1, xFactor * 4.5, -yFactor / 2, r, false);
+                }
+            }
+            while (((Math.abs(xTargetDistance - xCurrDistance) > 2)) && timeout.seconds() < 5 && opModeIsActive());
+
+            //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
+            drive.stopMotors();
+            drive.runWithEncoders();
+        }
+    }
+
+    private double getSensorFactor(boolean isLongRange, int irId, double currDistance, double targetDistance) {
+        double derivValue = isLongRange ? drive.longIrRates[irId] : drive.shortIrRates[irId];
+
+        //Set up the derivative and proportional terms
+        double deriv = derivValue * -10;
+        double proportional = (currDistance - targetDistance) * .025;
+
+        //Apply the controller
+        double factor = (proportional - deriv);
+
+        factor = Range.clip(factor, -1, 1);
+        return factor;
+    }
+    private double getSensorR(double targetGyro) {
+        double r = drive.useGyro(targetGyro) * .75 + 5 * drive.gyroRate;
+        r = r < .05 && r > 0 ? 0 : r;
+        r = r > -.05 && r < 0 ? 0 : r;
+        r = Range.clip(r, -1, 1);
+        return r;
     }
 
     private void autoSensorDrive(double speed, double targetDistance) {
         telemetry.addData("ir", drive.shortIr[0]);
         telemetry.update();
-        autoSensorDrive(speed, 0, 0, false, false, targetDistance, 0, false);
+        autoSensorDrive(speed, 0, 0, false, false, targetDistance, 0, false, true, 0);
     }
 
     public void jewelLeft() {

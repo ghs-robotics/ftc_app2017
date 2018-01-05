@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.team4042.autos.Constants;
 import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
 
 import java.io.PrintWriter;
@@ -24,17 +25,18 @@ public abstract class Drive {
 
     //Require drive() in subclasses
     public abstract void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor);
+    public abstract void driveXYR(double speedFactor, double x, double y, double r, boolean useGyro);
 
     //Initializes a factor for the speed of movement to a position when driving with encoders
-    public static final double BASE_SPEED = .3;
+    public static final double BASE_SPEED = Constants.getInstance().getDouble("base");
     //The deadzone size for the joystick inputs
-    public static final double DEADZONE_SIZE = .01;
+    public static final double DEADZONE_SIZE = Constants.getInstance().getDouble("ds");
     //The largest speed factor possible
-    public static final double FULL_SPEED = 1;
+    public static final double FULL_SPEED = Constants.getInstance().getDouble("full");
     //The power to put to the motors to stop them
-    public static final double STOP_SPEED = 0;
+    public static final double STOP_SPEED = Constants.getInstance().getDouble("stop");
 
-    public static final double MAGIC_NUMBER = .8;
+    public static final double MAGIC_NUMBER = Constants.getInstance().getDouble("magic");
 
     public static final boolean THE_FAST_ONES_ARE_THE_FRONT_ONES = true;
     public static final double LOW_SPEED_MOTOR_THINGS = 7;
@@ -63,10 +65,10 @@ public abstract class Drive {
     //adjusted power for power levels
 
     /***instance variables**/
-    DcMotor motorLeftFront;
-    DcMotor motorRightFront;
-    DcMotor motorLeftBack;
-    DcMotor motorRightBack;
+    public DcMotor motorLeftFront;
+    public DcMotor motorRightFront;
+    public DcMotor motorLeftBack;
+    public DcMotor motorRightBack;
 
     private Servo jewelServo;
 
@@ -165,7 +167,7 @@ public abstract class Drive {
         } catch (IllegalArgumentException ex) {
             telemetry.addData("Front Left", "Could not find.");
             useMotors = false;
-        }
+    }
 
         try {
             motorRightFront = hardwareMap.dcMotor.get("front right");
@@ -237,6 +239,8 @@ public abstract class Drive {
     public double[] shortIrRates = new double[3];
     public double[] longIrRates = new double[2];
 
+    private double lastUTrack = 0;
+    public double uTrackRate = 0;
     public void updateRates() {
         //System time
         double currMilli = System.currentTimeMillis();
@@ -282,8 +286,18 @@ public abstract class Drive {
         lastMilli = currMilli;
     }
 
+    public void uTrackUpdate() {
+        //Vertical drive
+        double currUTrack = verticalDriveCurrPos();
+        double currMilli = System.currentTimeMillis();
+        uTrackRate = (currUTrack - lastUTrack) / (currMilli - lastMilli);
+
+        lastUTrack = currUTrack;
+        lastMilli = currMilli;
+    }
+
     private void glyphLocate() {
-        targetY = GlyphPlacementSystem.Position.values()[glyph.uiTargetY];
+        targetY = GlyphPlacementSystem.Position.values()[glyph.uiTargetY + 3];
         targetX = GlyphPlacementSystem.HorizPos.values()[glyph.uiTargetX];
     }
 
@@ -312,6 +326,7 @@ public abstract class Drive {
             }
             case PLACE1: {
                 //Raise the u-track
+                setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
                 glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
                 if(glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
                     stage = GlyphPlacementSystem.Stage.PAUSE1;
@@ -365,13 +380,16 @@ public abstract class Drive {
             case RETURN2: {
                 //Move back to the bottom and get ready to do it again
                 glyph.setHomeTarget();
+                setVerticalDriveMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                setVerticalDrive(-1);
                 stage = GlyphPlacementSystem.Stage.RESET;
-                uTrackAtBottom = true;
                 return false;
             }
             case RESET: {
                 if (getBottomState()) {
                     resetUTrack();
+                    setVerticalDrive(0);
+                    uTrackAtBottom = true;
                 }
                 return true;
             }
@@ -383,7 +401,6 @@ public abstract class Drive {
         stage = GlyphPlacementSystem.Stage.HOME;
         jewelUp();
         setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
         uTrackAtBottom = true;
     }
 
@@ -453,6 +470,8 @@ public abstract class Drive {
     public boolean isHandOpen() {
         return handIsOpen;
     }
+
+    public double getVerticalDrive() { return verticalDrive.getPower(); }
 
     public void setVerticalDrive(double power) {
         verticalDrive.setPower(power);
