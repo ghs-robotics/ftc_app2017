@@ -55,7 +55,7 @@ import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
 @TeleOp(name="Analog Sensor", group="testops")
 public class AnalogSensorTest extends OpMode {
 
-    AnalogSensor ultrasonic = new AnalogSensor("ultrasonic", true);
+    AnalogSensor ultrasonic = new AnalogSensor("ultrasonic", AnalogSensor.Type.LONG_RANGE);
     //File file;
     //BufferedWriter writer;
 

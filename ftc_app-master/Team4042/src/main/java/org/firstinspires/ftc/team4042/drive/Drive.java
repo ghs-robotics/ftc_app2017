@@ -123,11 +123,11 @@ public abstract class Drive {
 
     public Drive() {
         for(int i = 0; i < shortIr.length; i++){
-            shortIr[i] = new AnalogSensor("ir" + i, false);
+            shortIr[i] = new AnalogSensor("ir" + i, AnalogSensor.Type.SHORT_RANGE);
         }
 
         for(int i = 0; i < longIr.length; i++){
-            longIr[i] = new AnalogSensor("longir" + i, true);
+            longIr[i] = new AnalogSensor("longir" + i, AnalogSensor.Type.LONG_RANGE);
         }
 
         verbose = false;
