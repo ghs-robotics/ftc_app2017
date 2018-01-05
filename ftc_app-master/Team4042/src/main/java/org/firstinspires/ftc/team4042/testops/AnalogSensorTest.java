@@ -32,6 +32,10 @@ package org.firstinspires.ftc.team4042.testops;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
 
 /**
@@ -52,12 +56,16 @@ import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
 public class AnalogSensorTest extends OpMode {
 
     AnalogSensor ultrasonic = new AnalogSensor("ultrasonic", true);
-    /*File file;
-    BufferedWriter writer;*/
+    //File file;
+    //BufferedWriter writer;
 
     @Override
     public void init() {
         ultrasonic.initialize(hardwareMap);
+        for (int i = 0; i < AnalogSensor.NUM_OF_READINGS; i++) {
+            ultrasonic.addReading();
+        }
+
         /*file = new File("./storage/emulated/0/DCIM/ir.txt");
         try {
             writer = new BufferedWriter(new FileWriter(file, true));
@@ -66,26 +74,15 @@ public class AnalogSensorTest extends OpMode {
         }*/
     }
 
-    /*@Override
-    public void loop() {
-        if (val[9] != 0) {
-            double sum = 0;
-            for (double i : val)
-                sum += i;
-            telemetry.addData("Inches", sum / 10);
-        } else {
-            val[num] = ultrasonic.getVoltage() * 42.8125;
-            num++;
-        }
-    }*/
-
     @Override
     public void loop() {
-        telemetry.addData("cm", ultrasonic.getCmAvg());
+        ultrasonic.addReading();
+        double vAvg = ultrasonic.getVAvg();
+        telemetry.addData("voltage", vAvg);
         telemetry.update();
 
         /*try {
-            writer.append(Double.toString(voltageAvg)).append("\n");
+            writer.append(Double.toString(vAvg)).append("\n");
         } catch (IOException ex) {
             telemetry.addData("error", "trying to append to file");
         }*/

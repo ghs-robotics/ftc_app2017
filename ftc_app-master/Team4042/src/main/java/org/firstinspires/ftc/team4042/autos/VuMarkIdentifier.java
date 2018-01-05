@@ -33,6 +33,7 @@ import android.graphics.Bitmap;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.vuforia.Image;
 import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Vuforia;
@@ -110,7 +111,7 @@ public class VuMarkIdentifier {
 
             //We also indicate which camera on the RC that we wish to use. Here we chose the back (HiRes) camera.
             parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-            this.vuforia = new VuforiaLocalizerImplSubclass(parameters);
+            this.vuforia = new VuforiaLocalizerImplSubclass(parameters, telemetry);
 
         } catch (VuforiaLocalizerImpl.FailureException ex) {
             StringWriter sw = new StringWriter();
@@ -132,33 +133,45 @@ public class VuMarkIdentifier {
 
         RelicRecoveryVuMark relicRecoveryVuMark;
 
+        ElapsedTime timer = new ElapsedTime();
+
         do {
             relicRecoveryVuMark = RelicRecoveryVuMark.from(relicTemplate);
-        } while (relicRecoveryVuMark.equals(RelicRecoveryVuMark.UNKNOWN));
+        } while (relicRecoveryVuMark.equals(RelicRecoveryVuMark.UNKNOWN) && timer.seconds() < 10);
 
+        if (relicRecoveryVuMark == RelicRecoveryVuMark.UNKNOWN) {
+            relicRecoveryVuMark = RelicRecoveryVuMark.CENTER;
+        }
         return relicRecoveryVuMark;
     }
 
     public Mat getJewel() {
-/*       relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
+        relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
         relicTemplate = relicTrackables.get(0);
 
         relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
 
-        relicTrackables.activate();*/
+        relicTrackables.activate();
         //ElapsedTime timeout = new ElapsedTime();
+
+        telemetry.log().add("hey we got herreeeeeeee");
         Bitmap bm = null;
         while(bm == null) {
             if (this.vuforia.rgb != null) {
                 bm = Bitmap.createBitmap(this.vuforia.rgb.getWidth(),
                         this.vuforia.rgb.getHeight(),
-                        Bitmap.Config.ARGB_8888);
+                        Bitmap.Config.RGB_565);
                 bm.copyPixelsFromBuffer(vuforia.rgb.getPixels());
             }
         }
 
+
+        telemetry.log().add(bm.getWidth() + " x " + bm.getHeight());
         Mat tmp = new Mat(bm.getWidth(), bm.getHeight(), CvType.CV_8UC4);
+        telemetry.log().add("give me one more second");
         Utils.bitmapToMat(bm, tmp);
+
+        telemetry.log().add("NOOOO");
         return tmp;
     }
 }
