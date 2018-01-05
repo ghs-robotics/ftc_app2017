@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.team4042.autos.Constants;
+import org.firstinspires.ftc.team4042.autos.C;
 
 @TeleOp(name = "Mecanum", group="drive")
 public class TeleOpMecanum extends OpMode {
@@ -21,6 +21,8 @@ public class TeleOpMecanum extends OpMode {
     //CONTROL BOOLEANS START
     // We have these booleans so we only register a button press once.
     // You have to let go of the button and push it again to register a new event.
+    private boolean aBack = false;
+    private double aBackTime = 0;
     private boolean bBack = false;
     private boolean bStart = false;
 
@@ -117,11 +119,23 @@ public class TeleOpMecanum extends OpMode {
         }
         bStart = gamepad2.start;
 
-        if (gamepad1.back) {
-            balance();
-        } else if (onBalancingStone) {
-            //reset?
+        //The first time you hit back, it establishes how long you've been pushing it for
+        if (gamepad1.back && !aBack) {
+            aBackTime = System.nanoTime();
         }
+        //If you're pushing back and have been for longer than "nano", then run the full balance code
+        if (gamepad1.back && aBack) {
+            if (System.nanoTime() - aBackTime > C.get().getDouble("nano")) {
+                balance();
+            }
+        }
+        //If you've released back and did so for a shorter time than "nano", then toggle whether you're on the stone
+        if (!gamepad1.back && aBack) {
+            if (System.nanoTime() - aBackTime < C.get().getDouble("nano")) {
+                onBalancingStone = !onBalancingStone;
+            }
+        }
+        aBack = gamepad1.back;
 
         //Adjust drive modes, speeds, etc
         setUpDrive();
@@ -173,7 +187,7 @@ public class TeleOpMecanum extends OpMode {
             drive.driveXYR(1, 0, y, 0, true);
         } else if (!flat) {
             //If you're on the balancing stone and not quite flat, then adjust
-            double degreeP = Constants.getInstance().getDouble("degree");
+            double degreeP = C.get().getDouble("degree");
             double x = degreeP * (startPitch - currPitch);
             double y = degreeP * (startRoll - currRoll);
             drive.driveXYR(1, x, y, 0, true);

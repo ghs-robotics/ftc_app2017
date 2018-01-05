@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.team4042.autos.Constants;
+import org.firstinspires.ftc.team4042.autos.C;
 import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
 
 import java.io.PrintWriter;
@@ -28,15 +28,15 @@ public abstract class Drive {
     public abstract void driveXYR(double speedFactor, double x, double y, double r, boolean useGyro);
 
     //Initializes a factor for the speed of movement to a position when driving with encoders
-    public static final double BASE_SPEED = Constants.getInstance().getDouble("base");
+    public static final double BASE_SPEED = C.get().getDouble("base");
     //The deadzone size for the joystick inputs
-    public static final double DEADZONE_SIZE = Constants.getInstance().getDouble("ds");
+    public static final double DEADZONE_SIZE = C.get().getDouble("ds");
     //The largest speed factor possible
-    public static final double FULL_SPEED = Constants.getInstance().getDouble("full");
+    public static final double FULL_SPEED = C.get().getDouble("full");
     //The power to put to the motors to stop them
-    public static final double STOP_SPEED = Constants.getInstance().getDouble("stop");
+    public static final double STOP_SPEED = C.get().getDouble("stop");
 
-    public static final double MAGIC_NUMBER = Constants.getInstance().getDouble("magic");
+    public static final double MAGIC_NUMBER = C.get().getDouble("magic");
 
     public static final boolean THE_FAST_ONES_ARE_THE_FRONT_ONES = true;
     public static final double LOW_SPEED_MOTOR_THINGS = 7;

@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
-import org.firstinspires.ftc.team4042.autos.Constants;
+import org.firstinspires.ftc.team4042.autos.C;
 
 /**
  * Created by Ryan on 11/2/2017.
@@ -13,10 +13,10 @@ import org.firstinspires.ftc.team4042.autos.Constants;
 
 public class GlyphPlacementSystem {
 
-    public final double HORIZONTAL_TRANSLATION_TIME = Constants.getInstance().getDouble("TransTime");
-    public final int PLACEMENT_ERROR_MARGIN = Constants.getInstance().getInt("PlaceError");
-    private final double PROPORTIONAL_CONSTANT = Constants.getInstance().getDouble("Prop");
-    private final double DERIV_CONSTANT = Constants.getInstance().getDouble("Deriv");
+    public final double HORIZONTAL_TRANSLATION_TIME = C.get().getDouble("TransTime");
+    public final int PLACEMENT_ERROR_MARGIN = C.get().getInt("PlaceError");
+    private final double PROPORTIONAL_CONSTANT = C.get().getDouble("Prop");
+    private final double DERIV_CONSTANT = C.get().getDouble("Deriv");
     public int uiTargetX;
     public int uiTargetY;
     public Position currentY;

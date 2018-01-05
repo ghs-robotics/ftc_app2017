@@ -39,8 +39,8 @@ public abstract class Auto extends LinearVisionOpMode {
     private VuMarkIdentifier vuMarkIdentifier = new VuMarkIdentifier();
     private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.CENTER;
 
-    private double PROPORTIONAL_ROTATE = Constants.getInstance().getDouble("PropRot");
-    private double DERIV_ROTATE = Constants.getInstance().getDouble("DerivRot");
+    private double PROPORTIONAL_ROTATE = C.get().getDouble("PropRot");
+    private double DERIV_ROTATE = C.get().getDouble("DerivRot");
 
     private Telemetry.Log log;
 
@@ -282,14 +282,14 @@ public abstract class Auto extends LinearVisionOpMode {
             drive.intakeLeft(-1);
             drive.intakeRight(1);
 
-            while (opModeIsActive() && (timer.seconds() < Constants.getInstance().getDouble("time"))) { }
+            while (opModeIsActive() && (timer.seconds() < C.get().getDouble("time"))) { }
 
             //Pull the glyph in for "time" seconds
             timer.reset();
             drive.intakeLeft(1);
             drive.intakeRight(1);
 
-            while (opModeIsActive() && (timer.seconds() < Constants.getInstance().getDouble("time"))) { }
+            while (opModeIsActive() && (timer.seconds() < C.get().getDouble("time"))) { }
 
             //See if there's still a glyph in the intake
             double backDistance = 0;
