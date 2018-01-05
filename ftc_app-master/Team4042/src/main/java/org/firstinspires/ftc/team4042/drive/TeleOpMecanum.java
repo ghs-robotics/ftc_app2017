@@ -16,6 +16,8 @@ public class TeleOpMecanum extends OpMode {
     private boolean manual = false;
     private boolean onBalancingStone = false;
 
+    private double oops = 1; //switch to -1 if runs in wrong direction when going for balance
+
     //CONTROL BOOLEANS START
     // We have these booleans so we only register a button press once.
     // You have to let go of the button and push it again to register a new event.
@@ -156,14 +158,16 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("currPitch", currPitch);
 
         boolean flat = Math.abs(currRoll - startRoll) < 2 && Math.abs(currPitch - startPitch) < 2;
-        boolean veryTipped = Math.abs(currRoll - startRoll) > 10 || Math.abs(currPitch - startPitch) > 10;
+        boolean veryTipped = Math.abs(currRoll - startRoll) > 8 || Math.abs(currPitch - startPitch) > 8;
         telemetry.addData("flat", flat);
         if (!onBalancingStone && !flat) {
             //If you get tipped, you must be on the balancing stone and we flag you as such
             onBalancingStone = true;
-        } else if (veryTipped || (!onBalancingStone && flat)) {
+        } else if (!onBalancingStone && flat) {
             //If you're just getting on or you're on the ground, run back hard
             drive.driveXYR(1, 0, -1, 0, true);
+        } else if (veryTipped) {
+            drive.driveXYR(1, 0, oops*2*(Math.ceil((currRoll-startRoll)/100)-.5), 0, true);
         } else if (!flat) {
             //If you're on the balancing stone and not quite flat, then adjust
             double degreeP = Constants.getInstance().getDouble("degree");
