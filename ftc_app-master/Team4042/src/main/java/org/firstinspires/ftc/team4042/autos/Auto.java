@@ -202,6 +202,9 @@ public abstract class Auto extends LinearOpMode {
                 case "a":
                     alignHorizontally(parameters);
                     break;
+                case "cv":
+                    cv(parameters);
+                    break;
                 default:
                     System.err.println("Unknown function called from file " + file);
                     break;
@@ -226,6 +229,14 @@ public abstract class Auto extends LinearOpMode {
         //move right until we see -^-^-| from ultrasonic
         //place block
         //detach and extend robot towards glyph
+    }
+
+    public void cv(HashMap<String, String> parameters) {
+        String balls = getBallColor(vuMarkIdentifier.getJewel());
+        vuMark = vuMarkIdentifier.getMark();
+        telemetry.addData("balls", balls);
+        telemetry.addData("vumark", vuMark);
+        telemetry.update();
     }
 
     public void getVuMark(HashMap<String, String> parameters) {
