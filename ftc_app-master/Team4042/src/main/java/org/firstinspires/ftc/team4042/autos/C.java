@@ -31,7 +31,7 @@ public class C {
 
     private HashMap<String, String> loadFile() {
         if (file == null) {
-            return null;
+            throw new RuntimeException("file not found");
         } //Can't load a null file
 
         try {
@@ -60,7 +60,7 @@ public class C {
             ex.printStackTrace(new PrintWriter(sw));
 
         }
-        return null;
+        throw new RuntimeException("got to the end of the C file construtor thing");
     }
 
     public String getString(String constant) {
@@ -75,6 +75,7 @@ public class C {
 
     public double getDouble(String constant) {
         //return c.getDouble(constant);
+
         return Double.parseDouble(get().myConstants.get(constant));
     }
 }
