@@ -15,6 +15,7 @@ import java.util.HashMap;
 
 public class C {
     File file;
+
     private HashMap<String, String> myConstants;
     private static C c;
 
@@ -35,8 +36,7 @@ public class C {
         if (!file.exists()) {
             throw new RuntimeException("file not found");
         } //Can't load a null file
-        
-        Log.d("TOMMY", "starstars" + file.exists());
+
         try {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
