@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.team4042.autos;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -30,10 +32,11 @@ public class C {
     }
 
     private HashMap<String, String> loadFile() {
-        if (file == null) {
+        if (!file.exists()) {
             throw new RuntimeException("file not found");
         } //Can't load a null file
-
+        
+        Log.d("TOMMY", "starstars" + file.exists());
         try {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
