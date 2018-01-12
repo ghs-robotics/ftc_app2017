@@ -17,6 +17,7 @@ public class ProtoAuto extends Auto {
 
             super.setUp(drive, "proto.txt");
             waitForStart();
+            Log.d()
 
             super.runAuto();
         } catch (Exception ex) {

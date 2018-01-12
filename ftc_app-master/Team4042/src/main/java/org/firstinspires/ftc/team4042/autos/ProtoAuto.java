@@ -8,7 +8,7 @@ import org.firstinspires.ftc.team4042.drive.MecanumDrive;
 @Autonomous(name="ProtoAuto", group="autos")
 public class ProtoAuto extends Auto {
 
-    MecanumDrive drive = new MecanumDrive(true);
+    MecanumDrive drive = new MecanumDrive(true, false);
 
     @Override
     public void runOpMode() {
@@ -18,10 +18,14 @@ public class ProtoAuto extends Auto {
             super.setUp(drive, "proto.txt");
             waitForStart();
 
-            super.runAuto();
+            //super.runAuto();
+            telemetry.addData("we did it", "starstarstarst");
+
         } catch (Exception ex) {
             telemetry.addData("Exception", Drive.getStackTrace(ex));
         }
+
+
         
         //check sensor sums
         //robot starts facing right
