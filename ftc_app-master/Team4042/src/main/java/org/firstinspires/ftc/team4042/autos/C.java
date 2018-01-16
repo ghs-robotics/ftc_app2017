@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.team4042.autos;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -13,6 +15,7 @@ import java.util.HashMap;
 
 public class C {
     File file;
+
     private HashMap<String, String> myConstants;
     private static C c;
 
@@ -30,8 +33,8 @@ public class C {
     }
 
     private HashMap<String, String> loadFile() {
-        if (file == null) {
-            return null;
+        if (!file.exists()) {
+            throw new RuntimeException("file not found");
         } //Can't load a null file
 
         try {
@@ -60,7 +63,7 @@ public class C {
             ex.printStackTrace(new PrintWriter(sw));
 
         }
-        return null;
+        throw new RuntimeException("got to the end of the C file construtor thing");
     }
 
     public String getString(String constant) {
@@ -75,6 +78,7 @@ public class C {
 
     public double getDouble(String constant) {
         //return c.getDouble(constant);
+
         return Double.parseDouble(get().myConstants.get(constant));
     }
 }

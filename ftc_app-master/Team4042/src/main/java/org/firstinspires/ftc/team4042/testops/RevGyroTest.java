@@ -11,7 +11,7 @@ import org.firstinspires.ftc.team4042.drive.MecanumDrive;
 @Autonomous(name="Rev_Gyro_test", group="testops")
 public class RevGyroTest extends LinearOpMode {
 
-    private MecanumDrive drive = new MecanumDrive();
+    private MecanumDrive drive = new MecanumDrive(true);
 
     @Override
     public void runOpMode() {

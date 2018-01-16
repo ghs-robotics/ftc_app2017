@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.team4042.autos;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -153,6 +155,7 @@ public abstract class Auto extends LinearVisionOpMode {
      * Runs the list of instructions
      */
     public void runAuto() {
+        Log.d("TOMM", "starstrastarstarst");
         gyro();
         try {
             drive.jewelUp();
