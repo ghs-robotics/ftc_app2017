@@ -154,7 +154,9 @@ public abstract class Auto extends LinearVisionOpMode {
      */
     public void runAuto() {
         gyro();
-        drive.jewelUp();
+        try {
+            drive.jewelUp();
+        } catch (NullPointerException ex) { }
         drive.resetEncoders();
         drive.setEncoders(true);
         drive.setVerbose(true);
@@ -258,8 +260,8 @@ public abstract class Auto extends LinearVisionOpMode {
     */
 
     public void grabGlyph(HashMap<String, String> parameters) {
-        double glyphIn = 2;
-        double glyphOut = 6;
+        double glyphIn = 7;
+        double glyphOut = 30;
 
         ElapsedTime timer = new ElapsedTime();
 
@@ -269,11 +271,17 @@ public abstract class Auto extends LinearVisionOpMode {
         drive.intakeLeft(1);
         drive.intakeRight(1);
 
+        drive.readSensorsSetUp();
+
         do {
-            double currDistance = 0;
+            drive.shortIr[0].addReading();
+            double frontDistance = drive.shortIr[0].getCmAvg();
 
             //If the IR reading is closer to glyphIn than glyphOut, we assume the glyph is in
-            isGlyphIn = Math.abs(currDistance - glyphIn) > Math.abs(currDistance - glyphOut);
+            isGlyphIn = Math.abs(frontDistance - glyphIn) > Math.abs(frontDistance - glyphOut);
+            log.add("front distance: " + frontDistance);
+            log.add("is glyph in: " + isGlyphIn);
+            telemetry.update();
         } while (opModeIsActive() && !isGlyphIn);
 
         do {
@@ -292,7 +300,8 @@ public abstract class Auto extends LinearVisionOpMode {
             while (opModeIsActive() && (timer.seconds() < C.get().getDouble("time"))) { }
 
             //See if there's still a glyph in the intake
-            double backDistance = 0;
+            drive.shortIr[1].addReading();
+            double backDistance = drive.shortIr[1].getCmAvg();
             isGlyphBack = Math.abs(backDistance - glyphIn) > Math.abs(backDistance - glyphOut);
 
             //If there is, repeat.
