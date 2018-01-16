@@ -162,69 +162,110 @@ public abstract class Drive {
             aLongIr.initialize(hardwareMap);
         }
 
+        motorLeftFront = initializeMotor(hardwareMap, "front left");
+        motorRightFront = initializeMotor(hardwareMap, "front right");
+        motorLeftBack = initializeMotor(hardwareMap, "back left");
+        motorRightBack = initializeMotor(hardwareMap, "back right");
+
+        jewelServo = initializeServo(hardwareMap, "jewel");
         try {
-            motorLeftFront = hardwareMap.dcMotor.get("front left");
-        } catch (IllegalArgumentException ex) {
-            telemetry.addData("Front Left", "Could not find.");
-            useMotors = false;
+            jewelIn();
+        } catch (NullPointerException ex) { }
+
+        grabbyBoi = initializeServo(hardwareMap, "hand");
+
+        leftBrake = initializeServo(hardwareMap, "left brake");
+        rightBrake = initializeServo(hardwareMap, "right brake");
+
+        leftCatch = initializeServo(hardwareMap, "left catch");
+        rightCatch = initializeServo(hardwareMap, "right catch");
+
+        horizontalDrive = initializeCrServo(hardwareMap, "horizontal");
+
+        center = initializeDigital(hardwareMap, "center");
+        try {
+            center.setState(false);
+            center.setMode(DigitalChannel.Mode.INPUT);
+        } catch (NullPointerException ex) { }
+
+        bottom = initializeDigital(hardwareMap, "bottom");
+        try {
+            bottom.setState(false);
+            bottom.setMode(DigitalChannel.Mode.INPUT);
+        } catch (NullPointerException ex) { }
+
+        intakeLeft = initializeMotor(hardwareMap, "intake left");
+        intakeRight = initializeMotor(hardwareMap, "intake right");
+        //The left intake is mounted "backwards"
+        try {
+            intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        } catch (NullPointerException ex) { }
+
+        inLServo = initializeCrServo(hardwareMap, "intake left servo");
+        inRServo = initializeCrServo(hardwareMap, "intake right servo");
+        //The left intake servo is mounted "backwards"
+        try {
+            inLServo.setDirection(DcMotorSimple.Direction.REVERSE);
+        } catch (NullPointerException ex) { }
+
+        verticalDrive = initializeMotor(hardwareMap, "vertical drive");
+        try {
+            verticalDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            verticalDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        } catch (NullPointerException ex) { }
+        //verticalDrive.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
+    public void readSensorsSetUp() {
+        for (int i = 0; i < AnalogSensor.NUM_OF_READINGS; i++ ) {
+            for (AnalogSensor shortIr : shortIr) {
+                shortIr.addReading();
+            }
+            for (AnalogSensor longIr : longIr) {
+                longIr.addReading();
+            }
+        }
+    }
+
+    private DcMotor initializeMotor(HardwareMap hardwareMap, String motorName) {
+        DcMotor motor = null;
         try {
-            motorRightFront = hardwareMap.dcMotor.get("front right");
+            motor = hardwareMap.dcMotor.get(motorName);
         } catch (IllegalArgumentException ex) {
-            telemetry.addData("Front Right", "Could not find.");
+            telemetry.addData(motorName, "Could not find.");
             useMotors = false;
         }
+        return motor;
+    }
 
+    private Servo initializeServo(HardwareMap hardwareMap, String servoName) {
+        Servo servo = null;
         try {
-            motorRightBack = hardwareMap.dcMotor.get("back right");
+            servo = hardwareMap.servo.get(servoName);
         } catch (IllegalArgumentException ex) {
-            telemetry.addData("Back Right", "Could not find.");
-            useMotors = false;
+            telemetry.addData(servoName, "Could not find.");
         }
+        return servo;
+    }
 
+    private CRServo initializeCrServo(HardwareMap hardwareMap, String crServoName) {
+        CRServo crServo = null;
         try {
-            motorLeftBack = hardwareMap.dcMotor.get("back left");
+            crServo = hardwareMap.crservo.get(crServoName);
         } catch (IllegalArgumentException ex) {
-            telemetry.addData("Back Left", "Could not find.");
-            useMotors = false;
+            telemetry.addData(crServoName, "Could not find.");
         }
+        return crServo;
+    }
 
-        jewelServo = hardwareMap.servo.get("jewel");
-        jewelIn();
-
-        grabbyBoi = hardwareMap.servo.get("hand");
-
-        leftBrake = hardwareMap.servo.get("left brake");
-        rightBrake = hardwareMap.servo.get("right brake");
-
-        leftCatch = hardwareMap.servo.get("left catch");
-        rightCatch = hardwareMap.servo.get("right catch");
-
-        horizontalDrive = hardwareMap.crservo.get("horizontal");
-
-        center = hardwareMap.digitalChannel.get("center");
-        center.setState(false);
-        center.setMode(DigitalChannel.Mode.INPUT);
-
-        bottom = hardwareMap.digitalChannel.get("bottom");
-        bottom.setState(false);
-        bottom.setMode(DigitalChannel.Mode.INPUT);
-
-        intakeLeft = hardwareMap.dcMotor.get("intake left");
-        intakeRight = hardwareMap.dcMotor.get("intake right");
-        //The left intake is mounted "backwards"
-        intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        inLServo = hardwareMap.crservo.get("intake left servo");
-        inRServo = hardwareMap.crservo.get("intake right servo");
-        //The left intake servo is mounted "backwards"
-        inLServo.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        verticalDrive = hardwareMap.dcMotor.get("vertical drive");
-        verticalDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        verticalDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        //verticalDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+    private DigitalChannel initializeDigital(HardwareMap hardwareMap, String digitalName) {
+        DigitalChannel digitalChannel = null;
+        try {
+            digitalChannel = hardwareMap.digitalChannel.get(digitalName);
+        } catch (IllegalArgumentException ex) {
+            telemetry.addData(digitalName, "Could not find.");
+        }
+        return digitalChannel;
     }
 
     private double[] lastEncoders = new double[4];

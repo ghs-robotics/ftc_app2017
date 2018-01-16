@@ -1,1 +1,2 @@
-function:s speed:.5 xdistance:33 xir:1 xlong:true gyro:0
+#function:s speed:.5 xdistance:33 xir:1 xlong:true gyro:0
+function:g
