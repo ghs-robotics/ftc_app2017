@@ -29,7 +29,11 @@ public class AnalogSensor {
     }
 
     public void initialize(HardwareMap hardwareMap) {
-        sensor = hardwareMap.analogInput.get(name);
+        try {
+            sensor = hardwareMap.analogInput.get(name);
+        } catch (IllegalArgumentException ex) {
+            sensor = null;
+        }
     }
 
     public String getName() {
