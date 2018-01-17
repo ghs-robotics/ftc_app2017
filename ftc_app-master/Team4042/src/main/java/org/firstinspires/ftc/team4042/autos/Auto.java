@@ -22,6 +22,8 @@ import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -151,18 +153,39 @@ public abstract class Auto extends LinearVisionOpMode {
         } while (startRoll == 0 && startPitch == 0 && opModeIsActive());
     }
 
+    public void runAuto(boolean useSensors) {
+        if (useSensors) runAuto();
+        vuMarkIdentifier.initialize(telemetry, hardwareMap);
+        //telemetry.addData("vuMarkhere", "ststs");
+
+        //vuMark = vuMarkIdentifier.getMark();
+        //telemetry.addData("vuMarkhere", "after");
+
+
+        while(true) {
+            //Mat x = vuMarkIdentifier.getFrame();
+            //Log.d("TOMMY", x.toString());
+
+            RelicRecoveryVuMark j = vuMarkIdentifier.getMark();
+            //String j = getBallColor(x);
+            Log.d("TOMMY", j.toString());
+        }
+    }
+
     /**
      * Runs the list of instructions
      */
     public void runAuto() {
-        Log.d("TOMM", "starstrastarstarst");
+        vuMarkIdentifier.initialize(telemetry, hardwareMap);
+
         gyro();
+
         drive.jewelUp();
         drive.resetEncoders();
         drive.setEncoders(true);
         drive.setVerbose(true);
-
         timer.reset();
+
         //Reads each instruction and acts accordingly
         int i = 0;
         while (i < instructions.size() && opModeIsActive()) {
@@ -237,7 +260,7 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void getVuMark(HashMap<String, String> parameters) {
-        //vuMark = vuMarkIdentifier.getMark();
+        vuMark = vuMarkIdentifier.getMark();
         telemetry.addData("vuMark", vuMark);
         telemetry.update();
     }
@@ -320,7 +343,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
     public String getBallColor(Mat frame){
         log.add(frame.height() + " x " + frame.width());
-        //Imgproc.resize(frame, frame, new Size(960, 720));
+        Imgproc.resize(frame, frame, new Size(960, 720));
         telemetry.update();
         Rect left_crop = new Rect(new Point(215,585), new Point(380, 719));
         Rect right_crop = new Rect(new Point(460,585), new Point(620, 719));
@@ -382,7 +405,8 @@ public abstract class Auto extends LinearVisionOpMode {
     public void knockRedJewel(HashMap<String, String> parameters) {
         try {
             //String balls = getBallColor(vuMarkIdentifier.getFrameAsMat());
-            String balls = getBallColor(getFrameRgba());
+            //String balls = getBallColor(getFrameRgba());
+            String balls = getBallColor(vuMarkIdentifier.getFrame());
             //String balls = getBallColor(vuMarkIdentifier.getJewel());
             //String balls = "red, blue";
             telemetry.addData("ball orientation", balls);
@@ -416,7 +440,8 @@ public abstract class Auto extends LinearVisionOpMode {
     public void knockBlueJewel(HashMap<String, String> parameters) {
         log.add("blue jewel");
         //Mat mat = getFrameRgba();
-        String balls = getBallColor(getFrameRgba());
+        //String balls = getBallColor(getFrameRgba());
+        String balls = getBallColor(vuMarkIdentifier.getFrame());
         //String balls = "red, blue";
         log.add("ball orientation: " + balls);
         switch (balls) {
