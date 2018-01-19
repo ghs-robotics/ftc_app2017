@@ -18,15 +18,15 @@ public class ProtoAuto extends Auto {
             super.setUp(drive, "proto.txt");
             waitForStart();
 
-            //super.runAuto();
-            telemetry.addData("we did it", "starstarstarst");
+            super.runAuto();
+            telemetry.addData("finished auto", "s");
 
         } catch (Exception ex) {
             telemetry.addData("Exception", Drive.getStackTrace(ex));
         }
 
 
-        
+
         //check sensor sums
         //robot starts facing right
         //scan vision patter

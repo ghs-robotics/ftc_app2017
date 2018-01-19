@@ -53,7 +53,7 @@ public class VuforiaLocalizerImplSubclass extends VuforiaLocalizerImpl {
             }
 
             frame.close();
-            telemetry.log().add("A");
+            //telemetry.log().add("A");
         }
     }
 
