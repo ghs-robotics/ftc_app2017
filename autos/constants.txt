@@ -1,3 +1,3 @@
-ds:.01 base:.3 full:1 stop:0 magic:.8 Deriv:10 Prop:25 TransTime:.5 PlaceError:25 PropRot:.008 DerivRot:-.02 time:1 degree:.05 nano:1000000000
+ds:.01 base:.3 full:1 stop:0 magic:.8 Deriv:10 Prop:25 TransTime:.25 PlaceError:25 PropRot:.008 DerivRot:-.02 time:1 degree:.05 nano:1000000000
 
 #We only read the first line of this file

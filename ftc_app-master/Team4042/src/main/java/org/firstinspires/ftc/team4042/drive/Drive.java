@@ -110,6 +110,7 @@ public abstract class Drive {
 
     public AnalogSensor[] shortIr = new AnalogSensor[3];
     public AnalogSensor[] longIr = new AnalogSensor[2];
+    public AnalogSensor[] sonar = new AnalogSensor[2];
 
     public boolean verbose;
 
@@ -128,6 +129,10 @@ public abstract class Drive {
 
         for(int i = 0; i < longIr.length; i++){
             longIr[i] = new AnalogSensor("longir" + i, AnalogSensor.Type.LONG_RANGE);
+        }
+
+        for (int i = 0; i < sonar.length; i++){
+            sonar[i] = new AnalogSensor("sonar"+i, AnalogSensor.Type.SONAR);
         }
 
         verbose = false;
