@@ -32,6 +32,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * Parses a file to figure out which instructions to run. CAN NOT ACTUALLY RUN INSTRUCTIONS.
@@ -111,11 +112,9 @@ public abstract class Auto extends LinearVisionOpMode {
                         int i = 0;
                         while (i < inputParameters.length) {
                             String parameter = inputParameters[i];
-                            int colon = parameter.indexOf(':');
-                            String k = parameter.substring(0, colon);
-                            String v = parameter.substring(colon + 1);
-                            parameters.put(k, v); //Gets the next parameter and adds it to the list
-                            para.append(k).append(":").append(v).append(" ");
+                            String[] kv = parameter.split(":", 2);
+                            parameters.put(kv[0],  kv[1]); //Gets the next parameter and adds it to the list
+                            para.append(kv[0]).append(":").append(kv[1]).append(" ");
                             i++;
                         }
 
@@ -183,16 +182,16 @@ public abstract class Auto extends LinearVisionOpMode {
         try {
             drive.jewelUp();
         } catch (NullPointerException ex) { }
-        
+
         drive.resetEncoders();
         drive.setEncoders(true);
         drive.setVerbose(true);
         timer.reset();
 
         //Reads each instruction and acts accordingly
-        int i = 0;
-        while (i < instructions.size() && opModeIsActive()) {
-            AutoInstruction instruction = instructions.get(i);
+        Iterator<AutoInstruction> instructionsIter = instructions.iterator();
+        while (instructionsIter.hasNext() && opModeIsActive()) {
+            AutoInstruction instruction = instructionsIter.next();
             String functionName = instruction.getFunctionName();
             HashMap<String, String> parameters = instruction.getParameters();
             log.add("function: " + functionName);
@@ -240,7 +239,6 @@ public abstract class Auto extends LinearVisionOpMode {
                     System.err.println("Unknown function called from file " + file);
                     break;
             }
-            i++;
         }
 
         //autoDrive(new Direction(1, .5), Drive.FULL_SPEED, 1000);
