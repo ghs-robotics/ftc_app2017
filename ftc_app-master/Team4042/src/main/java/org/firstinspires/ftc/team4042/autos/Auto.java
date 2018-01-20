@@ -303,19 +303,24 @@ public abstract class Auto extends LinearVisionOpMode {
             double frontDistance = drive.shortIr[0].getCmAvg();
 
             //If the IR reading is closer to glyphIn than glyphOut, we assume the glyph is in
-            isGlyphIn = Math.abs(frontDistance - glyphIn) > Math.abs(frontDistance - glyphOut);
-            log.add("front distance: " + frontDistance);
-            log.add("is glyph in: " + isGlyphIn);
+            isGlyphIn = Math.abs(frontDistance - glyphIn) < Math.abs(frontDistance - glyphOut);
+            //log.add("front distance: " + frontDistance);
+            //log.add("is glyph in: " + isGlyphIn);
             telemetry.update();
         } while (opModeIsActive() && !isGlyphIn);
 
+        log.add("glyph in front");
+
         do {
             //Rotate the glyph for "time" seconds
+            log.add("running backwards");
             timer.reset();
             drive.intakeLeft(-1);
             drive.intakeRight(1);
 
-            while (opModeIsActive() && (timer.seconds() < C.get().getDouble("time"))) { }
+            while (opModeIsActive() && (timer.seconds() < C.get().getDouble("time")/2)) { }
+
+            log.add("running forwards");
 
             //Pull the glyph in for "time" seconds
             timer.reset();
@@ -331,6 +336,8 @@ public abstract class Auto extends LinearVisionOpMode {
 
             //If there is, repeat.
         } while (opModeIsActive() && isGlyphBack);
+
+        log.add("glyph is out");
     }
 
     public void alignHorizontally(HashMap<String, String> parameters) {
