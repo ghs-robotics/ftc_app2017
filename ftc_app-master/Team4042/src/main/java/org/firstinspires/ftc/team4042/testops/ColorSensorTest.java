@@ -30,10 +30,11 @@
 package org.firstinspires.ftc.team4042.testops;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.I2cDevice;
 import org.firstinspires.ftc.team4042.sensor.UltrasonicI2cRangeSensor;
+
+import org.firstinspires.ftc.team4042.sensor.ColorSensor;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -49,24 +50,35 @@ import org.firstinspires.ftc.team4042.sensor.UltrasonicI2cRangeSensor;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="TestUltra", group="testops")
-public class TestUltra extends LinearOpMode {
+@Autonomous(name="TestColor", group="testops")
+public class ColorSensorTest extends OpMode
+{
 
-    UltrasonicI2cRangeSensor ultraSensor;
+    ColorSensor colorSensor;
 
     @Override
-    public void runOpMode() {
-        ultraSensor = hardwareMap.get(UltrasonicI2cRangeSensor.class, "ultra");
-        ultraSensor.startRanging(telemetry);
-        telemetry.update();
-        waitForStart();
-        while (opModeIsActive()) {
-            ultraSensor.write();
-            //sleep(1000);
-            telemetry.addData("value", ultraSensor.read());
-            telemetry.update();
-            //sleep(1000);
-        }
-        ultraSensor.close();
+    public void init() {
+        colorSensor = hardwareMap.get(ColorSensor.class, "ultra");
+        colorSensor.init(48, ColorSensor.Register.GAIN_16X.bVal);
     }
+
+    @Override
+    public void start() {
+        colorSensor.startRanging();
+    }
+
+    @Override
+    public void loop() {
+        int[] crgb = colorSensor.getCRGB();
+
+        telemetry.addData("CRGB", "%5d %5d %5d %5d",
+                crgb[0], crgb[1], crgb[2], crgb[3]);
+        telemetry.update();
+    }
+
+    @Override
+    public void stop() {
+        colorSensor.close();
+    }
+
 }

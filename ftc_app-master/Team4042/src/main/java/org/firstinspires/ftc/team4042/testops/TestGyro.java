@@ -31,8 +31,8 @@ package org.firstinspires.ftc.team4042.testops;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.I2cDevice;
+
+import org.firstinspires.ftc.team4042.sensor.GyroOld;
 import org.firstinspires.ftc.team4042.sensor.UltrasonicI2cRangeSensor;
 
 /**
@@ -49,23 +49,20 @@ import org.firstinspires.ftc.team4042.sensor.UltrasonicI2cRangeSensor;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="TestUltra", group="testops")
-public class TestUltra extends LinearOpMode {
+@Autonomous(name="TestGyroBrendan", group="testops")
+public class TestGyro extends LinearOpMode {
 
-    UltrasonicI2cRangeSensor ultraSensor;
+    GyroOld ultraSensor;
 
     @Override
     public void runOpMode() {
-        ultraSensor = hardwareMap.get(UltrasonicI2cRangeSensor.class, "ultra");
+        ultraSensor = hardwareMap.get(GyroOld.class, "ultra");
         ultraSensor.startRanging(telemetry);
         telemetry.update();
         waitForStart();
         while (opModeIsActive()) {
-            ultraSensor.write();
-            //sleep(1000);
-            telemetry.addData("value", ultraSensor.read());
+            telemetry.addData("value", ultraSensor.getZ());
             telemetry.update();
-            //sleep(1000);
         }
         ultraSensor.close();
     }

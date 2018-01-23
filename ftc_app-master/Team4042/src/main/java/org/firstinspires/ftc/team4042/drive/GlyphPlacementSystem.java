@@ -110,6 +110,11 @@ public class GlyphPlacementSystem {
         //uiTargetY = y;
     }
 
+    public void uiTarget(int uiTargetX, int uiTargetY) {
+        this.uiTargetX = uiTargetX;
+        this.uiTargetY = uiTargetY;
+    }
+
     public int uiUp() {
         if (uiTargetY != 0) {
             uiTargetY -= 1;
