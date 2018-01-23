@@ -116,6 +116,8 @@ public abstract class Drive {
 
     Telemetry.Log log;
 
+    public boolean useSensors;
+
     public static String getStackTrace(Exception ex) {
         StringWriter sw = new StringWriter();
         ex.printStackTrace(new PrintWriter(sw));
@@ -136,6 +138,7 @@ public abstract class Drive {
         }
 
         verbose = false;
+        useSensors = true;
     }
 
     public Drive(boolean verbose) {
@@ -159,12 +162,14 @@ public abstract class Drive {
 
         log.add("useGyro: " + useGyro);
 
-        for (AnalogSensor aShortIr : shortIr) {
-            aShortIr.initialize(hardwareMap);
-        }
+        if (useSensors) {
+            for (AnalogSensor aShortIr : shortIr) {
+                aShortIr.initialize(hardwareMap);
+            }
 
-        for (AnalogSensor aLongIr : shortIr) {
-            aLongIr.initialize(hardwareMap);
+            for (AnalogSensor aLongIr : shortIr) {
+                aLongIr.initialize(hardwareMap);
+            }
         }
 
         motorLeftFront = initializeMotor(hardwareMap, "front left");
