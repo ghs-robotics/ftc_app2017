@@ -145,14 +145,13 @@ public class VuMarkIdentifier {
         return relicRecoveryVuMark;
     }
 
-    public Mat getJewel() {
-        relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
+    public Mat getFrame() {
+        /*relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
         relicTemplate = relicTrackables.get(0);
 
         relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
 
-        relicTrackables.activate();
-        //ElapsedTime timeout = new ElapsedTime();
+        relicTrackables.activate();*/       //ElapsedTime timeout = new ElapsedTime();
 
         telemetry.log().add("hey we got herreeeeeeee");
         Bitmap bm = null;

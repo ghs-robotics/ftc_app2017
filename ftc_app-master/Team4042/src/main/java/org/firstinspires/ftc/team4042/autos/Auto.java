@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.team4042.autos;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -20,6 +22,8 @@ import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -28,6 +32,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * Parses a file to figure out which instructions to run. CAN NOT ACTUALLY RUN INSTRUCTIONS.
@@ -39,8 +44,8 @@ public abstract class Auto extends LinearVisionOpMode {
     private VuMarkIdentifier vuMarkIdentifier = new VuMarkIdentifier();
     private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.CENTER;
 
-    private double PROPORTIONAL_ROTATE = Constants.getInstance().getDouble("PropRot");
-    private double DERIV_ROTATE = Constants.getInstance().getDouble("DerivRot");
+    private double PROPORTIONAL_ROTATE = C.get().getDouble("PropRot");
+    private double DERIV_ROTATE = C.get().getDouble("DerivRot");
 
     private Telemetry.Log log;
 
@@ -107,11 +112,9 @@ public abstract class Auto extends LinearVisionOpMode {
                         int i = 0;
                         while (i < inputParameters.length) {
                             String parameter = inputParameters[i];
-                            int colon = parameter.indexOf(':');
-                            String k = parameter.substring(0, colon);
-                            String v = parameter.substring(colon + 1);
-                            parameters.put(k, v); //Gets the next parameter and adds it to the list
-                            para.append(k).append(":").append(v).append(" ");
+                            String[] kv = parameter.split(":", 2);
+                            parameters.put(kv[0],  kv[1]); //Gets the next parameter and adds it to the list
+                            para.append(kv[0]).append(":").append(kv[1]).append(" ");
                             i++;
                         }
 
@@ -149,21 +152,46 @@ public abstract class Auto extends LinearVisionOpMode {
         } while (startRoll == 0 && startPitch == 0 && opModeIsActive());
     }
 
+    public void runAuto(boolean useSensors) {
+        if (useSensors) runAuto();
+        vuMarkIdentifier.initialize(telemetry, hardwareMap);
+        //telemetry.addData("vuMarkhere", "ststs");
+
+        //vuMark = vuMarkIdentifier.getMark();
+        //telemetry.addData("vuMarkhere", "after");
+
+
+        while(true) {
+            //Mat x = vuMarkIdentifier.getFrame();
+            //Log.d("TOMMY", x.toString());
+
+            RelicRecoveryVuMark j = vuMarkIdentifier.getMark();
+            //String j = getBallColor(x);
+            Log.d("TOMMY", j.toString());
+        }
+    }
+
     /**
      * Runs the list of instructions
      */
     public void runAuto() {
+        vuMarkIdentifier.initialize(telemetry, hardwareMap);
+
         gyro();
-        drive.jewelUp();
+
+        try {
+            drive.jewelUp();
+        } catch (NullPointerException ex) { }
+
         drive.resetEncoders();
         drive.setEncoders(true);
         drive.setVerbose(true);
-
         timer.reset();
+
         //Reads each instruction and acts accordingly
-        int i = 0;
-        while (i < instructions.size() && opModeIsActive()) {
-            AutoInstruction instruction = instructions.get(i);
+        Iterator<AutoInstruction> instructionsIter = instructions.iterator();
+        while (instructionsIter.hasNext() && opModeIsActive()) {
+            AutoInstruction instruction = instructionsIter.next();
             String functionName = instruction.getFunctionName();
             HashMap<String, String> parameters = instruction.getParameters();
             log.add("function: " + functionName);
@@ -211,7 +239,6 @@ public abstract class Auto extends LinearVisionOpMode {
                     System.err.println("Unknown function called from file " + file);
                     break;
             }
-            i++;
         }
 
         //autoDrive(new Direction(1, .5), Drive.FULL_SPEED, 1000);
@@ -234,7 +261,7 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void getVuMark(HashMap<String, String> parameters) {
-        //vuMark = vuMarkIdentifier.getMark();
+        vuMark = vuMarkIdentifier.getMark();
         telemetry.addData("vuMark", vuMark);
         telemetry.update();
     }
@@ -258,31 +285,59 @@ public abstract class Auto extends LinearVisionOpMode {
     */
 
     public void grabGlyph(HashMap<String, String> parameters) {
-        double glyphIn = 2;
-        double glyphOut = 6;
+        double glyphIn = 7;
+        double glyphOut = 30;
 
         ElapsedTime timer = new ElapsedTime();
 
+        boolean isGlyphIn;
+        boolean isGlyphBack;
+
+        drive.intakeLeft(1);
+        drive.intakeRight(1);
+
+        drive.readSensorsSetUp();
+
         do {
-            double currDistance = 0;
-            double backDistance = 0;
+            drive.shortIr[0].addReading();
+            double frontDistance = drive.shortIr[0].getCmAvg();
 
-            boolean isGlyphIn = Math.abs(currDistance - glyphIn) > Math.abs(currDistance - glyphOut);
-            boolean isGlyphBack = Math.abs(backDistance - glyphIn) > Math.abs(backDistance - glyphOut);
+            //If the IR reading is closer to glyphIn than glyphOut, we assume the glyph is in
+            isGlyphIn = Math.abs(frontDistance - glyphIn) < Math.abs(frontDistance - glyphOut);
+            //log.add("front distance: " + frontDistance);
+            //log.add("is glyph in: " + isGlyphIn);
+            telemetry.update();
+        } while (opModeIsActive() && !isGlyphIn);
 
-            if (!isGlyphIn) {
-                drive.intakeLeft(1);
-                drive.intakeRight(1);
-                timer.reset();
-            } else if (timer.seconds() < Constants.getInstance().getDouble("time")){
-                drive.intakeLeft(-1);
-                drive.intakeRight(1);
-            } else if (isGlyphBack) {
-                drive.intakeLeft(1);
-                drive.intakeRight(1);
-            }
+        log.add("glyph in front");
 
-        } while (opModeIsActive());
+        do {
+            //Rotate the glyph for "time" seconds
+            log.add("running backwards");
+            timer.reset();
+            drive.intakeLeft(-1);
+            drive.intakeRight(1);
+
+            while (opModeIsActive() && (timer.seconds() < C.get().getDouble("time")/2)) { }
+
+            log.add("running forwards");
+
+            //Pull the glyph in for "time" seconds
+            timer.reset();
+            drive.intakeLeft(1);
+            drive.intakeRight(1);
+
+            while (opModeIsActive() && (timer.seconds() < C.get().getDouble("time"))) { }
+
+            //See if there's still a glyph in the intake
+            drive.shortIr[1].addReading();
+            double backDistance = drive.shortIr[1].getCmAvg();
+            isGlyphBack = Math.abs(backDistance - glyphIn) > Math.abs(backDistance - glyphOut);
+
+            //If there is, repeat.
+        } while (opModeIsActive() && isGlyphBack);
+
+        log.add("glyph is out");
     }
 
     public void alignHorizontally(HashMap<String, String> parameters) {
@@ -303,7 +358,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
     public String getBallColor(Mat frame){
         log.add(frame.height() + " x " + frame.width());
-        //Imgproc.resize(frame, frame, new Size(960, 720));
+        Imgproc.resize(frame, frame, new Size(960, 720));
         telemetry.update();
         Rect left_crop = new Rect(new Point(215,585), new Point(380, 719));
         Rect right_crop = new Rect(new Point(460,585), new Point(620, 719));
@@ -365,7 +420,8 @@ public abstract class Auto extends LinearVisionOpMode {
     public void knockRedJewel(HashMap<String, String> parameters) {
         try {
             //String balls = getBallColor(vuMarkIdentifier.getFrameAsMat());
-            String balls = getBallColor(getFrameRgba());
+            //String balls = getBallColor(getFrameRgba());
+            String balls = getBallColor(vuMarkIdentifier.getFrame());
             //String balls = getBallColor(vuMarkIdentifier.getJewel());
             //String balls = "red, blue";
             telemetry.addData("ball orientation", balls);
@@ -399,7 +455,8 @@ public abstract class Auto extends LinearVisionOpMode {
     public void knockBlueJewel(HashMap<String, String> parameters) {
         log.add("blue jewel");
         //Mat mat = getFrameRgba();
-        String balls = getBallColor(getFrameRgba());
+        //String balls = getBallColor(getFrameRgba());
+        String balls = getBallColor(vuMarkIdentifier.getFrame());
         //String balls = "red, blue";
         log.add("ball orientation: " + balls);
         switch (balls) {
@@ -622,6 +679,11 @@ public abstract class Auto extends LinearVisionOpMode {
         try {
             drive.resetEncoders();
             drive.runWithEncoders();
+
+            drive.intakeLeft(1);
+            drive.intakeRight(1);
+            log.add("running intakes in");
+
             ElapsedTime timer = new ElapsedTime();
 
             timer.reset();
@@ -630,23 +692,42 @@ public abstract class Auto extends LinearVisionOpMode {
             while (timer.seconds() < 1) {
             }
             timer.reset();
-
             log.add("rotate left");
 
             //Moves the robot left
             autoRotate(7, Drive.FULL_SPEED/4);
-
             log.add("rotate right");
 
-            autoRotate(0, Drive.FULL_SPEED/4);
-
-            log.add("jewel up");
+            drive.intakeLeft(-1);
+            log.add("reversing left intake");
 
             drive.jewelUp();
-
             timer.reset();
             while (timer.seconds() < 1) {
             }
+            log.add("jewel up");
+
+            drive.intakeLeft(1);
+            log.add("forwarding left intake");
+
+            autoRotate(0, Drive.FULL_SPEED/4);
+
+            drive.intakeLeft(-1);
+            log.add("reverse, reverse!");
+            while (timer.seconds() < 1) {}
+            drive.intakeLeft(1);
+            log.add("turn it up!");
+            while (timer.seconds() < 1) {}
+            drive.intakeLeft(-1);
+            log.add("reverse, reverse! (second time)");
+            while (timer.seconds() < 1) {}
+            drive.intakeLeft(1);
+            log.add("turn it up! (second time)");
+            while (timer.seconds() < 1) {}
+            log.add("intake now maybe deployed, engines shutting down. scotty out");
+            drive.intakeLeft(0);
+            drive.intakeRight(0);
+
             //autoRotate(0, Drive.FULL_SPEED/4);
         } catch (NullPointerException ex) {
             StringWriter sw = new StringWriter();
@@ -659,6 +740,11 @@ public abstract class Auto extends LinearVisionOpMode {
         try {
             drive.resetEncoders();
             drive.runWithEncoders();
+
+            drive.intakeLeft(1);
+            drive.intakeRight(1);
+            log.add("running intakes in");
+
             ElapsedTime timer = new ElapsedTime();
 
             timer.reset();
@@ -670,13 +756,35 @@ public abstract class Auto extends LinearVisionOpMode {
 
             autoRotate(-7, Drive.FULL_SPEED/4);
 
-            autoRotate(0, Drive.FULL_SPEED/4);
+            drive.intakeLeft(-1);
+            log.add("reversing left intake");
 
             drive.jewelUp();
-
             timer.reset();
             while (timer.seconds() < 1) {
             }
+
+            drive.intakeLeft(1);
+            log.add("forwarding left intake");
+
+            autoRotate(0, Drive.FULL_SPEED/4);
+
+            drive.intakeLeft(-1);
+            log.add("reverse, reverse!");
+            while (timer.seconds() < 1) {}
+            drive.intakeLeft(1);
+            log.add("turn it up!");
+            while (timer.seconds() < 1) {}
+            drive.intakeLeft(-1);
+            log.add("reverse, reverse! (second time)");
+            while (timer.seconds() < 1) {}
+            drive.intakeLeft(1);
+            log.add("turn it up! (second time)");
+            while (timer.seconds() < 1) {}
+            log.add("intake now maybe deployed, engines shutting down. scotty out");
+            drive.intakeLeft(0);
+            drive.intakeRight(0);
+
             //autoRotate(0, Drive.FULL_SPEED/4);
         } catch (NullPointerException ex) {
             StringWriter sw = new StringWriter();

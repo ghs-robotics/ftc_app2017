@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.team4042.autos.Constants;
+import org.firstinspires.ftc.team4042.autos.C;
 
 @TeleOp(name = "Mecanum", group="drive")
 public class TeleOpMecanum extends OpMode {
@@ -16,9 +16,13 @@ public class TeleOpMecanum extends OpMode {
     private boolean manual = false;
     private boolean onBalancingStone = false;
 
+    private double oops = 1; //switch to -1 if runs in wrong direction when going for balance
+
     //CONTROL BOOLEANS START
     // We have these booleans so we only register a button press once.
     // You have to let go of the button and push it again to register a new event.
+    private boolean aBack = false;
+    private double aBackTime = 0;
     private boolean bBack = false;
     private boolean bStart = false;
 
@@ -115,12 +119,23 @@ public class TeleOpMecanum extends OpMode {
         }
         bStart = gamepad2.start;
 
-        if (gamepad1.back) {
-            balance();
-        }else {
-            //Drives the robot
-            drive.drive(false, gamepad1, gamepad2, adjustedSpeed * MecanumDrive.FULL_SPEED);
+        //The first time you hit back, it establishes how long you've been pushing it for
+        if (gamepad1.back && !aBack) {
+            aBackTime = System.nanoTime();
         }
+        //If you're pushing back and have been for longer than "nano", then run the full balance code
+        if (gamepad1.back && aBack) {
+            if (System.nanoTime() - aBackTime > C.get().getDouble("nano")) {
+                balance();
+            }
+        }
+        //If you've released back and did so for a shorter time than "nano", then toggle whether you're on the stone
+        if (!gamepad1.back && aBack) {
+            if (System.nanoTime() - aBackTime < C.get().getDouble("nano")) {
+                onBalancingStone = !onBalancingStone;
+            }
+        }
+        aBack = gamepad1.back;
 
         //Adjust drive modes, speeds, etc
         setUpDrive();
@@ -156,19 +171,24 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("currPitch", currPitch);
 
         boolean flat = Math.abs(currRoll - startRoll) < 2 && Math.abs(currPitch - startPitch) < 2;
-        boolean veryTipped = Math.abs(currRoll - startRoll) > 10 || Math.abs(currPitch - startPitch) > 10;
+        boolean veryTipped = Math.abs(currRoll - startRoll) > 8 || Math.abs(currPitch - startPitch) > 8;
         telemetry.addData("flat", flat);
         if (!onBalancingStone && !flat) {
             //If you get tipped, you must be on the balancing stone and we flag you as such
             onBalancingStone = true;
-        } else if (veryTipped || (!onBalancingStone && flat)) {
+        } else if (!onBalancingStone && flat) {
             //If you're just getting on or you're on the ground, run back hard
             drive.driveXYR(1, 0, -1, 0, true);
+        } else if (veryTipped) {
+            //Move away from which way you're tipped (should go towards the center)
+            double y = oops*2*(Math.ceil((currRoll-startRoll)/100)-.5);
+            telemetry.addData("y", y);
+            drive.driveXYR(1, 0, y, 0, true);
         } else if (!flat) {
             //adjust
             //double degreeP = .05;
             //If you're on the balancing stone and not quite flat, then adjust
-            double degreeP = Constants.getInstance().getDouble("degree");
+            double degreeP = C.get().getDouble("degree");
             double x = degreeP * (startPitch - currPitch);
             double y = degreeP * (startRoll - currRoll);
             drive.driveXYR(1, x, y, 0, true);
@@ -311,7 +331,7 @@ public class TeleOpMecanum extends OpMode {
     }
 
     private void glyphTarget() {
-        int targetX = gamepad2.x ? 0 : (gamepad2.y ? 1 : (gamepad2.b ? 2 : -1));
+        int targetX = gamepad2.x ? 0 : (gamepad2.y || gamepad2.a ? 1 : (gamepad2.b ? 2 : -1));
         int targetY = gamepad2.dpad_up ? 0 : (gamepad2.dpad_left || gamepad2.dpad_right ? 1 : (gamepad2.dpad_down ? 2 : -1));
         if (targetX != -1 && targetY != -1) {
             drive.glyph.uiTarget(targetX, targetY);
