@@ -25,6 +25,7 @@ public class TeleOpMecanum extends OpMode {
     private double aBackTime = 0;
     private boolean bBack = false;
     private boolean bStart = false;
+    private boolean lJoyBtn = false;
 
     private boolean aY = false;
     private boolean aX = false;
@@ -114,10 +115,10 @@ public class TeleOpMecanum extends OpMode {
         }
         bBack = gamepad2.back;
 
-        if (gamepad2.start && !bStart) {
+        if (gamepad2.left_stick_button && !lJoyBtn) {
             placerModeInstant = !placerModeInstant;
         }
-        bStart = gamepad2.start;
+        lJoyBtn = gamepad2.left_stick_button;
 
         //The first time you hit back, it establishes how long you've been pushing it for
         if (gamepad1.back && !aBack) {
@@ -237,7 +238,7 @@ public class TeleOpMecanum extends OpMode {
         }
         bA = gamepad2.a;
 
-        if (gamepad2.x && !bX) {
+        if (gamepad2.start && !bStart) {
             manual = !manual;
 
             if (!manual) {
@@ -253,20 +254,25 @@ public class TeleOpMecanum extends OpMode {
                 drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
         }
-        bX = gamepad2.x;
+        bStart = gamepad2.start;
 
-        if (gamepad2.b && !bB) {
-            drive.toggleHand();
-        }
-        bB = gamepad2.b;
+        if (manual) {
+            if (gamepad2.b && !bB) {
+                drive.toggleHand();
+            }
+            bB = gamepad2.b;
 
-        if (bY && !gamepad2.y) { //When you release Y, reset the utrack
-            drive.resetUTrack();
-            drive.glyph.setHomeTarget();
-        }
-        else if (gamepad2.y) { //If you're holding y, run the utrack downwards
-            drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            drive.setVerticalDrive(-0.5);
+            if (bY && !gamepad2.y) { //When you release Y, reset the utrack
+                drive.resetUTrack();
+                drive.glyph.setHomeTarget();
+            } else if (gamepad2.y) { //If you're holding y, run the utrack downwards
+                drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                drive.setVerticalDrive(-0.5);
+            } else {
+                drive.setVerticalDrive(gamepad2.left_stick_y);
+                drive.setHorizontalDrive(gamepad2.right_stick_x);
+            }
+            bY = gamepad2.y;
         }
         else if(!manual) {
             //Glyph locate
@@ -279,11 +285,7 @@ public class TeleOpMecanum extends OpMode {
             if (!drive.stage.equals(GlyphPlacementSystem.Stage.RETURN2) && !drive.stage.equals(GlyphPlacementSystem.Stage.RESET)) {
                 drive.glyph.runToPosition();
             }
-        } else {
-            drive.setVerticalDrive(gamepad2.left_stick_y);
-            drive.setHorizontalDrive(gamepad2.right_stick_x);
         }
-        bY = gamepad2.y;
     }
 
     private void speedModes() {
