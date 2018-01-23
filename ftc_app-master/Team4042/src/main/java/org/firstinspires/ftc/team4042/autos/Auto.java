@@ -804,34 +804,40 @@ public abstract class Auto extends LinearVisionOpMode {
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
 
+        drive.intakeLeft(1);
+        drive.intakeRight(1);
+        log.add("running intakes in");
+        while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {}
+        timer.reset();
+
         drive.intakeLeft(-1);
         log.add("reversing left intake");
-        while (timer.seconds() < 1) {}
+        while (timer.seconds() < C.get().getDouble("intakeBackTime")) {}
         timer.reset();
 
         drive.intakeLeft(1);
         log.add("forwarding left intake");
-        while (timer.seconds() < 1) {}
+        while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {}
         timer.reset();
 
         drive.intakeLeft(-1);
         log.add("reverse, reverse!");
-        while (timer.seconds() < 1) {}
+        while (timer.seconds() < C.get().getDouble("intakeBackTime")) {}
         timer.reset();
 
         drive.intakeLeft(1);
         log.add("turn it up!");
-        while (timer.seconds() < 1) {}
+        while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {}
         timer.reset();
 
         drive.intakeLeft(-1);
         log.add("reverse, reverse! (second time)");
-        while (timer.seconds() < 1) {}
+        while (timer.seconds() < C.get().getDouble("intakeBackTime")) {}
         timer.reset();
 
         drive.intakeLeft(1);
         log.add("turn it up! (second time)");
-        while (timer.seconds() < 1) {}
+        while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {}
         timer.reset();
 
         log.add("intake now maybe deployed, engines shutting down. scotty out");

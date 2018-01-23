@@ -27,7 +27,7 @@ public class  MecanumDrive extends Drive {
 
     @Override
     public void initialize(Telemetry telemetry, HardwareMap hardwareMap) {
-        if(this.useSensors) super.initialize(telemetry, hardwareMap);
+        super.initialize(telemetry, hardwareMap);
     }
 
     public MecanumDrive(boolean verbose) {
