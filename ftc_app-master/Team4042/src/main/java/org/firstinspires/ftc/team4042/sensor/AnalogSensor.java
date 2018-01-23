@@ -3,8 +3,6 @@ package org.firstinspires.ftc.team4042.sensor;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import java.util.ArrayList;
-
 /**
  * Created by Hazel on 10/13/2017.
  *
@@ -14,7 +12,8 @@ import java.util.ArrayList;
 public class AnalogSensor {
     public AnalogInput sensor;
     private String name;
-    private boolean isLongRange;
+    private Type type;
+    public enum Type { SHORT_RANGE, LONG_RANGE, SONAR }
 
     public static final int NUM_OF_READINGS = 6;
 
@@ -24,13 +23,17 @@ public class AnalogSensor {
 
     private double[] readings = new double[NUM_OF_READINGS];
 
-    public AnalogSensor(String name, boolean isLongRange) {
+    public AnalogSensor(String name, Type type) {
         this.name = name;
-        this.isLongRange = isLongRange;
+        this.type = type;
     }
 
     public void initialize(HardwareMap hardwareMap) {
-        sensor = hardwareMap.analogInput.get(name);
+        try {
+            sensor = hardwareMap.analogInput.get(name);
+        } catch (IllegalArgumentException ex) {
+            sensor = null;
+        }
     }
 
     public String getName() {
@@ -39,7 +42,15 @@ public class AnalogSensor {
 
     public double getCmAvg() {
         double voltage = getVAvg();
-        return isLongRange ? getCmAsLongIR(voltage) : getCmAsShortIR(voltage);
+        switch (type) {
+            case SHORT_RANGE:
+                return getCmAsShortIR(voltage);
+            case LONG_RANGE:
+                return getCmAsLongIR(voltage);
+            case SONAR:
+                return getCmAsSonar(voltage);
+        }
+        return -1;
     }
 
     public void addReading() {
@@ -79,6 +90,11 @@ public class AnalogSensor {
         if (voltage == -1) { return -1; }
         return (int)Math.round(51.0608 * Math.pow(voltage, -1.2463) + 4.7463);
         //return (int)Math.round(51.0608 * Math.pow(voltage, -1.2463) - 1.2463);
+    }
+
+    private int getCmAsSonar(double voltage) {
+        if (voltage == -1) { return -1; }
+        return (int)Math.round(747.47*voltage - 0.7522);
     }
 
     /*private double getVReptAsShortIR() {

@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.team4042.autos.Constants;
+import org.firstinspires.ftc.team4042.autos.C;
 import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
 
 import java.io.PrintWriter;
@@ -28,15 +28,15 @@ public abstract class Drive {
     public abstract void driveXYR(double speedFactor, double x, double y, double r, boolean useGyro);
 
     //Initializes a factor for the speed of movement to a position when driving with encoders
-    public static final double BASE_SPEED = Constants.getInstance().getDouble("base");
+    public static final double BASE_SPEED = C.get().getDouble("base");
     //The deadzone size for the joystick inputs
-    public static final double DEADZONE_SIZE = Constants.getInstance().getDouble("ds");
+    public static final double DEADZONE_SIZE = C.get().getDouble("ds");
     //The largest speed factor possible
-    public static final double FULL_SPEED = Constants.getInstance().getDouble("full");
+    public static final double FULL_SPEED = C.get().getDouble("full");
     //The power to put to the motors to stop them
-    public static final double STOP_SPEED = Constants.getInstance().getDouble("stop");
+    public static final double STOP_SPEED = C.get().getDouble("stop");
 
-    public static final double MAGIC_NUMBER = Constants.getInstance().getDouble("magic");
+    public static final double MAGIC_NUMBER = C.get().getDouble("magic");
 
     public static final boolean THE_FAST_ONES_ARE_THE_FRONT_ONES = true;
     public static final double LOW_SPEED_MOTOR_THINGS = 7;
@@ -110,6 +110,7 @@ public abstract class Drive {
 
     public AnalogSensor[] shortIr = new AnalogSensor[3];
     public AnalogSensor[] longIr = new AnalogSensor[2];
+    public AnalogSensor[] sonar = new AnalogSensor[2];
 
     public boolean verbose;
 
@@ -123,11 +124,15 @@ public abstract class Drive {
 
     public Drive() {
         for(int i = 0; i < shortIr.length; i++){
-            shortIr[i] = new AnalogSensor("ir" + i, false);
+            shortIr[i] = new AnalogSensor("ir" + i, AnalogSensor.Type.SHORT_RANGE);
         }
 
         for(int i = 0; i < longIr.length; i++){
-            longIr[i] = new AnalogSensor("longir" + i, true);
+            longIr[i] = new AnalogSensor("longir" + i, AnalogSensor.Type.LONG_RANGE);
+        }
+
+        for (int i = 0; i < sonar.length; i++){
+            sonar[i] = new AnalogSensor("sonar"+i, AnalogSensor.Type.SONAR);
         }
 
         verbose = false;
@@ -162,69 +167,110 @@ public abstract class Drive {
             aLongIr.initialize(hardwareMap);
         }
 
+        motorLeftFront = initializeMotor(hardwareMap, "front left");
+        motorRightFront = initializeMotor(hardwareMap, "front right");
+        motorLeftBack = initializeMotor(hardwareMap, "back left");
+        motorRightBack = initializeMotor(hardwareMap, "back right");
+
+        jewelServo = initializeServo(hardwareMap, "jewel");
         try {
-            motorLeftFront = hardwareMap.dcMotor.get("front left");
-        } catch (IllegalArgumentException ex) {
-            telemetry.addData("Front Left", "Could not find.");
-            useMotors = false;
+            jewelIn();
+        } catch (NullPointerException ex) { }
+
+        grabbyBoi = initializeServo(hardwareMap, "hand");
+
+        leftBrake = initializeServo(hardwareMap, "left brake");
+        rightBrake = initializeServo(hardwareMap, "right brake");
+
+        leftCatch = initializeServo(hardwareMap, "left catch");
+        rightCatch = initializeServo(hardwareMap, "right catch");
+
+        horizontalDrive = initializeCrServo(hardwareMap, "horizontal");
+
+        center = initializeDigital(hardwareMap, "center");
+        try {
+            center.setState(false);
+            center.setMode(DigitalChannel.Mode.INPUT);
+        } catch (NullPointerException ex) { }
+
+        bottom = initializeDigital(hardwareMap, "bottom");
+        try {
+            bottom.setState(false);
+            bottom.setMode(DigitalChannel.Mode.INPUT);
+        } catch (NullPointerException ex) { }
+
+        intakeLeft = initializeMotor(hardwareMap, "intake left");
+        intakeRight = initializeMotor(hardwareMap, "intake right");
+        //The left intake is mounted "backwards"
+        try {
+            intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        } catch (NullPointerException ex) { }
+
+        inLServo = initializeCrServo(hardwareMap, "intake left servo");
+        inRServo = initializeCrServo(hardwareMap, "intake right servo");
+        //The left intake servo is mounted "backwards"
+        try {
+            inLServo.setDirection(DcMotorSimple.Direction.REVERSE);
+        } catch (NullPointerException ex) { }
+
+        verticalDrive = initializeMotor(hardwareMap, "vertical drive");
+        try {
+            verticalDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            verticalDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        } catch (NullPointerException ex) { }
+        //verticalDrive.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
+    public void readSensorsSetUp() {
+        for (int i = 0; i < AnalogSensor.NUM_OF_READINGS; i++ ) {
+            for (AnalogSensor shortIr : shortIr) {
+                shortIr.addReading();
+            }
+            for (AnalogSensor longIr : longIr) {
+                longIr.addReading();
+            }
+        }
+    }
+
+    private DcMotor initializeMotor(HardwareMap hardwareMap, String motorName) {
+        DcMotor motor = null;
         try {
-            motorRightFront = hardwareMap.dcMotor.get("front right");
+            motor = hardwareMap.dcMotor.get(motorName);
         } catch (IllegalArgumentException ex) {
-            telemetry.addData("Front Right", "Could not find.");
+            telemetry.addData(motorName, "Could not find.");
             useMotors = false;
         }
+        return motor;
+    }
 
+    private Servo initializeServo(HardwareMap hardwareMap, String servoName) {
+        Servo servo = null;
         try {
-            motorRightBack = hardwareMap.dcMotor.get("back right");
+            servo = hardwareMap.servo.get(servoName);
         } catch (IllegalArgumentException ex) {
-            telemetry.addData("Back Right", "Could not find.");
-            useMotors = false;
+            telemetry.addData(servoName, "Could not find.");
         }
+        return servo;
+    }
 
+    private CRServo initializeCrServo(HardwareMap hardwareMap, String crServoName) {
+        CRServo crServo = null;
         try {
-            motorLeftBack = hardwareMap.dcMotor.get("back left");
+            crServo = hardwareMap.crservo.get(crServoName);
         } catch (IllegalArgumentException ex) {
-            telemetry.addData("Back Left", "Could not find.");
-            useMotors = false;
+            telemetry.addData(crServoName, "Could not find.");
         }
+        return crServo;
+    }
 
-        jewelServo = hardwareMap.servo.get("jewel");
-        jewelIn();
-
-        grabbyBoi = hardwareMap.servo.get("hand");
-
-        leftBrake = hardwareMap.servo.get("left brake");
-        rightBrake = hardwareMap.servo.get("right brake");
-
-        leftCatch = hardwareMap.servo.get("left catch");
-        rightCatch = hardwareMap.servo.get("right catch");
-
-        horizontalDrive = hardwareMap.crservo.get("horizontal");
-
-        center = hardwareMap.digitalChannel.get("center");
-        center.setState(false);
-        center.setMode(DigitalChannel.Mode.INPUT);
-
-        bottom = hardwareMap.digitalChannel.get("bottom");
-        bottom.setState(false);
-        bottom.setMode(DigitalChannel.Mode.INPUT);
-
-        intakeLeft = hardwareMap.dcMotor.get("intake left");
-        intakeRight = hardwareMap.dcMotor.get("intake right");
-        //The left intake is mounted "backwards"
-        intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        inLServo = hardwareMap.crservo.get("intake left servo");
-        inRServo = hardwareMap.crservo.get("intake right servo");
-        //The left intake servo is mounted "backwards"
-        inLServo.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        verticalDrive = hardwareMap.dcMotor.get("vertical drive");
-        verticalDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        verticalDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        //verticalDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+    private DigitalChannel initializeDigital(HardwareMap hardwareMap, String digitalName) {
+        DigitalChannel digitalChannel = null;
+        try {
+            digitalChannel = hardwareMap.digitalChannel.get(digitalName);
+        } catch (IllegalArgumentException ex) {
+            telemetry.addData(digitalName, "Could not find.");
+        }
+        return digitalChannel;
     }
 
     private double[] lastEncoders = new double[4];
@@ -304,97 +350,107 @@ public abstract class Drive {
     public boolean uTrack() {
         telemetry.addData("stage", stage);
         switch (stage) {
-            case HOME: {
-                //Close the hand
-                closeHand();
-                jewelOut();
-                glyphLocate();
-                handDropTimer.reset();
-
-                glyph.currentY = GlyphPlacementSystem.Position.HOME;
-                glyph.currentX = GlyphPlacementSystem.HorizPos.CENTER;
-
-                stage = GlyphPlacementSystem.Stage.GRAB;
-                uTrackAtBottom = false;
-                return false;
-            }
-            case GRAB: {
-                if (handDropTimer.seconds() >= 1) {
-                    stage = GlyphPlacementSystem.Stage.PLACE1;
-                }
-                return false;
-            }
-            case PLACE1: {
-                //Raise the u-track
-                setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
-                glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
-                if(glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
-                    stage = GlyphPlacementSystem.Stage.PAUSE1;
-                    glyph.setXPower(targetX);
-                }
-                return false;
-            }
-            case PAUSE1: {
-                //Move to target X location
-                if(glyph.xTargetReached(targetX)) {
-                    stage = GlyphPlacementSystem.Stage.PLACE2;
-                }
-                return false;
-            }
-            case PLACE2:{
-                //Move to target Y location
-                glyph.setTargetPosition(targetY);
-                if(glyph.currentY.equals(targetY)) {
-                    stage = GlyphPlacementSystem.Stage.RETURN1;
-                }
-                return false;
-            }
-            case RETURN1: {
-                //Open the hand; raise the u-track
-                openHand();
-                handDropTimer.reset();
-
-                stage = GlyphPlacementSystem.Stage.RELEASE;
-                return false;
-            }
-            case RELEASE: {
-                if (handDropTimer.seconds() >= 1) {
-                    glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISEDBACK);
-                    if (glyph.currentY.equals(GlyphPlacementSystem.Position.RAISEDBACK)) {
-                        stage = GlyphPlacementSystem.Stage.PAUSE2;
-                    }
-                }
-                return false;
-            }
-            case PAUSE2: {
-                //Move back to center x location (so the hand fits back in the robot)
-                glyph.setXPower(GlyphPlacementSystem.HorizPos.CENTER);
-                if(glyph.xTargetReached(GlyphPlacementSystem.HorizPos.CENTER)) {
-                    stage = GlyphPlacementSystem.Stage.RETURN2;
-                    if (targetX.equals(GlyphPlacementSystem.HorizPos.LEFT)) {
-                        glyph.adjustBack(-1);
-                    }
-                }
-                return false;
-            }
-            case RETURN2: {
-                //Move back to the bottom and get ready to do it again
-                glyph.setHomeTarget();
-                setVerticalDriveMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                setVerticalDrive(-1);
-                stage = GlyphPlacementSystem.Stage.RESET;
-                return false;
-            }
-            case RESET: {
-                if (getBottomState()) {
-                    resetUTrack();
-                    setVerticalDrive(0);
-                    uTrackAtBottom = true;
-                }
-                return true;
-            }
+            case HOME: { home(); return false; }
+            case GRAB: { grab(); return false; }
+            case PLACE1: { place1(); return false; }
+            case PAUSE1: { pause1(); return false; }
+            case PLACE2:{ place2(); return false; }
+            case RETURN1: { return1(); return false; }
+            case RELEASE: { release(); return false; }
+            case PAUSE2: { pause2(); return false; }
+            case RETURN2: { return2(); return false; }
+            case RESET: { reset(); return true; }
         }
         return false;
+    }
+
+    private void home() {
+        //Close the hand
+        closeHand();
+        jewelOut();
+        glyphLocate();
+        handDropTimer.reset();
+
+        glyph.currentY = GlyphPlacementSystem.Position.HOME;
+        glyph.currentX = GlyphPlacementSystem.HorizPos.CENTER;
+
+        stage = GlyphPlacementSystem.Stage.GRAB;
+        uTrackAtBottom = false;
+    }
+
+    private void grab() {
+        if (handDropTimer.seconds() >= 1) {
+            stage = GlyphPlacementSystem.Stage.PLACE1;
+        }
+    }
+
+    private void place1() {
+        //Raise the u-track
+        setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+        glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
+        if(glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
+            stage = GlyphPlacementSystem.Stage.PAUSE1;
+            glyph.setXPower(targetX);
+        }
+    }
+
+    private void pause1() {
+        //Move to target X location
+        if(glyph.xTargetReached(targetX)) {
+            stage = GlyphPlacementSystem.Stage.PLACE2;
+        }
+    }
+
+    private void place2() {
+        //Move to target Y location
+        glyph.setTargetPosition(targetY);
+        if(glyph.currentY.equals(targetY)) {
+            stage = GlyphPlacementSystem.Stage.RETURN1;
+        }
+    }
+
+    private void return1() {
+        //Open the hand; raise the u-track
+        openHand();
+        handDropTimer.reset();
+
+        stage = GlyphPlacementSystem.Stage.RELEASE;
+    }
+
+    private void release() {
+        if (handDropTimer.seconds() >= 1) {
+            glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISEDBACK);
+            if (glyph.currentY.equals(GlyphPlacementSystem.Position.RAISEDBACK)) {
+                stage = GlyphPlacementSystem.Stage.PAUSE2;
+            }
+        }
+    }
+
+    private void pause2() {
+        //Move back to center x location (so the hand fits back in the robot)
+        glyph.setXPower(GlyphPlacementSystem.HorizPos.CENTER);
+        if(glyph.xTargetReached(GlyphPlacementSystem.HorizPos.CENTER)) {
+            stage = GlyphPlacementSystem.Stage.RETURN2;
+            if (targetX.equals(GlyphPlacementSystem.HorizPos.LEFT)) {
+                glyph.adjustBack(-1);
+            }
+        }
+    }
+
+    private void return2() {
+        //Move back to the bottom and get ready to do it again
+        glyph.setHomeTarget();
+        setVerticalDriveMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        setVerticalDrive(-1);
+        stage = GlyphPlacementSystem.Stage.RESET;
+    }
+
+    private void reset() {
+        if (getBottomState()) {
+            resetUTrack();
+            setVerticalDrive(0);
+            uTrackAtBottom = true;
+        }
     }
 
     public void resetUTrack() {

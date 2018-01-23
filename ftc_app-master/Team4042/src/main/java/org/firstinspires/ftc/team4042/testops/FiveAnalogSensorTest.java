@@ -17,24 +17,38 @@ public class FiveAnalogSensorTest extends OpMode{
     @Override
     public void init() {
         for (int i = 0; i < shortRange.length; i++) {
-            shortRange[i] = new AnalogSensor("ir" + i, false);
-            shortRange[i].initialize(hardwareMap);
+            shortRange[i] = new AnalogSensor("ir" + i, AnalogSensor.Type.SHORT_RANGE);
+            if (shortRange[i] != null) {
+                shortRange[i].initialize(hardwareMap);
+                for (int j = 0; j < AnalogSensor.NUM_OF_READINGS; j++) {
+                    shortRange[i].addReading();
+                }
+            }
         }
         for (int i = 0; i < longRange.length; i++) {
-            longRange[i] = new AnalogSensor("longir" + i, true);
-            longRange[i].initialize(hardwareMap);
+            longRange[i] = new AnalogSensor("longir" + i, AnalogSensor.Type.LONG_RANGE);
+            if (longRange[i] != null) {
+                longRange[i].initialize(hardwareMap);
+                for (int j = 0; j < AnalogSensor.NUM_OF_READINGS; j++) {
+                    longRange[i].addReading();
+                }
+            }
         }
     }
 
     @Override
     public void loop() {
         for (AnalogSensor shortRange : shortRange) {
-            shortRange.addReading();
-            telemetry.addData(shortRange.getName(), shortRange.getCmAvg());
+            if (shortRange != null) {
+                shortRange.addReading();
+                telemetry.addData(shortRange.getName(), shortRange.getCmAvg());
+            }
         }
         for (AnalogSensor longRange : longRange) {
-            longRange.addReading();
-            telemetry.addData(longRange.getName(), longRange.getCmAvg());
+            if (longRange != null) {
+                longRange.addReading();
+                telemetry.addData(longRange.getName(), longRange.getCmAvg());
+            }
         }
         telemetry.update();
     }

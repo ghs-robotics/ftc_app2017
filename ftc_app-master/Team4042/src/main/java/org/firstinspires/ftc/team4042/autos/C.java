@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.team4042.autos;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,27 +13,28 @@ import java.util.HashMap;
  * Created by Gautham on 12/19/2017.
  */
 
-public class Constants {
+public class C {
     File file;
+
     private HashMap<String, String> myConstants;
-    private static Constants c;
+    private static C c;
 
 
-    public static Constants getInstance() {
+    public static C get() {
         if(c == null){
-            c = new Constants();
+            c = new C();
         }
         return c;
     }
 
-    private Constants() {
+    private C() {
         file = new File("./storage/emulated/0/DCIM/" + "constants.txt");
         myConstants = loadFile();
     }
 
     private HashMap<String, String> loadFile() {
-        if (file == null) {
-            return null;
+        if (!file.exists()) {
+            throw new RuntimeException("file not found");
         } //Can't load a null file
 
         try {
@@ -62,21 +63,22 @@ public class Constants {
             ex.printStackTrace(new PrintWriter(sw));
 
         }
-        return null;
+        throw new RuntimeException("got to the end of the C file construtor thing");
     }
 
     public String getString(String constant) {
         //return c.getString(constant);
-        return getInstance().myConstants.get(constant);
+        return get().myConstants.get(constant);
     }
 
     public int getInt(String constant) {
         //return c.getInt(constant);
-        return Integer.parseInt(getInstance().myConstants.get(constant));
+        return Integer.parseInt(get().myConstants.get(constant));
     }
 
     public double getDouble(String constant) {
         //return c.getDouble(constant);
-        return Double.parseDouble(getInstance().myConstants.get(constant));
+
+        return Double.parseDouble(get().myConstants.get(constant));
     }
 }
