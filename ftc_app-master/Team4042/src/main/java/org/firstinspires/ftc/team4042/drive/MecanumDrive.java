@@ -18,11 +18,9 @@ public class  MecanumDrive extends Drive {
     /**
      * Constructor for Drive, it creates the motors and the gyro objects
      */
-    private boolean useSensors;
     public MecanumDrive() {
         //Initialize motors and gyro
         super();
-        useSensors = true;
     }
 
 
@@ -34,13 +32,12 @@ public class  MecanumDrive extends Drive {
 
     public MecanumDrive(boolean verbose) {
         super(verbose);
-        useSensors = true;
     }
 
     public MecanumDrive(boolean verbose, boolean useSensors) {
         //Initialize motors and gyro
         super(verbose);
-        this.useSensors = useSensors;
+        super.useSensors = useSensors;
     }
 
     private void driveTank(double speedFactor, double l, double r) {

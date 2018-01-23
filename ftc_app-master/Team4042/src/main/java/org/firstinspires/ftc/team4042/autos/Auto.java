@@ -235,6 +235,9 @@ public abstract class Auto extends LinearVisionOpMode {
                 case "g":
                     grabGlyph(parameters);
                     break;
+                case "open":
+                    openIntakes(parameters);
+                    break;
                 default:
                     System.err.println("Unknown function called from file " + file);
                     break;
@@ -286,7 +289,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
     public void grabGlyph(HashMap<String, String> parameters) {
         double glyphIn = 7;
-        double glyphOut = 30;
+        double glyphOut = 20;
 
         ElapsedTime timer = new ElapsedTime();
 
@@ -336,6 +339,9 @@ public abstract class Auto extends LinearVisionOpMode {
 
             //If there is, repeat.
         } while (opModeIsActive() && isGlyphBack);
+
+        drive.intakeLeft(0);
+        drive.intakeRight(0);
 
         log.add("glyph is out");
     }
@@ -791,5 +797,45 @@ public abstract class Auto extends LinearVisionOpMode {
             ex.printStackTrace(new PrintWriter(sw));
             telemetry.addData("NullPointerException", sw.toString());
         }
+    }
+
+    public void openIntakes(HashMap<String, String> parameters) {
+
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
+
+        drive.intakeLeft(-1);
+        log.add("reversing left intake");
+        while (timer.seconds() < 1) {}
+        timer.reset();
+
+        drive.intakeLeft(1);
+        log.add("forwarding left intake");
+        while (timer.seconds() < 1) {}
+        timer.reset();
+
+        drive.intakeLeft(-1);
+        log.add("reverse, reverse!");
+        while (timer.seconds() < 1) {}
+        timer.reset();
+
+        drive.intakeLeft(1);
+        log.add("turn it up!");
+        while (timer.seconds() < 1) {}
+        timer.reset();
+
+        drive.intakeLeft(-1);
+        log.add("reverse, reverse! (second time)");
+        while (timer.seconds() < 1) {}
+        timer.reset();
+
+        drive.intakeLeft(1);
+        log.add("turn it up! (second time)");
+        while (timer.seconds() < 1) {}
+        timer.reset();
+
+        log.add("intake now maybe deployed, engines shutting down. scotty out");
+        drive.intakeLeft(0);
+        drive.intakeRight(0);
     }
 }
