@@ -51,8 +51,6 @@ public abstract class Auto extends LinearVisionOpMode {
 
     File file;
 
-    ElapsedTime timer;
-
     private ArrayList<AutoInstruction> instructions = new ArrayList<>();
 
     private double startRoll;
@@ -186,7 +184,6 @@ public abstract class Auto extends LinearVisionOpMode {
         drive.resetEncoders();
         drive.setEncoders(true);
         drive.setVerbose(true);
-        timer.reset();
 
         //Reads each instruction and acts accordingly
         Iterator<AutoInstruction> instructionsIter = instructions.iterator();
@@ -288,62 +285,9 @@ public abstract class Auto extends LinearVisionOpMode {
     */
 
     public void grabGlyph(HashMap<String, String> parameters) {
-        double glyphIn = 7;
-        double glyphOut = 20;
-
-        ElapsedTime timer = new ElapsedTime();
-
-        boolean isGlyphIn;
-        boolean isGlyphBack;
-
-        drive.intakeLeft(1);
-        drive.intakeRight(1);
-
         drive.readSensorsSetUp();
 
-        do {
-            drive.shortIr[0].addReading();
-            double frontDistance = drive.shortIr[0].getCmAvg();
-
-            //If the IR reading is closer to glyphIn than glyphOut, we assume the glyph is in
-            isGlyphIn = Math.abs(frontDistance - glyphIn) < Math.abs(frontDistance - glyphOut);
-            //log.add("front distance: " + frontDistance);
-            //log.add("is glyph in: " + isGlyphIn);
-            telemetry.update();
-        } while (opModeIsActive() && !isGlyphIn);
-
-        log.add("glyph in front");
-
-        do {
-            //Rotate the glyph for "time" seconds
-            log.add("running backwards");
-            timer.reset();
-            drive.intakeLeft(-1);
-            drive.intakeRight(1);
-
-            while (opModeIsActive() && (timer.seconds() < C.get().getDouble("time")/2)) { }
-
-            log.add("running forwards");
-
-            //Pull the glyph in for "time" seconds
-            timer.reset();
-            drive.intakeLeft(1);
-            drive.intakeRight(1);
-
-            while (opModeIsActive() && (timer.seconds() < C.get().getDouble("time"))) { }
-
-            //See if there's still a glyph in the intake
-            drive.shortIr[1].addReading();
-            double backDistance = drive.shortIr[1].getCmAvg();
-            isGlyphBack = Math.abs(backDistance - glyphIn) > Math.abs(backDistance - glyphOut);
-
-            //If there is, repeat.
-        } while (opModeIsActive() && isGlyphBack);
-
-        drive.intakeLeft(0);
-        drive.intakeRight(0);
-
-        log.add("glyph is out");
+        while (opModeIsActive() && !drive.collectGlyphStep()) {  }
     }
 
     public void alignHorizontally(HashMap<String, String> parameters) {
