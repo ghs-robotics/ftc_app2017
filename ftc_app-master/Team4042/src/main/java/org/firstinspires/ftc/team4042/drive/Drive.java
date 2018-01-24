@@ -287,8 +287,11 @@ public abstract class Drive {
 
     private double[] lastShortIr = new double[3];
     private double[] lastLongIr = new double[2];
+    private double[] lastSonar = new double[2];
+
     public double[] shortIrRates = new double[3];
     public double[] longIrRates = new double[2];
+    public double[] sonarRates = new double[2];
 
     private double lastUTrack = 0;
     public double uTrackRate = 0;
@@ -326,6 +329,14 @@ public abstract class Drive {
             longIrRates[i] = (currLongIr[i] - lastLongIr[i]) / (currMilli - lastMilli);
         }
 
+        double[] currSonar = new double[3];
+        for (int i = 0; i < currSonar.length; i++) {
+            AnalogSensor sIr = sonar[i];
+            sIr.addReading();
+            currSonar[i] = sIr.getCmAvg();
+            sonarRates[i] = (currSonar[i] - lastSonar[i]) / (currMilli - lastMilli);
+        }
+
         //Gyro rates
         gyroRate = (currGyro - lastGyro) / (currMilli - lastMilli);
 
@@ -333,6 +344,7 @@ public abstract class Drive {
         lastGyro = currGyro;
         lastShortIr = currShortIr;
         lastLongIr = currLongIr;
+        lastSonar = currSonar;
 
         lastMilli = currMilli;
     }
