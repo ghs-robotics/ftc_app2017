@@ -81,6 +81,8 @@ public abstract class Drive {
     private Servo leftBrake;
     private Servo rightBrake;
 
+    private Servo winch;
+
     private Servo leftCatch;
     private Servo rightCatch;
 
@@ -633,6 +635,14 @@ public abstract class Drive {
     public void raiseBrakes() {
         leftBrake.setPosition(0);
         rightBrake.setPosition(.66);
+    }
+
+    public void stowWinch() {
+        winch.setPosition(.97);
+    }
+
+    public void openWinch() {
+        winch.setPosition(.69);
     }
 
     public void jewelAdjust(double adjustAmt) {
