@@ -366,6 +366,55 @@ public abstract class Drive {
         targetX = GlyphPlacementSystem.HorizPos.values()[glyph.uiTargetX];
     }
 
+    private ElapsedTime glyphCollectionTimer = new ElapsedTime();
+
+    /**
+     * One step in collecting a glyph - designed to be looped over
+     * @return Whether a glyph has been collected
+     */
+    public boolean collectGlyphStep() {
+        double glyphIn = 7;
+        double glyphOut = 20;
+
+        shortIr[0].addReading();
+        double frontDistance = shortIr[0].getCmAvg();
+
+        shortIr[1].addReading();
+        double backDistance = shortIr[1].getCmAvg();
+
+        //If the IR reading is closer to glyphIn than glyphOut, we assume the glyph is in
+        boolean isGlyphIn = Math.abs(frontDistance - glyphIn) < Math.abs(frontDistance - glyphOut);
+        boolean isGlyphBack = Math.abs(backDistance - glyphIn) < Math.abs(backDistance - glyphOut);
+
+        if (!isGlyphIn && !isGlyphBack) {
+            //Step 1: intakes in until a glyph is found
+            intakeLeft(1);
+            intakeRight(1);
+            glyphCollectionTimer.reset();
+            return false;
+        } else if (!isGlyphBack && glyphCollectionTimer.seconds() < C.get().getDouble("time")/2){
+            //Step 2: after a glyph gets in, until half of time, rotate the glyph
+            intakeLeft(-1);
+            intakeRight(1);
+            return false;
+        } else if (!isGlyphBack && glyphCollectionTimer.seconds() < C.get().getDouble("time") * 3/2) {
+            //Step 3: after a glyph gets in and has been rotated, pull it in
+            intakeLeft(1);
+            intakeRight(1);
+            return false;
+        } else if (!isGlyphBack && glyphCollectionTimer.seconds() >= C.get().getDouble("time") * 3/2) {
+            //Step 4: If the glyph still isn't in, reset the glyphCollectionTimer to loop us back through to step 2
+            glyphCollectionTimer.reset();
+            return false;
+        } else if (isGlyphBack) {
+            //Step 5: But if the glyph is in, then stop the intakes and wait
+            intakeLeft(0);
+            intakeRight(0);
+            return true;
+        }
+        return false;
+    }
+
     public boolean uTrack() {
         telemetry.addData("stage", stage);
         switch (stage) {
