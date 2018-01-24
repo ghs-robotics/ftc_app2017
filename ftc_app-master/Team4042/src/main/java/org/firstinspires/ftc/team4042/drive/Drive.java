@@ -616,23 +616,23 @@ public abstract class Drive {
     }
 
     public void lockCatches() {
-        rightCatch.setPosition(.9);
-        leftCatch.setPosition(.17);
+        rightCatch.setPosition(1);
+        leftCatch.setPosition(0);
     }
 
     public void unlockCatches() {
-        rightCatch.setPosition(.46);
-        leftCatch.setPosition(.6);
+        rightCatch.setPosition(.12);
+        leftCatch.setPosition(.9);
     }
 
     public void lowerBrakes() {
-        leftBrake.setPosition(.9);
-        rightBrake.setPosition(0);
+        leftBrake.setPosition(.8);
+        rightBrake.setPosition(.01);
     }
 
     public void raiseBrakes() {
-        leftBrake.setPosition(.1);
-        rightBrake.setPosition(.68);
+        leftBrake.setPosition(0);
+        rightBrake.setPosition(.66);
     }
 
     public void jewelAdjust(double adjustAmt) {
