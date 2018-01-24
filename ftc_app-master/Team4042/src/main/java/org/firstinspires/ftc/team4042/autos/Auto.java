@@ -58,7 +58,6 @@ public abstract class Auto extends LinearVisionOpMode {
 
 
     public void setUp(MecanumDrive drive, String filePath) {
-        timer = new ElapsedTime();
         this.drive = drive;
 
         log = telemetry.log();
