@@ -573,7 +573,6 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void autoSensorDrive(HashMap<String, String> parameters) {
-        double speed = Double.parseDouble(parameters.get("speed"));
         double targetGyro = Double.parseDouble(parameters.get("gyro"));
 
         boolean useX = parameters.containsKey("xdistance");
@@ -581,32 +580,82 @@ public abstract class Auto extends LinearVisionOpMode {
 
         double yTargetDistance = useY ? Double.parseDouble(parameters.get("ydistance")) : 0;
         int yIr = useY ? Integer.parseInt(parameters.get("yir")) : 0;
-        boolean yLongIr = useY ? Boolean.parseBoolean(parameters.get("ylong")) : false;
+
+        AnalogSensor.Type yType = AnalogSensor.Type.SHORT_RANGE;
+        if (useY) {
+            switch (parameters.get("ytype")) {
+                case "short":
+                    yType = AnalogSensor.Type.SHORT_RANGE;
+                    break;
+                case "long":
+                    yType = AnalogSensor.Type.LONG_RANGE;
+                    break;
+                case "sonar":
+                    yType = AnalogSensor.Type.SONAR;
+                    break;
+            }
+        }
 
         log.add("" + parameters.containsKey("xdistance"));
 
         double xTargetDistance = useX ? Double.parseDouble(parameters.get("xdistance")) : 0;
         int xIr = useX ? Integer.parseInt(parameters.get("xir")) : 0;
-        boolean xLongIr = useX ? Boolean.parseBoolean(parameters.get("xlong")) : false;
 
-        autoSensorDrive(speed, xTargetDistance, xIr, xLongIr, useX, yTargetDistance, yIr, yLongIr, useY, targetGyro);
+        AnalogSensor.Type xType = AnalogSensor.Type.SHORT_RANGE;
+        if (useX) {
+            switch (parameters.get("xtype")) {
+                case "short":
+                    xType = AnalogSensor.Type.SHORT_RANGE;
+                    break;
+                case "long":
+                    xType = AnalogSensor.Type.LONG_RANGE;
+                    break;
+                case "sonar":
+                    xType = AnalogSensor.Type.SONAR;
+                    break;
+            }
+        }
+
+        autoSensorDrive(xTargetDistance, xIr, xType, useX, yTargetDistance, yIr, yType, useY, targetGyro);
     }
 
     /**
      * Drives until two sensors returns a target value, one for the x positioning and one for the y
-     * @param speed The speed to move at
      * @param xTargetDistance The final distance for the x sensor to return
      * @param xIrId The sensor to read an x distance from
-     * @param xIsLongRange Whether the x sensor is long-range or not
+     * @param xType Whether the x sensor is long-range or not
      * @param yTargetDistance The final distance for the y sensor to return
      * @param yIrId The sensor to read an y distance from
-     * @param yIsLongRange Whether the y sensor is long-range or not
+     * @param yType Whether the y sensor is long-range or not
      */
-    private void autoSensorDrive(double speed, double xTargetDistance, int xIrId, boolean xIsLongRange, boolean useX,
-                                 double yTargetDistance, int yIrId, boolean yIsLongRange, boolean useY, double targetGyro) {
+    private void autoSensorDrive(double xTargetDistance, int xIrId, AnalogSensor.Type xType, boolean useX,
+                                 double yTargetDistance, int yIrId, AnalogSensor.Type yType, boolean useY, double targetGyro) {
         if (useX || useY) {
-            AnalogSensor xIr = xIsLongRange ? drive.longIr[xIrId] : drive.shortIr[xIrId];
-            AnalogSensor yIr = yIsLongRange ? drive.longIr[yIrId] : drive.shortIr[yIrId];
+            AnalogSensor xIr = null;
+            switch (xType) {
+                case SHORT_RANGE:
+                    xIr = drive.shortIr[xIrId];
+                    break;
+                case LONG_RANGE:
+                    xIr = drive.longIr[xIrId];
+                    break;
+                case SONAR:
+                    xIr = drive.sonar[xIrId];
+                    break;
+            }
+
+            AnalogSensor yIr = null;
+            switch (yType) {
+                case SHORT_RANGE:
+                    yIr = drive.shortIr[yIrId];
+                    break;
+                case LONG_RANGE:
+                    yIr = drive.longIr[yIrId];
+                    break;
+                case SONAR:
+                    yIr = drive.sonar[yIrId];
+                    break;
+            }
 
             double xCurrDistance;
             double yCurrDistance;
@@ -630,8 +679,8 @@ public abstract class Auto extends LinearVisionOpMode {
                 xCurrDistance = xIr.getCmAvg();
                 yCurrDistance = yIr.getCmAvg();
 
-                double xFactor = getSensorFactor(xIsLongRange, xIrId, xCurrDistance, xTargetDistance);
-                double yFactor = getSensorFactor(yIsLongRange, yIrId, yCurrDistance, yTargetDistance);
+                double xFactor = getSensorFactor(xType, xIrId, xCurrDistance, xTargetDistance);
+                double yFactor = getSensorFactor(yType, yIrId, yCurrDistance, yTargetDistance);
 
                 drive.runWithoutEncoders();
                 //Actually drives
@@ -654,8 +703,19 @@ public abstract class Auto extends LinearVisionOpMode {
         }
     }
 
-    private double getSensorFactor(boolean isLongRange, int irId, double currDistance, double targetDistance) {
-        double derivValue = isLongRange ? drive.longIrRates[irId] : drive.shortIrRates[irId];
+    private double getSensorFactor(AnalogSensor.Type type, int irId, double currDistance, double targetDistance) {
+        double derivValue = 0;
+        switch (type) {
+            case SHORT_RANGE:
+                derivValue = drive.shortIrRates[irId];
+                break;
+            case LONG_RANGE:
+                derivValue = drive.longIrRates[irId];
+                break;
+            case SONAR:
+                derivValue = drive.sonarRates[irId];
+                break;
+        }
 
         //Set up the derivative and proportional terms
         double deriv = derivValue * -10;
@@ -675,10 +735,10 @@ public abstract class Auto extends LinearVisionOpMode {
         return r;
     }
 
-    private void autoSensorDrive(double speed, double targetDistance) {
+    private void autoSensorDrive(double targetDistance) {
         telemetry.addData("ir", drive.shortIr[0]);
         telemetry.update();
-        autoSensorDrive(speed, 0, 0, false, false, targetDistance, 0, false, true, 0);
+        autoSensorDrive(0, 0, AnalogSensor.Type.SHORT_RANGE, false, targetDistance, 0, AnalogSensor.Type.SHORT_RANGE, true, 0);
     }
 
     public void jewelLeft() {

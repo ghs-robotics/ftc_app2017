@@ -1,26 +1,8 @@
-#function:d|r|s|jr|jb|v|p
-#d | dead-reckoning drive | parameters - x:[number], y:[number], speed:[number], target:[number]
-#r | gyro rotation (x = -1 for counter-clockwise; 1 for clockwise) until distance | parameters - r:[number], speed:[number], target:[number]
-#s | sensor drive until name returns distance | parameters - x:[number], y:[number], speed:[number], target:[number]
-#jr | knock red jewel | parameters - [none]
-#jb | knock blue jewel | parameters - [none]
-#v | identifies vumark | parameters - [none]
-#p | places glyph (ASSUMES V HAS BEEN CALLED) | parameters - [none]
-#ex: function:d x:1 y:.2 speed:.5 target:1000 will drive right and slightly forward at half speed for 1000 encoder ticks
-#function:s x:0 y:1 speed:.1 target:1000 distance:25
-
 function:jb
 function:doff x:0 y:1 speed:.5 target:1000
 function:d x:0 y:1 speed:.5 target:900
 function:r r:-80 speed:.5
 function:d x:0 y:1 speed:.5 target:800
-function:s speed:.5 ydistance:35 yir:0 ylong:false gyro:-90
-function:s speed:.5 xdistance:33 xir:1 xlong:false ydistance:35 yir:0 ylong:false gyro:-90
+function:s speed:.5 ydistance:35 yir:0 ytype:short gyro:-90
+function:s speed:.5 xdistance:33 xir:1 xtype:short ydistance:35 yir:0 ytype:short gyro:-90
 function:p
-
-#function:d x:0 y:1 speed:.5 target:500
-#function:d x:-1 y:.9 speed:.5 target:3000 time:9
-#function:d x:0 y:-1 speed:.5 target:300 useGyro:alkfdljadglkhagdlkhfdlkhfdslkjsf
-#function:p
-#function:d x:0 y:1 speed:.5 target:300
-#function:s x:0 y:1 speed:.5 distance:4.5 target:100
