@@ -31,9 +31,6 @@ public class TeleOpMecanum extends OpMode {
     private boolean aX = false;
     private boolean aB = false;
 
-    private boolean aDown = false;
-    private boolean aUp = false;
-
     private boolean aLeftStick = false;
     private boolean aRightStick = false;
 
@@ -61,7 +58,7 @@ public class TeleOpMecanum extends OpMode {
       Joystick 2 button     medium
       Bumpers               (extendo) external intakes backwards    (normal) both intakes backwards
       Triggers              (extendo) external intakes forwards     (normal) both intakes forwards
-      Dpad up               toggle auto intake
+      Dpad up               turn off auto intake
       A
       B                     toggle tank
       X                     toggle crawl
@@ -409,8 +406,8 @@ public class TeleOpMecanum extends OpMode {
                 drive.intakeLeft(0);
                 if (!Drive.isExtendo) { drive.internalIntakeLeft(0); }
             }
-        } else {
-
+        } else if (!gamepad1.dpad_up) {
+            drive.collectGlyphStep();
         }
     }
 
