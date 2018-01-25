@@ -1,8 +1,19 @@
 function:jb
+function:brace
+#Get in front of cryptobox
 function:doff x:0 y:1 speed:.5 target:1000
 function:d x:0 y:1 speed:.5 target:900
 function:r r:-80 speed:.5
+function:s speed:.5 xdistance:100 xir:0 xtype:sonar gyro:-90
+#Drive into cryptobox
 function:d x:0 y:1 speed:.5 target:800
-function:s speed:.5 ydistance:35 yir:0 ytype:short gyro:-90
-function:s speed:.5 xdistance:33 xir:1 xtype:short ydistance:35 yir:0 ytype:short gyro:-90
+#Back off and place
+function:d x:0 y:-1 speed:.5 target:200
 function:p
+#Ram and back off
+function:d x:0 y:1 speed:.5 target:800
+function:d x:0 y:-1 speed:.5 target:200
+
+#function:s speed:.5 ydistance:35 yir:0 ytype:short gyro:-90
+#function:s speed:.5 xdistance:33 xir:1 xtype:short ydistance:35 yir:0 ytype:short gyro:-90
+#function:p
