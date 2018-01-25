@@ -234,6 +234,9 @@ public abstract class Auto extends LinearVisionOpMode {
                 case "open":
                     openIntakes(parameters);
                     break;
+                case "brace":
+                    drive.openWinch();
+                    break;
                 default:
                     System.err.println("Unknown function called from file " + file);
                     break;
