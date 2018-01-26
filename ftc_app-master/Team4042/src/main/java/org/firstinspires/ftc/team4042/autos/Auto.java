@@ -264,8 +264,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
     public void getVuMark(HashMap<String, String> parameters) {
         vuMark = vuMarkIdentifier.getMark();
-        telemetry.addData("vuMark", vuMark);
-        telemetry.update();
+        log.add("vuMark: " + vuMark);
     }
 
     /*
@@ -310,10 +309,12 @@ public abstract class Auto extends LinearVisionOpMode {
 
     public String getBallColor(Mat frame){
         log.add(frame.height() + " x " + frame.width());
-        Imgproc.resize(frame, frame, new Size(960, 720));
+        //Imgproc.resize(frame, frame, new Size(960, 720));
         telemetry.update();
-        Rect left_crop = new Rect(new Point(215,585), new Point(380, 719));
-        Rect right_crop = new Rect(new Point(460,585), new Point(620, 719));
+        //Rect left_crop = new Rect(new Point(215,585), new Point(380, 719));
+        //Rect right_crop = new Rect(new Point(460,585), new Point(620, 719));
+        Rect left_crop = new Rect(new Point(464,688), new Point(617, 719));
+        Rect right_crop = new Rect(new Point(771,672), new Point(942, 719));
 
         //Log.d("A", this.getFrameSize().width + " x " + this.getFrameSize().height);
         Mat right = new Mat(frame, right_crop);
@@ -701,44 +702,33 @@ public abstract class Auto extends LinearVisionOpMode {
             timer.reset();
             drive.jewelDown();
 
-            while (timer.seconds() < 1) {
-            }
+            while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {}
             timer.reset();
-            log.add("rotate left");
 
             //Moves the robot left
-            autoRotate(7, Drive.FULL_SPEED/4);
-            log.add("rotate right");
+            autoRotate(14, Drive.FULL_SPEED*2/3);
 
             drive.intakeLeft(-1);
-            log.add("reversing left intake");
 
             drive.jewelUp();
             timer.reset();
-            while (timer.seconds() < 1) {
+            while (timer.seconds() < 1) {}
+
+            drive.intakeLeft(1);
+
+            autoRotate(0, Drive.FULL_SPEED*2/3);
+
+            for (int i = 0; i < 2; i++) {
+                drive.intakeLeft(-1);
+                while (timer.seconds() < C.get().getDouble("intakeBackTime")) {
+                }
+                timer.reset();
+
+                drive.intakeLeft(1);
+                while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {
+                }
+                timer.reset();
             }
-            log.add("jewel up");
-
-            drive.intakeLeft(1);
-            log.add("forwarding left intake");
-
-            autoRotate(0, Drive.FULL_SPEED/4);
-
-            drive.intakeLeft(-1);
-            log.add("reverse, reverse!");
-            while (timer.seconds() < 1) {}
-            drive.intakeLeft(1);
-            log.add("turn it up!");
-            while (timer.seconds() < 1) {}
-            drive.intakeLeft(-1);
-            log.add("reverse, reverse! (second time)");
-            while (timer.seconds() < 1) {}
-            drive.intakeLeft(1);
-            log.add("turn it up! (second time)");
-            while (timer.seconds() < 1) {}
-            log.add("intake now maybe deployed, engines shutting down. scotty out");
-            drive.intakeLeft(0);
-            drive.intakeRight(0);
 
             //autoRotate(0, Drive.FULL_SPEED/4);
         } catch (NullPointerException ex) {
@@ -755,45 +745,39 @@ public abstract class Auto extends LinearVisionOpMode {
 
             drive.intakeLeft(1);
             drive.intakeRight(1);
-            log.add("running intakes in");
 
             ElapsedTime timer = new ElapsedTime();
 
             timer.reset();
             drive.jewelDown();
 
-            while (timer.seconds() < 1) {
-            }
+            while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {}
             timer.reset();
 
-            autoRotate(-7, Drive.FULL_SPEED/4);
+            autoRotate(-14, Drive.FULL_SPEED*2/3);
 
             drive.intakeLeft(-1);
-            log.add("reversing left intake");
 
             drive.jewelUp();
             timer.reset();
-            while (timer.seconds() < 1) {
+            while (timer.seconds() < 1) {}
+
+            drive.intakeLeft(1);
+
+            autoRotate(0, Drive.FULL_SPEED*2/3);
+
+            for (int i = 0; i < 2; i++) {
+                drive.intakeLeft(-1);
+                while (timer.seconds() < C.get().getDouble("intakeBackTime")) {
+                }
+                timer.reset();
+
+                drive.intakeLeft(1);
+                while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {
+                }
+                timer.reset();
             }
 
-            drive.intakeLeft(1);
-            log.add("forwarding left intake");
-
-            autoRotate(0, Drive.FULL_SPEED/4);
-
-            drive.intakeLeft(-1);
-            log.add("reverse, reverse!");
-            while (timer.seconds() < 1) {}
-            drive.intakeLeft(1);
-            log.add("turn it up!");
-            while (timer.seconds() < 1) {}
-            drive.intakeLeft(-1);
-            log.add("reverse, reverse! (second time)");
-            while (timer.seconds() < 1) {}
-            drive.intakeLeft(1);
-            log.add("turn it up! (second time)");
-            while (timer.seconds() < 1) {}
-            log.add("intake now maybe deployed, engines shutting down. scotty out");
             drive.intakeLeft(0);
             drive.intakeRight(0);
 
@@ -812,41 +796,21 @@ public abstract class Auto extends LinearVisionOpMode {
 
         drive.intakeLeft(1);
         drive.intakeRight(1);
-        log.add("running intakes in");
         while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {}
         timer.reset();
 
-        drive.intakeLeft(-1);
-        log.add("reversing left intake");
-        while (timer.seconds() < C.get().getDouble("intakeBackTime")) {}
-        timer.reset();
+        for (int i = 0; i < 3; i++) {
+            drive.intakeLeft(-1);
+            while (timer.seconds() < C.get().getDouble("intakeBackTime")) {
+            }
+            timer.reset();
 
-        drive.intakeLeft(1);
-        log.add("forwarding left intake");
-        while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {}
-        timer.reset();
+            drive.intakeLeft(1);
+            while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {
+            }
+            timer.reset();
+        }
 
-        drive.intakeLeft(-1);
-        log.add("reverse, reverse!");
-        while (timer.seconds() < C.get().getDouble("intakeBackTime")) {}
-        timer.reset();
-
-        drive.intakeLeft(1);
-        log.add("turn it up!");
-        while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {}
-        timer.reset();
-
-        drive.intakeLeft(-1);
-        log.add("reverse, reverse! (second time)");
-        while (timer.seconds() < C.get().getDouble("intakeBackTime")) {}
-        timer.reset();
-
-        drive.intakeLeft(1);
-        log.add("turn it up! (second time)");
-        while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {}
-        timer.reset();
-
-        log.add("intake now maybe deployed, engines shutting down. scotty out");
         drive.intakeLeft(0);
         drive.intakeRight(0);
     }

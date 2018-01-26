@@ -332,7 +332,7 @@ public abstract class Drive {
             longIrRates[i] = (currLongIr[i] - lastLongIr[i]) / (currMilli - lastMilli);
         }
 
-        double[] currSonar = new double[3];
+        double[] currSonar = new double[2];
         for (int i = 0; i < currSonar.length; i++) {
             AnalogSensor sIr = sonar[i];
             sIr.addReading();
