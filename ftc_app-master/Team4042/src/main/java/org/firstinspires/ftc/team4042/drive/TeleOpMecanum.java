@@ -31,8 +31,8 @@ public class TeleOpMecanum extends OpMode {
     private boolean aX = false;
     private boolean aB = false;
 
-    private boolean aDown = false;
-    private boolean aUp = false;
+    private boolean aLeftStick = false;
+    private boolean aRightStick = false;
 
     private boolean bUp;
     private boolean bDown;
@@ -53,10 +53,12 @@ public class TeleOpMecanum extends OpMode {
     /**
     GAMEPAD 1:
       Joystick 1 X & Y      movement
+      Joystick 1 button     fast
       Joystick 2 X          rotation
+      Joystick 2 button     medium
       Bumpers               (extendo) external intakes backwards    (normal) both intakes backwards
       Triggers              (extendo) external intakes forwards     (normal) both intakes forwards
-      Dpad up/down          speed modes
+      Dpad up               turn off auto intake
       A
       B                     toggle tank
       X                     toggle crawl
@@ -289,17 +291,20 @@ public class TeleOpMecanum extends OpMode {
     }
 
     private void speedModes() {
-        //If you push the left bumper, dials the speed down
-        if (gamepad1.dpad_down && !aDown && (adjustedSpeed - 0.25) >= 0) {
-            adjustedSpeed -= 0.25;
+        //Left and right stick together = super slow
+        if (gamepad1.left_stick_button && !aLeftStick && gamepad1.right_stick_button && !aRightStick) {
+            adjustedSpeed = .5;
         }
-        aDown = gamepad1.dpad_down;
-        //Right bumper - dial speed up
-        if (gamepad1.dpad_up && !aUp && (adjustedSpeed + 0.25) <= MecanumDrive.FULL_SPEED)
-        {
-            adjustedSpeed += 0.25;
+        //Left stick = fast
+        if (gamepad1.left_stick_button && !aLeftStick && !gamepad1.right_stick_button) {
+            adjustedSpeed = 1;
         }
-        aUp = gamepad1.dpad_up;
+        //Right stick = med
+        if (gamepad1.right_stick_button && !aRightStick && !gamepad1.left_stick_button) {
+            adjustedSpeed = .75;
+        }
+        aLeftStick = gamepad1.left_stick_button;
+        aRightStick = gamepad1.right_stick_button;
     }
 
     private void toggleExtendo() {
@@ -353,69 +358,56 @@ public class TeleOpMecanum extends OpMode {
     }
 
     private void intakes() {
-        if (Drive.isExtendo) {
-            double bRightTrigger = drive.deadZone(gamepad2.right_trigger);
-            if (bRightTrigger > 0) {
-                drive.internalIntakeRight(bRightTrigger);
-            }
-            //Right bumper of the b controller runs the right intake backwards
-            else if (gamepad2.right_bumper) {
-                drive.internalIntakeRight(-1);
-            } else {
-                drive.internalIntakeRight(0);
-            }
-
-            //Left trigger of the b controller runs the left intake forward
-            double bLeftTrigger = drive.deadZone(gamepad2.left_trigger);
-            if (bLeftTrigger > 0) {
-                drive.internalIntakeLeft(bLeftTrigger);
-            }
-            //Left bumper of the b controller runs the left intake backwards
-            else if (gamepad2.left_bumper) {
-                drive.internalIntakeLeft(-1);
-            } else {
-                drive.internalIntakeLeft(0);
-            }
-        }
-
         double aRightTrigger = drive.deadZone(gamepad1.right_trigger);
-        if (aRightTrigger > 0) {
-            drive.intakeRight(aRightTrigger);
-            if (!Drive.isExtendo) {
-                drive.internalIntakeRight(aRightTrigger);
-            }
-        }
-        else if (gamepad1.right_bumper) {
-            drive.intakeRight(-1);
-            if (!Drive.isExtendo) {
-                drive.internalIntakeRight(-1);
-            }
-        }
-        else {
-            drive.intakeRight(0);
-            if (!Drive.isExtendo) {
-                drive.internalIntakeRight(0);
-            }
-        }
-
+        boolean aRightBumper = gamepad1.right_bumper;
         double aLeftTrigger = drive.deadZone(gamepad1.left_trigger);
-        if (aLeftTrigger > 0) {
-            drive.intakeLeft(aLeftTrigger);
-            if (!Drive.isExtendo) {
-                drive.internalIntakeLeft(aLeftTrigger);
+        boolean aLeftBumper = gamepad1.left_bumper;
+
+        double bRightTrigger = drive.deadZone(gamepad2.right_trigger);
+        boolean bRightBumper = gamepad2.right_bumper;
+        double bLeftTrigger = drive.deadZone(gamepad2.left_trigger);
+        boolean bLeftBumper = gamepad2.left_bumper;
+
+        boolean intakeInput = (aRightBumper || aLeftBumper || aRightTrigger != 0 || aLeftTrigger != 0) ||
+                (Drive.isExtendo && (bRightBumper || bLeftBumper || bRightTrigger != 0 || bLeftTrigger != 0));
+
+        if (intakeInput) {
+            if (Drive.isExtendo) {
+                if (bRightTrigger > 0) { drive.internalIntakeRight(bRightTrigger); }
+                //Right bumper of the b controller runs the right intake backwards
+                else if (bRightBumper) { drive.internalIntakeRight(-1); }
+                else { drive.internalIntakeRight(0); }
+
+                //Left trigger of the b controller runs the left intake forward
+                if (bLeftTrigger > 0) { drive.internalIntakeLeft(bLeftTrigger); }
+                //Left bumper of the b controller runs the left intake backwards
+                else if (bLeftBumper) { drive.internalIntakeLeft(-1); }
+                else { drive.internalIntakeLeft(0); }
             }
-        }
-        else if (gamepad1.left_bumper) {
-            drive.intakeLeft(-1);
-            if (!Drive.isExtendo) {
-                drive.internalIntakeLeft(-1);
+
+            if (aRightTrigger > 0) {
+                drive.intakeRight(aRightTrigger);
+                if (!Drive.isExtendo) { drive.internalIntakeRight(aRightTrigger); }
+            } else if (aRightBumper) {
+                drive.intakeRight(-1);
+                if (!Drive.isExtendo) { drive.internalIntakeRight(-1); }
+            } else {
+                drive.intakeRight(0);
+                if (!Drive.isExtendo) { drive.internalIntakeRight(0); }
             }
-        }
-        else {
-            drive.intakeLeft(0);
-            if (!Drive.isExtendo) {
-                drive.internalIntakeLeft(0);
+
+            if (aLeftTrigger > 0) {
+                drive.intakeLeft(aLeftTrigger);
+                if (!Drive.isExtendo) { drive.internalIntakeLeft(aLeftTrigger); }
+            } else if (aLeftBumper) {
+                drive.intakeLeft(-1);
+                if (!Drive.isExtendo) { drive.internalIntakeLeft(-1); }
+            } else {
+                drive.intakeLeft(0);
+                if (!Drive.isExtendo) { drive.internalIntakeLeft(0); }
             }
+        } else if (!gamepad1.dpad_up) {
+            drive.collectGlyphStep();
         }
     }
 
