@@ -81,6 +81,8 @@ public abstract class Drive {
     private Servo leftBrake;
     private Servo rightBrake;
 
+    private Servo winch;
+
     private Servo leftCatch;
     private Servo rightCatch;
 
@@ -287,8 +289,11 @@ public abstract class Drive {
 
     private double[] lastShortIr = new double[3];
     private double[] lastLongIr = new double[2];
+    private double[] lastSonar = new double[2];
+
     public double[] shortIrRates = new double[3];
     public double[] longIrRates = new double[2];
+    public double[] sonarRates = new double[2];
 
     private double lastUTrack = 0;
     public double uTrackRate = 0;
@@ -326,6 +331,14 @@ public abstract class Drive {
             longIrRates[i] = (currLongIr[i] - lastLongIr[i]) / (currMilli - lastMilli);
         }
 
+        double[] currSonar = new double[3];
+        for (int i = 0; i < currSonar.length; i++) {
+            AnalogSensor sIr = sonar[i];
+            sIr.addReading();
+            currSonar[i] = sIr.getCmAvg();
+            sonarRates[i] = (currSonar[i] - lastSonar[i]) / (currMilli - lastMilli);
+        }
+
         //Gyro rates
         gyroRate = (currGyro - lastGyro) / (currMilli - lastMilli);
 
@@ -333,6 +346,7 @@ public abstract class Drive {
         lastGyro = currGyro;
         lastShortIr = currShortIr;
         lastLongIr = currLongIr;
+        lastSonar = currSonar;
 
         lastMilli = currMilli;
     }
@@ -350,6 +364,55 @@ public abstract class Drive {
     private void glyphLocate() {
         targetY = GlyphPlacementSystem.Position.values()[glyph.uiTargetY + 3];
         targetX = GlyphPlacementSystem.HorizPos.values()[glyph.uiTargetX];
+    }
+
+    private ElapsedTime glyphCollectionTimer = new ElapsedTime();
+
+    /**
+     * One step in collecting a glyph - designed to be looped over
+     * @return Whether a glyph has been collected
+     */
+    public boolean collectGlyphStep() {
+        double glyphIn = 7;
+        double glyphOut = 20;
+
+        shortIr[0].addReading();
+        double frontDistance = shortIr[0].getCmAvg();
+
+        shortIr[1].addReading();
+        double backDistance = shortIr[1].getCmAvg();
+
+        //If the IR reading is closer to glyphIn than glyphOut, we assume the glyph is in
+        boolean isGlyphIn = Math.abs(frontDistance - glyphIn) < Math.abs(frontDistance - glyphOut);
+        boolean isGlyphBack = Math.abs(backDistance - glyphIn) < Math.abs(backDistance - glyphOut);
+
+        if (!isGlyphIn && !isGlyphBack) {
+            //Step 1: intakes in until a glyph is found
+            intakeLeft(1);
+            intakeRight(1);
+            glyphCollectionTimer.reset();
+            return false;
+        } else if (!isGlyphBack && glyphCollectionTimer.seconds() < C.get().getDouble("time")/2){
+            //Step 2: after a glyph gets in, until half of time, rotate the glyph
+            intakeLeft(-1);
+            intakeRight(1);
+            return false;
+        } else if (!isGlyphBack && glyphCollectionTimer.seconds() < C.get().getDouble("time") * 3/2) {
+            //Step 3: after a glyph gets in and has been rotated, pull it in
+            intakeLeft(1);
+            intakeRight(1);
+            return false;
+        } else if (!isGlyphBack && glyphCollectionTimer.seconds() >= C.get().getDouble("time") * 3/2) {
+            //Step 4: If the glyph still isn't in, reset the glyphCollectionTimer to loop us back through to step 2
+            glyphCollectionTimer.reset();
+            return false;
+        } else if (isGlyphBack) {
+            //Step 5: But if the glyph is in, then stop the intakes and wait
+            intakeLeft(0);
+            intakeRight(0);
+            return true;
+        }
+        return false;
     }
 
     public boolean uTrack() {
@@ -604,23 +667,31 @@ public abstract class Drive {
     }
 
     public void lockCatches() {
-        rightCatch.setPosition(.9);
-        leftCatch.setPosition(.17);
+        rightCatch.setPosition(1);
+        leftCatch.setPosition(0);
     }
 
     public void unlockCatches() {
-        rightCatch.setPosition(.46);
-        leftCatch.setPosition(.6);
+        rightCatch.setPosition(.12);
+        leftCatch.setPosition(.9);
     }
 
     public void lowerBrakes() {
-        leftBrake.setPosition(.9);
-        rightBrake.setPosition(0);
+        leftBrake.setPosition(.8);
+        rightBrake.setPosition(.01);
     }
 
     public void raiseBrakes() {
-        leftBrake.setPosition(.1);
-        rightBrake.setPosition(.68);
+        leftBrake.setPosition(0);
+        rightBrake.setPosition(.66);
+    }
+
+    public void stowWinch() {
+        winch.setPosition(.97);
+    }
+
+    public void openWinch() {
+        winch.setPosition(.69);
     }
 
     public void jewelAdjust(double adjustAmt) {
