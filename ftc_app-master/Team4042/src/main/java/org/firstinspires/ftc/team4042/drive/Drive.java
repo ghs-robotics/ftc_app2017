@@ -174,6 +174,7 @@ public abstract class Drive {
             }
         }
 
+        winch = hardwareMap.servo.get("winch");
         motorLeftFront = initializeMotor(hardwareMap, "front left");
         motorRightFront = initializeMotor(hardwareMap, "front right");
         motorLeftBack = initializeMotor(hardwareMap, "back left");
