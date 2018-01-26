@@ -155,8 +155,6 @@ public class VuMarkIdentifier {
         relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
 
         relicTrackables.activate();*/       //ElapsedTime timeout = new ElapsedTime();
-
-        telemetry.log().add("hey we got herreeeeeeee");
         Bitmap bm = null;
         while(bm == null) {
             if (this.vuforia.rgb != null) {
@@ -170,11 +168,9 @@ public class VuMarkIdentifier {
 
         telemetry.log().add(bm.getWidth() + " x " + bm.getHeight());
         Mat tmp = new Mat(bm.getWidth(), bm.getHeight(), CvType.CV_8UC4);
-        telemetry.log().add("give me one more second");
         Utils.bitmapToMat(bm, tmp);
 
-        telemetry.log().add("NOOOO");
-
+        /*
         FileOutputStream out = null;
         try {
             out = new FileOutputStream(new File("./storage/emulated/0/DCIM/nicepic.png"));
@@ -191,6 +187,7 @@ public class VuMarkIdentifier {
                 e.printStackTrace();
             }
         }
+        */
 
         return tmp;
     }
