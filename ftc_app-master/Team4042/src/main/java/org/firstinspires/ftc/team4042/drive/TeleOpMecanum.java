@@ -146,7 +146,8 @@ public class TeleOpMecanum extends OpMode {
         //Sets up speed modes
         speedModes();
 
-
+        //Drives the robot
+        drive.drive(false, gamepad1, gamepad2, adjustedSpeed * MecanumDrive.FULL_SPEED);
 
         //Runs the intakes
         intakes();
