@@ -26,6 +26,7 @@ public class TeleOpMecanum extends OpMode {
     private boolean bBack = false;
     private boolean bStart = false;
     private boolean lJoyBtn = false;
+    private boolean rJoyBtn = false;
 
     private boolean aY = false;
     private boolean aX = false;
@@ -67,17 +68,34 @@ public class TeleOpMecanum extends OpMode {
       Back                  balance
 
     GAMEPAD 2:
-      Joystick 1 Y          (manual) controls placer vertical
-      Joystick 2 X          (manual) controls place horizontal
+     Manual mode:
+      Joystick 1 Y          controls placer vertical
+      Joystick 1 btn        toggle Ryan v Brendan uTrack
+      Joystick 2 X          controls place horizontal
+      Joystick 2 btn        toggle manual
       Bumpers               (extendo) internal intakes backwards
       Triggers              (extendo) internal intakes forwards
-      Dpad                  placer
-      A                     places glyph
       B                     manual hand toggle
-      X                     toggles manual placement mode
       Y                     resets the glyph placer
-      Start                 toggle placer mode
       Back                  toggle verbose
+
+     Ryan control:
+      Joystick 1 btn        toggle Ryan v Brendan uTrack
+      Joystick 2 btn        toggle manual
+      Bumpers               (extendo) internal intakes backwards
+      Triggers              (extendo) internal intakes forwards
+      A                     Move uTrack
+      dpad                  Target uTrack
+      Back                  toggle verbose
+
+     Brendan control:
+     Joystick 1 btn        toggle Ryan v Brendan uTrack
+     Joystick 2 btn        toggle manual
+     Bumpers               (extendo) internal intakes backwards
+     Triggers              (extendo) internal intakes forwards
+     A,B,X,Y               Move x trget uTrack
+     dpad                  Move y trget uTrack
+     Back                  toggle verbose
      */
 
     @Override
@@ -241,7 +259,7 @@ public class TeleOpMecanum extends OpMode {
         }
         bA = gamepad2.a;
 
-        if (gamepad2.start && !bStart) {
+        if (gamepad2.right_stick_button && !rJoyBtn) {
             manual = !manual;
 
             if (!manual) {
@@ -257,7 +275,7 @@ public class TeleOpMecanum extends OpMode {
                 drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
         }
-        bStart = gamepad2.start;
+        rJoyBtn = gamepad2.right_stick_button;
 
         if (manual) {
             if (gamepad2.b && !bB) {
