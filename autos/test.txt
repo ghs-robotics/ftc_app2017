@@ -1,2 +1,2 @@
 #function:g
-function:s speed:.5 xdistance:100 xir:0 xtype:sonar gyro:-90
+function:s speed:.5 xdistance:126 xir:0 xtype:sonar gyro:-90
