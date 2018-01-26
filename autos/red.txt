@@ -3,7 +3,7 @@ function:jb
 function:doff x:0 y:1 speed:.5 target:1000
 function:d x:0 y:1 speed:.5 target:900
 function:r r:-80 speed:.5
-function:s speed:.5 xdistance:100 xir:0 xtype:sonar gyro:-90
+function:s speed:.5 xdistance:126 xir:0 xtype:sonar gyro:-90
 #Drive into cryptobox
 function:d x:0 y:1 speed:.5 target:800
 #Back off and place
