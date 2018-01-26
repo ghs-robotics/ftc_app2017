@@ -576,12 +576,12 @@ public abstract class Drive {
 
     public void openHand() {
         handIsOpen = true;
-        grabbyBoi.setPosition(.57);
+        grabbyBoi.setPosition(.54);
     }
 
     public void closeHand() {
         handIsOpen = false;
-        grabbyBoi.setPosition(1);
+        grabbyBoi.setPosition(.88);
     }
 
     public void setHorizontalDrive(double power) {
