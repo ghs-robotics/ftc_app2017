@@ -13,6 +13,7 @@ import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
 public class FiveAnalogSensorTest extends OpMode{
     private AnalogSensor[] shortRange = new AnalogSensor[3];
     private AnalogSensor[] longRange = new AnalogSensor[2];
+    private AnalogSensor[] sonar = new AnalogSensor[2];
 
     @Override
     public void init() {
@@ -34,6 +35,15 @@ public class FiveAnalogSensorTest extends OpMode{
                 }
             }
         }
+        for (int i = 0; i < sonar.length; i++) {
+            sonar[i] = new AnalogSensor("sonar" + i, AnalogSensor.Type.SONAR);
+            if (sonar[i] != null) {
+                sonar[i].initialize(hardwareMap);
+                for (int j = 0; j < AnalogSensor.NUM_OF_READINGS; j++) {
+                    sonar[i].addReading();
+                }
+            }
+        }
     }
 
     @Override
@@ -48,6 +58,12 @@ public class FiveAnalogSensorTest extends OpMode{
             if (longRange != null) {
                 longRange.addReading();
                 telemetry.addData(longRange.getName(), longRange.getCmAvg());
+            }
+        }
+        for (AnalogSensor sonar : sonar) {
+            if (sonar != null) {
+                sonar.addReading();
+                telemetry.addData(sonar.getName(), sonar.getCmAvg());
             }
         }
         telemetry.update();
