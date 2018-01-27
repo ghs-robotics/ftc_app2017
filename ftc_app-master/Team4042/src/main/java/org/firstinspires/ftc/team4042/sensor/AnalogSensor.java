@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class AnalogSensor {
     public AnalogInput sensor;
     private String name;
-    private Type type;
+    public Type type;
     public enum Type { SHORT_RANGE, LONG_RANGE, SONAR }
 
     public static final int NUM_OF_READINGS = 6;

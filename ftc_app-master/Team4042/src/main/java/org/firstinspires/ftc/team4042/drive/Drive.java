@@ -172,6 +172,10 @@ public abstract class Drive {
             for (AnalogSensor aLongIr : shortIr) {
                 aLongIr.initialize(hardwareMap);
             }
+
+            for (AnalogSensor aSonar: sonar) {
+                aSonar.initialize(hardwareMap);
+            }
         }
 
         winch = hardwareMap.servo.get("winch");
@@ -362,7 +366,7 @@ public abstract class Drive {
         lastMilli = currMilli;
     }
 
-    private void glyphLocate() {
+    public void glyphLocate() {
         targetY = GlyphPlacementSystem.Position.values()[glyph.uiTargetY + 3];
         targetX = GlyphPlacementSystem.HorizPos.values()[glyph.uiTargetX];
     }
@@ -383,6 +387,8 @@ public abstract class Drive {
         shortIr[1].addReading();
         double backDistance = shortIr[1].getCmAvg();
 
+        telemetry.addData("frontDistance", frontDistance);
+        telemetry.addData("backDistance", backDistance);
         //If the IR reading is closer to glyphIn than glyphOut, we assume the glyph is in
         boolean isGlyphIn = Math.abs(frontDistance - glyphIn) < Math.abs(frontDistance - glyphOut);
         boolean isGlyphBack = Math.abs(backDistance - glyphIn) < Math.abs(backDistance - glyphOut);
@@ -499,6 +505,7 @@ public abstract class Drive {
         //Move back to center x location (so the hand fits back in the robot)
         glyph.setXPower(GlyphPlacementSystem.HorizPos.CENTER);
         if(glyph.xTargetReached(GlyphPlacementSystem.HorizPos.CENTER)) {
+            log.add("reached x target, center is " + getCenterState());
             stage = GlyphPlacementSystem.Stage.RETURN2;
             if (targetX.equals(GlyphPlacementSystem.HorizPos.LEFT)) {
                 glyph.adjustBack(-1);
@@ -687,12 +694,25 @@ public abstract class Drive {
         rightBrake.setPosition(.66);
     }
 
+    private boolean winchOpen = false;
+
+    public void toggleWinch() {
+        if (winchOpen) {
+            stowWinch();
+        } else {
+            openWinch();
+        }
+        winchOpen = !winchOpen;
+    }
+
     public void stowWinch() {
         winch.setPosition(.97);
+        winchOpen = false;
     }
 
     public void openWinch() {
         winch.setPosition(.69);
+        winchOpen = true;
     }
 
     public void jewelAdjust(double adjustAmt) {
