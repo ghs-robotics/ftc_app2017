@@ -158,7 +158,7 @@ public class  MecanumDrive extends Drive {
         double[] speedWheel = new double[4];
         for(int i = 0; i < speedWheel.length; i++) {
             speedWheel[i] = (targSpeedWheel[i] - encoderRates[i]) * pConstant + targSpeedWheel[i] * velFeedForwardConstant;
-            telemetry.addData("" + i, targSpeedWheel[i] + " " + encoderRates[i]);
+            //telemetry.addData("" + i, targSpeedWheel[i] + " " + encoderRates[i]);
         }
 
         //sets the wheel powers to the appropriate ratios

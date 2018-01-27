@@ -8,7 +8,7 @@ import org.firstinspires.ftc.team4042.drive.MecanumDrive;
 @Autonomous(name="ProtoAuto", group="autos")
 public class ProtoAuto extends Auto {
 
-    MecanumDrive drive = new MecanumDrive(true, false);
+    MecanumDrive drive = new MecanumDrive(true);
 
     @Override
     public void runOpMode() {

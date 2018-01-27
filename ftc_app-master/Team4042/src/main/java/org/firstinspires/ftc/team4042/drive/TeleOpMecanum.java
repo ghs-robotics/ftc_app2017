@@ -12,9 +12,11 @@ public class TeleOpMecanum extends OpMode {
 
     private double adjustedSpeed;
 
-    private boolean placerModeInstant = true;
+    private boolean placerModeInstant = false;
     private boolean manual = false;
     private boolean onBalancingStone = false;
+
+    private boolean noIntakes = false;
 
     private double oops = 1; //switch to -1 if runs in wrong direction when going for balance
 
@@ -31,6 +33,9 @@ public class TeleOpMecanum extends OpMode {
     private boolean aY = false;
     private boolean aX = false;
     private boolean aB = false;
+
+    private boolean aUp = false;
+    private boolean aDown = false;
 
     private boolean aLeftStick = false;
     private boolean aRightStick = false;
@@ -128,6 +133,16 @@ public class TeleOpMecanum extends OpMode {
     
     @Override
     public void loop() {
+
+        if (gamepad1.dpad_up && !aUp) {
+            noIntakes = !noIntakes;
+        }
+        aUp = gamepad1.dpad_up;
+
+        if (gamepad1.dpad_down && !aDown) {
+            drive.toggleWinch();
+        }
+        aDown = gamepad1.dpad_down;
 
         //Toggles verbose
         if (gamepad2.back && !bBack) {
@@ -361,6 +376,7 @@ public class TeleOpMecanum extends OpMode {
         int targetY = gamepad2.dpad_up ? 0 : (gamepad2.dpad_left || gamepad2.dpad_right ? 1 : (gamepad2.dpad_down ? 2 : -1));
         if (targetX != -1 && targetY != -1) {
             drive.glyph.uiTarget(targetX, targetY);
+            drive.glyphLocate();
             drive.uTrack();
         }
     }
@@ -391,6 +407,7 @@ public class TeleOpMecanum extends OpMode {
                 (Drive.isExtendo && (bRightBumper || bLeftBumper || bRightTrigger != 0 || bLeftTrigger != 0));
 
         if (intakeInput) {
+            telemetry.log().add("intake input");
             if (Drive.isExtendo) {
                 if (bRightTrigger > 0) { drive.internalIntakeRight(bRightTrigger); }
                 //Right bumper of the b controller runs the right intake backwards
@@ -425,8 +442,11 @@ public class TeleOpMecanum extends OpMode {
                 drive.intakeLeft(0);
                 if (!Drive.isExtendo) { drive.internalIntakeLeft(0); }
             }
-        } else if (!gamepad1.dpad_up) {
+        } else if (!noIntakes) {
             drive.collectGlyphStep();
+        } else {
+            drive.intakeLeft(0);
+            drive.intakeRight(0);
         }
     }
 
@@ -443,23 +463,9 @@ public class TeleOpMecanum extends OpMode {
         //drive.uTrackAtBottom && !bA && gamepad2.a
         //!drive.uTrackAtBottom && gamepad2.a
         if (drive.verbose) {
-            telemetry.addData("vertical mode", drive.getVerticalDriveMode());
-            telemetry.addData("encoder currentY pos", drive.verticalDriveCurrPos());
-            telemetry.addData("vertical drive power", drive.getVerticalDrive());
-            telemetry.addData("hand is open", drive.isHandOpen());
-            telemetry.addData("center limit switch", drive.getCenterState());
-            telemetry.addData("bottom limit switch", drive.getBottomState());
-            telemetry.addData("targetY", drive.targetY.toString());
-            telemetry.addData("Current pos", drive.glyph.currentY.toString());
-            telemetry.addData("encoder targetY pos", drive.verticalDriveTargetPos());
-            telemetry.addData("stage", drive.stage);
-            telemetry.addData("gamepad2.a", gamepad2.a);
-            telemetry.addData("handDropTimer seconds", drive.handDropTimer.seconds());
-            telemetry.addData("horizontal u", drive.getHorizontalDrive());
-            telemetry.addData("horizontal translate timer", drive.glyph.horizontalTimer.seconds());
-            telemetry.addData("TARGET POS",drive.targetX + " ui target pos " + drive.glyph.uiTargetX);
-            telemetry.addData("boolean",((drive.targetX.equals(GlyphPlacementSystem.HorizPos.LEFT) ||
-                    drive.targetX.equals(GlyphPlacementSystem.HorizPos.RIGHT)) + " bool " + (drive.glyph.horizontalTimer.seconds() >= drive.glyph.HORIZONTAL_TRANSLATION_TIME)));
+            telemetry.addData("gamepad1.dpad_up", gamepad1.dpad_up);
+            telemetry.addData("bottom", drive.getBottomState());
+            telemetry.addData("center", drive.getCenterState());
         }
         if (Drive.useGyro) {
             telemetry.addData("gyro", drive.gyro.updateHeading());

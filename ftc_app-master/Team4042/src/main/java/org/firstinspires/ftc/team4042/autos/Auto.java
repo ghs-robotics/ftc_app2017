@@ -192,25 +192,25 @@ public abstract class Auto extends LinearVisionOpMode {
             HashMap<String, String> parameters = instruction.getParameters();
             log.add("function: " + functionName);
             switch (functionName) {
-                case "d":
+                case "drive":
                     autoDrive(parameters);
                     break;
                 case "doff":
                     autoDriveOff(parameters);
                     break;
-                case "r":
+                case "rot":
                     autoRotate(parameters);
                     break;
-                case "s":
+                case "sdrive":
                     autoSensorDrive(parameters);
                     break;
                 case "up":
                     jewelUp(parameters);
                     break;
-                case "jr":
+                case "knockr":
                     knockRedJewel(parameters);
                     break;
-                case "jb":
+                case "knockb":
                     knockBlueJewel(parameters);
                     break;
                 case "jleft":
@@ -219,16 +219,16 @@ public abstract class Auto extends LinearVisionOpMode {
                 case "jright":
                     knockRightJewel(parameters);
                     break;
-                case "v":
+                case "getmark":
                     getVuMark(parameters);
                     break;
-                case "p":
+                case "place":
                     placeGlyph(parameters);
                     break;
-                case "a":
+                case "alignh":
                     alignHorizontally(parameters);
                     break;
-                case "g":
+                case "glyph":
                     grabGlyph(parameters);
                     break;
                 case "open":
@@ -485,6 +485,9 @@ public abstract class Auto extends LinearVisionOpMode {
                 (Math.abs(pitch - startPitch) >= 3) && opModeIsActive());
             //If you're too tipped forward/backwards or left/right, then keep driving
             //This effectively drives until you're off the balancing stone
+
+        drive.resetEncoders();
+        drive.runWithEncoders();
     }
 
     public void autoRotate(HashMap<String, String> parameters) {
@@ -493,6 +496,9 @@ public abstract class Auto extends LinearVisionOpMode {
         double speed = Double.parseDouble(parameters.get("speed"));
 
         autoRotate(realR, speed);
+
+        drive.resetEncoders();
+        drive.runWithEncoders();
     }
 
     /**
@@ -528,6 +534,8 @@ public abstract class Auto extends LinearVisionOpMode {
         double yTargetDistance = useY ? Double.parseDouble(parameters.get("ydistance")) : 0;
         int yIr = useY ? Integer.parseInt(parameters.get("yir")) : 0;
 
+        double offset = parameters.containsKey("offset") ? Double.parseDouble(parameters.get("offset")) : 0;
+
         AnalogSensor.Type yType = AnalogSensor.Type.SHORT_RANGE;
         if (useY) {
             switch (parameters.get("ytype")) {
@@ -540,10 +548,13 @@ public abstract class Auto extends LinearVisionOpMode {
                 case "sonar":
                     yType = AnalogSensor.Type.SONAR;
                     break;
+                default:
+                    yType = AnalogSensor.Type.SHORT_RANGE;
+                    break;
             }
         }
 
-        log.add("" + parameters.containsKey("xdistance"));
+        log.add("" + parameters.containsKey("offset"));
 
         double xTargetDistance = useX ? Double.parseDouble(parameters.get("xdistance")) : 0;
         int xIr = useX ? Integer.parseInt(parameters.get("xir")) : 0;
@@ -560,10 +571,13 @@ public abstract class Auto extends LinearVisionOpMode {
                 case "sonar":
                     xType = AnalogSensor.Type.SONAR;
                     break;
+                default:
+                    xType = AnalogSensor.Type.SHORT_RANGE;
+                    break;
             }
         }
 
-        autoSensorDrive(xTargetDistance, xIr, xType, useX, yTargetDistance, yIr, yType, useY, targetGyro);
+        autoSensorDrive(xTargetDistance, xIr, xType, useX, yTargetDistance, yIr, yType, useY, targetGyro, offset);
     }
 
     /**
@@ -576,7 +590,7 @@ public abstract class Auto extends LinearVisionOpMode {
      * @param yType Whether the y sensor is long-range or not
      */
     private void autoSensorDrive(double xTargetDistance, int xIrId, AnalogSensor.Type xType, boolean useX,
-                                 double yTargetDistance, int yIrId, AnalogSensor.Type yType, boolean useY, double targetGyro) {
+                                 double yTargetDistance, int yIrId, AnalogSensor.Type yType, boolean useY, double targetGyro, double offset) {
         if (useX || useY) {
             AnalogSensor xIr = null;
             switch (xType) {
@@ -604,11 +618,16 @@ public abstract class Auto extends LinearVisionOpMode {
                     break;
             }
 
+            //log.add("xIr: " + xIr + " type: " + xIr.type);
+
             double xCurrDistance;
             double yCurrDistance;
             int i = 0;
             while (i < AnalogSensor.NUM_OF_READINGS && opModeIsActive()) {
                 //read the IRs just to set them up
+
+                //log.add("xIr: " + xIr + " type: " + xIr.type);
+
                 xIr.addReading();
                 yIr.addReading();
                 i++;
@@ -623,26 +642,36 @@ public abstract class Auto extends LinearVisionOpMode {
                 double r = getSensorR(targetGyro);
 
                 //Get the distances and derivative terms
+                xIr.addReading();
+                yIr.addReading();
                 xCurrDistance = xIr.getCmAvg();
                 yCurrDistance = yIr.getCmAvg();
+
+                //log.add("x: " + xCurrDistance);
+                //log.add("y: " + yCurrDistance);
+
+                if (xCurrDistance < 100) { xCurrDistance += offset; }
+                if (yCurrDistance < 100) { yCurrDistance += offset; }
 
                 double xFactor = getSensorFactor(xType, xIrId, xCurrDistance, xTargetDistance);
                 double yFactor = getSensorFactor(yType, yIrId, yCurrDistance, yTargetDistance);
 
                 drive.runWithoutEncoders();
                 //Actually drives
-                if (!useY) {
-                    drive.driveXYRWimpo(1, xFactor * 4.5, 0, r, false);
+                if (!useY && useX) {
+                    log.add("x: " + xCurrDistance + " xFactor: " + xFactor + " y: " + 0 + " r: " + r);
+                    drive.driveXYR(1, -xFactor * 3, 0, r, false);
                 }
-                if (!useX) {
+                if (!useX && useY) {
                     //drive.driveXYR(speedFactor, 0, -yFactor/2, r, false);
                     drive.driveXYR(1, 0, -yFactor / 2, r, false);
-                } else {
+                }
+                if (useX && useY){
                     //drive.driveXYR(speedFactor, xFactor/2, -yFactor/2, r, false);
                     drive.driveXYR(1, xFactor * 4.5, -yFactor / 2, r, false);
                 }
             }
-            while (((Math.abs(xTargetDistance - xCurrDistance) > 2)) && timeout.seconds() < 5 && opModeIsActive());
+            while (/*((Math.abs(xTargetDistance - xCurrDistance) > 2)) && timeout.seconds() < 5 &&*/ opModeIsActive());
 
             //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
             drive.stopMotors();
@@ -685,7 +714,7 @@ public abstract class Auto extends LinearVisionOpMode {
     private void autoSensorDrive(double targetDistance) {
         telemetry.addData("ir", drive.shortIr[0]);
         telemetry.update();
-        autoSensorDrive(0, 0, AnalogSensor.Type.SHORT_RANGE, false, targetDistance, 0, AnalogSensor.Type.SHORT_RANGE, true, 0);
+        autoSensorDrive(0, 0, AnalogSensor.Type.SHORT_RANGE, false, targetDistance, 0, AnalogSensor.Type.SHORT_RANGE, true, 0, 0);
     }
 
     public void jewelLeft() {
