@@ -241,6 +241,9 @@ public abstract class Drive {
             for (AnalogSensor longIr : longIr) {
                 longIr.addReading();
             }
+            for (AnalogSensor sonar : sonar) {
+                sonar.addReading();
+            }
         }
     }
 

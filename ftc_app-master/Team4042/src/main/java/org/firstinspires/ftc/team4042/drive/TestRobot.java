@@ -4,18 +4,39 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
+
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Stack;
+
 /**
  * Created by Bren on 1/22/2018.
  */
 
-@Autonomous(name = "Sensor: Color", group = "Sensor")
-@Disabled
+@Autonomous(name = "TestRobot", group = "Drive")
 public class TestRobot extends LinearOpMode{
 
     private Drive drive = new MecanumDrive();
 
+    private Queue<String> tests = new PriorityQueue<>();
+
     @Override
     public void runOpMode() {
+        tests.add("Drive Motors");
+        tests.add("Drive Encoders");
+        tests.add("External and Internal Intakes");
+        tests.add("Vertical U-track");
+        tests.add("U-track Encoder");
+        tests.add("UHT");
+        tests.add("U-track Hand");
+        tests.add("Reset U-track");
+        tests.add("Brakes Down; Catches Up");
+        tests.add("Jewel Probe");
+        tests.add("Open Winch");
+        tests.add("Sensors");
+        tests.add("There are no more tests to run.");
+
         drive.initialize(telemetry, hardwareMap);
         drive.runWithEncoders();
 
@@ -24,75 +45,97 @@ public class TestRobot extends LinearOpMode{
         telemetry.update();
         waitForStart();
         post();
-        //test motors
-        telemetry.addData("Testing: ", "motors");
+        //Drive motors
         drive.runWithEncoders();
         drive.motorLeftBack.setPower(.5);
         drive.motorLeftFront.setPower(.5);
         drive.motorRightBack.setPower(.5);
         drive.motorRightFront.setPower(.5);
         post();
+
+        //Drive encoders
         drive.motorLeftBack.setPower(0);
         drive.motorLeftFront.setPower(0);
         drive.motorRightBack.setPower(0);
         drive.motorRightFront.setPower(0);
-        telemetry.addData("Left Back", drive.motorLeftBack.getCurrentPosition());
-        telemetry.addData("Left Front", drive.motorLeftFront.getCurrentPosition());
-        telemetry.addData("Right Back", drive.motorRightBack.getCurrentPosition());
-        telemetry.addData("Right Front", drive.motorRightFront.getCurrentPosition());
+        telemetry.addData("Left Back Encoder", drive.motorLeftBack.getCurrentPosition());
+        telemetry.addData("Left Front Encoder", drive.motorLeftFront.getCurrentPosition());
+        telemetry.addData("Right Back Encoder", drive.motorRightBack.getCurrentPosition());
+        telemetry.addData("Right Front Encoder", drive.motorRightFront.getCurrentPosition());
+        telemetry.update();
         post();
-        //test intake
-        telemetry.addData("Testing: ", "intake");
+
+        //External and internal intakes
         drive.intakeLeft(1);
+        drive.internalIntakeLeft(1);
         drive.intakeRight(1);
+        drive.internalIntakeRight(1);
         post();
+
+        //Vertical u-track
         drive.intakeRight(0);
         drive.intakeLeft(0);
-        //test verticle utrack
-        telemetry.addData("Testing: ", "Vertical U-track");
-        telemetry.update();
-        drive.setVerticalDrive(1);
-        sleep(500);
-        drive.setVerticalDrive(0);
-        telemetry.addData("Utrack position: ", drive.verticalDriveCurrPos());
-        post();
-        drive.setVerticalDrive(-1);
-        sleep(470);
-        drive.setVerticalDrive(0);
-        post();
-        //test horizontal utrack
-        telemetry.addData("Testing: ", "horizontal U-track");
-        telemetry.addData("Control", "press a to skip");
-        telemetry.update();
-        drive.setHorizontalDrive(.82);
-        sleep(500);
-        drive.setHorizontalDrive(0);
-        sleep(200);
-        drive.setHorizontalDrive(-.82);
-        while(!drive.getCenterState() && ! gamepad1.a);
-        drive.setHorizontalDrive(0);
-        sleep(200);
-        //test internal intake
-        telemetry.addData("Testing: ", "internal intake");
-        drive.internalIntakeLeft(.82);
-        drive.internalIntakeRight(.82);
-        post();
-        drive.internalIntakeLeft(0);
         drive.internalIntakeRight(0);
-        //test hand
-        telemetry.addData("Testing: ", "hand");
-        telemetry.addData("Extra Controls", "press b to toggle");
+        drive.internalIntakeLeft(0);
+        drive.setVerticalDrive(1);
+        post();
 
-    }
+        //U-track Encoder
+        drive.setVerticalDrive(0);
+        telemetry.addData("U-track Encoder", drive.verticalDriveCurrPos());
+        post();
 
-    public void testDrive() {
-        
+        //UHT
+        drive.setHorizontalDrive(.82);
+        post();
+
+        //U-track Hand
+        drive.openHand();
+        post();
+
+        //Reset U-track
+        drive.closeHand();
+        drive.setHorizontalDrive(-.82);
+        while(!drive.getCenterState() && opModeIsActive());
+        drive.setHorizontalDrive(0);
+        drive.setVerticalDrive(-1);
+        while (!drive.getBottomState() && opModeIsActive());
+        drive.setVerticalDrive(0);
+        post();
+
+        //Brakes Down; Catches Up
+        drive.lowerBrakes();
+        drive.unlockCatches();
+        post();
+
+        //Jewel Probe
+        drive.lockCatches();
+        drive.raiseBrakes();
+        drive.jewelOut();
+        post();
+
+        //Open Winch
+        drive.jewelUp();
+        drive.openWinch();
+        post();
+
+        //Sensors
+        drive.stowWinch();
+        drive.readSensorsSetUp();
+        for (AnalogSensor ir : drive.shortIr) { telemetry.addData(ir.getName(), ir.getCmAvg()); }
+        for (AnalogSensor longIr : drive.longIr) { telemetry.addData(longIr.getName(), longIr.getCmAvg()); }
+        for (AnalogSensor sonar : drive.sonar) { telemetry.addData(sonar.getName(), sonar.getCmAvg()); }
+        post();
     }
 
     public void post() {
-        telemetry.addData("Control", "Press a");
+        String nextTest = tests.poll();
+        telemetry.addData("Next Test", nextTest);
+        telemetry.addData("Control", "Press a to continue");
         telemetry.update();
-        while(!gamepad1.a);
-        sleep(100);
+        while(!gamepad1.a && opModeIsActive());
+
+        telemetry.addData("Testing", nextTest);
+        telemetry.update();
     }
 }
