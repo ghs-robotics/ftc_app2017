@@ -1,14 +1,12 @@
 package org.firstinspires.ftc.team4042.drive;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
 
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.Stack;
 
 /**
  * Created by Bren on 1/22/2018.
@@ -20,6 +18,7 @@ public class TestRobot extends LinearOpMode{
     private Drive drive = new MecanumDrive();
 
     private Queue<String> tests = new PriorityQueue<>();
+    private boolean lastA = false;
 
     @Override
     public void runOpMode() {
@@ -133,8 +132,14 @@ public class TestRobot extends LinearOpMode{
         telemetry.addData("Next Test", nextTest);
         telemetry.addData("Control", "Press a to continue");
         telemetry.update();
-        while(!gamepad1.a && opModeIsActive());
-
+        lastA = gamepad1.a;
+        while(opModeIsActive()){
+            if (gamepad1.a && !lastA) {
+                break;
+            }
+            lastA = gamepad1.a;
+        }
+        lastA = gamepad1.a;
         telemetry.addData("Testing", nextTest);
         telemetry.update();
     }
