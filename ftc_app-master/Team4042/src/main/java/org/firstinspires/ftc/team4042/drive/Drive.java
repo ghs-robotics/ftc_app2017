@@ -378,8 +378,8 @@ public abstract class Drive {
      * @return Whether a glyph has been collected
      */
     public boolean collectGlyphStep() {
-        double glyphIn = 7;
-        double glyphOut = 20;
+        double glyphIn = C.get().getDouble("glyphIn");
+        double glyphOut = C.get().getDouble("glyphOut");
 
         shortIr[0].addReading();
         double frontDistance = shortIr[0].getCmAvg();
@@ -517,7 +517,7 @@ public abstract class Drive {
         //Move back to the bottom and get ready to do it again
         glyph.setHomeTarget();
         setVerticalDriveMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        setVerticalDrive(-.5        );
+        setVerticalDrive(-.5);
         stage = GlyphPlacementSystem.Stage.RESET;
     }
 
@@ -528,10 +528,11 @@ public abstract class Drive {
         boolean currBottom = getBottomState();
         if (currBottom && !lastBottom) {
             bottomTimer.reset();
-        } else if (currBottom && bottomTimer.seconds() > C.get().getDouble("bottomWait")) {
+        } else if (currBottom && bottomTimer.milliseconds() / 1000 > C.get().getDouble("bottomWait")) {
             resetUTrack();
-            setVerticalDrive(0);
             uTrackAtBottom = true;
+        } else if (currBottom) {
+            setVerticalDrive(C.get().getDouble("bottomWait") - bottomTimer.milliseconds() / 1000);
         }
         lastBottom = currBottom;
     }
