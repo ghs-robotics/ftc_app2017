@@ -185,7 +185,7 @@ public class GlyphPlacementSystem {
             currentX = targetPos;
             return true;
             //If we want to go to the center but miss the switch, it will reverse th u-track
-        } else if(!drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER) && (horizontalTimer.seconds() >= 2 * HORIZONTAL_TRANSLATION_TIME)) {
+        } else if(!drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER) && (horizontalTimer.seconds() >= C.get().getDouble("missedCenter") * HORIZONTAL_TRANSLATION_TIME)) {
             this.horizontalTimer.reset();
             if (drive.targetX.equals(HorizPos.LEFT)){drive.targetX = HorizPos.RIGHT;}
             if (drive.targetX.equals(HorizPos.RIGHT)){drive.targetX = HorizPos.LEFT;}
