@@ -158,7 +158,9 @@ public class GlyphPlacementSystem {
         if (!drive.targetX.equals(HorizPos.CENTER)) {
             double power = targetPos.getPower() - currentX.getPower();
             power = Range.clip(power, -1, 1);
-
+            if (targetPos.equals(HorizPos.CENTER)) {
+                power *= C.get().getDouble("returnSpeed");
+            }
             drive.setHorizontalDrive(power);
             horizontalTimer.reset();
         }
