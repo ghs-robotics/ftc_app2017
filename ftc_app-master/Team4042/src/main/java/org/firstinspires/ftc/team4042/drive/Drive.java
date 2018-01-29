@@ -517,16 +517,23 @@ public abstract class Drive {
         //Move back to the bottom and get ready to do it again
         glyph.setHomeTarget();
         setVerticalDriveMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        setVerticalDrive(-1);
+        setVerticalDrive(-.5        );
         stage = GlyphPlacementSystem.Stage.RESET;
     }
 
+    private boolean lastBottom;
+    private ElapsedTime bottomTimer = new ElapsedTime();
+
     private void reset() {
-        if (getBottomState()) {
+        boolean currBottom = getBottomState();
+        if (currBottom && !lastBottom) {
+            bottomTimer.reset();
+        } else if (currBottom && bottomTimer.seconds() > C.get().getDouble("bottomWait")) {
             resetUTrack();
             setVerticalDrive(0);
             uTrackAtBottom = true;
         }
+        lastBottom = currBottom;
     }
 
     public void resetUTrack() {
