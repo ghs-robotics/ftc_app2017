@@ -1,1 +1,4 @@
-f:drive x:0 y:-1 speed:1 target:1250
+f:knockr
+#Get in front of cryptobox
+f:doff x:0 y:-1 speed:.5 target:1000
+f:drive x:0 y:-1 speed:.5 target:1000 gyro:0
