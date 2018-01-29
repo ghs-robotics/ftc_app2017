@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.team4042.testops;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -8,6 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Created by Hazel on 1/5/2018.
  */
 @TeleOp(name = "ButtonPress", group = "testops")
+@Disabled
 public class ButtonPress extends OpMode {
 
     private ElapsedTime timer = new ElapsedTime();

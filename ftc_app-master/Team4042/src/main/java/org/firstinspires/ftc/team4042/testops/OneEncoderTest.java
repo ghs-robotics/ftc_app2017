@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.team4042.testops;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -8,6 +9,7 @@ import org.firstinspires.ftc.team4042.drive.Direction;
 import org.firstinspires.ftc.team4042.drive.Drive;
 
 @Autonomous(name="One Encoder Test", group="testops")
+@Disabled
 public class OneEncoderTest extends LinearOpMode {
 
     private DcMotor motor;
