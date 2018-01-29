@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.team4042.testops;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.AnalogInput;
@@ -48,6 +49,7 @@ import com.qualcomm.robotcore.hardware.AnalogInput;
  */
 
 @TeleOp(name="Analog Sensor 2", group="testops")
+@Disabled
 public class AnalogSensorTest2 extends OpMode {
 
     AnalogInput infrared;

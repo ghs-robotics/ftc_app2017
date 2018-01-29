@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.team4042.testops;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.I2cDevice;
@@ -50,6 +51,7 @@ import org.firstinspires.ftc.team4042.sensor.UltrasonicI2cRangeSensor;
  */
 
 @Autonomous(name="TestUltra", group="testops")
+@Disabled
 public class TestUltra extends LinearOpMode {
 
     UltrasonicI2cRangeSensor ultraSensor;

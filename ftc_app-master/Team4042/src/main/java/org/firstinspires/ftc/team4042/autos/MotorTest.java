@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.team4042.autos;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -7,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.team4042.drive.MecanumDrive;
 
 @TeleOp(name = "Motor Test", group = "Iterative Opmode")
+@Disabled
 public class MotorTest extends OpMode {
 
     private MecanumDrive drive = new MecanumDrive(true);

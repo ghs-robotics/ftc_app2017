@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.team4042.testops;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.team4042.sensor.GyroOld;
@@ -50,6 +51,7 @@ import org.firstinspires.ftc.team4042.sensor.UltrasonicI2cRangeSensor;
  */
 
 @Autonomous(name="TestGyroBrendan", group="testops")
+@Disabled
 public class TestGyro extends LinearOpMode {
 
     GyroOld ultraSensor;

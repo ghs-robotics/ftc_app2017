@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.team4042.autos;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.team4042.autos.Auto;
 import org.firstinspires.ftc.team4042.drive.MecanumDrive;
@@ -9,6 +10,7 @@ import org.firstinspires.ftc.team4042.drive.MecanumDrive;
  * Reads the vuforia mark
  */
 @Autonomous(name="JewelAuto", group="autos")
+@Disabled
 public class JewelAuto extends Auto {
 
     MecanumDrive drive = new MecanumDrive(true);

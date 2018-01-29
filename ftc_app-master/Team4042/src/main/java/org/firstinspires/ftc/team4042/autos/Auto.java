@@ -69,7 +69,7 @@ public abstract class Auto extends LinearVisionOpMode {
         //drive.setUseGyro(true);
         //telemetry.addData("glyph", drive.glyph.getTargetPositionAsString());
 
-        //vuMarkIdentifier.initialize(telemetry, hardwareMap);
+        vuMarkIdentifier.initialize(telemetry, hardwareMap);
 
         log.add("Reading file " + filePath);
         file = new File("./storage/emulated/0/DCIM/" + filePath);
@@ -151,7 +151,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
     public void runAuto(boolean useSensors) {
         if (useSensors) runAuto();
-        vuMarkIdentifier.initialize(telemetry, hardwareMap);
+        //vuMarkIdentifier.initialize(telemetry, hardwareMap);
         //telemetry.addData("vuMarkhere", "ststs");
 
         //vuMark = vuMarkIdentifier.getMark();
@@ -172,7 +172,7 @@ public abstract class Auto extends LinearVisionOpMode {
      * Runs the list of instructions
      */
     public void runAuto() {
-        vuMarkIdentifier.initialize(telemetry, hardwareMap);
+        //vuMarkIdentifier.initialize(telemetry, hardwareMap);
 
         gyro();
 
