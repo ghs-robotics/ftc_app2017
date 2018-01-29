@@ -16,7 +16,7 @@ public class TeleOpMecanum extends OpMode {
     private boolean manual = false;
     private boolean onBalancingStone = false;
 
-    private boolean noIntakes = false;
+    private boolean noAutoIntakes = false;
 
     private double oops = 1; //switch to -1 if runs in wrong direction when going for balance
 
@@ -135,7 +135,7 @@ public class TeleOpMecanum extends OpMode {
     public void loop() {
 
         if (gamepad1.dpad_up && !aUp) {
-            noIntakes = !noIntakes;
+            noAutoIntakes = !noAutoIntakes;
         }
         aUp = gamepad1.dpad_up;
 
@@ -403,11 +403,14 @@ public class TeleOpMecanum extends OpMode {
         double bLeftTrigger = drive.deadZone(gamepad2.left_trigger);
         boolean bLeftBumper = gamepad2.left_bumper;
 
-        boolean intakeInput = (aRightBumper || aLeftBumper || aRightTrigger != 0 || aLeftTrigger != 0) ||
-                (Drive.isExtendo && (bRightBumper || bLeftBumper || bRightTrigger != 0 || bLeftTrigger != 0));
+        drive.shortIr[1].addReading();
+        double backDistance = drive.shortIr[1].getCmAvg();
+        boolean isGlyphBack = Math.abs(backDistance - C.get().getDouble("glyphIn")) < Math.abs(backDistance - C.get().getDouble("glyphOut"));
 
-        if (intakeInput) {
-            telemetry.log().add("intake input");
+        if (noAutoIntakes && isGlyphBack) {
+            drive.intakeLeft(0);
+            drive.intakeRight(0);
+        } else {
             if (Drive.isExtendo) {
                 if (bRightTrigger > 0) { drive.internalIntakeRight(bRightTrigger); }
                 //Right bumper of the b controller runs the right intake backwards
@@ -442,11 +445,6 @@ public class TeleOpMecanum extends OpMode {
                 drive.intakeLeft(0);
                 if (!Drive.isExtendo) { drive.internalIntakeLeft(0); }
             }
-        } else if (!noIntakes) {
-            drive.collectGlyphStep();
-        } else {
-            drive.intakeLeft(0);
-            drive.intakeRight(0);
         }
     }
 
