@@ -1,2 +1,2 @@
 #function:g
-f:sdrive speed:.5 xdistance:183 xir:1 xtype:sonar gyro:0 offset:119
+f:sdrive speed:-1 xdistance:183 xir:0 xtype:sonar gyro:0 offset:119

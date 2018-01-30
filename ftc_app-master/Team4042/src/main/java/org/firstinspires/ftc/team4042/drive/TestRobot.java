@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
 
+import java.util.ArrayList;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
@@ -18,7 +19,7 @@ public class TestRobot extends LinearOpMode{
 
     private Drive drive = new MecanumDrive();
 
-    private Queue<String> tests = new PriorityQueue<>();
+    private ArrayList<String> tests = new ArrayList<>();
     private boolean lastA = false;
 
     @Override
@@ -26,13 +27,13 @@ public class TestRobot extends LinearOpMode{
         tests.add("Drive Motors");
         tests.add("Drive Encoders");
         tests.add("External and Internal Intakes");
+        tests.add("Jewel Probe");
         tests.add("Vertical U-track");
         tests.add("U-track Encoder");
         tests.add("UHT");
         tests.add("U-track Hand");
         tests.add("Reset U-track");
         tests.add("Brakes Down; Catches Up");
-        tests.add("Jewel Probe");
         tests.add("Open Winch");
         tests.add("Sensors");
         tests.add("There are no more tests to run.");
@@ -63,7 +64,6 @@ public class TestRobot extends LinearOpMode{
         telemetry.addData("Left Front Encoder", drive.motorLeftFront.getCurrentPosition());
         telemetry.addData("Right Back Encoder", drive.motorRightBack.getCurrentPosition());
         telemetry.addData("Right Front Encoder", drive.motorRightFront.getCurrentPosition());
-        telemetry.update();
         post();
 
         //External and internal intakes
@@ -73,11 +73,16 @@ public class TestRobot extends LinearOpMode{
         drive.internalIntakeRight(1);
         post();
 
-        //Vertical u-track
+        //Jewel Probe
         drive.intakeRight(0);
         drive.intakeLeft(0);
         drive.internalIntakeRight(0);
         drive.internalIntakeLeft(0);
+        drive.jewelOut();
+        post();
+
+        //Vertical u-track
+        drive.jewelUp();
         drive.setVerticalDrive(1);
         post();
 
@@ -109,14 +114,9 @@ public class TestRobot extends LinearOpMode{
         drive.unlockCatches();
         post();
 
-        //Jewel Probe
+        //Open Winch
         drive.lockCatches();
         drive.raiseBrakes();
-        drive.jewelOut();
-        post();
-
-        //Open Winch
-        drive.jewelUp();
         drive.openWinch();
         post();
 
@@ -130,7 +130,7 @@ public class TestRobot extends LinearOpMode{
     }
 
     public void post() {
-        String nextTest = tests.poll();
+        String nextTest = tests.remove(0);
         telemetry.addData("Next Test", nextTest);
         telemetry.addData("Control", "Press a to continue");
         telemetry.update();
