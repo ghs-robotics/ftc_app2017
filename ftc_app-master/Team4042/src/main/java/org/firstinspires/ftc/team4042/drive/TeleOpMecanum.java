@@ -105,91 +105,102 @@ public class TeleOpMecanum extends OpMode {
 
     @Override
     public void init() {
-        drive.initialize(telemetry, hardwareMap);
-        drive.runWithEncoders();
+        try {
+            drive.initialize(telemetry, hardwareMap);
+            drive.runWithEncoders();
 
-        drive.initializeGyro(telemetry, hardwareMap);
-        gyro();
+            drive.initializeGyro(telemetry, hardwareMap);
+            gyro();
 
-        telemetry.update();
+            telemetry.update();
 
-        drive.targetY = GlyphPlacementSystem.Position.TOP;
-        drive.targetX = GlyphPlacementSystem.HorizPos.LEFT;
-        drive.stage = GlyphPlacementSystem.Stage.HOME;
-        drive.glyph.setHomeTarget();
+            drive.targetY = GlyphPlacementSystem.Position.TOP;
+            drive.targetX = GlyphPlacementSystem.HorizPos.LEFT;
+            drive.stage = GlyphPlacementSystem.Stage.HOME;
+            drive.glyph.setHomeTarget();
 
-        adjustedSpeed = MecanumDrive.FULL_SPEED;
+            adjustedSpeed = MecanumDrive.FULL_SPEED;
+        } catch (Exception ex) {
+            telemetry.addData("Exception", Drive.getStackTrace(ex));
+        }
     }
 
     @Override
     public void start() {
-        //Moves the servo to the up position
-        drive.jewelUp();
-        //Raises the brakes
-        drive.raiseBrakes();
-        //Locks the catches
-        drive.lockCatches();
+        try {
+            //Moves the servo to the up position
+            drive.jewelUp();
+            //Raises the brakes
+            drive.raiseBrakes();
+            //Locks the catches
+            drive.lockCatches();
+        } catch (Exception ex) {
+            telemetry.addData("Exception", Drive.getStackTrace(ex));
+        }
     }
     
     @Override
     public void loop() {
-
-        if (gamepad1.dpad_up && !aUp) {
-            noAutoIntakes = !noAutoIntakes;
-        }
-        aUp = gamepad1.dpad_up;
-
-        if (gamepad1.dpad_down && !aDown) {
-            drive.toggleWinch();
-        }
-        aDown = gamepad1.dpad_down;
-
-        //Toggles verbose
-        if (gamepad2.back && !bBack) {
-            drive.toggleVerbose();
-        }
-        bBack = gamepad2.back;
-
-        if (gamepad2.left_stick_button && !lJoyBtn) {
-            placerModeInstant = !placerModeInstant;
-        }
-        lJoyBtn = gamepad2.left_stick_button;
-
-        //The first time you hit back, it establishes how long you've been pushing it for
-        if (gamepad1.back && !aBack) {
-            aBackTime = System.nanoTime();
-        }
-        //If you're pushing back and have been for longer than "nano", then run the full balance code
-        if (gamepad1.back && aBack) {
-            if (System.nanoTime() - aBackTime > C.get().getDouble("nano")) {
-                balance();
+        try {
+            if (gamepad1.dpad_up && !aUp) {
+                noAutoIntakes = !noAutoIntakes;
             }
-        }
-        //If you've released back and did so for a shorter time than "nano", then toggle whether you're on the stone
-        if (!gamepad1.back && aBack) {
-            if (System.nanoTime() - aBackTime < C.get().getDouble("nano")) {
-                onBalancingStone = !onBalancingStone;
+            aUp = gamepad1.dpad_up;
+
+            if (gamepad1.dpad_down && !aDown) {
+                drive.toggleWinch();
             }
+            aDown = gamepad1.dpad_down;
+
+            //Toggles verbose
+            if (gamepad2.back && !bBack) {
+                drive.toggleVerbose();
+            }
+            bBack = gamepad2.back;
+
+            if (gamepad2.left_stick_button && !lJoyBtn) {
+                placerModeInstant = !placerModeInstant;
+            }
+            lJoyBtn = gamepad2.left_stick_button;
+
+            //The first time you hit back, it establishes how long you've been pushing it for
+            if (gamepad1.back && !aBack) {
+                aBackTime = System.nanoTime();
+            }
+            //If you're pushing back and have been for longer than "nano", then run the full balance code
+            if (gamepad1.back && aBack) {
+                if (System.nanoTime() - aBackTime > C.get().getDouble("nano")) {
+                    balance();
+                }
+            }
+            //If you've released back and did so for a shorter time than "nano", then toggle whether you're on the stone
+            if (!gamepad1.back && aBack) {
+                if (System.nanoTime() - aBackTime < C.get().getDouble("nano")) {
+                    onBalancingStone = !onBalancingStone;
+                }
+            }
+            aBack = gamepad1.back;
+
+            //Adjust drive modes, speeds, etc
+            setUpDrive();
+
+            //Sets up speed modes
+            speedModes();
+
+            //Drives the robot
+            drive.drive(false, gamepad1, gamepad2, adjustedSpeed * MecanumDrive.FULL_SPEED);
+
+            //Runs the intakes
+            intakes();
+
+            //Runs the glyph placer
+            glyphPlacer();
+
+            //Updates the telemetry output
+            telemetryUpdate();
+        } catch (Exception ex) {
+            telemetry.addData("Exception", Drive.getStackTrace(ex));
         }
-        aBack = gamepad1.back;
-
-        //Adjust drive modes, speeds, etc
-        setUpDrive();
-
-        //Sets up speed modes
-        speedModes();
-
-        //Drives the robot
-        drive.drive(false, gamepad1, gamepad2, adjustedSpeed * MecanumDrive.FULL_SPEED);
-
-        //Runs the intakes
-        intakes();
-
-        //Runs the glyph placer
-        glyphPlacer();
-
-        //Updates the telemetry output
-        telemetryUpdate();
     }
 
     public void gyro() {
