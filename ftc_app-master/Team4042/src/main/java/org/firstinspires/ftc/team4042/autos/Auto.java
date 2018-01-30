@@ -536,6 +536,8 @@ public abstract class Auto extends LinearVisionOpMode {
 
         double offset = parameters.containsKey("offset") ? Double.parseDouble(parameters.get("offset")) : 0;
 
+        double speed = parameters.containsKey("speed") ? Double.parseDouble(parameters.get("speed")) : 1;
+
         AnalogSensor.Type yType = AnalogSensor.Type.SHORT_RANGE;
         if (useY) {
             switch (parameters.get("ytype")) {
@@ -577,7 +579,7 @@ public abstract class Auto extends LinearVisionOpMode {
             }
         }
 
-        autoSensorDrive(xTargetDistance, xIr, xType, useX, yTargetDistance, yIr, yType, useY, targetGyro, offset);
+        autoSensorDrive(xTargetDistance, xIr, xType, useX, yTargetDistance, yIr, yType, useY, targetGyro, offset, speed);
     }
 
     /**
@@ -590,7 +592,7 @@ public abstract class Auto extends LinearVisionOpMode {
      * @param yType Whether the y sensor is long-range or not
      */
     private void autoSensorDrive(double xTargetDistance, int xIrId, AnalogSensor.Type xType, boolean useX,
-                                 double yTargetDistance, int yIrId, AnalogSensor.Type yType, boolean useY, double targetGyro, double offset) {
+                                 double yTargetDistance, int yIrId, AnalogSensor.Type yType, boolean useY, double targetGyro, double offset, double speed) {
         if (useX || useY) {
             AnalogSensor xIr = null;
             switch (xType) {
@@ -653,8 +655,8 @@ public abstract class Auto extends LinearVisionOpMode {
                 if (xCurrDistance < 100) { xCurrDistance += offset; }
                 if (yCurrDistance < 100) { yCurrDistance += offset; }
 
-                double xFactor = getSensorFactor(xType, xIrId, xCurrDistance, xTargetDistance);
-                double yFactor = getSensorFactor(yType, yIrId, yCurrDistance, yTargetDistance);
+                double xFactor = getSensorFactor(xType, xIrId, xCurrDistance, xTargetDistance) * speed;
+                double yFactor = getSensorFactor(yType, yIrId, yCurrDistance, yTargetDistance) * speed;
 
                 drive.runWithoutEncoders();
                 //Actually drives
@@ -714,7 +716,7 @@ public abstract class Auto extends LinearVisionOpMode {
     private void autoSensorDrive(double targetDistance) {
         telemetry.addData("ir", drive.shortIr[0]);
         telemetry.update();
-        autoSensorDrive(0, 0, AnalogSensor.Type.SHORT_RANGE, false, targetDistance, 0, AnalogSensor.Type.SHORT_RANGE, true, 0, 0);
+        autoSensorDrive(0, 0, AnalogSensor.Type.SHORT_RANGE, false, targetDistance, 0, AnalogSensor.Type.SHORT_RANGE, true, 0, 0, 1);
     }
 
     public void jewelLeft() {

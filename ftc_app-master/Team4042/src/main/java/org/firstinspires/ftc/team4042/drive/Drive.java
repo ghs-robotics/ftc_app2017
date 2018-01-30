@@ -520,7 +520,7 @@ public abstract class Drive {
         //Move back to the bottom and get ready to do it again
         glyph.setHomeTarget();
         setVerticalDriveMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        setVerticalDrive(-.5);
+        setVerticalDrive(-1);
         stage = GlyphPlacementSystem.Stage.RESET;
     }
 
@@ -535,9 +535,10 @@ public abstract class Drive {
             resetUTrack();
             uTrackAtBottom = true;
         } else if (currBottom) {
-            setVerticalDrive(C.get().getDouble("bottomWait") - bottomTimer.milliseconds() / 1000);
+            setVerticalDrive((C.get().getDouble("bottomWait") - bottomTimer.milliseconds() / 1000)/-2);
         }
         lastBottom = currBottom;
+        telemetry.addData("Bottom timer", bottomTimer.milliseconds()/1000);
     }
 
     public void resetUTrack() {
