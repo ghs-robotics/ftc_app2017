@@ -55,6 +55,8 @@ public abstract class Auto extends LinearVisionOpMode {
 
     private double startRoll;
     private double startPitch;
+    private ElapsedTime intakeTimer = new ElapsedTime();
+    private int intakeCount = 0;
 
 
     public void setUp(MecanumDrive drive, String filePath) {
@@ -819,6 +821,21 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void openIntakes(HashMap<String, String> parameters) {
+
+        /*if (this.intakeTimer.milliseconds() / 1000 < C.get().getDouble("intakeForwardTime")){
+            drive.intakeLeft(1);
+            drive.intakeRight(1);
+        }else if (this.intakeTimer.milliseconds() / 1000 < (C.get().getDouble("intakeForwardTime") + C.get().getDouble("intakeBackTime"))){
+            drive.intakeLeft(-1);
+            drive.intakeRight(-1);
+        }else if (this.intakeTimer.milliseconds() / 1000 > (C.get().getDouble("intakeForwardTime") + C.get().getDouble("intakeBackTime"))){
+            drive.intakeLeft(0);
+            drive.intakeRight(0);
+            if (intakeCount < 3){
+                intakeCount++;
+                intakeTimer.reset();
+            }
+        }*/
 
         ElapsedTime timer = new ElapsedTime();
         timer.reset();

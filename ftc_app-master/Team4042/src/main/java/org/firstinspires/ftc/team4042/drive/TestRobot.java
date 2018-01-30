@@ -2,6 +2,7 @@ package org.firstinspires.ftc.team4042.drive;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
 
@@ -38,6 +39,7 @@ public class TestRobot extends LinearOpMode{
 
         drive.initialize(telemetry, hardwareMap);
         drive.runWithEncoders();
+        drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         drive.initializeGyro(telemetry, hardwareMap);
 
