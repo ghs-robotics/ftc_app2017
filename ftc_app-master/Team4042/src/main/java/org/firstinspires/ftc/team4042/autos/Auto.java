@@ -239,6 +239,9 @@ public abstract class Auto extends LinearVisionOpMode {
                 case "brace":
                     drive.openWinch();
                     break;
+                case "wait":
+                    wait(parameters);
+                    break;
                 default:
                     System.err.println("Unknown function called from file " + file);
                     break;
@@ -286,6 +289,13 @@ public abstract class Auto extends LinearVisionOpMode {
         telemetry.update();
     }
     */
+
+    public void wait(HashMap<String, String> parameters) {
+        double seconds = Double.parseDouble(parameters.get("sec"));
+
+        ElapsedTime waitTimer = new ElapsedTime();
+        while (waitTimer.seconds() < seconds);
+    }
 
     public void grabGlyph(HashMap<String, String> parameters) {
         drive.readSensorsSetUp();
@@ -356,7 +366,7 @@ public abstract class Auto extends LinearVisionOpMode {
         do {
             drive.uTrackUpdate();
             drive.glyph.runToPosition();
-            done = drive.uTrack(); //GETS STUCK IN THIS FUNCTION
+            done = drive.uTrack();
         } while (opModeIsActive() && !done);
     }
 
@@ -648,14 +658,11 @@ public abstract class Auto extends LinearVisionOpMode {
                 //Get the distances and derivative terms
                 xIr.addReading();
                 yIr.addReading();
-                xCurrDistance = xIr.getCmAvg();
-                yCurrDistance = yIr.getCmAvg();
+                xCurrDistance = xIr.getCmAvg(100, offset);
+                yCurrDistance = yIr.getCmAvg(100, offset);
 
                 //log.add("x: " + xCurrDistance);
                 //log.add("y: " + yCurrDistance);
-
-                if (xCurrDistance < 100) { xCurrDistance += offset; }
-                if (yCurrDistance < 100) { yCurrDistance += offset; }
 
                 double xFactor = getSensorFactor(xType, xIrId, xCurrDistance, xTargetDistance) * speed;
                 double yFactor = getSensorFactor(yType, yIrId, yCurrDistance, yTargetDistance) * speed;
@@ -675,7 +682,7 @@ public abstract class Auto extends LinearVisionOpMode {
                     drive.driveXYR(1, xFactor * 4.5, -yFactor / 2, r, false);
                 }
             }
-            while (/*((Math.abs(xTargetDistance - xCurrDistance) > 2)) && timeout.seconds() < 5 &&*/ opModeIsActive());
+            while (((Math.abs(xTargetDistance - xCurrDistance) > 2)) && timeout.seconds() < 5 && opModeIsActive());
 
             //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
             drive.stopMotors();
@@ -762,6 +769,9 @@ public abstract class Auto extends LinearVisionOpMode {
                 }
                 timer.reset();
             }
+
+            drive.intakeRight(0);
+            drive.intakeLeft(0);
 
             //autoRotate(0, Drive.FULL_SPEED/4);
         } catch (NullPointerException ex) {

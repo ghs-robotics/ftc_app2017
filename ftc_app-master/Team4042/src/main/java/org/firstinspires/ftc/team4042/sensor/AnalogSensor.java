@@ -75,6 +75,28 @@ public class AnalogSensor {
         return voltage;
     }
 
+    public double getCmAvg(double threshold, double offset) {
+        if (sensor == null) { return -1; }
+        double sum = 0;
+        double numToRead = firstLoop ? curr + 1 : NUM_OF_READINGS;
+
+        for (int i = 0; i < numToRead; i++) {
+            double add = readings[i];
+            switch (type) {
+                case SHORT_RANGE:
+                    add = getCmAsShortIR(add);
+                case LONG_RANGE:
+                    add = getCmAsLongIR(add);
+                case SONAR:
+                    add = getCmAsSonar(add);
+            }
+            if (add < threshold) { add += offset; }
+            sum += add;
+        }
+        double voltage = sum/NUM_OF_READINGS;
+        return voltage;
+    }
+
     /**
      * Parses the voltage and returns a centimeter distance, as mapped by a power function
      * @param voltage The voltage returned by the IR
