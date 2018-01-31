@@ -28,7 +28,8 @@ public class GlyphPlacementSystem {
 
     public enum Position {
         //HOME(0), RAISED(1200), TOP(1600), MID(2000), BOT(2500), TRANSITION(-1);
-        HOME(10), RAISEDBACK(1350), RAISED(1401), TOP(1600), MID(1900), BOT(2200), TRANSITION(-1);
+        HOME(0), RAISEDBACK(1325), RAISED(1375), TOP(1525), MID(1875), BOT(2050), TRANSITION(-1);
+        //HOME(10), RAISEDBACK(1350), RAISED(1401), TOP(1600), MID(1900), BOT(2200), TRANSITION(-1);
 
         private final Integer encoderVal;
         Position(Integer encoderVal) { this.encoderVal = encoderVal; }
@@ -60,7 +61,6 @@ public class GlyphPlacementSystem {
     public String getTargetPositionAsString()
     {
         char[] output = baseOutput.toCharArray();
-
         int position = uiTargetX + 3 * uiTargetY;
         switch(position)
         {
@@ -187,8 +187,8 @@ public class GlyphPlacementSystem {
             //If we want to go to the center but miss the switch, it will reverse th u-track
         } else if(!drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER) && (horizontalTimer.seconds() >= C.get().getDouble("missedCenter") * HORIZONTAL_TRANSLATION_TIME)) {
             this.horizontalTimer.reset();
-            if (drive.targetX.equals(HorizPos.LEFT)){drive.targetX = HorizPos.RIGHT;}
-            if (drive.targetX.equals(HorizPos.RIGHT)){drive.targetX = HorizPos.LEFT;}
+            if (this.currentX.equals(HorizPos.LEFT)){this.currentX = HorizPos.RIGHT;}
+            if (this.currentX.equals(HorizPos.RIGHT)){this.currentX = HorizPos.LEFT;}
             this.setXPower(HorizPos.CENTER);
         }
         return false;
