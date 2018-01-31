@@ -500,13 +500,14 @@ public abstract class Drive {
             glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISEDBACK);
             if (glyph.currentY.equals(GlyphPlacementSystem.Position.RAISEDBACK)) {
                 stage = GlyphPlacementSystem.Stage.PAUSE2;
+                glyph.setXPower(GlyphPlacementSystem.HorizPos.CENTER);
             }
         }
     }
 
     private void pause2() {
         //Move back to center x location (so the hand fits back in the robot)
-        glyph.setXPower(GlyphPlacementSystem.HorizPos.CENTER);
+        //glyph.setXPower(GlyphPlacementSystem.HorizPos.CENTER);
         if(glyph.xTargetReached(GlyphPlacementSystem.HorizPos.CENTER)) {
             log.add("reached x target, center is " + getCenterState());
             stage = GlyphPlacementSystem.Stage.RETURN2;

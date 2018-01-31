@@ -43,7 +43,7 @@ public class GlyphPlacementSystem {
     }
 
     public enum HorizPos {
-        LEFT(-.8), CENTER(0.0), RIGHT(.8);
+        LEFT(-.75), CENTER(0.0), RIGHT(.75);
 
         private final Double power;
         HorizPos(Double power) { this.power = power; }
@@ -187,8 +187,14 @@ public class GlyphPlacementSystem {
             //If we want to go to the center but miss the switch, it will reverse th u-track
         } else if(!drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER) && (horizontalTimer.seconds() >= C.get().getDouble("missedCenter") * HORIZONTAL_TRANSLATION_TIME)) {
             this.horizontalTimer.reset();
-            if (this.currentX.equals(HorizPos.LEFT)){this.currentX = HorizPos.RIGHT;}
-            if (this.currentX.equals(HorizPos.RIGHT)){this.currentX = HorizPos.LEFT;}
+            if (this.currentX.equals(HorizPos.LEFT)){
+                this.currentX = HorizPos.RIGHT;
+                drive.targetX = HorizPos.RIGHT;
+            }
+            if (this.currentX.equals(HorizPos.RIGHT)){
+                this.currentX = HorizPos.LEFT;
+                drive.targetX = HorizPos.LEFT;
+            }
             this.setXPower(HorizPos.CENTER);
         }
         return false;
