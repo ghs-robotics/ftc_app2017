@@ -671,18 +671,18 @@ public abstract class Auto extends LinearVisionOpMode {
                 //Actually drives
                 if (!useY && useX) {
                     log.add("x: " + xCurrDistance + " xFactor: " + xFactor + " y: " + 0 + " r: " + r);
-                    drive.driveXYR(1, -xFactor * 3, 0, r, false);
+                    drive.driveXYR(1, -xFactor * 3, 0, r*2, false);
                 }
                 if (!useX && useY) {
                     //drive.driveXYR(speedFactor, 0, -yFactor/2, r, false);
-                    drive.driveXYR(1, 0, -yFactor / 2, r, false);
+                    drive.driveXYR(1, 0, -yFactor / 2, r*2, false);
                 }
                 if (useX && useY){
                     //drive.driveXYR(speedFactor, xFactor/2, -yFactor/2, r, false);
                     drive.driveXYR(1, xFactor * 4.5, -yFactor / 2, r, false);
                 }
             }
-            while (((Math.abs(xTargetDistance - xCurrDistance) > 2)) && timeout.seconds() < 5 && opModeIsActive());
+            while (/*((Math.abs(xTargetDistance - xCurrDistance) > 2)) &&*/ timeout.seconds() < 5 && opModeIsActive());
 
             //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
             drive.stopMotors();
@@ -746,7 +746,7 @@ public abstract class Auto extends LinearVisionOpMode {
             //timer.reset();
 
             //Moves the robot left
-            autoRotate(14, Drive.FULL_SPEED*2/3);
+            autoRotate(14, Drive.FULL_SPEED);
 
             //drive.intakeLeft(-1);
 
@@ -756,7 +756,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
             //drive.intakeLeft(1);
 
-            autoRotate(0, Drive.FULL_SPEED*2/3);
+            autoRotate(0, Drive.FULL_SPEED);
 
             /*for (int i = 0; i < 2; i++) {
                 drive.intakeLeft(-1);
@@ -797,7 +797,7 @@ public abstract class Auto extends LinearVisionOpMode {
             //while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {}
             //timer.reset();
 
-            autoRotate(-14, Drive.FULL_SPEED*2/3);
+            autoRotate(-14, Drive.FULL_SPEED);
 
             //drive.intakeLeft(-1);
 
@@ -807,7 +807,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
             //drive.intakeLeft(1);
 
-            autoRotate(0, Drive.FULL_SPEED*2/3);
+            autoRotate(0, Drive.FULL_SPEED);
 
             /*for (int i = 0; i < 2; i++) {
                 drive.intakeLeft(-1);
