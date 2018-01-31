@@ -1,6 +1,7 @@
 f:knockb
 #Get in front of cryptobox
 f:doff x:0 y:1 speed:.5 target:1000
+f:open
 f:drive x:0 y:1 speed:.5 target:900
 f:rot r:-80 speed:.5
 f:sdrive speed:1 xdistance:183 xir:1 xtype:sonar gyro:-90 offset:127
