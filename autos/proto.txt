@@ -15,4 +15,5 @@
 #ex: function:d x:1 y:.2 speed:.5 target:1000 will drive right and slightly forward at half speed for 1000 encoder ticks
 
 #f:open
-f:place
+#f:place
+f:doff x:0 y:1 speed:1 target:2000

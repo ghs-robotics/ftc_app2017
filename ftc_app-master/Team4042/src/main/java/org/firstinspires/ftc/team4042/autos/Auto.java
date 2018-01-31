@@ -234,7 +234,7 @@ public abstract class Auto extends LinearVisionOpMode {
                     grabGlyph(parameters);
                     break;
                 case "open":
-                    openIntakes(parameters);
+                    //openIntakes(parameters);
                     break;
                 case "brace":
                     drive.openWinch();
@@ -531,6 +531,7 @@ public abstract class Auto extends LinearVisionOpMode {
             if (Math.abs(diff) > 2) {
                 drive.driveXYR(speed, 0, 0, DERIV_ROTATE * diff, false, PROPORTIONAL_ROTATE);
             }
+            log.add("made it thru rot");
         } while (Math.abs(gyro - realR) > 2 && opModeIsActive());
 
         drive.stopMotors();
