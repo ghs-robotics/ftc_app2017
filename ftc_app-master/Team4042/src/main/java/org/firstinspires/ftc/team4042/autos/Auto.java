@@ -320,7 +320,7 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public String getBallColor(Mat frame){
-        log.add(frame.height() + " x " + frame.width());
+        //log.add(frame.height() + " x " + frame.width());
         //Imgproc.resize(frame, frame, new Size(960, 720));
         telemetry.update();
         //Rect left_crop = new Rect(new Point(215,585), new Point(380, 719));
