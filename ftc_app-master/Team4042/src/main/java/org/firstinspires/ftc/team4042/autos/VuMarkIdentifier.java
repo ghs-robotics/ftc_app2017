@@ -34,6 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.vuforia.CameraDevice;
 import com.vuforia.Image;
 import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Vuforia;
@@ -129,6 +130,7 @@ public class VuMarkIdentifier {
         //Load the data set containing the VuMarks for Relic Recovery.
         relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
         relicTemplate = relicTrackables.get(0);
+        CameraDevice.getInstance().setFlashTorchMode(true);
 
         relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
 
@@ -145,6 +147,7 @@ public class VuMarkIdentifier {
         if (relicRecoveryVuMark == RelicRecoveryVuMark.UNKNOWN) {
             relicRecoveryVuMark = RelicRecoveryVuMark.CENTER;
         }
+        CameraDevice.getInstance().setFlashTorchMode(false);
         return relicRecoveryVuMark;
     }
 

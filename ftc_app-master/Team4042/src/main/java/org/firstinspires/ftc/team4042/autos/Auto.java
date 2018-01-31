@@ -473,8 +473,8 @@ public abstract class Auto extends LinearVisionOpMode {
             done = drive.driveWithEncoders(direction, speed, targetTicks, useGyro, targetGyro);
             //telemetry.update();
         }
-        drive.resetEncoders();
         drive.runWithEncoders();
+        drive.resetEncoders();
     }
 
     private void autoDriveOff(HashMap<String, String> parameters) {
@@ -733,8 +733,8 @@ public abstract class Auto extends LinearVisionOpMode {
             drive.resetEncoders();
             drive.runWithEncoders();
 
-            drive.intakeLeft(1);
-            drive.intakeRight(1);
+            //drive.intakeLeft(1);
+            //drive.intakeRight(1);
             log.add("running intakes in");
 
             ElapsedTime timer = new ElapsedTime();
@@ -742,23 +742,23 @@ public abstract class Auto extends LinearVisionOpMode {
             timer.reset();
             drive.jewelDown();
 
-            while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {}
-            timer.reset();
+            //while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {}
+            //timer.reset();
 
             //Moves the robot left
             autoRotate(14, Drive.FULL_SPEED*2/3);
 
-            drive.intakeLeft(-1);
+            //drive.intakeLeft(-1);
 
             drive.jewelUp();
-            timer.reset();
-            while (timer.seconds() < 1) {}
+            //timer.reset();
+            //while (timer.seconds() < 1) {}
 
-            drive.intakeLeft(1);
+            //drive.intakeLeft(1);
 
             autoRotate(0, Drive.FULL_SPEED*2/3);
 
-            for (int i = 0; i < 2; i++) {
+            /*for (int i = 0; i < 2; i++) {
                 drive.intakeLeft(-1);
                 while (timer.seconds() < C.get().getDouble("intakeBackTime")) {
                 }
@@ -771,7 +771,7 @@ public abstract class Auto extends LinearVisionOpMode {
             }
 
             drive.intakeRight(0);
-            drive.intakeLeft(0);
+            drive.intakeLeft(0);*/
 
             //autoRotate(0, Drive.FULL_SPEED/4);
         } catch (NullPointerException ex) {
@@ -786,30 +786,30 @@ public abstract class Auto extends LinearVisionOpMode {
             drive.resetEncoders();
             drive.runWithEncoders();
 
-            drive.intakeLeft(1);
-            drive.intakeRight(1);
+            //drive.intakeLeft(1);
+            //drive.intakeRight(1);
 
             ElapsedTime timer = new ElapsedTime();
 
             timer.reset();
             drive.jewelDown();
 
-            while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {}
-            timer.reset();
+            //while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {}
+            //timer.reset();
 
             autoRotate(-14, Drive.FULL_SPEED*2/3);
 
-            drive.intakeLeft(-1);
+            //drive.intakeLeft(-1);
 
             drive.jewelUp();
-            timer.reset();
-            while (timer.seconds() < 1) {}
+            //timer.reset();
+            //while (timer.seconds() < 1) {}
 
-            drive.intakeLeft(1);
+            //drive.intakeLeft(1);
 
             autoRotate(0, Drive.FULL_SPEED*2/3);
 
-            for (int i = 0; i < 2; i++) {
+            /*for (int i = 0; i < 2; i++) {
                 drive.intakeLeft(-1);
                 while (timer.seconds() < C.get().getDouble("intakeBackTime")) {
                 }
@@ -822,7 +822,7 @@ public abstract class Auto extends LinearVisionOpMode {
             }
 
             drive.intakeLeft(0);
-            drive.intakeRight(0);
+            drive.intakeRight(0);*/
 
             //autoRotate(0, Drive.FULL_SPEED/4);
         } catch (NullPointerException ex) {
@@ -832,8 +832,29 @@ public abstract class Auto extends LinearVisionOpMode {
         }
     }
 
+    @Override
+    public boolean opModeIsActive(){
+        if (this.intakeTimer.milliseconds() / 1000 < C.get().getDouble("intakeForwardTime")){
+            drive.intakeLeft(1);
+            drive.intakeRight(1);
+        }else if (this.intakeTimer.milliseconds() / 1000 < (C.get().getDouble("intakeForwardTime") + C.get().getDouble("intakeBackTime"))){
+            drive.intakeLeft(-1);
+            drive.intakeRight(-1);
+        }else if (this.intakeTimer.milliseconds() / 1000 > (C.get().getDouble("intakeForwardTime") + C.get().getDouble("intakeBackTime"))){
+            drive.intakeLeft(0);
+            drive.intakeRight(0);
+            if (intakeCount > 0){
+                intakeCount--;
+                intakeTimer.reset();
+            }
+        }
+        return super.opModeIsActive();
+    }
+
     public void openIntakes(HashMap<String, String> parameters) {
 
+        this.intakeCount = 3;
+        this.intakeTimer.reset();
         /*if (this.intakeTimer.milliseconds() / 1000 < C.get().getDouble("intakeForwardTime")){
             drive.intakeLeft(1);
             drive.intakeRight(1);
@@ -843,11 +864,11 @@ public abstract class Auto extends LinearVisionOpMode {
         }else if (this.intakeTimer.milliseconds() / 1000 > (C.get().getDouble("intakeForwardTime") + C.get().getDouble("intakeBackTime"))){
             drive.intakeLeft(0);
             drive.intakeRight(0);
-            if (intakeCount < 3){
-                intakeCount++;
+            if (intakeCount > 0){
+                intakeCount--;
                 intakeTimer.reset();
             }
-        }*/
+        }
 
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
@@ -870,6 +891,6 @@ public abstract class Auto extends LinearVisionOpMode {
         }
 
         drive.intakeLeft(0);
-        drive.intakeRight(0);
+        drive.intakeRight(0);*/
     }
 }
