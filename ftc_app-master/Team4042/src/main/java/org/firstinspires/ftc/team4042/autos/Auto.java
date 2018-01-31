@@ -482,7 +482,7 @@ public abstract class Auto extends LinearVisionOpMode {
         double speed = Double.parseDouble(parameters.get("speed"));
 
         //Drive in the direction indicated
-        autoDrive(direction, speed, 500, -1, false, 0);
+        autoDrive(direction, speed, 750, -1, false, 0);
 
         double roll;
         double pitch;
@@ -491,6 +491,7 @@ public abstract class Auto extends LinearVisionOpMode {
             drive.gyro.updateAngles();
             roll = drive.gyro.getRoll();
             pitch = drive.gyro.getPitch();
+            log.add("roll: " + roll + " pitch: " + pitch);
             autoDrive(direction, speed, 100, -1, false, 0);
         }
         while ((Math.abs(roll - startRoll) >= 3) ||
@@ -519,6 +520,7 @@ public abstract class Auto extends LinearVisionOpMode {
      * @param speed The speed to rotate at
      */
     private void autoRotate(double realR, double speed) {
+        log.add("Got to rotate:");
         double gyro;
         do {
             gyro = drive.gyro.updateHeading();
@@ -830,14 +832,14 @@ public abstract class Auto extends LinearVisionOpMode {
             ex.printStackTrace(new PrintWriter(sw));
             telemetry.addData("NullPointerException", sw.toString());
         }
-    }
+    }/*
 
     @Override
     public boolean opModeIsActive(){
-        if (this.intakeTimer.milliseconds() / 1000 < C.get().getDouble("intakeForwardTime")){
+        if (intakeCount > 0 && this.intakeTimer.milliseconds() / 1000 < C.get().getDouble("intakeForwardTime")){
             drive.intakeLeft(1);
             drive.intakeRight(1);
-        }else if (this.intakeTimer.milliseconds() / 1000 < (C.get().getDouble("intakeForwardTime") + C.get().getDouble("intakeBackTime"))){
+        }else if (intakeCount > 0 && this.intakeTimer.milliseconds() / 1000 < (C.get().getDouble("intakeForwardTime") + C.get().getDouble("intakeBackTime"))){
             drive.intakeLeft(-1);
             drive.intakeRight(-1);
         }else if (this.intakeTimer.milliseconds() / 1000 > (C.get().getDouble("intakeForwardTime") + C.get().getDouble("intakeBackTime"))){
@@ -849,7 +851,7 @@ public abstract class Auto extends LinearVisionOpMode {
             }
         }
         return super.opModeIsActive();
-    }
+    }*/
 
     public void openIntakes(HashMap<String, String> parameters) {
 

@@ -297,7 +297,7 @@ public class TeleOpMecanum extends OpMode {
             if (drive.getVerticalDriveMode().equals(DcMotor.RunMode.RUN_TO_POSITION)) {
                 drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
             } else {
-                drive.stage = GlyphPlacementSystem.Stage.RETURN1;
+                drive.stage = GlyphPlacementSystem.Stage.RETURN2;
                 drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
         }
@@ -463,6 +463,8 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Manual", manual);
         telemetry.addData("Crawl", Drive.crawl);
         telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
+        telemetry.addData("Glyph pos", drive.verticalDriveCurrPos());
+        telemetry.addData("some pos", drive.motorLeftBack.getCurrentPosition());
         telemetry.addData("Speed factor", adjustedSpeed);
         telemetry.addData("Tank", Drive.tank);
         telemetry.addData("Placer Mode Instant", placerModeInstant);

@@ -142,7 +142,7 @@ public class VuMarkIdentifier {
 
         do {
             relicRecoveryVuMark = RelicRecoveryVuMark.from(relicTemplate);
-        } while (relicRecoveryVuMark.equals(RelicRecoveryVuMark.UNKNOWN) && timer.seconds() < 10);
+        } while (relicRecoveryVuMark.equals(RelicRecoveryVuMark.UNKNOWN) && timer.seconds() < 3);
 
         if (relicRecoveryVuMark == RelicRecoveryVuMark.UNKNOWN) {
             relicRecoveryVuMark = RelicRecoveryVuMark.CENTER;
