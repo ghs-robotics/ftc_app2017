@@ -204,11 +204,13 @@ public class TeleOpMecanum extends OpMode {
     }
 
     public void gyro() {
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
         do {
             drive.gyro.updateAngles();
             startRoll = drive.gyro.getRoll();
             startPitch = drive.gyro.getPitch();
-        } while (startRoll == 0 && startPitch == 0);
+        } while (startRoll == 0 && startPitch == 0 && timer.seconds() < 1);
     }
 
     private void balance() {
