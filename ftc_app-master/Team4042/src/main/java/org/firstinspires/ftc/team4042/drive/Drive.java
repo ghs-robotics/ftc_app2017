@@ -427,6 +427,8 @@ public abstract class Drive {
 
     public boolean uTrack() {
         telemetry.addData("stage", stage);
+        telemetry.addData("horizontal timer", glyph.horizontalTimer.seconds());
+        telemetry.addData("power", getHorizontalDrive());
         switch (stage) {
             case HOME: { home(); return false; }
             case GRAB: { grab(); return false; }
