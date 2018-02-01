@@ -49,8 +49,6 @@ public abstract class Auto extends LinearVisionOpMode {
 
     private Telemetry.Log log;
 
-    private boolean lastA = false;
-
     File file;
 
     private ArrayList<AutoInstruction> instructions = new ArrayList<>();
@@ -195,14 +193,6 @@ public abstract class Auto extends LinearVisionOpMode {
             String functionName = instruction.getFunctionName();
             HashMap<String, String> parameters = instruction.getParameters();
             log.add("function: " + functionName);
-            lastA = gamepad1.a;
-            while(opModeIsActive()){
-                if (gamepad1.a && !lastA) {
-                    break;
-                }
-                lastA = gamepad1.a;
-            }
-            lastA = gamepad1.a;
             switch (functionName) {
                 case "drive":
                     autoDrive(parameters);
@@ -244,7 +234,7 @@ public abstract class Auto extends LinearVisionOpMode {
                     grabGlyph(parameters);
                     break;
                 case "open":
-                    //openIntakes(parameters);
+                    openIntakes(parameters);
                     break;
                 case "brace":
                     drive.openWinch();
@@ -845,7 +835,7 @@ public abstract class Auto extends LinearVisionOpMode {
             ex.printStackTrace(new PrintWriter(sw));
             telemetry.addData("NullPointerException", sw.toString());
         }
-    }/*
+    }
 
     @Override
     public boolean opModeIsActive(){
@@ -864,7 +854,7 @@ public abstract class Auto extends LinearVisionOpMode {
             }
         }
         return super.opModeIsActive();
-    }*/
+    }
 
     public void openIntakes(HashMap<String, String> parameters) {
 
