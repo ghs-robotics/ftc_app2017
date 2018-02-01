@@ -49,6 +49,8 @@ public abstract class Auto extends LinearVisionOpMode {
 
     private Telemetry.Log log;
 
+    private boolean lastA = false;
+
     File file;
 
     private ArrayList<AutoInstruction> instructions = new ArrayList<>();
@@ -193,6 +195,14 @@ public abstract class Auto extends LinearVisionOpMode {
             String functionName = instruction.getFunctionName();
             HashMap<String, String> parameters = instruction.getParameters();
             log.add("function: " + functionName);
+            lastA = gamepad1.a;
+            while(opModeIsActive()){
+                if (gamepad1.a && !lastA) {
+                    break;
+                }
+                lastA = gamepad1.a;
+            }
+            lastA = gamepad1.a;
             switch (functionName) {
                 case "drive":
                     autoDrive(parameters);
@@ -473,8 +483,8 @@ public abstract class Auto extends LinearVisionOpMode {
             done = drive.driveWithEncoders(direction, speed, targetTicks, useGyro, targetGyro);
             //telemetry.update();
         }
-        drive.runWithEncoders();
         drive.resetEncoders();
+        drive.runWithEncoders();
     }
 
     private void autoDriveOff(HashMap<String, String> parameters) {
@@ -492,6 +502,7 @@ public abstract class Auto extends LinearVisionOpMode {
             roll = drive.gyro.getRoll();
             pitch = drive.gyro.getPitch();
             log.add("roll: " + roll + " pitch: " + pitch);
+            log.add("" + opModeIsActive());
             autoDrive(direction, speed, 100, -1, false, 0);
         }
         while ((Math.abs(roll - startRoll) >= 3) ||
@@ -521,6 +532,7 @@ public abstract class Auto extends LinearVisionOpMode {
      */
     private void autoRotate(double realR, double speed) {
         log.add("Got to rotate:");
+        log.add("" + opModeIsActive());
         double gyro;
         do {
             gyro = drive.gyro.updateHeading();
@@ -531,7 +543,7 @@ public abstract class Auto extends LinearVisionOpMode {
             if (Math.abs(diff) > 2) {
                 drive.driveXYR(speed, 0, 0, DERIV_ROTATE * diff, false, PROPORTIONAL_ROTATE);
             }
-            log.add("made it thru rot");
+            log.add("" + opModeIsActive());
         } while (Math.abs(gyro - realR) > 2 && opModeIsActive());
 
         drive.stopMotors();
