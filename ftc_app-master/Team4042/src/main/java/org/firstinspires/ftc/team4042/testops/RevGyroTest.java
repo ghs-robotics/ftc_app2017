@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.team4042.testops;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous ;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.team4042.drive.MecanumDrive;
@@ -9,6 +10,7 @@ import org.firstinspires.ftc.team4042.drive.MecanumDrive;
  * Gets all the data from a gyro and prints it to telemetry
  */
 @Autonomous(name="Rev_Gyro_test", group="testops")
+@Disabled
 public class RevGyroTest extends LinearOpMode {
 
     private MecanumDrive drive = new MecanumDrive(true);

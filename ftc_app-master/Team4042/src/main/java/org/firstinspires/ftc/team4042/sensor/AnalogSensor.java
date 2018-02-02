@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class AnalogSensor {
     public AnalogInput sensor;
     private String name;
-    private Type type;
+    public Type type;
     public enum Type { SHORT_RANGE, LONG_RANGE, SONAR }
 
     public static final int NUM_OF_READINGS = 6;
@@ -70,6 +70,28 @@ public class AnalogSensor {
 
         for (int i = 0; i < numToRead; i++) {
             sum += readings[i];
+        }
+        double voltage = sum/NUM_OF_READINGS;
+        return voltage;
+    }
+
+    public double getCmAvg(double threshold, double offset) {
+        if (sensor == null) { return -1; }
+        double sum = 0;
+        double numToRead = firstLoop ? curr + 1 : NUM_OF_READINGS;
+
+        for (int i = 0; i < numToRead; i++) {
+            double add = readings[i];
+            switch (type) {
+                case SHORT_RANGE:
+                    add = getCmAsShortIR(add);
+                case LONG_RANGE:
+                    add = getCmAsLongIR(add);
+                case SONAR:
+                    add = getCmAsSonar(add);
+            }
+            if (add < threshold) { add += offset; }
+            sum += add;
         }
         double voltage = sum/NUM_OF_READINGS;
         return voltage;

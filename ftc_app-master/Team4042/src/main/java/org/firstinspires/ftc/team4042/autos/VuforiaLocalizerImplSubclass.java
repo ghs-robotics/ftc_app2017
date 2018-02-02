@@ -31,8 +31,7 @@ public class VuforiaLocalizerImplSubclass extends VuforiaLocalizerImpl {
 
     public class VuforiaCallbackSubclass extends VuforiaLocalizerImpl.VuforiaCallback {
 
-        @Override
-        public synchronized void Vuforia_onUpdate(State state) {
+        @Override public synchronized void Vuforia_onUpdate(State state) {
             super.Vuforia_onUpdate(state);
             // We wish to accomplish two things: (a) get a clone of the Frame so we can use
             // it beyond the callback, and (b) get a variant that will allow us to proactively

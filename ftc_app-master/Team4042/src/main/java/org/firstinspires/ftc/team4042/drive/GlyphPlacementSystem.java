@@ -28,7 +28,8 @@ public class GlyphPlacementSystem {
 
     public enum Position {
         //HOME(0), RAISED(1200), TOP(1600), MID(2000), BOT(2500), TRANSITION(-1);
-        HOME(10), RAISEDBACK(1350), RAISED(1401), TOP(1600), MID(1900), BOT(2200), TRANSITION(-1);
+        HOME(0), RAISEDBACK(1325), RAISED(1375), TOP(1525), MID(1875), BOT(2050), TRANSITION(-1);
+        //HOME(10), RAISEDBACK(1350), RAISED(1401), TOP(1600), MID(1900), BOT(2200), TRANSITION(-1);
 
         private final Integer encoderVal;
         Position(Integer encoderVal) { this.encoderVal = encoderVal; }
@@ -42,7 +43,7 @@ public class GlyphPlacementSystem {
     }
 
     public enum HorizPos {
-        LEFT(-.8), CENTER(0.0), RIGHT(.8);
+        LEFT(-.75), CENTER(0.0), RIGHT(.75);
 
         private final Double power;
         HorizPos(Double power) { this.power = power; }
@@ -60,7 +61,6 @@ public class GlyphPlacementSystem {
     public String getTargetPositionAsString()
     {
         char[] output = baseOutput.toCharArray();
-
         int position = uiTargetX + 3 * uiTargetY;
         switch(position)
         {
@@ -158,7 +158,9 @@ public class GlyphPlacementSystem {
         if (!drive.targetX.equals(HorizPos.CENTER)) {
             double power = targetPos.getPower() - currentX.getPower();
             power = Range.clip(power, -1, 1);
-
+            if (targetPos.equals(HorizPos.CENTER)) {
+                power *= C.get().getDouble("returnSpeed");
+            }
             drive.setHorizontalDrive(power);
             horizontalTimer.reset();
         }
@@ -182,6 +184,19 @@ public class GlyphPlacementSystem {
             drive.setHorizontalDrive(0);
             currentX = targetPos;
             return true;
+            //If we want to go to the center but miss the switch, it will reverse th u-track
+        } if(!drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER) && (horizontalTimer.seconds() >= C.get().getDouble("missedCenter") * HORIZONTAL_TRANSLATION_TIME)) {
+            this.horizontalTimer.reset();
+            if (this.currentX.equals(HorizPos.LEFT)){
+                this.currentX = HorizPos.RIGHT;
+                drive.targetX = HorizPos.RIGHT;
+            }
+            if (this.currentX.equals(HorizPos.RIGHT)){
+                this.currentX = HorizPos.LEFT;
+                drive.targetX = HorizPos.LEFT;
+            }
+            drive.setHorizontalDrive(-1 * drive.getHorizontalDrive());
+            //this.setXPower(HorizPos.CENTER);
         }
         return false;
     }

@@ -81,6 +81,8 @@ public abstract class Drive {
     private Servo leftBrake;
     private Servo rightBrake;
 
+    private Servo winch;
+
     private Servo leftCatch;
     private Servo rightCatch;
 
@@ -110,10 +112,13 @@ public abstract class Drive {
 
     public AnalogSensor[] shortIr = new AnalogSensor[3];
     public AnalogSensor[] longIr = new AnalogSensor[2];
+    public AnalogSensor[] sonar = new AnalogSensor[2];
 
     public boolean verbose;
 
     Telemetry.Log log;
+
+    public boolean useSensors;
 
     public static String getStackTrace(Exception ex) {
         StringWriter sw = new StringWriter();
@@ -130,7 +135,12 @@ public abstract class Drive {
             longIr[i] = new AnalogSensor("longir" + i, AnalogSensor.Type.LONG_RANGE);
         }
 
+        for (int i = 0; i < sonar.length; i++){
+            sonar[i] = new AnalogSensor("sonar"+i, AnalogSensor.Type.SONAR);
+        }
+
         verbose = false;
+        useSensors = true;
     }
 
     public Drive(boolean verbose) {
@@ -154,14 +164,21 @@ public abstract class Drive {
 
         log.add("useGyro: " + useGyro);
 
-        for (AnalogSensor aShortIr : shortIr) {
-            aShortIr.initialize(hardwareMap);
+        if (useSensors) {
+            for (AnalogSensor aShortIr : shortIr) {
+                aShortIr.initialize(hardwareMap);
+            }
+
+            for (AnalogSensor aLongIr : shortIr) {
+                aLongIr.initialize(hardwareMap);
+            }
+
+            for (AnalogSensor aSonar: sonar) {
+                aSonar.initialize(hardwareMap);
+            }
         }
 
-        for (AnalogSensor aLongIr : shortIr) {
-            aLongIr.initialize(hardwareMap);
-        }
-
+        winch = hardwareMap.servo.get("winch");
         motorLeftFront = initializeMotor(hardwareMap, "front left");
         motorRightFront = initializeMotor(hardwareMap, "front right");
         motorLeftBack = initializeMotor(hardwareMap, "back left");
@@ -224,6 +241,9 @@ public abstract class Drive {
             for (AnalogSensor longIr : longIr) {
                 longIr.addReading();
             }
+            for (AnalogSensor sonar : sonar) {
+                sonar.addReading();
+            }
         }
     }
 
@@ -277,8 +297,11 @@ public abstract class Drive {
 
     private double[] lastShortIr = new double[3];
     private double[] lastLongIr = new double[2];
+    private double[] lastSonar = new double[2];
+
     public double[] shortIrRates = new double[3];
     public double[] longIrRates = new double[2];
+    public double[] sonarRates = new double[2];
 
     private double lastUTrack = 0;
     public double uTrackRate = 0;
@@ -316,6 +339,14 @@ public abstract class Drive {
             longIrRates[i] = (currLongIr[i] - lastLongIr[i]) / (currMilli - lastMilli);
         }
 
+        double[] currSonar = new double[2];
+        for (int i = 0; i < currSonar.length; i++) {
+            AnalogSensor sIr = sonar[i];
+            sIr.addReading();
+            currSonar[i] = sIr.getCmAvg();
+            sonarRates[i] = (currSonar[i] - lastSonar[i]) / (currMilli - lastMilli);
+        }
+
         //Gyro rates
         gyroRate = (currGyro - lastGyro) / (currMilli - lastMilli);
 
@@ -323,6 +354,7 @@ public abstract class Drive {
         lastGyro = currGyro;
         lastShortIr = currShortIr;
         lastLongIr = currLongIr;
+        lastSonar = currSonar;
 
         lastMilli = currMilli;
     }
@@ -337,13 +369,66 @@ public abstract class Drive {
         lastMilli = currMilli;
     }
 
-    private void glyphLocate() {
+    public void glyphLocate() {
         targetY = GlyphPlacementSystem.Position.values()[glyph.uiTargetY + 3];
         targetX = GlyphPlacementSystem.HorizPos.values()[glyph.uiTargetX];
     }
 
+    private ElapsedTime glyphCollectionTimer = new ElapsedTime();
+
+    /**
+     * One step in collecting a glyph - designed to be looped over
+     * @return Whether a glyph has been collected
+     */
+    public boolean collectGlyphStep() {
+        double glyphIn = C.get().getDouble("glyphIn");
+        double glyphOut = C.get().getDouble("glyphOut");
+
+        shortIr[0].addReading();
+        double frontDistance = shortIr[0].getCmAvg();
+
+        shortIr[1].addReading();
+        double backDistance = shortIr[1].getCmAvg();
+
+        telemetry.addData("frontDistance", frontDistance);
+        telemetry.addData("backDistance", backDistance);
+        //If the IR reading is closer to glyphIn than glyphOut, we assume the glyph is in
+        boolean isGlyphIn = Math.abs(frontDistance - glyphIn) < Math.abs(frontDistance - glyphOut);
+        boolean isGlyphBack = Math.abs(backDistance - glyphIn) < Math.abs(backDistance - glyphOut);
+
+        if (!isGlyphIn && !isGlyphBack) {
+            //Step 1: intakes in until a glyph is found
+            intakeLeft(1);
+            intakeRight(1);
+            glyphCollectionTimer.reset();
+            return false;
+        } else if (!isGlyphBack && glyphCollectionTimer.seconds() < C.get().getDouble("time")/2){
+            //Step 2: after a glyph gets in, until half of time, rotate the glyph
+            intakeLeft(-1);
+            intakeRight(1);
+            return false;
+        } else if (!isGlyphBack && glyphCollectionTimer.seconds() < C.get().getDouble("time") * 3/2) {
+            //Step 3: after a glyph gets in and has been rotated, pull it in
+            intakeLeft(1);
+            intakeRight(1);
+            return false;
+        } else if (!isGlyphBack && glyphCollectionTimer.seconds() >= C.get().getDouble("time") * 3/2) {
+            //Step 4: If the glyph still isn't in, reset the glyphCollectionTimer to loop us back through to step 2
+            glyphCollectionTimer.reset();
+            return false;
+        } else if (isGlyphBack) {
+            //Step 5: But if the glyph is in, then stop the intakes and wait
+            intakeLeft(0);
+            intakeRight(0);
+            return true;
+        }
+        return false;
+    }
+
     public boolean uTrack() {
         telemetry.addData("stage", stage);
+        telemetry.addData("horizontal timer", glyph.horizontalTimer.seconds());
+        telemetry.addData("power", getHorizontalDrive());
         switch (stage) {
             case HOME: { home(); return false; }
             case GRAB: { grab(); return false; }
@@ -417,14 +502,16 @@ public abstract class Drive {
             glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISEDBACK);
             if (glyph.currentY.equals(GlyphPlacementSystem.Position.RAISEDBACK)) {
                 stage = GlyphPlacementSystem.Stage.PAUSE2;
+                glyph.setXPower(GlyphPlacementSystem.HorizPos.CENTER);
             }
         }
     }
 
     private void pause2() {
         //Move back to center x location (so the hand fits back in the robot)
-        glyph.setXPower(GlyphPlacementSystem.HorizPos.CENTER);
+        //glyph.setXPower(GlyphPlacementSystem.HorizPos.CENTER);
         if(glyph.xTargetReached(GlyphPlacementSystem.HorizPos.CENTER)) {
+            log.add("reached x target, center is " + getCenterState());
             stage = GlyphPlacementSystem.Stage.RETURN2;
             if (targetX.equals(GlyphPlacementSystem.HorizPos.LEFT)) {
                 glyph.adjustBack(-1);
@@ -440,12 +527,21 @@ public abstract class Drive {
         stage = GlyphPlacementSystem.Stage.RESET;
     }
 
+    private boolean lastBottom;
+    private ElapsedTime bottomTimer = new ElapsedTime();
+
     private void reset() {
-        if (getBottomState()) {
+        boolean currBottom = getBottomState();
+        if (currBottom && !lastBottom) {
+            bottomTimer.reset();
+        } else if (currBottom && bottomTimer.milliseconds() / 1000 > C.get().getDouble("bottomWait")) {
             resetUTrack();
-            setVerticalDrive(0);
             uTrackAtBottom = true;
+        } else if (currBottom) {
+            setVerticalDrive((C.get().getDouble("bottomWait") - bottomTimer.milliseconds() / 1000)/-2);
         }
+        lastBottom = currBottom;
+        telemetry.addData("Bottom timer", bottomTimer.milliseconds()/1000);
     }
 
     public void resetUTrack() {
@@ -502,12 +598,12 @@ public abstract class Drive {
 
     public void openHand() {
         handIsOpen = true;
-        grabbyBoi.setPosition(.57);
+        grabbyBoi.setPosition(.54);
     }
 
     public void closeHand() {
         handIsOpen = false;
-        grabbyBoi.setPosition(1);
+        grabbyBoi.setPosition(.88);
     }
 
     public void setHorizontalDrive(double power) {
@@ -549,11 +645,11 @@ public abstract class Drive {
     public void verticalDriveDir(DcMotorSimple.Direction dir) { verticalDrive.setDirection(dir);}
 
     public void intakeLeft(double power) {
-        intakeLeft.setPower(power * .75);
+        intakeLeft.setPower(power);
     }
 
     public void intakeRight(double power) {
-        intakeRight.setPower(power * .75);
+        intakeRight.setPower(power);
     }
 
     public void internalIntakeLeft(double power) {
@@ -594,23 +690,44 @@ public abstract class Drive {
     }
 
     public void lockCatches() {
-        rightCatch.setPosition(.9);
-        leftCatch.setPosition(.17);
+        rightCatch.setPosition(1);
+        leftCatch.setPosition(0);
     }
 
     public void unlockCatches() {
-        rightCatch.setPosition(.46);
-        leftCatch.setPosition(.6);
+        rightCatch.setPosition(.12);
+        leftCatch.setPosition(.9);
     }
 
     public void lowerBrakes() {
-        leftBrake.setPosition(.9);
-        rightBrake.setPosition(0);
+        leftBrake.setPosition(.8);
+        rightBrake.setPosition(.01);
     }
 
     public void raiseBrakes() {
-        leftBrake.setPosition(.1);
-        rightBrake.setPosition(.68);
+        leftBrake.setPosition(0);
+        rightBrake.setPosition(.66);
+    }
+
+    private boolean winchOpen = false;
+
+    public void toggleWinch() {
+        if (winchOpen) {
+            stowWinch();
+        } else {
+            openWinch();
+        }
+        winchOpen = !winchOpen;
+    }
+
+    public void stowWinch() {
+        winch.setPosition(.97);
+        winchOpen = false;
+    }
+
+    public void openWinch() {
+        winch.setPosition(.69);
+        winchOpen = true;
     }
 
     public void jewelAdjust(double adjustAmt) {

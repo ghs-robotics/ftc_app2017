@@ -117,6 +117,7 @@ public abstract class LinearVisionOpMode extends VisionOpMode {
 
     @Override
     public final void start() {
+        //super.start();
         this.opModeStarted = true;
         synchronized (this) {
             this.notifyAll();

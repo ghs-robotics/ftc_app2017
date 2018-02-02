@@ -57,6 +57,7 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
  */
 
 @TeleOp(name="RevTest", group="testops")
+@Disabled
 public class RevTest extends OpMode{
 
     DcMotor motor1, motor2, motor3, motor4;
