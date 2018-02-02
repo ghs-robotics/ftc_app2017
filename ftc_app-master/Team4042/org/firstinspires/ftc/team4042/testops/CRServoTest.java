@@ -13,12 +13,12 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 public class CRServoTest extends OpMode {
 
     private CRServo crServo;
-    private double power = 0;
+    private double power = 1;
     private boolean y = false;
     private boolean a = false;
     private DigitalChannel center;
 
-    private static final double STEP = .1;
+    private static final double STEP = 1;
 
     @Override
     public void init() {

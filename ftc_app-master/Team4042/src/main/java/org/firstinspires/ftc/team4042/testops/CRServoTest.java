@@ -18,7 +18,7 @@ public class CRServoTest extends OpMode {
     private boolean a = false;
     private DigitalChannel center;
 
-    private static final double STEP = .1;
+    private static final double STEP = .8;
 
     @Override
     public void init() {
@@ -33,15 +33,25 @@ public class CRServoTest extends OpMode {
     public void loop() {
         if (gamepad1.y && !y && power < 1) {
             power += STEP;
-            crServo.setPower(power);
+            //crServo.setPower(power);
         }
         y = gamepad1.y;
 
         if (gamepad1.a && !a && power > -1) {
             power -= STEP;
-            crServo.setPower(power);
+            //crServo.setPower(power);
         }
         a = gamepad1.a;
+
+        /*if (gamepad1.a) {
+            crServo.setPower(1);
+        }else if(gamepad1.y){
+            crServo.setPower(-1);
+        }else{
+            crServo.setPower(0);
+        }*/
+
+        crServo.setPower(power);
 
         telemetry.addData("power", power);
         telemetry.addData("limit hit", center.getState());

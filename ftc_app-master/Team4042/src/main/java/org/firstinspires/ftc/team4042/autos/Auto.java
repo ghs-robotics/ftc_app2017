@@ -75,7 +75,7 @@ public abstract class Auto extends LinearVisionOpMode {
         //vuMarkIdentifier.initialize(telemetry, hardwareMap);
 
         log.add("Reading file " + filePath);
-        file = new File("./storage/emulated/0/DCIM/" + filePath);
+        file = new File("./storage/emulated/0/bluetooth/" + filePath);
 
         loadFile();
 
