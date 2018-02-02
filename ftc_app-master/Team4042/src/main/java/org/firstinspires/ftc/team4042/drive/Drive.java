@@ -515,6 +515,8 @@ public abstract class Drive {
             stage = GlyphPlacementSystem.Stage.RETURN2;
             if (targetX.equals(GlyphPlacementSystem.HorizPos.LEFT)) {
                 glyph.adjustBack(-1);
+            }else if(targetX.equals(GlyphPlacementSystem.HorizPos.LEFT)){
+                glyph.adjustBack(1);
             }
         }
     }
