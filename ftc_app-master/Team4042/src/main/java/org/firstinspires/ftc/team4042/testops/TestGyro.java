@@ -29,9 +29,12 @@
 
 package org.firstinspires.ftc.team4042.testops;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+import org.firstinspires.ftc.team4042.sensor.GyroOld;
+import org.firstinspires.ftc.team4042.sensor.UltrasonicI2cRangeSensor;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -47,35 +50,22 @@ import com.qualcomm.robotcore.hardware.AnalogInput;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Analog Sensor 2", group="testops")
-public class AnalogSensorTest2 extends OpMode {
+@Autonomous(name="TestGyroBrendan", group="testops")
+@Disabled
+public class TestGyro extends LinearOpMode {
 
-    AnalogInput infrared;
-    double[] val = {0,0,0,0,0,0,0,0,0,0};
-
-    int num = 0;
+    GyroOld ultraSensor;
 
     @Override
-    public void init() {
-        infrared = hardwareMap.analogInput.get("infrared");
-    }
-    @Override
-    public void loop() {
-        if (val[9] != 0) {
-            double sum = 0;
-            for (double i : val)
-                sum += i;
-            telemetry.addData("wshh", sum / 10);
-        } else {
-            val[num] = infrared.getVoltage();
-            num++;
+    public void runOpMode() {
+        ultraSensor = hardwareMap.get(GyroOld.class, "ultra");
+        ultraSensor.startRanging(telemetry);
+        telemetry.update();
+        waitForStart();
+        while (opModeIsActive()) {
+            telemetry.addData("value", ultraSensor.getZ());
+            telemetry.update();
         }
-
-        telemetry.addData("hi brendan", infrared.getVoltage());
+        ultraSensor.close();
     }
-
 }
-
-
-
-

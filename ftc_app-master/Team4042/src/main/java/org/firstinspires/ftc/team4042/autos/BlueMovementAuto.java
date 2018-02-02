@@ -5,17 +5,17 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.team4042.drive.MecanumDrive;
 
 /**
- * Parks in the safe zone, but does so badly
+ * Parks in the safe zone
  */
-@Autonomous(name="RedTopAuto", group="autos")
-public class RedTopAuto extends Auto {
+@Autonomous(name="BlueMovementAuto", group="autos")
+public class BlueMovementAuto extends Auto {
 
     MecanumDrive drive = new MecanumDrive(true);
 
     @Override
     public void runOpMode() {
 
-        super.setUp(drive, "redtop.txt");
+        super.setUp(drive, "bluebottom.txt");
         try {
             waitForStart();
         } catch (InterruptedException e) {

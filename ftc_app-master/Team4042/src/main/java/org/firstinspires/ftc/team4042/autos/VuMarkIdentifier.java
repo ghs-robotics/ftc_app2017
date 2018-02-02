@@ -34,6 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.vuforia.CameraDevice;
 import com.vuforia.Image;
 import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Vuforia;
@@ -58,6 +59,9 @@ import org.opencv.android.Utils;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -126,6 +130,7 @@ public class VuMarkIdentifier {
         //Load the data set containing the VuMarks for Relic Recovery.
         relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
         relicTemplate = relicTrackables.get(0);
+        CameraDevice.getInstance().setFlashTorchMode(true);
 
         relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
 
@@ -137,11 +142,12 @@ public class VuMarkIdentifier {
 
         do {
             relicRecoveryVuMark = RelicRecoveryVuMark.from(relicTemplate);
-        } while (relicRecoveryVuMark.equals(RelicRecoveryVuMark.UNKNOWN) && timer.seconds() < 10);
+        } while (relicRecoveryVuMark.equals(RelicRecoveryVuMark.UNKNOWN) && timer.seconds() < 3);
 
         if (relicRecoveryVuMark == RelicRecoveryVuMark.UNKNOWN) {
             relicRecoveryVuMark = RelicRecoveryVuMark.CENTER;
         }
+        CameraDevice.getInstance().setFlashTorchMode(false);
         return relicRecoveryVuMark;
     }
 
@@ -152,8 +158,6 @@ public class VuMarkIdentifier {
         relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
 
         relicTrackables.activate();*/       //ElapsedTime timeout = new ElapsedTime();
-
-        telemetry.log().add("hey we got herreeeeeeee");
         Bitmap bm = null;
         while(bm == null) {
             if (this.vuforia.rgb != null) {
@@ -165,12 +169,29 @@ public class VuMarkIdentifier {
         }
 
 
-        telemetry.log().add(bm.getWidth() + " x " + bm.getHeight());
+        //telemetry.log().add(bm.getWidth() + " x " + bm.getHeight());
         Mat tmp = new Mat(bm.getWidth(), bm.getHeight(), CvType.CV_8UC4);
-        telemetry.log().add("give me one more second");
         Utils.bitmapToMat(bm, tmp);
 
-        telemetry.log().add("NOOOO");
+        /*
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(new File("./storage/emulated/0/DCIM/nicepic.png"));
+            bm.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+            // PNG is a lossless format, the compression factor (100) is ignored
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        */
+
         return tmp;
     }
 }

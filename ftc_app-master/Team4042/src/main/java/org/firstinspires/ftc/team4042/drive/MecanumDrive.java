@@ -18,29 +18,26 @@ public class  MecanumDrive extends Drive {
     /**
      * Constructor for Drive, it creates the motors and the gyro objects
      */
-    private boolean useSensors;
     public MecanumDrive() {
         //Initialize motors and gyro
         super();
-        useSensors = true;
     }
 
 
 
     @Override
     public void initialize(Telemetry telemetry, HardwareMap hardwareMap) {
-        if(this.useSensors) super.initialize(telemetry, hardwareMap);
+        super.initialize(telemetry, hardwareMap);
     }
 
     public MecanumDrive(boolean verbose) {
         super(verbose);
-        useSensors = true;
     }
 
     public MecanumDrive(boolean verbose, boolean useSensors) {
         //Initialize motors and gyro
         super(verbose);
-        this.useSensors = useSensors;
+        super.useSensors = useSensors;
     }
 
     private void driveTank(double speedFactor, double l, double r) {
@@ -161,7 +158,7 @@ public class  MecanumDrive extends Drive {
         double[] speedWheel = new double[4];
         for(int i = 0; i < speedWheel.length; i++) {
             speedWheel[i] = (targSpeedWheel[i] - encoderRates[i]) * pConstant + targSpeedWheel[i] * velFeedForwardConstant;
-            telemetry.addData("" + i, targSpeedWheel[i] + " " + encoderRates[i]);
+            //telemetry.addData("" + i, targSpeedWheel[i] + " " + encoderRates[i]);
         }
 
         //sets the wheel powers to the appropriate ratios

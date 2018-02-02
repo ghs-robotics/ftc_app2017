@@ -30,10 +30,11 @@
 package org.firstinspires.ftc.team4042.testops;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.I2cDevice;
-
-import org.firstinspires.ftc.team4042.sensor.Ultrasonic12c;
+import org.firstinspires.ftc.team4042.sensor.UltrasonicI2cRangeSensor;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -50,26 +51,24 @@ import org.firstinspires.ftc.team4042.sensor.Ultrasonic12c;
  */
 
 @Autonomous(name="TestUltra", group="testops")
-public class TestUltra extends OpMode
-{
+@Disabled
+public class TestUltra extends LinearOpMode {
 
-    Ultrasonic12c ultraSensor;
-    I2cDevice ultra;
-
-    @Override
-    public void init() {
-        ultra = hardwareMap.i2cDevice.get("ultra");
-        ultraSensor = new Ultrasonic12c(ultra);
-    }
+    UltrasonicI2cRangeSensor ultraSensor;
 
     @Override
-    public void loop() {
-        telemetry.addData("value", ultraSensor.read());
-    }
-
-    @Override
-    public void stop() {
+    public void runOpMode() {
+        ultraSensor = hardwareMap.get(UltrasonicI2cRangeSensor.class, "ultra");
+        ultraSensor.startRanging(telemetry);
+        telemetry.update();
+        waitForStart();
+        while (opModeIsActive()) {
+            ultraSensor.write();
+            //sleep(1000);
+            telemetry.addData("value", ultraSensor.read());
+            telemetry.update();
+            //sleep(1000);
+        }
         ultraSensor.close();
     }
-
 }

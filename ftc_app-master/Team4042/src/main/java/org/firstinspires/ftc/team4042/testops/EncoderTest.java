@@ -57,6 +57,7 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 @TeleOp(name="jimbobjow", group="testops")  // @Autonomous(...) is the other common choice
+@Disabled
 public class EncoderTest extends OpMode
 {
     /* Declare OpMode members. */

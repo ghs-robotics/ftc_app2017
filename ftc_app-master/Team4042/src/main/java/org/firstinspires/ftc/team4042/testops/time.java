@@ -44,6 +44,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @TeleOp(name="time", group="testops")  // @Autonomous(...) is the other common choice
+@Disabled
 public class time extends LinearOpMode {
 
     /* Declare OpMode members. */

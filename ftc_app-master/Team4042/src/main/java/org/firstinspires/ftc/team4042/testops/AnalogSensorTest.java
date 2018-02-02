@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.team4042.testops;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -53,9 +54,10 @@ import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
  */
 
 @TeleOp(name="Analog Sensor", group="testops")
+@Disabled
 public class AnalogSensorTest extends OpMode {
 
-    AnalogSensor ultrasonic = new AnalogSensor("ultrasonic", AnalogSensor.Type.LONG_RANGE);
+    AnalogSensor ultrasonic = new AnalogSensor("ultrasonic", AnalogSensor.Type.SONAR);
     //File file;
     //BufferedWriter writer;
 
@@ -78,7 +80,9 @@ public class AnalogSensorTest extends OpMode {
     public void loop() {
         ultrasonic.addReading();
         double vAvg = ultrasonic.getVAvg();
-        telemetry.addData("voltage", vAvg);
+        double dist = ultrasonic.getCmAvg();
+        telemetry.addData("voltage: ", vAvg);
+        telemetry.addData("distance: ", dist);
         telemetry.update();
 
         /*try {

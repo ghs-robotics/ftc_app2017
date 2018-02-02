@@ -7,8 +7,8 @@ import org.firstinspires.ftc.team4042.drive.MecanumDrive;
 /**
  * USELESS - Run BlueBottomAuto for parks in the safe zone
  */
-@Autonomous(name="RedBottomAuto", group="autos")
-public class RedBottomAuto extends Auto {
+@Autonomous(name="RedMovementAuto", group="autos")
+public class RedMovementAuto extends Auto {
 
     MecanumDrive drive = new MecanumDrive(true);
 

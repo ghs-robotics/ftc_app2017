@@ -51,16 +51,15 @@ public abstract class Auto extends LinearVisionOpMode {
 
     File file;
 
-    ElapsedTime timer;
-
     private ArrayList<AutoInstruction> instructions = new ArrayList<>();
 
     private double startRoll;
     private double startPitch;
+    private ElapsedTime intakeTimer = new ElapsedTime();
+    private int intakeCount = 0;
 
 
     public void setUp(MecanumDrive drive, String filePath) {
-        timer = new ElapsedTime();
         this.drive = drive;
 
         log = telemetry.log();
@@ -72,7 +71,7 @@ public abstract class Auto extends LinearVisionOpMode {
         //drive.setUseGyro(true);
         //telemetry.addData("glyph", drive.glyph.getTargetPositionAsString());
 
-        //vuMarkIdentifier.initialize(telemetry, hardwareMap);
+        vuMarkIdentifier.initialize(telemetry, hardwareMap);
 
         log.add("Reading file " + filePath);
         file = new File("./storage/emulated/0/bluetooth/" + filePath);
@@ -154,7 +153,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
     public void runAuto(boolean useSensors) {
         if (useSensors) runAuto();
-        vuMarkIdentifier.initialize(telemetry, hardwareMap);
+        //vuMarkIdentifier.initialize(telemetry, hardwareMap);
         //telemetry.addData("vuMarkhere", "ststs");
 
         //vuMark = vuMarkIdentifier.getMark();
@@ -175,7 +174,7 @@ public abstract class Auto extends LinearVisionOpMode {
      * Runs the list of instructions
      */
     public void runAuto() {
-        vuMarkIdentifier.initialize(telemetry, hardwareMap);
+        //vuMarkIdentifier.initialize(telemetry, hardwareMap);
 
         gyro();
 
@@ -186,7 +185,6 @@ public abstract class Auto extends LinearVisionOpMode {
         drive.resetEncoders();
         drive.setEncoders(true);
         drive.setVerbose(true);
-        timer.reset();
 
         //Reads each instruction and acts accordingly
         Iterator<AutoInstruction> instructionsIter = instructions.iterator();
@@ -196,25 +194,25 @@ public abstract class Auto extends LinearVisionOpMode {
             HashMap<String, String> parameters = instruction.getParameters();
             log.add("function: " + functionName);
             switch (functionName) {
-                case "d":
+                case "drive":
                     autoDrive(parameters);
                     break;
                 case "doff":
                     autoDriveOff(parameters);
                     break;
-                case "r":
+                case "rot":
                     autoRotate(parameters);
                     break;
-                case "s":
+                case "sdrive":
                     autoSensorDrive(parameters);
                     break;
                 case "up":
                     jewelUp(parameters);
                     break;
-                case "jr":
+                case "knockr":
                     knockRedJewel(parameters);
                     break;
-                case "jb":
+                case "knockb":
                     knockBlueJewel(parameters);
                     break;
                 case "jleft":
@@ -223,17 +221,26 @@ public abstract class Auto extends LinearVisionOpMode {
                 case "jright":
                     knockRightJewel(parameters);
                     break;
-                case "v":
+                case "getmark":
                     getVuMark(parameters);
                     break;
-                case "p":
+                case "place":
                     placeGlyph(parameters);
                     break;
-                case "a":
+                case "alignh":
                     alignHorizontally(parameters);
                     break;
-                case "g":
+                case "glyph":
                     grabGlyph(parameters);
+                    break;
+                case "open":
+                    openIntakes(parameters);
+                    break;
+                case "brace":
+                    drive.openWinch();
+                    break;
+                case "wait":
+                    wait(parameters);
                     break;
                 default:
                     System.err.println("Unknown function called from file " + file);
@@ -262,8 +269,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
     public void getVuMark(HashMap<String, String> parameters) {
         vuMark = vuMarkIdentifier.getMark();
-        telemetry.addData("vuMark", vuMark);
-        telemetry.update();
+        log.add("vuMark: " + vuMark);
     }
 
     /*
@@ -284,53 +290,17 @@ public abstract class Auto extends LinearVisionOpMode {
     }
     */
 
+    public void wait(HashMap<String, String> parameters) {
+        double seconds = Double.parseDouble(parameters.get("sec"));
+
+        ElapsedTime waitTimer = new ElapsedTime();
+        while (waitTimer.seconds() < seconds);
+    }
+
     public void grabGlyph(HashMap<String, String> parameters) {
-        double glyphIn = 7;
-        double glyphOut = 30;
-
-        ElapsedTime timer = new ElapsedTime();
-
-        boolean isGlyphIn;
-        boolean isGlyphBack;
-
-        drive.intakeLeft(1);
-        drive.intakeRight(1);
-
         drive.readSensorsSetUp();
 
-        do {
-            drive.shortIr[0].addReading();
-            double frontDistance = drive.shortIr[0].getCmAvg();
-
-            //If the IR reading is closer to glyphIn than glyphOut, we assume the glyph is in
-            isGlyphIn = Math.abs(frontDistance - glyphIn) > Math.abs(frontDistance - glyphOut);
-            log.add("front distance: " + frontDistance);
-            log.add("is glyph in: " + isGlyphIn);
-            telemetry.update();
-        } while (opModeIsActive() && !isGlyphIn);
-
-        do {
-            //Rotate the glyph for "time" seconds
-            timer.reset();
-            drive.intakeLeft(-1);
-            drive.intakeRight(1);
-
-            while (opModeIsActive() && (timer.seconds() < C.get().getDouble("time"))) { }
-
-            //Pull the glyph in for "time" seconds
-            timer.reset();
-            drive.intakeLeft(1);
-            drive.intakeRight(1);
-
-            while (opModeIsActive() && (timer.seconds() < C.get().getDouble("time"))) { }
-
-            //See if there's still a glyph in the intake
-            drive.shortIr[1].addReading();
-            double backDistance = drive.shortIr[1].getCmAvg();
-            isGlyphBack = Math.abs(backDistance - glyphIn) > Math.abs(backDistance - glyphOut);
-
-            //If there is, repeat.
-        } while (opModeIsActive() && isGlyphBack);
+        while (opModeIsActive() && !drive.collectGlyphStep()) {  }
     }
 
     public void alignHorizontally(HashMap<String, String> parameters) {
@@ -350,11 +320,13 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public String getBallColor(Mat frame){
-        log.add(frame.height() + " x " + frame.width());
-        Imgproc.resize(frame, frame, new Size(960, 720));
+        //log.add(frame.height() + " x " + frame.width());
+        //Imgproc.resize(frame, frame, new Size(960, 720));
         telemetry.update();
-        Rect left_crop = new Rect(new Point(215,585), new Point(380, 719));
-        Rect right_crop = new Rect(new Point(460,585), new Point(620, 719));
+        //Rect left_crop = new Rect(new Point(215,585), new Point(380, 719));
+        //Rect right_crop = new Rect(new Point(460,585), new Point(620, 719));
+        Rect left_crop = new Rect(new Point(464,688), new Point(617, 719));
+        Rect right_crop = new Rect(new Point(771,672), new Point(942, 719));
 
         //Log.d("A", this.getFrameSize().width + " x " + this.getFrameSize().height);
         Mat right = new Mat(frame, right_crop);
@@ -394,7 +366,7 @@ public abstract class Auto extends LinearVisionOpMode {
         do {
             drive.uTrackUpdate();
             drive.glyph.runToPosition();
-            done = drive.uTrack(); //GETS STUCK IN THIS FUNCTION
+            done = drive.uTrack();
         } while (opModeIsActive() && !done);
     }
 
@@ -510,7 +482,7 @@ public abstract class Auto extends LinearVisionOpMode {
         double speed = Double.parseDouble(parameters.get("speed"));
 
         //Drive in the direction indicated
-        autoDrive(direction, speed, 500, -1, false, 0);
+        autoDrive(direction, speed, 750, -1, false, 0);
 
         double roll;
         double pitch;
@@ -519,12 +491,17 @@ public abstract class Auto extends LinearVisionOpMode {
             drive.gyro.updateAngles();
             roll = drive.gyro.getRoll();
             pitch = drive.gyro.getPitch();
+            log.add("roll: " + roll + " pitch: " + pitch);
+            log.add("" + opModeIsActive());
             autoDrive(direction, speed, 100, -1, false, 0);
         }
         while ((Math.abs(roll - startRoll) >= 3) ||
                 (Math.abs(pitch - startPitch) >= 3) && opModeIsActive());
             //If you're too tipped forward/backwards or left/right, then keep driving
             //This effectively drives until you're off the balancing stone
+
+        drive.resetEncoders();
+        drive.runWithEncoders();
     }
 
     public void autoRotate(HashMap<String, String> parameters) {
@@ -533,6 +510,9 @@ public abstract class Auto extends LinearVisionOpMode {
         double speed = Double.parseDouble(parameters.get("speed"));
 
         autoRotate(realR, speed);
+
+        drive.resetEncoders();
+        drive.runWithEncoders();
     }
 
     /**
@@ -541,6 +521,8 @@ public abstract class Auto extends LinearVisionOpMode {
      * @param speed The speed to rotate at
      */
     private void autoRotate(double realR, double speed) {
+        log.add("Got to rotate:");
+        log.add("" + opModeIsActive());
         double gyro;
         do {
             gyro = drive.gyro.updateHeading();
@@ -551,6 +533,7 @@ public abstract class Auto extends LinearVisionOpMode {
             if (Math.abs(diff) > 2) {
                 drive.driveXYR(speed, 0, 0, DERIV_ROTATE * diff, false, PROPORTIONAL_ROTATE);
             }
+            log.add("" + opModeIsActive());
         } while (Math.abs(gyro - realR) > 2 && opModeIsActive());
 
         drive.stopMotors();
@@ -560,7 +543,6 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void autoSensorDrive(HashMap<String, String> parameters) {
-        double speed = Double.parseDouble(parameters.get("speed"));
         double targetGyro = Double.parseDouble(parameters.get("gyro"));
 
         boolean useX = parameters.containsKey("xdistance");
@@ -568,38 +550,103 @@ public abstract class Auto extends LinearVisionOpMode {
 
         double yTargetDistance = useY ? Double.parseDouble(parameters.get("ydistance")) : 0;
         int yIr = useY ? Integer.parseInt(parameters.get("yir")) : 0;
-        boolean yLongIr = useY ? Boolean.parseBoolean(parameters.get("ylong")) : false;
 
-        log.add("" + parameters.containsKey("xdistance"));
+        double offset = parameters.containsKey("offset") ? Double.parseDouble(parameters.get("offset")) : 0;
+
+        double speed = parameters.containsKey("speed") ? Double.parseDouble(parameters.get("speed")) : 1;
+
+        AnalogSensor.Type yType = AnalogSensor.Type.SHORT_RANGE;
+        if (useY) {
+            switch (parameters.get("ytype")) {
+                case "short":
+                    yType = AnalogSensor.Type.SHORT_RANGE;
+                    break;
+                case "long":
+                    yType = AnalogSensor.Type.LONG_RANGE;
+                    break;
+                case "sonar":
+                    yType = AnalogSensor.Type.SONAR;
+                    break;
+                default:
+                    yType = AnalogSensor.Type.SHORT_RANGE;
+                    break;
+            }
+        }
+
+        log.add("" + parameters.containsKey("offset"));
 
         double xTargetDistance = useX ? Double.parseDouble(parameters.get("xdistance")) : 0;
         int xIr = useX ? Integer.parseInt(parameters.get("xir")) : 0;
-        boolean xLongIr = useX ? Boolean.parseBoolean(parameters.get("xlong")) : false;
 
-        autoSensorDrive(speed, xTargetDistance, xIr, xLongIr, useX, yTargetDistance, yIr, yLongIr, useY, targetGyro);
+        AnalogSensor.Type xType = AnalogSensor.Type.SHORT_RANGE;
+        if (useX) {
+            switch (parameters.get("xtype")) {
+                case "short":
+                    xType = AnalogSensor.Type.SHORT_RANGE;
+                    break;
+                case "long":
+                    xType = AnalogSensor.Type.LONG_RANGE;
+                    break;
+                case "sonar":
+                    xType = AnalogSensor.Type.SONAR;
+                    break;
+                default:
+                    xType = AnalogSensor.Type.SHORT_RANGE;
+                    break;
+            }
+        }
+
+        autoSensorDrive(xTargetDistance, xIr, xType, useX, yTargetDistance, yIr, yType, useY, targetGyro, offset, speed);
     }
 
     /**
      * Drives until two sensors returns a target value, one for the x positioning and one for the y
-     * @param speed The speed to move at
      * @param xTargetDistance The final distance for the x sensor to return
      * @param xIrId The sensor to read an x distance from
-     * @param xIsLongRange Whether the x sensor is long-range or not
+     * @param xType Whether the x sensor is long-range or not
      * @param yTargetDistance The final distance for the y sensor to return
      * @param yIrId The sensor to read an y distance from
-     * @param yIsLongRange Whether the y sensor is long-range or not
+     * @param yType Whether the y sensor is long-range or not
      */
-    private void autoSensorDrive(double speed, double xTargetDistance, int xIrId, boolean xIsLongRange, boolean useX,
-                                 double yTargetDistance, int yIrId, boolean yIsLongRange, boolean useY, double targetGyro) {
+    private void autoSensorDrive(double xTargetDistance, int xIrId, AnalogSensor.Type xType, boolean useX,
+                                 double yTargetDistance, int yIrId, AnalogSensor.Type yType, boolean useY, double targetGyro, double offset, double speed) {
         if (useX || useY) {
-            AnalogSensor xIr = xIsLongRange ? drive.longIr[xIrId] : drive.shortIr[xIrId];
-            AnalogSensor yIr = yIsLongRange ? drive.longIr[yIrId] : drive.shortIr[yIrId];
+            AnalogSensor xIr = null;
+            switch (xType) {
+                case SHORT_RANGE:
+                    xIr = drive.shortIr[xIrId];
+                    break;
+                case LONG_RANGE:
+                    xIr = drive.longIr[xIrId];
+                    break;
+                case SONAR:
+                    xIr = drive.sonar[xIrId];
+                    break;
+            }
+
+            AnalogSensor yIr = null;
+            switch (yType) {
+                case SHORT_RANGE:
+                    yIr = drive.shortIr[yIrId];
+                    break;
+                case LONG_RANGE:
+                    yIr = drive.longIr[yIrId];
+                    break;
+                case SONAR:
+                    yIr = drive.sonar[yIrId];
+                    break;
+            }
+
+            //log.add("xIr: " + xIr + " type: " + xIr.type);
 
             double xCurrDistance;
             double yCurrDistance;
             int i = 0;
             while (i < AnalogSensor.NUM_OF_READINGS && opModeIsActive()) {
                 //read the IRs just to set them up
+
+                //log.add("xIr: " + xIr + " type: " + xIr.type);
+
                 xIr.addReading();
                 yIr.addReading();
                 i++;
@@ -614,26 +661,33 @@ public abstract class Auto extends LinearVisionOpMode {
                 double r = getSensorR(targetGyro);
 
                 //Get the distances and derivative terms
-                xCurrDistance = xIr.getCmAvg();
-                yCurrDistance = yIr.getCmAvg();
+                xIr.addReading();
+                yIr.addReading();
+                xCurrDistance = xIr.getCmAvg(100, offset);
+                yCurrDistance = yIr.getCmAvg(100, offset);
 
-                double xFactor = getSensorFactor(xIsLongRange, xIrId, xCurrDistance, xTargetDistance);
-                double yFactor = getSensorFactor(yIsLongRange, yIrId, yCurrDistance, yTargetDistance);
+                //log.add("x: " + xCurrDistance);
+                //log.add("y: " + yCurrDistance);
+
+                double xFactor = getSensorFactor(xType, xIrId, xCurrDistance, xTargetDistance) * speed;
+                double yFactor = getSensorFactor(yType, yIrId, yCurrDistance, yTargetDistance) * speed;
 
                 drive.runWithoutEncoders();
                 //Actually drives
-                if (!useY) {
-                    drive.driveXYRWimpo(1, xFactor * 4.5, 0, r, false);
+                if (!useY && useX) {
+                    log.add("x: " + xCurrDistance + " xFactor: " + xFactor + " y: " + 0 + " r: " + r);
+                    drive.driveXYR(1, -xFactor * 3, 0, r*2, false);
                 }
-                if (!useX) {
+                if (!useX && useY) {
                     //drive.driveXYR(speedFactor, 0, -yFactor/2, r, false);
-                    drive.driveXYR(1, 0, -yFactor / 2, r, false);
-                } else {
+                    drive.driveXYR(1, 0, -yFactor / 2, r*2, false);
+                }
+                if (useX && useY){
                     //drive.driveXYR(speedFactor, xFactor/2, -yFactor/2, r, false);
                     drive.driveXYR(1, xFactor * 4.5, -yFactor / 2, r, false);
                 }
             }
-            while (((Math.abs(xTargetDistance - xCurrDistance) > 2)) && timeout.seconds() < 5 && opModeIsActive());
+            while (/*((Math.abs(xTargetDistance - xCurrDistance) > 2)) &&*/ timeout.seconds() < 5 && opModeIsActive());
 
             //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
             drive.stopMotors();
@@ -641,8 +695,19 @@ public abstract class Auto extends LinearVisionOpMode {
         }
     }
 
-    private double getSensorFactor(boolean isLongRange, int irId, double currDistance, double targetDistance) {
-        double derivValue = isLongRange ? drive.longIrRates[irId] : drive.shortIrRates[irId];
+    private double getSensorFactor(AnalogSensor.Type type, int irId, double currDistance, double targetDistance) {
+        double derivValue = 0;
+        switch (type) {
+            case SHORT_RANGE:
+                derivValue = drive.shortIrRates[irId];
+                break;
+            case LONG_RANGE:
+                derivValue = drive.longIrRates[irId];
+                break;
+            case SONAR:
+                derivValue = drive.sonarRates[irId];
+                break;
+        }
 
         //Set up the derivative and proportional terms
         double deriv = derivValue * -10;
@@ -662,10 +727,10 @@ public abstract class Auto extends LinearVisionOpMode {
         return r;
     }
 
-    private void autoSensorDrive(double speed, double targetDistance) {
+    private void autoSensorDrive(double targetDistance) {
         telemetry.addData("ir", drive.shortIr[0]);
         telemetry.update();
-        autoSensorDrive(speed, 0, 0, false, false, targetDistance, 0, false, true, 0);
+        autoSensorDrive(0, 0, AnalogSensor.Type.SHORT_RANGE, false, targetDistance, 0, AnalogSensor.Type.SHORT_RANGE, true, 0, 0, 1);
     }
 
     public void jewelLeft() {
@@ -673,8 +738,8 @@ public abstract class Auto extends LinearVisionOpMode {
             drive.resetEncoders();
             drive.runWithEncoders();
 
-            drive.intakeLeft(1);
-            drive.intakeRight(1);
+            //drive.intakeLeft(1);
+            //drive.intakeRight(1);
             log.add("running intakes in");
 
             ElapsedTime timer = new ElapsedTime();
@@ -682,44 +747,36 @@ public abstract class Auto extends LinearVisionOpMode {
             timer.reset();
             drive.jewelDown();
 
-            while (timer.seconds() < 1) {
-            }
-            timer.reset();
-            log.add("rotate left");
+            //while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {}
+            //timer.reset();
 
             //Moves the robot left
-            autoRotate(7, Drive.FULL_SPEED/4);
-            log.add("rotate right");
+            autoRotate(14, Drive.FULL_SPEED);
 
-            drive.intakeLeft(-1);
-            log.add("reversing left intake");
+            //drive.intakeLeft(-1);
 
             drive.jewelUp();
-            timer.reset();
-            while (timer.seconds() < 1) {
+            //timer.reset();
+            //while (timer.seconds() < 1) {}
+
+            //drive.intakeLeft(1);
+
+            autoRotate(0, Drive.FULL_SPEED);
+
+            /*for (int i = 0; i < 2; i++) {
+                drive.intakeLeft(-1);
+                while (timer.seconds() < C.get().getDouble("intakeBackTime")) {
+                }
+                timer.reset();
+
+                drive.intakeLeft(1);
+                while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {
+                }
+                timer.reset();
             }
-            log.add("jewel up");
 
-            drive.intakeLeft(1);
-            log.add("forwarding left intake");
-
-            autoRotate(0, Drive.FULL_SPEED/4);
-
-            drive.intakeLeft(-1);
-            log.add("reverse, reverse!");
-            while (timer.seconds() < 1) {}
-            drive.intakeLeft(1);
-            log.add("turn it up!");
-            while (timer.seconds() < 1) {}
-            drive.intakeLeft(-1);
-            log.add("reverse, reverse! (second time)");
-            while (timer.seconds() < 1) {}
-            drive.intakeLeft(1);
-            log.add("turn it up! (second time)");
-            while (timer.seconds() < 1) {}
-            log.add("intake now maybe deployed, engines shutting down. scotty out");
-            drive.intakeLeft(0);
             drive.intakeRight(0);
+            drive.intakeLeft(0);*/
 
             //autoRotate(0, Drive.FULL_SPEED/4);
         } catch (NullPointerException ex) {
@@ -734,49 +791,43 @@ public abstract class Auto extends LinearVisionOpMode {
             drive.resetEncoders();
             drive.runWithEncoders();
 
-            drive.intakeLeft(1);
-            drive.intakeRight(1);
-            log.add("running intakes in");
+            //drive.intakeLeft(1);
+            //drive.intakeRight(1);
 
             ElapsedTime timer = new ElapsedTime();
 
             timer.reset();
             drive.jewelDown();
 
-            while (timer.seconds() < 1) {
-            }
-            timer.reset();
+            //while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {}
+            //timer.reset();
 
-            autoRotate(-7, Drive.FULL_SPEED/4);
+            autoRotate(-14, Drive.FULL_SPEED);
 
-            drive.intakeLeft(-1);
-            log.add("reversing left intake");
+            //drive.intakeLeft(-1);
 
             drive.jewelUp();
-            timer.reset();
-            while (timer.seconds() < 1) {
+            //timer.reset();
+            //while (timer.seconds() < 1) {}
+
+            //drive.intakeLeft(1);
+
+            autoRotate(0, Drive.FULL_SPEED);
+
+            /*for (int i = 0; i < 2; i++) {
+                drive.intakeLeft(-1);
+                while (timer.seconds() < C.get().getDouble("intakeBackTime")) {
+                }
+                timer.reset();
+
+                drive.intakeLeft(1);
+                while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {
+                }
+                timer.reset();
             }
 
-            drive.intakeLeft(1);
-            log.add("forwarding left intake");
-
-            autoRotate(0, Drive.FULL_SPEED/4);
-
-            drive.intakeLeft(-1);
-            log.add("reverse, reverse!");
-            while (timer.seconds() < 1) {}
-            drive.intakeLeft(1);
-            log.add("turn it up!");
-            while (timer.seconds() < 1) {}
-            drive.intakeLeft(-1);
-            log.add("reverse, reverse! (second time)");
-            while (timer.seconds() < 1) {}
-            drive.intakeLeft(1);
-            log.add("turn it up! (second time)");
-            while (timer.seconds() < 1) {}
-            log.add("intake now maybe deployed, engines shutting down. scotty out");
             drive.intakeLeft(0);
-            drive.intakeRight(0);
+            drive.intakeRight(0);*/
 
             //autoRotate(0, Drive.FULL_SPEED/4);
         } catch (NullPointerException ex) {
@@ -784,5 +835,67 @@ public abstract class Auto extends LinearVisionOpMode {
             ex.printStackTrace(new PrintWriter(sw));
             telemetry.addData("NullPointerException", sw.toString());
         }
+    }
+
+    @Override
+    public boolean opModeIsActive(){
+        if (intakeCount > 0 && this.intakeTimer.milliseconds() / 1000 < C.get().getDouble("intakeForwardTime")){
+            drive.intakeLeft(1);
+            drive.intakeRight(1);
+        }else if (intakeCount > 0 && this.intakeTimer.milliseconds() / 1000 < (C.get().getDouble("intakeForwardTime") + C.get().getDouble("intakeBackTime"))){
+            drive.intakeLeft(-1);
+            drive.intakeRight(-1);
+        }else if (this.intakeTimer.milliseconds() / 1000 > (C.get().getDouble("intakeForwardTime") + C.get().getDouble("intakeBackTime"))){
+            drive.intakeLeft(0);
+            drive.intakeRight(0);
+            if (intakeCount > 0){
+                intakeCount--;
+                intakeTimer.reset();
+            }
+        }
+        return super.opModeIsActive();
+    }
+
+    public void openIntakes(HashMap<String, String> parameters) {
+
+        this.intakeCount = 3;
+        this.intakeTimer.reset();
+        /*if (this.intakeTimer.milliseconds() / 1000 < C.get().getDouble("intakeForwardTime")){
+            drive.intakeLeft(1);
+            drive.intakeRight(1);
+        }else if (this.intakeTimer.milliseconds() / 1000 < (C.get().getDouble("intakeForwardTime") + C.get().getDouble("intakeBackTime"))){
+            drive.intakeLeft(-1);
+            drive.intakeRight(-1);
+        }else if (this.intakeTimer.milliseconds() / 1000 > (C.get().getDouble("intakeForwardTime") + C.get().getDouble("intakeBackTime"))){
+            drive.intakeLeft(0);
+            drive.intakeRight(0);
+            if (intakeCount > 0){
+                intakeCount--;
+                intakeTimer.reset();
+            }
+        }
+
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
+
+        drive.intakeLeft(1);
+        drive.intakeRight(1);
+        while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {}
+        timer.reset();
+
+        for (int i = 0; i < 3; i++) {
+            drive.intakeLeft(-1);
+            while (timer.seconds() < C.get().getDouble("intakeBackTime")) {
+            }
+            timer.reset();
+
+            drive.intakeLeft(1);
+            while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {
+            }
+            timer.reset();
+        }
+
+        drive.intakeLeft(0);
+        drive.intakeRight(0);*/
     }
 }
