@@ -39,6 +39,7 @@ public class TestRobot extends LinearOpMode{
         tests.add("There are no more tests to run.");
 
         drive.initialize(telemetry, hardwareMap);
+        drive.initializeGyro(telemetry, hardwareMap);
         drive.runWithEncoders();
         drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -53,6 +54,7 @@ public class TestRobot extends LinearOpMode{
         drive.motorLeftFront.setPower(.5);
         drive.motorRightBack.setPower(.5);
         drive.motorRightFront.setPower(.5);
+        drive.gyro.updateHeading();
         post();
 
         //Drive encoders
@@ -60,6 +62,8 @@ public class TestRobot extends LinearOpMode{
         drive.motorLeftFront.setPower(0);
         drive.motorRightBack.setPower(0);
         drive.motorRightFront.setPower(0);
+        drive.gyro.updateHeading();
+        telemetry.addData("gyro", drive.gyro.getHeading());
         telemetry.addData("Left Back Encoder", drive.motorLeftBack.getCurrentPosition());
         telemetry.addData("Left Front Encoder", drive.motorLeftFront.getCurrentPosition());
         telemetry.addData("Right Back Encoder", drive.motorRightBack.getCurrentPosition());
