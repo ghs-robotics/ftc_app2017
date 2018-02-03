@@ -170,7 +170,7 @@ public class GlyphPlacementSystem {
         drive.setHorizontalDrive(mulch * .2);
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
-        while (timer.seconds() < .3) {  }
+        while (timer.seconds() < .15) {  }
         drive.setHorizontalDrive(0);
     }
 
@@ -185,7 +185,7 @@ public class GlyphPlacementSystem {
             currentX = targetPos;
             return true;
             //If we want to go to the center but miss the switch, it will reverse th u-track
-        } else if(!drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER) && (horizontalTimer.seconds() >= C.get().getDouble("missedCenter") * HORIZONTAL_TRANSLATION_TIME)) {
+        } if(!drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER) && (horizontalTimer.seconds() >= (/*C.get().getDouble("missedCenter") + */HORIZONTAL_TRANSLATION_TIME))) {
             this.horizontalTimer.reset();
             if (this.currentX.equals(HorizPos.LEFT)){
                 this.currentX = HorizPos.RIGHT;
@@ -195,7 +195,8 @@ public class GlyphPlacementSystem {
                 this.currentX = HorizPos.LEFT;
                 drive.targetX = HorizPos.LEFT;
             }
-            this.setXPower(HorizPos.CENTER);
+            drive.setHorizontalDrive(-.75 * drive.getHorizontalDrive());
+            //this.setXPower(HorizPos.CENTER);
         }
         return false;
     }

@@ -226,7 +226,7 @@ public class TeleOpMecanum extends OpMode {
             drive.gyro.updateAngles();
             startRoll = drive.gyro.getRoll();
             startPitch = drive.gyro.getPitch();
-        } while (startRoll == 0 && startPitch == 0 && timer.seconds() < 1);
+        } while (startRoll == 0 && startPitch == 0 && timer.seconds() < .5);
     }
 
     private void balance() {
