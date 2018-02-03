@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.team4042.autos.C;
 
@@ -167,9 +168,10 @@ public class GlyphPlacementSystem {
     }
 
     public void adjustBack(double mulch) {
-        drive.setHorizontalDrive(mulch * .2);
+        drive.setHorizontalDrive(mulch * drive.getHorizontalDrive() * -.4);
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
+        drive.log.add("adjusting back at power " + drive.getHorizontalDrive());
         while (timer.seconds() < .15) {  }
         drive.setHorizontalDrive(0);
     }
@@ -181,6 +183,9 @@ public class GlyphPlacementSystem {
                 //If you're going to the center and you hit the limit switch, stop
                 (!drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER) && drive.getCenterState()) ||
                 (drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER))) {
+            if (drive.getHorizontalDrive() > 0) {
+                adjustBack(1);
+            }
             drive.setHorizontalDrive(0);
             currentX = targetPos;
             return true;
@@ -195,7 +200,7 @@ public class GlyphPlacementSystem {
                 this.currentX = HorizPos.LEFT;
                 drive.targetX = HorizPos.LEFT;
             }
-            drive.setHorizontalDrive(-.75 * drive.getHorizontalDrive());
+            drive.setHorizontalDrive(-.5 * drive.getHorizontalDrive());
             //this.setXPower(HorizPos.CENTER);
         }
         return false;

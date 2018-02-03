@@ -66,6 +66,11 @@ public abstract class Auto extends LinearVisionOpMode {
 
         drive.initialize(telemetry, hardwareMap);
 
+        drive.targetY = GlyphPlacementSystem.Position.TOP;
+        drive.targetX = GlyphPlacementSystem.HorizPos.LEFT;
+        drive.stage = GlyphPlacementSystem.Stage.HOME;
+        drive.glyph.setHomeTarget();
+
         //drive.glyph = new GlyphPlacementSystem(1, 0, hardwareMap, drive, false);
 
         //drive.setUseGyro(true);
@@ -468,9 +473,11 @@ public abstract class Auto extends LinearVisionOpMode {
         boolean done = false;
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
-        while (opModeIsActive() && (!done && ((time != -1 && timer.seconds() <= time)) || (time == -1 && !done))) {
+        while (opModeIsActive() && (!done && ((time != -1 && timer.seconds() <= time) || (time == -1 && !done)))) {
             //Keep going if (you're not done and the seconds are less than the target) or (you're not waiting for the timer and you're not done)
             done = drive.driveWithEncoders(direction, speed, targetTicks, useGyro, targetGyro);
+            telemetry.addData("time", timer.seconds());
+            telemetry.update();
             //telemetry.update();
         }
         drive.resetEncoders();
@@ -480,9 +487,10 @@ public abstract class Auto extends LinearVisionOpMode {
     private void autoDriveOff(HashMap<String, String> parameters) {
         Direction direction = new Direction(Double.parseDouble(parameters.get("x")), -Double.parseDouble(parameters.get("y")));
         double speed = Double.parseDouble(parameters.get("speed"));
+        double gyro = Double.parseDouble(parameters.get("gyro"));
 
         //Drive in the direction indicated
-        autoDrive(direction, speed, 750, -1, false, 0);
+        autoDrive(direction, speed, 750, -1, true, gyro);
 
         double roll;
         double pitch;
@@ -493,7 +501,7 @@ public abstract class Auto extends LinearVisionOpMode {
             pitch = drive.gyro.getPitch();
             log.add("roll: " + roll + " pitch: " + pitch);
             log.add("" + opModeIsActive());
-            autoDrive(direction, speed, 100, -1, false, 0);
+            autoDrive(direction, speed, 100, -1, true, gyro);
         }
         while ((Math.abs(roll - startRoll) >= 3) ||
                 (Math.abs(pitch - startPitch) >= 3) && opModeIsActive());
@@ -676,18 +684,18 @@ public abstract class Auto extends LinearVisionOpMode {
                 //Actually drives
                 if (!useY && useX) {
                     log.add("x: " + xCurrDistance + " xFactor: " + xFactor + " y: " + 0 + " r: " + r);
-                    drive.driveXYR(1, -xFactor * 3, 0, r*2, false);
+                    drive.driveXYR(1, -xFactor * 3, 0, r*3/2, false);
                 }
                 if (!useX && useY) {
                     //drive.driveXYR(speedFactor, 0, -yFactor/2, r, false);
-                    drive.driveXYR(1, 0, -yFactor / 2, r*2, false);
+                    drive.driveXYR(1, 0, -yFactor / 2, r*3/2, false);
                 }
                 if (useX && useY){
                     //drive.driveXYR(speedFactor, xFactor/2, -yFactor/2, r, false);
                     drive.driveXYR(1, xFactor * 4.5, -yFactor / 2, r, false);
                 }
             }
-            while (/*((Math.abs(xTargetDistance - xCurrDistance) > 2)) &&*/ timeout.seconds() < 5 && opModeIsActive());
+            while (/*((Math.abs(xTargetDistance - xCurrDistance) > 2)) &&*/ timeout.seconds() < 2.5 && opModeIsActive());
 
             //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
             drive.stopMotors();
@@ -710,7 +718,7 @@ public abstract class Auto extends LinearVisionOpMode {
         }
 
         //Set up the derivative and proportional terms
-        double deriv = derivValue * -10;
+        double deriv = derivValue * -0;
         double proportional = (currDistance - targetDistance) * .025;
 
         //Apply the controller

@@ -14,7 +14,7 @@ public class TeleOpMecanum extends OpMode {
 
     private double adjustedSpeed;
 
-    private boolean placerModeInstant = false;
+    private boolean placerModeInstant = true;
     private boolean manual = false;
     private boolean onBalancingStone = false;
 
@@ -117,7 +117,7 @@ public class TeleOpMecanum extends OpMode {
             drive.runWithEncoders();
 
             drive.initializeGyro(telemetry, hardwareMap);
-            gyro();
+            //gyro();
 
             telemetry.update();
 
@@ -165,6 +165,7 @@ public class TeleOpMecanum extends OpMode {
                 drive.toggleWinch();
             }
             aDown = gamepad1.dpad_down;
+            telemetry.addData("winch", drive.winchOpen);
 
             //Toggles verbose
             if (gamepad2.back && !bBack) {
@@ -418,14 +419,26 @@ public class TeleOpMecanum extends OpMode {
         }
     }
 
+    private boolean done = true;
+
     private void glyphTarget() {
         int targetX = gamepad2.x ? 0 : (gamepad2.y || gamepad2.a ? 1 : (gamepad2.b ? 2 : -1));
         int targetY = gamepad2.dpad_up ? 0 : (gamepad2.dpad_left || gamepad2.dpad_right ? 1 : (gamepad2.dpad_down ? 2 : -1));
-        if (targetX != -1 && targetY != -1) {
+        if (targetX != -1 && targetY != -1 &&
+                (!done || ((done && !bRight && !bLeft && !bUp && !bDown) || (done && !bA && !bB && !bX && !bY)))) {
             drive.glyph.uiTarget(targetX, targetY);
             drive.glyphLocate();
-            drive.uTrack();
+            done = drive.uTrack();
+            telemetry.addData("done", done);
         }
+        bRight = gamepad2.dpad_right;
+        bLeft = gamepad2.dpad_left;
+        bUp = gamepad2.dpad_up;
+        bDown = gamepad2.dpad_down;
+        bA = gamepad2.a;
+        bB = gamepad2.b;
+        bX = gamepad2.x;
+        bY = gamepad2.y;
     }
 
     private void glyphUI() {
