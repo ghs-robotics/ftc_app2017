@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.team4042.drive;
 
+import android.hardware.Camera;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -55,6 +57,10 @@ public class TeleOpMecanum extends OpMode {
 
     private double startRoll;
     private double startPitch;
+
+    private Camera cam;
+    private Camera.Parameters p;
+    private boolean flashOn;
 
     /**
     GAMEPAD 1:
@@ -123,6 +129,10 @@ public class TeleOpMecanum extends OpMode {
         } catch (Exception ex) {
             telemetry.addData("Exception", Drive.getStackTrace(ex));
         }
+        cam = Camera.open();
+        p = cam.getParameters();
+        p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+        cam.setParameters(p);
     }
 
     @Override
@@ -201,6 +211,12 @@ public class TeleOpMecanum extends OpMode {
         } catch (Exception ex) {
             telemetry.addData("Exception", Drive.getStackTrace(ex));
         }
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        cam.release();
     }
 
     public void gyro() {
@@ -294,6 +310,19 @@ public class TeleOpMecanum extends OpMode {
                 drive.resetEncoders();
                 drive.runWithEncoders();
                 drive.glyph.setHomeTarget();
+
+                // Turn off flashlight
+                if (flashOn) {
+                    cam.stopPreview();
+                    cam.release();
+                    flashOn = false;
+                }
+            } else if (manual) {
+                // Turn on flashlight
+                if (!flashOn) {
+                    cam.startPreview();
+                    flashOn = true;
+                }
             }
 
             if (drive.getVerticalDriveMode().equals(DcMotor.RunMode.RUN_TO_POSITION)) {
