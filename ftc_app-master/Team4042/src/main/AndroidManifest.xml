@@ -8,5 +8,10 @@
 <manifest
     package="org.firstinspires.ftc.team4042"
     xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Allows access to the flashlight -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+
     <application/>
 </manifest>
