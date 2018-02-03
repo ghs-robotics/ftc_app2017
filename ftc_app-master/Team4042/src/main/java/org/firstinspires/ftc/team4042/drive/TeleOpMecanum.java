@@ -59,7 +59,8 @@ public class TeleOpMecanum extends OpMode {
     private double startPitch;
 
     private Camera cam;
-    private Camera.Parameters p;
+    private Camera.Parameters onParams;
+    private Camera.Parameters offParams;
     private boolean flashOn;
 
     /**
@@ -130,9 +131,12 @@ public class TeleOpMecanum extends OpMode {
             telemetry.addData("Exception", Drive.getStackTrace(ex));
         }
         cam = Camera.open();
-        p = cam.getParameters();
-        p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-        cam.setParameters(p);
+
+        onParams = cam.getParameters();
+        onParams.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+
+        offParams = cam.getParameters();
+        offParams.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
     }
 
     @Override
@@ -313,13 +317,14 @@ public class TeleOpMecanum extends OpMode {
 
                 // Turn off flashlight
                 if (flashOn) {
+                    cam.setParameters(offParams);
                     cam.stopPreview();
-                    cam.release();
                     flashOn = false;
                 }
             } else if (manual) {
                 // Turn on flashlight
                 if (!flashOn) {
+                    cam.setParameters(onParams);
                     cam.startPreview();
                     flashOn = true;
                 }
