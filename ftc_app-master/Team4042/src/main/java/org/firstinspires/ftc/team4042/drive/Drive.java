@@ -439,7 +439,7 @@ public abstract class Drive {
             case RELEASE: { release(); return false; }
             case PAUSE2: { pause2(); return false; }
             case RETURN2: { return2(); return false; }
-            case RESET: { reset(); return true; }
+            case RESET: { return reset(); }
         }
         return false;
     }
@@ -513,11 +513,11 @@ public abstract class Drive {
         if(glyph.xTargetReached(GlyphPlacementSystem.HorizPos.CENTER)) {
             log.add("reached x target, center is " + getCenterState());
             stage = GlyphPlacementSystem.Stage.RETURN2;
-            if (targetX.equals(GlyphPlacementSystem.HorizPos.LEFT)) {
+            /*if (targetX.equals(GlyphPlacementSystem.HorizPos.LEFT)) {
                 glyph.adjustBack(-1);
             }else if(targetX.equals(GlyphPlacementSystem.HorizPos.LEFT)){
                 glyph.adjustBack(1);
-            }
+            }*/
         }
     }
 
@@ -532,18 +532,20 @@ public abstract class Drive {
     private boolean lastBottom;
     private ElapsedTime bottomTimer = new ElapsedTime();
 
-    private void reset() {
+    private boolean reset() {
         boolean currBottom = getBottomState();
         if (currBottom && !lastBottom) {
             bottomTimer.reset();
         } else if (currBottom && bottomTimer.milliseconds() / 1000 > C.get().getDouble("bottomWait")) {
             resetUTrack();
             uTrackAtBottom = true;
+            return true;
         } else if (currBottom) {
             setVerticalDrive((C.get().getDouble("bottomWait") - bottomTimer.milliseconds() / 1000)/-2);
         }
         lastBottom = currBottom;
         telemetry.addData("Bottom timer", bottomTimer.milliseconds()/1000);
+        return false;
     }
 
     public void resetUTrack() {
@@ -711,7 +713,7 @@ public abstract class Drive {
         rightBrake.setPosition(.66);
     }
 
-    private boolean winchOpen = false;
+    public boolean winchOpen = false;
 
     public void toggleWinch() {
         if (winchOpen) {
@@ -719,7 +721,6 @@ public abstract class Drive {
         } else {
             openWinch();
         }
-        winchOpen = !winchOpen;
     }
 
     public void stowWinch() {
