@@ -473,7 +473,7 @@ public abstract class Auto extends LinearVisionOpMode {
         boolean done = false;
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
-        while (opModeIsActive() && (!done && ((time != -1 && timer.seconds() <= time) || (time == -1 && !done)))) {
+        while (opModeIsActive() && !done && (time == -1 || timer.seconds() <= time)) {
             //Keep going if (you're not done and the seconds are less than the target) or (you're not waiting for the timer and you're not done)
             done = drive.driveWithEncoders(direction, speed, targetTicks, useGyro, targetGyro);
             telemetry.addData("time", timer.seconds());
