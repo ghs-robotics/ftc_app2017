@@ -370,7 +370,9 @@ public abstract class Auto extends LinearVisionOpMode {
 
         do {
             drive.uTrackUpdate();
-            drive.glyph.runToPosition();
+            if (!drive.stage.equals(GlyphPlacementSystem.Stage.RETURN2) && !drive.stage.equals(GlyphPlacementSystem.Stage.RESET)) {
+                drive.glyph.runToPosition();
+            }
             done = drive.uTrack();
         } while (opModeIsActive() && !done);
     }
