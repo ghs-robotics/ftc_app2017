@@ -8,7 +8,8 @@ import java.io.File;
 /**
  * USELESS - Run BlueBottomAuto for parks in the safe zone
  */
-@Autonomous(name="RedMovementAuto", group="autos")
+@Autonomous(name="DelAuto", group="autos")
+@Deprecated
 public class DelAuto extends Auto {
 
     @Override
