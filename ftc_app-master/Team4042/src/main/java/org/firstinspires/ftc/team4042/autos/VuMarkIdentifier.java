@@ -130,9 +130,11 @@ public class VuMarkIdentifier {
         //Load the data set containing the VuMarks for Relic Recovery.
         relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
         relicTemplate = relicTrackables.get(0);
+        //Turn on the flashlight to see the mark better
         CameraDevice.getInstance().setFlashTorchMode(true);
 
-        relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
+        //Can help in debugging; otherwise not necessary
+        relicTemplate.setName("relicVuMarkTemplate");
 
         relicTrackables.activate();
 
@@ -142,7 +144,8 @@ public class VuMarkIdentifier {
 
         do {
             relicRecoveryVuMark = RelicRecoveryVuMark.from(relicTemplate);
-        } while (relicRecoveryVuMark.equals(RelicRecoveryVuMark.UNKNOWN) && timer.seconds() < 3);
+        } while (relicRecoveryVuMark.equals(RelicRecoveryVuMark.UNKNOWN) &&
+                timer.seconds() < 3);
 
         if (relicRecoveryVuMark == RelicRecoveryVuMark.UNKNOWN) {
             relicRecoveryVuMark = RelicRecoveryVuMark.CENTER;
