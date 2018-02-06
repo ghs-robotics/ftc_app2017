@@ -12,7 +12,8 @@
     android:largeHeap="true"
     android:icon="@drawable/ic_launcher"
     android:label="@string/app_name"
-    android:theme="@style/AppThemeRedRC" >
+    android:theme="@style/AppThemeRedRC">
+    //tools:replace="android:icon">
 
     <!-- The main robot controller activity -->
     <activity
