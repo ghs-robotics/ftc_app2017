@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.team4042.autos;
 
+import android.hardware.camera2.CameraDevice;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -277,6 +278,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
     public void getVuMark(HashMap<String, String> parameters) {
         readMark = true;
+        vuMarkIdentifier.prepareMark();
         //vuMark = vuMarkIdentifier.getMark();
         //log.add("vuMark: " + vuMark);
     }
@@ -875,8 +877,10 @@ public abstract class Auto extends LinearVisionOpMode {
             vuMark = vuMarkIdentifier.getMarkInstant();
             if (vuMark != RelicRecoveryVuMark.UNKNOWN){
                 readMark = false;
+                com.vuforia.CameraDevice.getInstance().setFlashTorchMode(false);
             }
         }
+        telemetry.addData("Mark", vuMark);
         return super.opModeIsActive();
     }
 
