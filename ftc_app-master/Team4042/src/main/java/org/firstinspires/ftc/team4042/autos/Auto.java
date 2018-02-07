@@ -108,7 +108,8 @@ public abstract class Auto extends LinearVisionOpMode {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line;
-            while ((line = bufferedReader.readLine()) != null) { //Reads the lines from the file in order
+            while ((line = bufferedReader.readLine()) != null) {
+                //Reads the lines from the file in order
                 if (line.length() > 0) {
                     if (line.charAt(0) != '#') { //Use a # for a comment
                         HashMap<String, String> parameters = new HashMap<>();
@@ -120,7 +121,8 @@ public abstract class Auto extends LinearVisionOpMode {
                         while (i < inputParameters.length) {
                             String parameter = inputParameters[i];
                             String[] kv = parameter.split(":", 2);
-                            parameters.put(kv[0],  kv[1]); //Gets the next parameter and adds it to the list
+                            parameters.put(kv[0],  kv[1]);
+                            //Gets the next parameter and adds it to the list
                             para.append(kv[0]).append(":").append(kv[1]).append(" ");
                             i++;
                         }
@@ -141,9 +143,7 @@ public abstract class Auto extends LinearVisionOpMode {
             StringWriter sw = new StringWriter();
             ex.printStackTrace(new PrintWriter(sw));
             telemetry.addData("error", sw.toString());
-
         }
-
     }
 
     /**
@@ -497,7 +497,8 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     private void autoDriveOff(HashMap<String, String> parameters) {
-        Direction direction = new Direction(Double.parseDouble(parameters.get("x")), -Double.parseDouble(parameters.get("y")));
+        Direction direction = new Direction(Double.parseDouble(parameters.get("x")),
+                -Double.parseDouble(parameters.get("y")));
         double speed = Double.parseDouble(parameters.get("speed"));
         double gyro = Double.parseDouble(parameters.get("gyro"));
 
@@ -629,7 +630,8 @@ public abstract class Auto extends LinearVisionOpMode {
      * @param yType Whether the y sensor is long-range or not
      */
     private void autoSensorDrive(double xTargetDistance, int xIrId, AnalogSensor.Type xType, boolean useX,
-                                 double yTargetDistance, int yIrId, AnalogSensor.Type yType, boolean useY, double targetGyro, double offset, double speed) {
+                                 double yTargetDistance, int yIrId, AnalogSensor.Type yType, boolean useY,
+                                 double targetGyro, double offset, double speed) {
         if (useX || useY) {
             AnalogSensor xIr = null;
             switch (xType) {
@@ -664,9 +666,6 @@ public abstract class Auto extends LinearVisionOpMode {
             int i = 0;
             while (i < AnalogSensor.NUM_OF_READINGS && opModeIsActive()) {
                 //read the IRs just to set them up
-
-                //log.add("xIr: " + xIr + " type: " + xIr.type);
-
                 xIr.addReading();
                 yIr.addReading();
                 i++;
@@ -686,9 +685,7 @@ public abstract class Auto extends LinearVisionOpMode {
                 xCurrDistance = xIr.getCmAvg(100, offset);
                 yCurrDistance = yIr.getCmAvg(100, offset);
 
-                //log.add("x: " + xCurrDistance);
-                //log.add("y: " + yCurrDistance);
-
+                //Proportional/derivative controller
                 double xFactor = getSensorFactor(xType, xIrId, xCurrDistance, xTargetDistance) * speed;
                 double yFactor = getSensorFactor(yType, yIrId, yCurrDistance, yTargetDistance) * speed;
 
@@ -699,15 +696,13 @@ public abstract class Auto extends LinearVisionOpMode {
                     drive.driveXYR(1, -xFactor * 4, 0, r*3/2, false);
                 }
                 if (!useX && useY) {
-                    //drive.driveXYR(speedFactor, 0, -yFactor/2, r, false);
                     drive.driveXYR(1, 0, -yFactor / 2, r*3/2, false);
                 }
                 if (useX && useY){
-                    //drive.driveXYR(speedFactor, xFactor/2, -yFactor/2, r, false);
                     drive.driveXYR(1, xFactor * 4.5, -yFactor / 2, r, false);
                 }
             }
-            while (/*((Math.abs(xTargetDistance - xCurrDistance) > 2)) &&*/ timeout.seconds() < 2.5 && opModeIsActive());
+            while (timeout.seconds() < 2.5 && opModeIsActive());
 
             //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
             drive.stopMotors();

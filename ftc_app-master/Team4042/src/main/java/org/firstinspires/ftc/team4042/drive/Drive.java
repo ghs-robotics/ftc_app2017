@@ -443,7 +443,6 @@ public abstract class Drive {
         }
         return false;
     }
-
     private void home() {
         //Close the hand
         closeHand();
@@ -457,13 +456,11 @@ public abstract class Drive {
         stage = GlyphPlacementSystem.Stage.GRAB;
         uTrackAtBottom = false;
     }
-
     private void grab() {
         if (handDropTimer.seconds() >= 1) {
             stage = GlyphPlacementSystem.Stage.PLACE1;
         }
     }
-
     private void place1() {
         //Raise the u-track
         setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -473,14 +470,12 @@ public abstract class Drive {
             glyph.setXPower(targetX);
         }
     }
-
     private void pause1() {
         //Move to target X location
         if(glyph.xTargetReached(targetX)) {
             stage = GlyphPlacementSystem.Stage.PLACE2;
         }
     }
-
     private void place2() {
         //Move to target Y location
         glyph.setTargetPosition(targetY);
@@ -488,7 +483,6 @@ public abstract class Drive {
             stage = GlyphPlacementSystem.Stage.RETURN1;
         }
     }
-
     private void return1() {
         //Open the hand; raise the u-track
         openHand();
@@ -496,7 +490,6 @@ public abstract class Drive {
 
         stage = GlyphPlacementSystem.Stage.RELEASE;
     }
-
     private void release() {
         if (handDropTimer.seconds() >= 1) {
             glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISEDBACK);
@@ -506,21 +499,14 @@ public abstract class Drive {
             }
         }
     }
-
     private void pause2() {
         //Move back to center x location (so the hand fits back in the robot)
         //glyph.setXPower(GlyphPlacementSystem.HorizPos.CENTER);
         if(glyph.xTargetReached(GlyphPlacementSystem.HorizPos.CENTER)) {
             log.add("reached x target, center is " + getCenterState());
             stage = GlyphPlacementSystem.Stage.RETURN2;
-            /*if (targetX.equals(GlyphPlacementSystem.HorizPos.LEFT)) {
-                glyph.adjustBack(-1);
-            }else if(targetX.equals(GlyphPlacementSystem.HorizPos.LEFT)){
-                glyph.adjustBack(1);
-            }*/
         }
     }
-
     private void return2() {
         //Move back to the bottom and get ready to do it again
         glyph.setHomeTarget();
@@ -536,18 +522,19 @@ public abstract class Drive {
         boolean currBottom = getBottomState();
         if (currBottom && !lastBottom) {
             bottomTimer.reset();
-        } else if (currBottom && bottomTimer.milliseconds() / 1000 > C.get().getDouble("bottomWait")) {
+        } else if (currBottom && bottomTimer.milliseconds() / 1000 >
+                C.get().getDouble("bottomWait")) {
             resetUTrack();
             uTrackAtBottom = true;
             return true;
         } else if (currBottom) {
-            setVerticalDrive((C.get().getDouble("bottomWait") - bottomTimer.milliseconds() / 1000)/-2);
+            setVerticalDrive((C.get().getDouble("bottomWait") -
+                    bottomTimer.milliseconds() / 1000)/-2);
         }
         lastBottom = currBottom;
         telemetry.addData("Bottom timer", bottomTimer.milliseconds()/1000);
         return false;
     }
-
     public void resetUTrack() {
         stage = GlyphPlacementSystem.Stage.HOME;
         jewelUp();
