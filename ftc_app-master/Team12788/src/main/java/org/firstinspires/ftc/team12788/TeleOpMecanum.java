@@ -1,9 +1,11 @@
-/*package org.firstinspires.ftc.team12788;
+package org.firstinspires.ftc.team12788;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.opencv.core.Range;
 
 
 @TeleOp(name = "Mecanum", group = "Iterative Opmode")
@@ -16,34 +18,26 @@ public class TeleOpMecanum extends OpMode {
 
     private double adjustedSpeed;
 
-    private DcMotor lift;
-    private DcMotor intakeRight;
-    private DcMotor intakeLeft;
-<<<<<<< HEAD
+    //private DcMotor lift;
+    //private DcMotor intakeRight;
+    //private DcMotor intakeLeft;
     private DcMotor arm;
 
-=======
-    private DcMotor relic;
->>>>>>> aceebeb6c4c2cc2777c3c1f94295f2810883d2af
-
-    private boolean overide;
     private boolean aToggle;
 
     private int liftPos;
 
-    public Servo grabLeft;
-    public Servo grabRight;
-<<<<<<< HEAD
-    public Servo relic;
-=======
+    //public Servo grabLeft;
+    //public Servo grabRight;
     public Servo pinch;
     public Servo jewel;
->>>>>>> aceebeb6c4c2cc2777c3c1f94295f2810883d2af
 
     private boolean invert;
     private boolean pinchBool;
     private boolean a;
     private boolean x;
+
+    private double jewelPos;
 
     private double num;
 
@@ -55,35 +49,27 @@ public class TeleOpMecanum extends OpMode {
         adjustedSpeed = MecanumDrive.FULL_SPEED;
 
         num = 0;
+        jewelPos = .1;
 
         invert = false;
-        overide = false;
-<<<<<<< HEAD
         aToggle = false;
-    }
-    
-    @Override
-    public void loop() {
-        liftLeft = hardwareMap.dcMotor.get("liftLeft");
-        liftRight = hardwareMap.dcMotor.get("liftRight");
-=======
+
         pinchBool = false;
         a = false;
         x = false;
 
-        lift = hardwareMap.dcMotor.get("lift");
-        relic = hardwareMap.dcMotor.get("relic");
->>>>>>> aceebeb6c4c2cc2777c3c1f94295f2810883d2af
-        intakeLeft = hardwareMap.dcMotor.get("intakeLeft");
-        intakeRight = hardwareMap.dcMotor.get("intakeRight");
-        grabLeft = hardwareMap.servo.get("grabLeft");
-        grabRight = hardwareMap.servo.get("grabRight");
+        //lift = hardwareMap.dcMotor.get("lift");
+        arm = hardwareMap.dcMotor.get("relic");
+        //intakeLeft = hardwareMap.dcMotor.get("intakeLeft");
+        //intakeRight = hardwareMap.dcMotor.get("intakeRight");
+        //grabLeft = hardwareMap.servo.get("grabLeft");
+        //grabRight = hardwareMap.servo.get("grabRight");
         pinch = hardwareMap.servo.get("pinch");
         jewel = hardwareMap.servo.get("jewel");
-        lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        intakeLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        intakeRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //intakeLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //intakeRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     @Override
@@ -93,17 +79,15 @@ public class TeleOpMecanum extends OpMode {
 
     @Override
     public void loop() {
-        if (gamepad1.right_bumper){
-            jewel.setPosition(.1);
+        if (gamepad1.dpad_up){
+            jewelPos -= .005;
         }
-        if (gamepad1.left_bumper){
-            jewel.setPosition(.86);
+        if (gamepad1.dpad_down){
+            jewelPos += .005;
         }
-<<<<<<< HEAD
-
-=======
->>>>>>> aceebeb6c4c2cc2777c3c1f94295f2810883d2af
-        if (gamepad2.dpad_up) {
+        jewelPos = com.qualcomm.robotcore.util.Range.clip(jewelPos, 0, 1);
+        jewel.setPosition(jewelPos);
+        /*if (gamepad2.dpad_up) {
             liftPos = 12000;
         } else if (gamepad2.dpad_down) {
             liftPos = 0;
@@ -123,35 +107,32 @@ public class TeleOpMecanum extends OpMode {
         }
         else if (x){
             lift.setPower(0);
-        }
+        }*/
 
 
-        if (0 < Math.abs(lift.getCurrentPosition() - liftPos) - 100) {
+        /*if (0 < Math.abs(lift.getCurrentPosition() - liftPos) - 100) {
             if (liftPos < lift.getCurrentPosition()) {
                 lift.setPower(-.5);
             } else if (liftPos > lift.getCurrentPosition()) {
                 lift.setPower(1);
             }
-        }
-<<<<<<< HEAD
-=======
-        else {
+        } else {
             lift.setPower(0);
-        }
+        }*/
 
-        if (gamepad2.right_bumper) {
-            relic.setPower(1);
+        if (gamepad1.left_trigger > .2) {
+            arm.setPower(-gamepad1.left_trigger);
         }
-        else if (gamepad2.left_bumper) {
-            relic.setPower(-1);
+        else if (gamepad1.right_trigger > .2) {
+            arm.setPower(gamepad1.right_trigger);
         }
         else {
-            relic.setPower(0);
+            arm.setPower(0);
         }
-        if (gamepad2.a && !a) {
+        if (gamepad1.a && !a) {
             a = true;
             pinchBool = !pinchBool;
-        } else if (!gamepad2.a & a){
+        } else if (!gamepad1.a & a){
             a = false;
         }
         if (pinchBool){
@@ -159,22 +140,8 @@ public class TeleOpMecanum extends OpMode {
         }
         else {
             pinch.setPosition(.4);
-
-
-
-
-
-
-
-
-
-
-
-
         }
->>>>>>> aceebeb6c4c2cc2777c3c1f94295f2810883d2af
-
-        if (drive.deadZone(gamepad2.right_trigger) > 0) {
+        /*if (drive.deadZone(gamepad2.right_trigger) > 0) {
             intakeLeft.setPower(1);
             intakeRight.setPower(-1);
         } else if (drive.deadZone(gamepad2.left_trigger) > 0) {
@@ -195,8 +162,8 @@ public class TeleOpMecanum extends OpMode {
         if (gamepad2.y) {
             grabRight.setPosition(.4);
             grabLeft.setPosition(.4);
-        }
-        if (gamepad1.a) {
+        }*/
+        if (gamepad1.y) {
             adjustedSpeed = .5;
         }
         if (gamepad1.b) {
@@ -204,26 +171,6 @@ public class TeleOpMecanum extends OpMode {
         }
         if (gamepad1.x) {
             adjustedSpeed = .25;
-        }
-        /*if (gamepad1.right_bumper) {
-            invert = false;
-        }
-        if (gamepad1.left_bumper) {
-            invert = true;
-<<<<<<< HEAD
-        }
-<<<<<<< HEAD
-        if (gamepad2.right_bumper) {
-            arm.setPower(.25);
-        }
-        else if (gamepad2.left_bumper){
-            arm.setPower(-.25);
-        }
-        else {
-            arm.setPower(0);
-        }
-        if (gamepad2.a) {
-            aToggle = !aToggle;
         }
             /*num ++;
             if(num % 2 == 1) {
@@ -250,17 +197,12 @@ public class TeleOpMecanum extends OpMode {
             }
         } else {
             drive.drive(false, gamepad1,adjustedSpeed * MecanumDrive.FULL_SPEED, invert);
-        }
-=======
-=======
-        }
->>>>>>> 88208d81d21b3baf45a582bf828a65e656dc505f
+        }*/
         drive.drive(false, gamepad1, adjustedSpeed, false);
->>>>>>> aceebeb6c4c2cc2777c3c1f94295f2810883d2af
     }
 
     private void telemetryUpdate() {
         telemetry.addData("Speed mode", adjustedSpeed);
         telemetry.update();
     }
-}*/
+}

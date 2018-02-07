@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import javax.microedition.khronos.opengles.GL;
+
 /**
  * Parses a file to figure out which instructions to run. CAN NOT ACTUALLY RUN INSTRUCTIONS.
  */
@@ -42,7 +44,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
     MecanumDrive drive = new MecanumDrive(true);
     private VuMarkIdentifier vuMarkIdentifier = new VuMarkIdentifier();
-    private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.CENTER;
+    private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
 
     private double PROPORTIONAL_ROTATE = C.get().getDouble("PropRot");
     private double DERIV_ROTATE = C.get().getDouble("DerivRot");
@@ -58,6 +60,7 @@ public abstract class Auto extends LinearVisionOpMode {
     private ElapsedTime intakeTimer = new ElapsedTime();
     private int intakeCount = 0;
 
+    private boolean readMark = false;
 
     public void setUp(MecanumDrive drive, String filePath) {
         this.drive = drive;
@@ -273,8 +276,9 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void getVuMark(HashMap<String, String> parameters) {
-        vuMark = vuMarkIdentifier.getMark();
-        log.add("vuMark: " + vuMark);
+        readMark = true;
+        //vuMark = vuMarkIdentifier.getMark();
+        //log.add("vuMark: " + vuMark);
     }
 
     /*
@@ -363,12 +367,16 @@ public abstract class Auto extends LinearVisionOpMode {
         //drive.glyph.setHomeTarget();
         drive.setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
-        drive.glyph.setTarget(vuMark, 0);
+        if (vuMark == RelicRecoveryVuMark.UNKNOWN){
+            vuMark = RelicRecoveryVuMark.CENTER;
+        }
+        drive.glyph.setTarget(vuMark, 2);
         drive.stage = GlyphPlacementSystem.Stage.HOME;
 
         boolean done = false;
 
         do {
+            telemetry.addData("y", "" + drive.targetY);
             drive.uTrackUpdate();
             if (!drive.stage.equals(GlyphPlacementSystem.Stage.RETURN2) && !drive.stage.equals(GlyphPlacementSystem.Stage.RESET)) {
                 drive.glyph.runToPosition();
@@ -863,6 +871,11 @@ public abstract class Auto extends LinearVisionOpMode {
             if (intakeCount > 0){
                 intakeCount--;
                 intakeTimer.reset();
+            }
+        }if (readMark){
+            vuMark = vuMarkIdentifier.getMarkInstant();
+            if (vuMark != RelicRecoveryVuMark.UNKNOWN){
+                readMark = false;
             }
         }
         return super.opModeIsActive();

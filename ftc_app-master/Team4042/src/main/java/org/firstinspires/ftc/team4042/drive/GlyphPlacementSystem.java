@@ -88,27 +88,27 @@ public class GlyphPlacementSystem {
     }
 
     public void setTarget(RelicRecoveryVuMark x, int y) {
-        drive.targetY = GlyphPlacementSystem.Position.TOP;
+        //drive.targetY = y;
         switch (x) {
-            case LEFT:
-                //uiTargetX = 0;
-                drive.targetX = HorizPos.LEFT;
+            case RIGHT:
+                uiTargetX = 0;
+                //drive.targetX = HorizPos.LEFT;
                 break;
             case CENTER:
-                //uiTargetX = 1;
-                drive.targetX = HorizPos.CENTER;
+                uiTargetX = 1;
+                //targetX = HorizPos.CENTER;
                 break;
-            case RIGHT:
-                //uiTargetX = 2;
-                drive.targetX = HorizPos.RIGHT;
+            case LEFT:
+                uiTargetX = 2;
+                //drive.targetX = HorizPos.RIGHT;
                 break;
             default:
                 //when in doubt, place in the middle
-                //uiTargetX = 1;
-                drive.targetX = HorizPos.CENTER;
+                uiTargetX = 1;
+                //drive.targetX = HorizPos.CENTER;
                 break;
         }
-        //uiTargetY = y;
+        uiTargetY = y;
     }
 
     public void uiTarget(int uiTargetX, int uiTargetY) {

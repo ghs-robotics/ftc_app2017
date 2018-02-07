@@ -151,6 +151,20 @@ public class VuMarkIdentifier {
         return relicRecoveryVuMark;
     }
 
+    public void prepareMark() {
+        relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
+        relicTemplate = relicTrackables.get(0);
+        CameraDevice.getInstance().setFlashTorchMode(true);
+
+        relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
+
+        relicTrackables.activate();
+    }
+
+    public RelicRecoveryVuMark getMarkInstant() {
+        return RelicRecoveryVuMark.from(relicTemplate);
+    }
+
     public Mat getFrame() {
         /*relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
         relicTemplate = relicTrackables.get(0);
