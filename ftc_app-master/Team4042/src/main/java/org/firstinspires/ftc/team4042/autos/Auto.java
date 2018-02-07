@@ -617,7 +617,11 @@ public abstract class Auto extends LinearVisionOpMode {
             }
         }
 
-        autoSensorDrive(xTargetDistance, xIr, xType, useX, yTargetDistance, yIr, yType, useY, targetGyro, offset, speed);
+        boolean testMode = parameters.containsKey("test");
+
+        double time = parameters.containsKey("time") ? Double.parseDouble(parameters.get("time")) : 2.5;
+
+        autoSensorDrive(xTargetDistance, xIr, xType, useX, yTargetDistance, yIr, yType, useY, targetGyro, offset, speed, testMode, time);
     }
 
     /**
@@ -631,7 +635,7 @@ public abstract class Auto extends LinearVisionOpMode {
      */
     private void autoSensorDrive(double xTargetDistance, int xIrId, AnalogSensor.Type xType, boolean useX,
                                  double yTargetDistance, int yIrId, AnalogSensor.Type yType, boolean useY,
-                                 double targetGyro, double offset, double speed) {
+                                 double targetGyro, double offset, double speed, boolean testMode, double time) {
         if (useX || useY) {
             AnalogSensor xIr = null;
             switch (xType) {
@@ -702,7 +706,7 @@ public abstract class Auto extends LinearVisionOpMode {
                     drive.driveXYR(1, xFactor * 4.5, -yFactor / 2, r, false);
                 }
             }
-            while (timeout.seconds() < 2.5 && opModeIsActive());
+            while ((opModeIsActive() && testMode) || (!testMode && timeout.seconds() < time && opModeIsActive()));
 
             //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
             drive.stopMotors();
@@ -745,7 +749,7 @@ public abstract class Auto extends LinearVisionOpMode {
     private void autoSensorDrive(double targetDistance) {
         telemetry.addData("ir", drive.shortIr[0]);
         telemetry.update();
-        autoSensorDrive(0, 0, AnalogSensor.Type.SHORT_RANGE, false, targetDistance, 0, AnalogSensor.Type.SHORT_RANGE, true, 0, 0, 1);
+        autoSensorDrive(0, 0, AnalogSensor.Type.SHORT_RANGE, false, targetDistance, 0, AnalogSensor.Type.SHORT_RANGE, true, 0, 0, 1, false, 2.5);
     }
 
     public void jewelLeft() {
