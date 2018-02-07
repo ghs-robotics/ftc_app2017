@@ -488,10 +488,10 @@ public abstract class Auto extends LinearVisionOpMode {
         while (opModeIsActive() && !done && (timer.seconds() <= time || time <= 0)) {
             //Keep going if (you're not done and the seconds are less than the target) or (you're not waiting for the timer and you're not done)
             done = drive.driveWithEncoders(direction, speed, targetTicks, useGyro, targetGyro);
-            telemetry.addData("targetTime", time);
-            telemetry.addData("time", timer.seconds());
-            telemetry.addData("DONE", done);
-            telemetry.update();
+            //telemetry.addData("targetTime", time);
+            //telemetry.addData("time", timer.seconds());
+            //telemetry.addData("DONE", done);
+            //telemetry.update();
             //telemetry.update();
         }
         drive.resetEncoders();
@@ -503,9 +503,36 @@ public abstract class Auto extends LinearVisionOpMode {
                 -Double.parseDouble(parameters.get("y")));
         double speed = Double.parseDouble(parameters.get("speed"));
         double gyro = Double.parseDouble(parameters.get("gyro"));
+        int sonarId = parameters.containsKey("sonar") ? Integer.parseInt(parameters.get("sonar")) : -1;
+        double dist = parameters.containsKey("dist")? Double.parseDouble(parameters.get("dist")) : 0;
 
         //Drive in the direction indicated
-        autoDrive(direction, speed, 750, -1, true, gyro);
+        if (sonarId >= 0) {
+            AnalogSensor xSonar = drive.sonar[sonarId];
+
+            boolean done;
+            for (int i = 0; i < AnalogSensor.NUM_OF_READINGS && opModeIsActive(); i++) {
+                xSonar.addReading();
+            }
+
+            do {
+                drive.updateRates();
+
+                //Get the distances and derivative terms
+                xSonar.addReading();
+
+                //Proportional/derivative controller
+                double xFactor = getSensorFactor(AnalogSensor.Type.SONAR, sonarId, xSonar.getCmAvg(), dist);
+                Direction newDir = new Direction(Range.clip(direction.getX() + xFactor, -1, 1), direction.getY());
+
+                done = drive.driveWithEncoders(newDir, speed, 750, true, gyro);
+            } while (opModeIsActive() && !done);
+
+            drive.resetEncoders();
+            drive.runWithEncoders();
+        } else {
+            autoDrive(direction, speed, 750, -1, true, gyro);
+        }
 
         double roll;
         double pitch;
