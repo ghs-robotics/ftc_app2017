@@ -183,7 +183,7 @@ public class GlyphPlacementSystem {
                 //If you're going to the center and you hit the limit switch, stop
                 (!drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER) && drive.getCenterState()) ||
                 (drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER))) {
-            if (drive.getHorizontalDrive() > 0) {
+            if (drive.getHorizontalDrive() > 0 && drive.targetX.equals(HorizPos.CENTER)) {
                 adjustBack(1);
             }
             drive.setHorizontalDrive(0);

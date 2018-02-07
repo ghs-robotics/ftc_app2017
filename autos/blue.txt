@@ -10,10 +10,10 @@ f:sdrive speed:-1 xdistance:170 xir:0 xtype:sonar gyro:-90 offset:127
 #Drive into cryptobox
 f:drive x:0 y:1 speed:1 target:1800 time:2
 #Back off
-f:drive x:0 y:-1 speed:1 target:600
+f:drive x:0 y:-1 speed:1 target:800
 #Ram, back off, and place
 f:rot r:-100 speed:1
-f:drive x:-1 y:.75 speed:.5 target:700 time:2
+f:drive x:-1 y:.75 speed:.5 target:1000 time:2
 f:drive x:0 y:1 speed:1 target:500 time:1
 f:place
 f:drive x:0 y:-1 speed:1 target:100
