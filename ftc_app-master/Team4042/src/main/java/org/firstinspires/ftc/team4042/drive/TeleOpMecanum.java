@@ -173,10 +173,10 @@ public class TeleOpMecanum extends OpMode {
             }
             bBack = gamepad2.back;
 
-            if (gamepad2.left_stick_button && !lJoyBtn) {
+            /*if (gamepad2.left_stick_button && !lJoyBtn) {
                 placerModeInstant = !placerModeInstant;
             }
-            lJoyBtn = gamepad2.left_stick_button;
+            lJoyBtn = gamepad2.left_stick_button;*/
 
             //The first time you hit back, it establishes how long you've been pushing it for
             if (gamepad1.back && !aBack) {
@@ -299,14 +299,14 @@ public class TeleOpMecanum extends OpMode {
 
     private void glyphPlacer() {
         //If you're at the bottom, haven't been pushing a, and now are pushing a
-        if (!placerModeInstant && drive.uTrackAtBottom && !bA && gamepad2.a) {
+        /*if (!placerModeInstant && drive.uTrackAtBottom && !bA && gamepad2.a) {
             drive.uTrack();
         }
         //If you're not at the bottom and are pushing a
         else if (!placerModeInstant && !drive.uTrackAtBottom && gamepad2.a) {
             drive.uTrack();
         }
-        bA = gamepad2.a;
+        bA = gamepad2.a;*/
 
         if (gamepad2.right_stick_button && !rJoyBtn) {
             manual = !manual;
@@ -360,12 +360,12 @@ public class TeleOpMecanum extends OpMode {
         }
         else if(!manual) {
             //Glyph locate
-            if (!placerModeInstant) {
+            /*if (!placerModeInstant) {
                 glyphUI();
             } else {
                 glyphTarget();
-            }
-
+            }*/
+            glyphTarget();
             if (!drive.stage.equals(GlyphPlacementSystem.Stage.RETURN2) && !drive.stage.equals(GlyphPlacementSystem.Stage.RESET)) {
                 drive.glyph.runToPosition();
             }
