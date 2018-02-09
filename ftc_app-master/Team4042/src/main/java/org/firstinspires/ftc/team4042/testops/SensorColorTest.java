@@ -44,6 +44,8 @@ import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
 
+import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
+
 //import org.firstinspires.ftc.robotcore.internal.AppUtil;
 
 /*
@@ -94,7 +96,8 @@ public class SensorColorTest extends LinearOpMode {
             // On the way out, *guarantee* that the background is reasonable. It doesn't actually start off
             // as pure white, but it's too much work to dig out what actually was used, and this is good
             // enough to at least make the screen reasonable again.
-            setBackground(Color.WHITE);
+            setBackground(Color.YELLOW);
+            // bad hair day
         }
     }
 
@@ -188,12 +191,11 @@ public class SensorColorTest extends LinearOpMode {
 
     // Change the background to be the indicated color
     void setBackground(@ColorInt final int color) {
-        /*AppUtil.getInstance().runOnUiThread(new Runnable() {
+        AppUtil.getInstance().runOnUiThread(new Runnable() {
                                                 public void run() {
                                                     // Max out the alpha for visual clarity
                                                     relativeLayout.setBackgroundColor(Color.argb(255, Color.red(color), Color.green(color), Color.blue(color)));
                                                 }
-                                            }
-        );*/
+                                            });
     }
 }
