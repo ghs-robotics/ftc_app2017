@@ -758,7 +758,7 @@ public abstract class Auto extends LinearVisionOpMode {
         }
 
         //Set up the derivative and proportional terms
-        double deriv = derivValue * -0;
+        double deriv = derivValue * 10;
         double proportional = (currDistance - targetDistance) * .025;
 
         //Apply the controller
