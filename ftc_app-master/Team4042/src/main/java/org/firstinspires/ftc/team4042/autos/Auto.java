@@ -726,7 +726,7 @@ public abstract class Auto extends LinearVisionOpMode {
                 //Actually drives
                 if (!useY && useX) {
                     log.add("x: " + xCurrDistance + " xFactor: " + xFactor + " y: " + 0 + " r: " + r);
-                    drive.driveXYR(1, -xFactor * 4, 0, r*3/2, false);
+                    drive.driveXYR(1, -xFactor * 6, 0, r*3/2, false);
                 }
                 if (!useX && useY) {
                     drive.driveXYR(1, 0, -yFactor / 2, r*3/2, false);
