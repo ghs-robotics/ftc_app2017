@@ -445,6 +445,7 @@ public abstract class Drive {
     }
     private void home() {
         //Close the hand
+        //Jaden closed his hand
         closeHand();
         jewelOut();
         glyphLocate();
@@ -457,7 +458,7 @@ public abstract class Drive {
         uTrackAtBottom = false;
     }
     private void grab() {
-        if (handDropTimer.seconds() >= 1) {
+        if (handDropTimer.seconds() >= .5) {
             stage = GlyphPlacementSystem.Stage.PLACE1;
         }
     }
@@ -491,7 +492,7 @@ public abstract class Drive {
         stage = GlyphPlacementSystem.Stage.RELEASE;
     }
     private void release() {
-        if (handDropTimer.seconds() >= 1) {
+        if (handDropTimer.seconds() >= .5) {
             glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISEDBACK);
             if (glyph.currentY.equals(GlyphPlacementSystem.Position.RAISEDBACK)) {
                 stage = GlyphPlacementSystem.Stage.PAUSE2;
