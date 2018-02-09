@@ -27,7 +27,7 @@ public class TeleOpMecanum extends OpMode {
     // You have to let go of the button and push it again to register a new event.
     private boolean aBack = false;
     private double aBackTime = 0;
-    private boolean bBack = false;
+    private boolean bLeftStick = false;
     private boolean bStart = false;
     private boolean lJoyBtn = false;
     private boolean rJoyBtn = false;
@@ -168,10 +168,10 @@ public class TeleOpMecanum extends OpMode {
             telemetry.addData("winch", drive.winchOpen);
 
             //Toggles verbose
-            if (gamepad2.back && !bBack) {
+            if (gamepad2.left_stick_button && !bLeftStick) {
                 drive.toggleVerbose();
             }
-            bBack = gamepad2.back;
+            bLeftStick = gamepad2.left_stick_button;
 
             /*if (gamepad2.left_stick_button && !lJoyBtn) {
                 placerModeInstant = !placerModeInstant;
