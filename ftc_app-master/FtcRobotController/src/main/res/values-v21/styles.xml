@@ -1,15 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- This is a placeholder for adding future style-specific content in the robot controller only -->
 <resources>
-
-    <style name="AppThemeRedRC" parent="AppTheme.Red">
-    </style>
-
-    <style name="AppThemeGreenRC" parent="AppTheme.Green">
-    </style>
-
-    <style name="AppThemeBlueRC" parent="AppTheme.Blue">
-    </style>
 
     <style name="AppThemePurpleRC" parent="AppTheme.Purple">
         <item name="android:windowBackground">@color/OFICCIALL_colur</item>
@@ -17,12 +7,6 @@
         <item name="android:textColorPrimary">@color/background_white</item>
         <item name="android:textColorPrimaryInverse">@color/background_white</item>
         <item name="android:textColorSecondary">@color/background_white</item>
+        <item name="android:colorPrimary">@color/background_dark_gray</item>
     </style>
-
-    <style name="AppThemeOrangeRC" parent="AppTheme.Orange">
-    </style>
-
-    <style name="AppThemeTealRC" parent="AppTheme.Teal">
-    </style>
-
 </resources>
