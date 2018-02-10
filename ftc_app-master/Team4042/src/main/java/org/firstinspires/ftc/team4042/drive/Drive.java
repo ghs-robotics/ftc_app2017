@@ -305,7 +305,11 @@ public abstract class Drive {
 
     private double lastUTrack = 0;
     public double uTrackRate = 0;
+
     public void updateRates() {
+        updateRates(0);
+    }
+    public void updateRates(double offset) {
         //System time
         double currMilli = System.currentTimeMillis();
 
@@ -327,7 +331,7 @@ public abstract class Drive {
         for (int i = 0; i < currShortIr.length; i++) {
             AnalogSensor sIr = shortIr[i];
             sIr.addReading();
-            currShortIr[i] = sIr.getCmAvg();
+            currShortIr[i] = sIr.getCmAvg(100, offset);
             shortIrRates[i] = (currShortIr[i] - lastShortIr[i]) / (currMilli - lastMilli);
         }
 
@@ -335,7 +339,7 @@ public abstract class Drive {
         for (int i = 0; i < currLongIr.length; i++) {
             AnalogSensor lIr = longIr[i];
             lIr.addReading();
-            currLongIr[i] = lIr.getCmAvg();
+            currLongIr[i] = lIr.getCmAvg(100, offset);
             longIrRates[i] = (currLongIr[i] - lastLongIr[i]) / (currMilli - lastMilli);
         }
 
@@ -343,7 +347,7 @@ public abstract class Drive {
         for (int i = 0; i < currSonar.length; i++) {
             AnalogSensor sIr = sonar[i];
             sIr.addReading();
-            currSonar[i] = sIr.getCmAvg();
+            currSonar[i] = sIr.getCmAvg(100, offset);
             sonarRates[i] = (currSonar[i] - lastSonar[i]) / (currMilli - lastMilli);
         }
 
