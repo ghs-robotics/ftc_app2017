@@ -193,7 +193,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
         drive.resetEncoders();
         drive.setEncoders(true);
-        drive.setVerbose(true);
+        drive.setVerbose(false);
 
         //Reads each instruction and acts accordingly
         Iterator<AutoInstruction> instructionsIter = instructions.iterator();
@@ -708,7 +708,7 @@ public abstract class Auto extends LinearVisionOpMode {
             timeout.reset();
 
             do {
-                drive.updateRates();
+                drive.updateRates(offset);
 
                 double r = getSensorR(targetGyro);
 
@@ -720,12 +720,11 @@ public abstract class Auto extends LinearVisionOpMode {
 
                 //Proportional/derivative controller
                 double xFactor = getSensorFactor(xType, xIrId, xCurrDistance, xTargetDistance) * speed;
-                double yFactor = getSensorFactor(yType, yIrId, yCurrDistance, yTargetDistance) * speed;
+                //double yFactor = getSensorFactor(yType, yIrId, yCurrDistance, yTargetDistance) * speed;
 
                 drive.runWithoutEncoders();
                 //Actually drives
-                if (!useY && useX) {
-                    log.add("x: " + xCurrDistance + " xFactor: " + xFactor + " y: " + 0 + " r: " + r);
+                /*if (!useY && useX) {
                     drive.driveXYR(1, -xFactor * 6, 0, r*3/2, false);
                 }
                 if (!useX && useY) {
@@ -733,7 +732,7 @@ public abstract class Auto extends LinearVisionOpMode {
                 }
                 if (useX && useY){
                     drive.driveXYR(1, xFactor * 4.5, -yFactor / 2, r, false);
-                }
+                }*/
             }
             while ((opModeIsActive() && testMode) || (!testMode && timeout.seconds() < time && opModeIsActive()));
 
@@ -758,11 +757,14 @@ public abstract class Auto extends LinearVisionOpMode {
         }
 
         //Set up the derivative and proportional terms
-        double deriv = derivValue * 10;
+        double deriv = derivValue * C.get().getDouble("SensorDeriv");
         double proportional = (currDistance - targetDistance) * .025;
 
+        log.add("derivative: " + deriv);
+        log.add("proportional: " + proportional);
+
         //Apply the controller
-        double factor = (proportional - deriv);
+        double factor = (proportional + deriv);
 
         factor = Range.clip(factor, -1, 1);
         return factor;

@@ -308,6 +308,11 @@ public class TeleOpMecanum extends OpMode {
         }
         bA = gamepad2.a;*/
 
+        if (gamepad2.a && !bA) {
+            drive.toggleHand();
+        }
+        bA = gamepad2.a;
+
         if (gamepad2.right_stick_button && !rJoyBtn) {
             manual = !manual;
 
@@ -341,11 +346,6 @@ public class TeleOpMecanum extends OpMode {
         rJoyBtn = gamepad2.right_stick_button;
 
         if (manual) {
-            if (gamepad2.b && !bB) {
-                drive.toggleHand();
-            }
-            bB = gamepad2.b;
-
             if (bY && !gamepad2.y) { //When you release Y, reset the utrack
                 drive.resetUTrack();
                 drive.glyph.setHomeTarget();
@@ -422,10 +422,10 @@ public class TeleOpMecanum extends OpMode {
     private boolean done = true;
 
     private void glyphTarget() {
-        int targetX = gamepad2.x ? 0 : (gamepad2.y || gamepad2.a ? 1 : (gamepad2.b ? 2 : -1));
+        int targetX = gamepad2.x ? 0 : (gamepad2.y ? 1 : (gamepad2.b ? 2 : -1));
         int targetY = gamepad2.dpad_up ? 0 : (gamepad2.dpad_left || gamepad2.dpad_right ? 1 : (gamepad2.dpad_down ? 2 : -1));
         if (targetX != -1 && targetY != -1 &&
-                (!done || ((done && !bRight && !bLeft && !bUp && !bDown) || (done && !bA && !bB && !bX && !bY)))) {
+                (!done || ((done && !bRight && !bLeft && !bUp && !bDown) || (done && !bB && !bX && !bY)))) {
             drive.glyph.uiTarget(targetX, targetY);
             drive.glyphLocate();
             done = drive.uTrack();
@@ -435,7 +435,6 @@ public class TeleOpMecanum extends OpMode {
         bLeft = gamepad2.dpad_left;
         bUp = gamepad2.dpad_up;
         bDown = gamepad2.dpad_down;
-        bA = gamepad2.a;
         bB = gamepad2.b;
         bX = gamepad2.x;
         bY = gamepad2.y;
