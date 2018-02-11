@@ -487,7 +487,7 @@ public abstract class Auto extends LinearVisionOpMode {
         timer.reset();
         while (opModeIsActive() && !done && (timer.seconds() <= time || time <= 0)) {
             //Keep going if (you're not done and the seconds are less than the target) or (you're not waiting for the timer and you're not done)
-            done = drive.driveWithEncoders(direction, speed, targetTicks, useGyro, targetGyro);
+            done = drive.driveWithEncoders(direction, speed, targetTicks, useGyro, targetGyro, 1);
             //telemetry.addData("targetTime", time);
             //telemetry.addData("time", timer.seconds());
             //telemetry.addData("DONE", done);
@@ -525,7 +525,7 @@ public abstract class Auto extends LinearVisionOpMode {
                 double xFactor = getSensorFactor(AnalogSensor.Type.SONAR, sonarId, xSonar.getCmAvg(), dist);
                 Direction newDir = new Direction(Range.clip(direction.getX() + xFactor, -1, 1), direction.getY());
 
-                done = drive.driveWithEncoders(newDir, speed, 750, true, gyro);
+                done = drive.driveWithEncoders(newDir, speed, 750, true, gyro, 1);
             } while (opModeIsActive() && !done);
 
             drive.resetEncoders();
@@ -542,7 +542,7 @@ public abstract class Auto extends LinearVisionOpMode {
             roll = drive.gyro.getRoll();
             pitch = drive.gyro.getPitch();
             log.add("roll: " + roll + " pitch: " + pitch);
-            log.add("" + opModeIsActive());
+            //log.add("" + opModeIsActive());
             autoDrive(direction, speed, 100, -1, true, gyro);
         }
         while ((Math.abs(roll - startRoll) >= 3) ||
@@ -653,6 +653,8 @@ public abstract class Auto extends LinearVisionOpMode {
         autoSensorDrive(xTargetDistance, xIr, xType, useX, yTargetDistance, yIr, yType, useY, targetGyro, offset, speed, testMode, time);
     }
 
+    private boolean bang = false;
+
     /**
      * Drives until two sensors returns a target value, one for the x positioning and one for the y
      * @param xTargetDistance The final distance for the x sensor to return
@@ -707,40 +709,62 @@ public abstract class Auto extends LinearVisionOpMode {
             ElapsedTime timeout = new ElapsedTime();
             timeout.reset();
 
-            do {
-                drive.updateRates(offset);
+            bangBangTimer.reset();
 
+            do {
+                xIr.addReading();
+
+                drive.updateRates(offset);
                 double r = getSensorR(targetGyro);
 
-                //Get the distances and derivative terms
-                xIr.addReading();
-                yIr.addReading();
-                xCurrDistance = xIr.getCmAvg(100, offset);
-                yCurrDistance = yIr.getCmAvg(100, offset);
+                drive.driveXYR(1, 0, 0, r * 3/2, false);
 
-                //Proportional/derivative controller
-                double xFactor = getSensorFactor(xType, xIrId, xCurrDistance, xTargetDistance) * speed;
-                //double yFactor = getSensorFactor(yType, yIrId, yCurrDistance, yTargetDistance) * speed;
+                if (bangBangTimer.seconds() > C.get().getDouble("BangTimer")) {
+                    //Get the distances and derivative terms
+                    xIr.addReading();
+                    //yIr.addReading();
+                    xCurrDistance = xIr.getCmAvg(100, offset);
+                    //yCurrDistance = yIr.getCmAvg(100, offset);
 
-                drive.runWithoutEncoders();
-                //Actually drives
-                /*if (!useY && useX) {
-                    drive.driveXYR(1, -xFactor * 6, 0, r*3/2, false);
+                    double xPower = (xCurrDistance - xTargetDistance) / Math.abs(xCurrDistance - xTargetDistance);
+                    //double yPower = (yCurrDistance - yTargetDistance)/Math.abs(yCurrDistance - xTargetDistance);
+
+                    log.add("xPower: " + xPower);
+                    log.add("diff: " + (xCurrDistance - xTargetDistance));
+                    drive.resetEncoders();
+                    drive.runWithEncoders();
+
+                    boolean done = false;
+                    while (/*bangBangTimer.seconds() < C.get().getDouble("BangTimer") + C.get().getDouble("BangRunTime")*/ opModeIsActive() && !done) {
+                        //drive.updateRates(offset);
+
+                        //r = getSensorR(targetGyro);
+                        Direction dir = new Direction(xPower, 0);
+
+                        double targetTicks = Math.abs(xCurrDistance - xTargetDistance) > 6 ? 300 : Math.abs(xCurrDistance - xTargetDistance) * 40;
+                        log.add(targetTicks + "");
+
+                        if (Math.abs(xCurrDistance - xTargetDistance) < 0.1) { break; }
+
+                        done = drive.driveWithEncoders(dir, 1, targetTicks, true, targetGyro, C.get().getDouble("mulch"));
+
+                        //drive.driveXYR(1, xPower, 0, r * 3 / 2, false);
+                    }
+
+                    drive.resetEncoders();
+                    drive.runWithEncoders();
+                    bangBangTimer.reset();
                 }
-                if (!useX && useY) {
-                    drive.driveXYR(1, 0, -yFactor / 2, r*3/2, false);
-                }
-                if (useX && useY){
-                    drive.driveXYR(1, xFactor * 4.5, -yFactor / 2, r, false);
-                }*/
             }
-            while ((opModeIsActive() && testMode) || (!testMode && timeout.seconds() < time && opModeIsActive()));
+            while (opModeIsActive() && timeout.seconds() < C.get().getDouble("SensorTimeout"));
 
             //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
             drive.stopMotors();
             drive.runWithEncoders();
         }
     }
+
+    private ElapsedTime bangBangTimer = new ElapsedTime();
 
     private double getSensorFactor(AnalogSensor.Type type, int irId, double currDistance, double targetDistance) {
         double derivValue = 0;
@@ -758,15 +782,15 @@ public abstract class Auto extends LinearVisionOpMode {
 
         //Set up the derivative and proportional terms
         double deriv = derivValue * C.get().getDouble("SensorDeriv");
-        double proportional = (currDistance - targetDistance) * .025;
+        double proportional = (currDistance - targetDistance) * C.get().getDouble("SensorProp");
 
-        log.add("derivative: " + deriv);
-        log.add("proportional: " + proportional);
+        telemetry.addData("derivative", deriv);
+        telemetry.addData("proportional", proportional);
 
         //Apply the controller
         double factor = (proportional + deriv);
 
-        factor = Range.clip(factor, -1, 1);
+        //factor = Range.clip(factor, -1, 1);
         return factor;
     }
     private double getSensorR(double targetGyro) {
@@ -909,7 +933,7 @@ public abstract class Auto extends LinearVisionOpMode {
                 com.vuforia.CameraDevice.getInstance().setFlashTorchMode(false);
             }
         }
-        telemetry.addData("Mark", vuMark);
+        //telemetry.addData("Mark", vuMark);
         return super.opModeIsActive();
     }
 

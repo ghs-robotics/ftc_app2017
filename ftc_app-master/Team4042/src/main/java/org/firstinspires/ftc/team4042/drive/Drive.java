@@ -295,9 +295,11 @@ public abstract class Drive {
     private double lastGyro = 0;
     public double gyroRate = 0;
 
-    private double[] lastShortIr = new double[3];
-    private double[] lastLongIr = new double[2];
-    private double[] lastSonar = new double[2];
+    private final static int READINGS = 3;
+
+    private double[][] lastShortIr = new double[READINGS][3];
+    private double[][] lastLongIr = new double[READINGS][2];
+    private double[][] lastSonar = new double[READINGS][2];
 
     public double[] shortIrRates = new double[3];
     public double[] longIrRates = new double[2];
@@ -305,6 +307,8 @@ public abstract class Drive {
 
     private double lastUTrack = 0;
     public double uTrackRate = 0;
+
+    private int index = 0;
 
     public void updateRates() {
         updateRates(0);
@@ -332,7 +336,7 @@ public abstract class Drive {
             AnalogSensor sIr = shortIr[i];
             sIr.addReading();
             currShortIr[i] = sIr.getCmAvg(100, offset);
-            shortIrRates[i] = (currShortIr[i] - lastShortIr[i]) / (currMilli - lastMilli);
+            shortIrRates[i] = (currShortIr[i] - lastShortIr[index][i]) / (currMilli - lastMilli);
         }
 
         double[] currLongIr = new double[2];
@@ -340,7 +344,7 @@ public abstract class Drive {
             AnalogSensor lIr = longIr[i];
             lIr.addReading();
             currLongIr[i] = lIr.getCmAvg(100, offset);
-            longIrRates[i] = (currLongIr[i] - lastLongIr[i]) / (currMilli - lastMilli);
+            longIrRates[i] = (currLongIr[i] - lastLongIr[index][i]) / (currMilli - lastMilli);
         }
 
         double[] currSonar = new double[2];
@@ -348,7 +352,7 @@ public abstract class Drive {
             AnalogSensor sIr = sonar[i];
             sIr.addReading();
             currSonar[i] = sIr.getCmAvg(100, offset);
-            sonarRates[i] = (currSonar[i] - lastSonar[i]) / (currMilli - lastMilli);
+            sonarRates[i] = (currSonar[i] - lastSonar[index][i]) / (currMilli - lastMilli);
         }
 
         //Gyro rates
@@ -356,9 +360,12 @@ public abstract class Drive {
 
         //Update last to current
         lastGyro = currGyro;
-        lastShortIr = currShortIr;
-        lastLongIr = currLongIr;
-        lastSonar = currSonar;
+
+        index = ++index % READINGS;
+
+        lastShortIr[index] = currShortIr;
+        lastLongIr[index] = currLongIr;
+        lastSonar[index] = currSonar;
 
         lastMilli = currMilli;
     }
@@ -524,26 +531,29 @@ public abstract class Drive {
     private ElapsedTime bottomTimer = new ElapsedTime();
 
     private boolean reset() {
-        boolean currBottom = getBottomState();
-        if (currBottom && !lastBottom) {
-            bottomTimer.reset();
-        } else if (currBottom && bottomTimer.milliseconds() / 1000 >
-                C.get().getDouble("bottomWait")) {
-            resetUTrack();
-            uTrackAtBottom = true;
-            return true;
-        } else if (currBottom) {
-            setVerticalDrive((C.get().getDouble("bottomWait") -
-                    bottomTimer.milliseconds() / 1000)/-2);
+        if (verticalDrive.getCurrentPosition() < 100) {
+            boolean currBottom = getBottomState();
+            if (currBottom && !lastBottom) {
+                bottomTimer.reset();
+            } else if (currBottom && bottomTimer.milliseconds() / 1000 >
+                    C.get().getDouble("bottomWait")) {
+                resetUTrack();
+                uTrackAtBottom = true;
+                return true;
+            } else if (currBottom) {
+                setVerticalDrive((C.get().getDouble("bottomWait") -
+                        bottomTimer.milliseconds() / 1000) / -2);
+            }
+            lastBottom = currBottom;
+            telemetry.addData("Bottom timer", bottomTimer.milliseconds() / 1000);
         }
-        lastBottom = currBottom;
-        telemetry.addData("Bottom timer", bottomTimer.milliseconds()/1000);
         return false;
     }
     public void resetUTrack() {
         stage = GlyphPlacementSystem.Stage.HOME;
         jewelUp();
         setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
         uTrackAtBottom = true;
     }
 

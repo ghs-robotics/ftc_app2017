@@ -512,7 +512,8 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Crawl", Drive.crawl);
         telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
         telemetry.addData("Glyph pos", drive.verticalDriveCurrPos());
-        telemetry.addData("some pos", drive.motorLeftBack.getCurrentPosition());
+        //telemetry.addData("some pos", drive.motorLeftBack.getCurrentPosition());
+        telemetry.addData("glyph pow", drive.getVerticalDrive());
         telemetry.addData("Speed factor", adjustedSpeed);
         telemetry.addData("Tank", Drive.tank);
         telemetry.addData("Placer Mode Instant", placerModeInstant);
