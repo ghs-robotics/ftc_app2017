@@ -574,7 +574,7 @@ public abstract class Drive {
         }
 
         // Scales -180 to 180 ==> -8 to 8
-        heading = heading / 22.5;
+        heading = heading / 15;
 
         return heading;
     }

@@ -1,1 +1,1 @@
-f:sdrive speed:-1 xdistance:183 xir:0 xtype:sonar gyro:0 offset:127 test:true
+f:sdrive speed:1 xdistance:179 xir:1 xtype:sonar gyro:0 offset:124 test:true prop:30
