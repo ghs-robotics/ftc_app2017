@@ -53,14 +53,23 @@ public class AnalogSensor {
         return -1;
     }
 
-    public void addReading() {
+    public void addReading(boolean remove) {
         if (sensor == null) { readings[curr] = 0; }
-        else { readings[curr] = sensor.getVoltage(); }
-        curr++;
-        if (firstLoop && curr >= NUM_OF_READINGS) {
-            firstLoop = false;
+        else if (remove && (sensor.getVoltage() > 0.121412 && sensor.getVoltage() < .148169)) { }
+        else {
+            readings[curr] = sensor.getVoltage();
+            curr++;
+
+            if (firstLoop && curr >= NUM_OF_READINGS) {
+                firstLoop = false;
+            }
+
+            curr %= NUM_OF_READINGS;
         }
-        curr %= NUM_OF_READINGS;
+    }
+
+    public void addReading() {
+        this.addReading(false);
     }
 
     public double getVAvg() {
@@ -79,6 +88,8 @@ public class AnalogSensor {
         if (sensor == null) { return -1; }
         double sum = 0;
         double numToRead = firstLoop ? curr + 1 : NUM_OF_READINGS;
+
+        double failures = 0;
 
         for (int i = 0; i < numToRead; i++) {
             double add = readings[i];
@@ -118,6 +129,9 @@ public class AnalogSensor {
         if (voltage == -1) { return -1; }
         return (int)Math.round(747.47*voltage - 0.7522);
     }
+
+    //90 - 110
+    //0.121412 - .148169
 
     /*private double getVReptAsShortIR() {
         if (sensor == null) { return -1; }

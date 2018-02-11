@@ -1,26 +1,48 @@
 package org.firstinspires.ftc.team4042.autos;
+import android.os.Environment;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import org.firstinspires.ftc.team4042.drive.MecanumDrive;
 import java.io.File;
+import java.io.IOException;
+//import com.qualcomm.ftccommon.DbgLog;
 
-/**
- * USELESS - Run BlueBottomAuto for parks in the safe zone
- */
 @Autonomous(name="DelAuto", group="autos")
 @Deprecated
-public class DelAuto extends Auto {
-
-    @Override
-    public void runOpMode() {
-        File file;
+public class DelAuto extends OpMode {
+    private Telemetry.Log log;
+    public void init() {
+        //log = telemetry.log();
+        File tfile;
+        File ofile;
         String[] autos = new String[] {
-                "blue.txt", "bluebottom.txt", "bluejewel.txt", "bluetop.txt", "constants.txt",
-                "ir.txt", "jewel.txt", "proto.txt", "red.txt", "redbottom.txt", "redjewel.txt",
-                "redtop.txt", "test.txt"
+                "blue", "bluebottom", "bluejewel", "bluetop", "constants", "ir", "jewel", "proto",
+                "red", "redbottom", "redjewel", "redtop", "test"
         };
-        for(String auto : autos)
-            file = new File("./storage/emulated/0/bluetooth/" + auto);
+        for(String auto : autos) {
+            tfile = new File("./storage/emulated/0/bluetooth/" + auto + "-1.txt");
+            //log.add("\n\n\n\n\n\nno\n\n\n\n\n\n");
+            telemetry.addLine("mebe time");
+            if(tfile.exists()) {
+                telemetry.addLine("go time");
+                //log.add("\n\n\n\n\n\ntest\n\n\n\n\n\n");
+                //String f = Environment.getExternalStoragePublicDirectory()
+                ofile = new File("./storage/emulated/0/bluetooth/" + auto + ".txt");
+                ofile.delete();
+                ofile = new File("./storage/emulated/0/bluetooth/" + auto + ".txt");
+                tfile.renameTo(ofile);
+            }
+        }
+        telemetry.update();
+    }
+    public void runOpMode() {
+
+    }
+    @Override
+    public void loop() {
+
     }
 }

@@ -650,7 +650,11 @@ public abstract class Auto extends LinearVisionOpMode {
 
         double time = parameters.containsKey("time") ? Double.parseDouble(parameters.get("time")) : 2.5;
 
-        autoSensorDrive(xTargetDistance, xIr, xType, useX, yTargetDistance, yIr, yType, useY, targetGyro, offset, speed, testMode, time);
+        double prop = Double.parseDouble(parameters.get("prop"));
+
+        boolean remove = parameters.containsKey("remove") && Boolean.parseBoolean(parameters.get("remove"));
+
+        autoSensorDrive(xTargetDistance, xIr, xType, useX, yTargetDistance, yIr, yType, useY, targetGyro, offset, speed, testMode, time, prop, remove);
     }
 
     private boolean bang = false;
@@ -666,7 +670,7 @@ public abstract class Auto extends LinearVisionOpMode {
      */
     private void autoSensorDrive(double xTargetDistance, int xIrId, AnalogSensor.Type xType, boolean useX,
                                  double yTargetDistance, int yIrId, AnalogSensor.Type yType, boolean useY,
-                                 double targetGyro, double offset, double speed, boolean testMode, double time) {
+                                 double targetGyro, double offset, double speed, boolean testMode, double time, double prop, boolean remove) {
         if (useX || useY) {
             AnalogSensor xIr = null;
             switch (xType) {
@@ -721,12 +725,12 @@ public abstract class Auto extends LinearVisionOpMode {
 
                 if (bangBangTimer.seconds() > C.get().getDouble("BangTimer")) {
                     //Get the distances and derivative terms
-                    xIr.addReading();
+                    xIr.addReading(remove);
                     //yIr.addReading();
                     xCurrDistance = xIr.getCmAvg(100, offset);
                     //yCurrDistance = yIr.getCmAvg(100, offset);
 
-                    double xPower = (xCurrDistance - xTargetDistance) / Math.abs(xCurrDistance - xTargetDistance);
+                    double xPower = (xCurrDistance - xTargetDistance) / Math.abs(xCurrDistance - xTargetDistance) * -speed;
                     //double yPower = (yCurrDistance - yTargetDistance)/Math.abs(yCurrDistance - xTargetDistance);
 
                     log.add("xPower: " + xPower);
@@ -741,8 +745,8 @@ public abstract class Auto extends LinearVisionOpMode {
                         //r = getSensorR(targetGyro);
                         Direction dir = new Direction(xPower, 0);
 
-                        double targetTicks = Math.abs(xCurrDistance - xTargetDistance) > 6 ? 300 : Math.abs(xCurrDistance - xTargetDistance) * 40;
-                        log.add(targetTicks + "");
+                        double targetTicks = Math.abs(xCurrDistance - xTargetDistance) > 6 ? 300 : Math.abs(xCurrDistance - xTargetDistance) * prop;
+                        log.add(xCurrDistance + "");
 
                         if (Math.abs(xCurrDistance - xTargetDistance) < 0.1) { break; }
 
@@ -756,7 +760,7 @@ public abstract class Auto extends LinearVisionOpMode {
                     bangBangTimer.reset();
                 }
             }
-            while (opModeIsActive() && timeout.seconds() < C.get().getDouble("SensorTimeout"));
+            while (opModeIsActive() && ((timeout.seconds() < C.get().getDouble("SensorTimeout") && !testMode) || (testMode)));
 
             //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
             drive.stopMotors();
@@ -804,7 +808,7 @@ public abstract class Auto extends LinearVisionOpMode {
     private void autoSensorDrive(double targetDistance) {
         telemetry.addData("ir", drive.shortIr[0]);
         telemetry.update();
-        autoSensorDrive(0, 0, AnalogSensor.Type.SHORT_RANGE, false, targetDistance, 0, AnalogSensor.Type.SHORT_RANGE, true, 0, 0, 1, false, 2.5);
+        autoSensorDrive(0, 0, AnalogSensor.Type.SHORT_RANGE, false, targetDistance, 0, AnalogSensor.Type.SHORT_RANGE, true, 0, 0, 1, false, 2.5, 40, false);
     }
 
     public void jewelLeft() {

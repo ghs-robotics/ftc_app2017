@@ -7,14 +7,14 @@ f:brace
 f:open
 f:drive x:0 y:-1 speed:1 target:600 gyro:0
 f:rot r:-80 speed:1
-f:sdrive speed:-1 xdistance:183 xir:0 xtype:sonar gyro:-90 offset:127
+f:sdrive speed:-1 xdistance:183 xir:0 xtype:sonar gyro:-90 offset:127 prop:40
 #Drive into cryptobox
-f:drive x:0 y:1 speed:1 target:1800 time:3
+f:drive x:0 y:1 speed:1 target:3000 time:3.75
 #Back off
-f:drive x:0 y:-1 speed:1 target:450
+f:drive x:0 y:-1 speed:.8 target:400
 #Ram, back off, and place
 f:rot r:-100 speed:1
 f:drive x:-1 y:.8 speed:.5 target:1000 time:2
 f:drive x:0 y:1 speed:1 target:500 time:1
 f:place
-f:drive x:0 y:-1 speed:1 target:200
+#f:drive x:0 y:-1 speed:1 target:150
