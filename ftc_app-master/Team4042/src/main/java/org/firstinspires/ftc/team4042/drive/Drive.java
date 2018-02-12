@@ -185,9 +185,6 @@ public abstract class Drive {
         motorRightBack = initializeMotor(hardwareMap, "back right");
 
         jewelServo = initializeServo(hardwareMap, "jewel");
-        try {
-            jewelIn();
-        } catch (NullPointerException ex) { }
 
         grabbyBoi = initializeServo(hardwareMap, "hand");
 

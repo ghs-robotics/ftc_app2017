@@ -17,4 +17,4 @@ f:rot r:-100 speed:1
 f:drive x:-1 y:.8 speed:.5 target:1000 time:2
 f:drive x:0 y:1 speed:1 target:500 time:1
 f:place
-#f:drive x:0 y:-1 speed:1 target:150
+#f:drive x:0 y:-1 speed:1 target:1000
