@@ -432,6 +432,7 @@ public abstract class Drive {
             //Step 1: intakes in until a glyph is found
             intakeLeft(1);
             intakeRight(1);
+            dance();
             glyphCollectionTimer.reset();
             return false;
         } else if (!isGlyphBack && glyphCollectionTimer.seconds() < C.get().getDouble("time")/2){
@@ -455,6 +456,13 @@ public abstract class Drive {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Needs to be written: should make the robot move forwards and backwards randomly
+     */
+    private void dance() {
+
     }
 
     public boolean uTrack() {
