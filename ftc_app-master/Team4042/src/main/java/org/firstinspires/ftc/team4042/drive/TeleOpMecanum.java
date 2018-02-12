@@ -272,7 +272,7 @@ public class TeleOpMecanum extends OpMode {
 
         //First controller pushing Y - toggle extendo
         if (gamepad1.y && !aY) {
-            toggleExtendo();
+            drive.toggleExtendo();
         }
         aY = gamepad1.y;
 
@@ -387,36 +387,6 @@ public class TeleOpMecanum extends OpMode {
         }
         aLeftStick = gamepad1.left_stick_button;
         aRightStick = gamepad1.right_stick_button;
-    }
-
-    private void toggleExtendo() {
-        //It's extendo, so put it back together
-        ElapsedTime timer = new ElapsedTime();
-        if (Drive.isExtendo) {
-            timer.reset();
-
-            //do {
-                //drive.pushRobotTogether();
-            drive.raiseBrakes();
-            drive.lockCatches();
-            drive.freezeBack();
-            //} while (timer.seconds() < 2);
-
-            Drive.isExtendo = false;
-        }
-        //Not extendo, so take it apart
-        else {
-            timer.reset();
-
-            //do {
-                //drive.pushRobotTogether();
-            drive.lowerBrakes();
-            drive.unlockCatches();
-            drive.runBackWithEncoders();
-            //} while (timer.seconds() < 2);
-
-            Drive.isExtendo = true;
-        }
     }
 
     private boolean done = true;

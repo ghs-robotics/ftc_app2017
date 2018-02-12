@@ -251,6 +251,9 @@ public abstract class Auto extends LinearVisionOpMode {
                 case "wait":
                     wait(parameters);
                     break;
+                case "break":
+                    drive.toggleExtendo();
+                    break;
                 default:
                     System.err.println("Unknown function called from file " + file);
                     break;
@@ -301,8 +304,45 @@ public abstract class Auto extends LinearVisionOpMode {
     }
     */
 
+    /**
+     * Gets a required double parameter, or throws an exception if it's not found
+     * @param parameters A hashmap of all the parameters
+     * @param key The parameter key to look for
+     * @return The value for the key
+     * @throws NoSuchFieldError If the key isn't mapped
+     */
+    private double getParam(HashMap<String, String> parameters, String key) throws NoSuchFieldError {
+        try {
+            return Double.parseDouble(parameters.get(key));
+        } catch (Exception ex) {
+            throw new NoSuchFieldError("Could not find " + key);
+        }
+    }
+
+    /**
+     * Gets an optional double parameter
+     * @param parameters A hashmap of all the parameters
+     * @param key The parameter key to look for
+     * @param defaultVal The value to return if the optional parameter is not included
+     * @return The value for the key, or the default value if the parameter doesn't exist
+     */
+    private double getParam(HashMap<String, String> parameters, String key, double defaultVal) {
+        return parameters.containsKey(key) ? Double.parseDouble(parameters.get(key)) : defaultVal;
+    }
+
+    /**
+     * Gets an optional integer parameter
+     * @param parameters A hashmap of all the parameters
+     * @param key The parameter key to look for
+     * @param defaultVal The value to return if the optional parameter is not included
+     * @return The value for the key, or the default value if the parameter doesn't exist
+     */
+    private int getParam(HashMap<String, String> parameters, String key, int defaultVal) {
+        return parameters.containsKey(key) ? Integer.parseInt(parameters.get(key)) : defaultVal;
+    }
+
     public void wait(HashMap<String, String> parameters) {
-        double seconds = Double.parseDouble(parameters.get("sec"));
+        double seconds = getParam(parameters, "sec");
 
         ElapsedTime waitTimer = new ElapsedTime();
         while (waitTimer.seconds() < seconds);
@@ -464,10 +504,10 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void autoDrive(HashMap<String, String> parameters) {
-        Direction direction = new Direction(Double.parseDouble(parameters.get("x")), -Double.parseDouble(parameters.get("y")));
-        double speed = Double.parseDouble(parameters.get("speed"));
-        double targetTicks = Double.parseDouble(parameters.get("target"));
-        double time = parameters.containsKey("time") ? Double.parseDouble(parameters.get("time")) : -1;
+        Direction direction = new Direction(getParam(parameters, "x"), -getParam(parameters, "y"));
+        double speed = getParam(parameters, "speed");
+        double targetTicks = getParam(parameters, "target");
+        double time = getParam(parameters, "time", -1);
         boolean useGyro = parameters.containsKey("gyro");
         double targetGyro = useGyro ? Double.parseDouble(parameters.get("gyro")) : 0;
 
@@ -499,12 +539,12 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     private void autoDriveOff(HashMap<String, String> parameters) {
-        Direction direction = new Direction(Double.parseDouble(parameters.get("x")),
-                -Double.parseDouble(parameters.get("y")));
-        double speed = Double.parseDouble(parameters.get("speed"));
-        double gyro = Double.parseDouble(parameters.get("gyro"));
+        Direction direction = new Direction(getParam(parameters, "x"),
+                -getParam(parameters, "y"));
+        double speed = getParam(parameters, "speed");
+        double gyro = getParam(parameters, "gyro");
         int sonarId = parameters.containsKey("sonar") ? Integer.parseInt(parameters.get("sonar")) : -1;
-        double dist = parameters.containsKey("dist")? Double.parseDouble(parameters.get("dist")) : 0;
+        double dist = getParam(parameters, "dist", 0);
 
         //Drive in the direction indicated
         if (sonarId >= 0) {
@@ -555,9 +595,9 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void autoRotate(HashMap<String, String> parameters) {
-        double realR = Double.parseDouble(parameters.get("r"));
+        double realR = getParam(parameters, "r");
 
-        double speed = Double.parseDouble(parameters.get("speed"));
+        double speed = getParam(parameters, "speed");
 
         autoRotate(realR, speed);
 
@@ -593,7 +633,7 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void autoSensorDrive(HashMap<String, String> parameters) {
-        double targetGyro = Double.parseDouble(parameters.get("gyro"));
+        double targetGyro = getParam(parameters, "gyro");
 
         boolean useX = parameters.containsKey("xdistance");
         boolean useY = parameters.containsKey("ydistance");
@@ -601,9 +641,9 @@ public abstract class Auto extends LinearVisionOpMode {
         double yTargetDistance = useY ? Double.parseDouble(parameters.get("ydistance")) : 0;
         int yIr = useY ? Integer.parseInt(parameters.get("yir")) : 0;
 
-        double offset = parameters.containsKey("offset") ? Double.parseDouble(parameters.get("offset")) : 0;
+        double offset = getParam(parameters, "offset", 0);
 
-        double speed = parameters.containsKey("speed") ? Double.parseDouble(parameters.get("speed")) : 1;
+        double speed = getParam(parameters, "speed", 1);
 
         AnalogSensor.Type yType = AnalogSensor.Type.SHORT_RANGE;
         if (useY) {
@@ -648,9 +688,9 @@ public abstract class Auto extends LinearVisionOpMode {
 
         boolean testMode = parameters.containsKey("test");
 
-        double time = parameters.containsKey("time") ? Double.parseDouble(parameters.get("time")) : 2.5;
+        double time = getParam(parameters, "time", 2.5);
 
-        double prop = Double.parseDouble(parameters.get("prop"));
+        double prop = getParam(parameters, "prop");
 
         boolean remove = parameters.containsKey("remove") && Boolean.parseBoolean(parameters.get("remove"));
 

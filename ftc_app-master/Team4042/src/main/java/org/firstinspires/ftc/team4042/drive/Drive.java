@@ -185,9 +185,6 @@ public abstract class Drive {
         motorRightBack = initializeMotor(hardwareMap, "back right");
 
         jewelServo = initializeServo(hardwareMap, "jewel");
-        try {
-            jewelIn();
-        } catch (NullPointerException ex) { }
 
         grabbyBoi = initializeServo(hardwareMap, "hand");
 
@@ -244,6 +241,30 @@ public abstract class Drive {
             for (AnalogSensor sonar : sonar) {
                 sonar.addReading();
             }
+        }
+    }
+
+    public void toggleExtendo() {
+        //It's extendo, so put it back together
+        ElapsedTime timer = new ElapsedTime();
+        if (Drive.isExtendo) {
+            timer.reset();
+
+            raiseBrakes();
+            lockCatches();
+            freezeBack();
+
+            Drive.isExtendo = false;
+        }
+        //Not extendo, so take it apart
+        else {
+            timer.reset();
+
+            lowerBrakes();
+            unlockCatches();
+            runBackWithEncoders();
+
+            Drive.isExtendo = true;
         }
     }
 
@@ -411,6 +432,7 @@ public abstract class Drive {
             //Step 1: intakes in until a glyph is found
             intakeLeft(1);
             intakeRight(1);
+            dance();
             glyphCollectionTimer.reset();
             return false;
         } else if (!isGlyphBack && glyphCollectionTimer.seconds() < C.get().getDouble("time")/2){
@@ -427,13 +449,30 @@ public abstract class Drive {
             //Step 4: If the glyph still isn't in, reset the glyphCollectionTimer to loop us back through to step 2
             glyphCollectionTimer.reset();
             return false;
+            /** Should be made to run the robot backwards for a short period of time and reconnect, then break and return true */
         } else if (isGlyphBack) {
             //Step 5: But if the glyph is in, then stop the intakes and wait
             intakeLeft(0);
             intakeRight(0);
+
+            pullBack();
             return true;
         }
         return false;
+    }
+
+    /**
+     * Needs to be written: should make the robot move forwards and backwards randomly
+     */
+    private void dance() {
+
+    }
+
+    /**
+     * Needs to be written: should run the front motors back aggressively
+     */
+    private void pullBack() {
+
     }
 
     public boolean uTrack() {
