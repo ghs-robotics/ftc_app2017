@@ -251,6 +251,9 @@ public abstract class Auto extends LinearVisionOpMode {
                 case "wait":
                     wait(parameters);
                     break;
+                case "break":
+                    drive.toggleExtendo();
+                    break;
                 default:
                     System.err.println("Unknown function called from file " + file);
                     break;
