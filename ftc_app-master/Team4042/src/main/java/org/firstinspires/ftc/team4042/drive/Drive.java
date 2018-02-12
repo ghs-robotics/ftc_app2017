@@ -244,6 +244,30 @@ public abstract class Drive {
         }
     }
 
+    public void toggleExtendo() {
+        //It's extendo, so put it back together
+        ElapsedTime timer = new ElapsedTime();
+        if (Drive.isExtendo) {
+            timer.reset();
+
+            raiseBrakes();
+            lockCatches();
+            freezeBack();
+
+            Drive.isExtendo = false;
+        }
+        //Not extendo, so take it apart
+        else {
+            timer.reset();
+
+            lowerBrakes();
+            unlockCatches();
+            runBackWithEncoders();
+
+            Drive.isExtendo = true;
+        }
+    }
+
     private DcMotor initializeMotor(HardwareMap hardwareMap, String motorName) {
         DcMotor motor = null;
         try {
