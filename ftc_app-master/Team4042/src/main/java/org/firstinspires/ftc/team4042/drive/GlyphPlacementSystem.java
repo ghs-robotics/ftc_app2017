@@ -29,7 +29,7 @@ public class GlyphPlacementSystem {
 
     public enum Position {
         //HOME(0), RAISED(1200), TOP(1600), MID(2000), BOT(2500), TRANSITION(-1);
-        HOME(0), RAISEDBACK(1325), RAISED(1375), TOP(1525), MID(1875), BOT(2050), TRANSITION(-1);
+        HOME(0), RAISEDBACK(1325), RAISED(1375), TOP(1550), MID(1875), BOT(2050), TRANSITION(-1);
         //HOME(10), RAISEDBACK(1350), RAISED(1401), TOP(1600), MID(1900), BOT(2200), TRANSITION(-1);
 
         private final Integer encoderVal;
