@@ -1,11 +1,15 @@
 package org.firstinspires.ftc.team4042.drive;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -114,6 +118,8 @@ public abstract class Drive {
     public AnalogSensor[] longIr = new AnalogSensor[2];
     public AnalogSensor[] sonar = new AnalogSensor[2];
 
+    public NormalizedColorSensor colorSensor;
+
     public boolean verbose;
 
     Telemetry.Log log;
@@ -175,6 +181,11 @@ public abstract class Drive {
 
             for (AnalogSensor aSonar: sonar) {
                 aSonar.initialize(hardwareMap);
+            }
+            try {
+                colorSensor = hardwareMap.get(NormalizedColorSensor.class, "color sensor");
+            }catch (IllegalArgumentException ex){
+                colorSensor = null;
             }
         }
 
@@ -242,6 +253,19 @@ public abstract class Drive {
                 sonar.addReading();
             }
         }
+    }
+
+    public float[] getRGB(){
+        NormalizedRGBA color = colorSensor.getNormalizedColors();
+        float[] val = {color.red, color.green, color.blue, color.alpha};
+        return val;
+    }
+
+    public float[] getHSV() {
+        NormalizedRGBA color = colorSensor.getNormalizedColors();
+        float[] hsvValues = new float[3];
+        Color.colorToHSV(color.toColor(), hsvValues);
+        return hsvValues;
     }
 
     public void toggleExtendo() {
