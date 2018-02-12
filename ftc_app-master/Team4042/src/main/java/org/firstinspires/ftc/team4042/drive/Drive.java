@@ -449,10 +449,13 @@ public abstract class Drive {
             //Step 4: If the glyph still isn't in, reset the glyphCollectionTimer to loop us back through to step 2
             glyphCollectionTimer.reset();
             return false;
+            /** Should be made to run the robot backwards for a short period of time and reconnect, then break and return true */
         } else if (isGlyphBack) {
             //Step 5: But if the glyph is in, then stop the intakes and wait
             intakeLeft(0);
             intakeRight(0);
+
+            pullBack();
             return true;
         }
         return false;
@@ -462,6 +465,13 @@ public abstract class Drive {
      * Needs to be written: should make the robot move forwards and backwards randomly
      */
     private void dance() {
+
+    }
+
+    /**
+     * Needs to be written: should run the front motors back aggressively
+     */
+    private void pullBack() {
 
     }
 
