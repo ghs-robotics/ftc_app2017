@@ -94,36 +94,31 @@ public class Cryptobox {
      * @param newGlyph The new glyph color to add
      * @param columnNum The column to place in
      * @param snakeTarget The target snake to try to match
-     * @return An array of two values, where the first is the number of grey possibilities and the second the number of brown possibilities
+     * @return An array of three columns, representing what the next glyph would have to be would this one be placed
      */
-    private int[] getPossibilities(GlyphColor newGlyph, int columnNum, Snake snakeTarget) {
+    private GlyphColor[] getPrediction(GlyphColor newGlyph, int columnNum, Snake snakeTarget) {
         int[] empties = new int[3];
         for (int i = 0; i < empties.length; i++) {
             empties[i] = getFirstEmpty(i);
         }
 
-        int[] greyBrown = new int[] {0, 0};
+        GlyphColor[] predictions = new GlyphColor[] {GlyphColor.NONE, GlyphColor.NONE, GlyphColor.NONE};
 
         //If there's no space for the new glyph or it doesn't match the target, then there are no future possibilities if we place here
         if (empties[columnNum] == -1 || !snakeTarget.getGlyphMap()[columnNum][empties[columnNum]].equals(newGlyph)) {
-            return greyBrown;
+            return predictions;
         } else {
             //Assume the glyph gets placed
             empties[columnNum]++;
         }
 
         for (int i = 0; i < empties.length; i++) {
-            //Get the glyph possibility at the empty space
-            GlyphColor possibility = snakeTarget.getGlyphMap()[columnNum][empties[i]];
-            if (possibility.equals(GlyphColor.GREY)) {
-                greyBrown[0]++;
-            }
-            else if (possibility.equals(GlyphColor.BROWN)) {
-                greyBrown[1]++;
-            }
+            //Get the glyph possibility at the empty space and puts it in the array
+            GlyphColor prediction = snakeTarget.getGlyphMap()[columnNum][empties[i]];
+            predictions[i] = prediction;
         }
-        
-        return greyBrown;
+
+        return predictions;
     }
 
     /**
