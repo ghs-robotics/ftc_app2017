@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.team4042.drive;
 
+import java.util.ArrayList;
+
 /**
  * Created by Hazel on 2/13/2018.
  */
@@ -35,16 +37,132 @@ public class Cryptobox {
         }
     }
 
-    public Cryptobox() {
+    private GlyphPlacementSystem glyphPlacementSystem;
+
+    public Cryptobox(GlyphPlacementSystem glyphPlacementSystem) {
         for (int i = 0; i < glyphs.length; i++) {
             for (int j = 0; j < glyphs[0].length; j++) {
                 glyphs[i][j] = GlyphColor.NONE;
             }
         }
+
+        this.glyphPlacementSystem = glyphPlacementSystem;
     }
 
     public void placeGlyph(GlyphColor newGlyph) {
+        GlyphColor[][] predictions = new GlyphColor[3][3];
+        for (int i = 0; i < glyphs.length; i++) {
+            //Contains the predictions for if we put the glyph in that column
+            GlyphColor[] prediction = getPrediction(newGlyph, i, Snake.ONE);
+            predictions[i] = prediction;
+        }
 
+        int column = getBestColumnIndex(predictions);
+
+        //Place at the height of one over the lowest
+        int[] height = new int[glyphs.length];
+        for (int i = 0; i < height.length; i++) {
+            height[i] = getFirstEmpty(i);
+        }
+
+        //The one with the most glyphs
+        int maximumHeight = getIndicesOfExtreme(height, true).get(0);
+
+        int row = maximumHeight == 3 ? 3 : maximumHeight + 1;
+
+        //Place the glyph in the simulation
+        addGlyphToColumn(newGlyph, column, Snake.ONE);
+
+        glyphPlacementSystem.uiTarget(row, column);
+        glyphPlacementSystem.drive.glyphLocate();
+        
+        while (!glyphPlacementSystem.drive.uTrack()) { }
+    }
+
+    private int getBestColumnIndex(GlyphColor[][] predictions) {
+        int[][] greyBrowns = new int[3][2];
+        int[] sums = new int[3];
+
+        for (int i = 0; i < greyBrowns.length; i++) {
+            greyBrowns[i] = convertPredictionToSums(predictions[i]);
+            sums[i] = greyBrowns[i][0] + greyBrowns[i][1];
+
+            //Determine which prediction is the most desirable based on which one
+            // has the highest sum with a tiebreaker of the variance
+            ArrayList<Integer> maximums = getIndicesOfExtreme(sums, true);
+            if (maximums.size() == 1) {
+                return maximums.get(0);
+            } else {
+                int[] variances = new int[3];
+                //Get the variances of the differences between the two number of greys and browns
+                for (int j = 0; j < greyBrowns.length; j++) {
+                    variances[j] = Math.abs(greyBrowns[j][0] - greyBrowns[j][1]);
+                }
+
+                //Get the one(s) with the smallest variance
+                ArrayList<Integer> minimums = getIndicesOfExtreme(variances, false);
+
+                //The one with the least variance is returned
+                if (minimums.size() == 1) {
+                    return minimums.get(0);
+                } else {
+                    //Get the heights of the columns
+                    int[] height = new int[minimums.size()];
+                    for (int k = 0; k < minimums.size(); k++) {
+                        height[k] = getFirstEmpty(k);
+                    }
+
+                    //The one with the fewest glyphs is returned
+                    ArrayList<Integer> minimumHeights = getIndicesOfExtreme(height, false);
+                    if (minimumHeights.size() == 1) {
+                        return minimumHeights.get(0);
+                    } else {
+                        //If we get here, there's only the center tied with an outside one,
+                        // so we prefer the other answer over the center
+                        if (minimumHeights.get(0) == 1) {
+                            return minimumHeights.get(1);
+                        } else {
+                            return minimumHeights.get(0);
+                        }
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+
+    private ArrayList<Integer> getIndicesOfExtreme(int[] array, boolean maximum) {
+        ArrayList<Integer> extremes = new ArrayList<>();
+
+        int extreme = maximum ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+        //Find largest value
+        for (int num : array) {
+            if ((num > extreme && maximum) || (num < extreme && !maximum)) {
+                extreme = num;
+            }
+        }
+        //Find all that are at largest value
+        for (int i = 0; i < array.length; i++) {
+            if (extreme == array[i]) {
+                extremes.add(i);
+            }
+        }
+        return extremes;
+    }
+
+    private int[] convertPredictionToSums(GlyphColor[] prediction) {
+        //First index is the number of greys, second index is the number of browns
+        int[] greyBrown = {0, 0};
+
+        for (GlyphColor curr : prediction) {
+            if (curr.equals(GlyphColor.GREY)) {
+                greyBrown[0]++;
+            }
+            if (curr.equals(GlyphColor.BROWN)) {
+                greyBrown[1]++;
+            }
+        }
+        return greyBrown;
     }
 
     /**
