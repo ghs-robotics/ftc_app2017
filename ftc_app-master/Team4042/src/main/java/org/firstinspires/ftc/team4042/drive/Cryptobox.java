@@ -1,5 +1,18 @@
 package org.firstinspires.ftc.team4042.drive;
 
+import android.content.SharedPreferences;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.team4042.autos.AutoInstruction;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.util.HashMap;
+
 /**
  * Created by Hazel on 2/13/2018.
  */
@@ -8,6 +21,9 @@ public class Cryptobox {
     private enum GlyphColor { GREY, BROWN, NONE, EITHER }
 
     private GlyphColor[][] glyphs = new GlyphColor[3][4];
+
+    private File file = null;
+    private Telemetry telemetry;
 
     /**
      * The first index is the column, the second index is the row
@@ -35,12 +51,66 @@ public class Cryptobox {
         }
     }
 
-    public Cryptobox() {
+    /**
+     * Reads the file and stores data into cryptobox array
+     */
+    public void loadFile() {
+        if (file == null) { return; } //Can't load a null file
+
+        try {
+            FileReader fileReader = new FileReader(file);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            String line;
+            for (int r = 0; r < 4 && (line = bufferedReader.readLine()) != null; r++) {
+                //Reads the lines from the file in order
+                if (line.length() > 0) {
+                    String[] row = line.split(" ");
+
+                    for (int c = 0; c < row.length; c++) {
+                        String pos = row[c];
+                        glyphs[r][c] = pos.equalsIgnoreCase("G") ? GlyphColor.GREY :
+                                pos.equalsIgnoreCase("B") ? GlyphColor.BROWN : GlyphColor.NONE;
+                    }
+
+                    telemetry.update();
+                }
+            }
+            fileReader.close();
+        }catch (Exception e) {
+            telemetry.addData("Err load file:", e);
+        }
+    }
+
+    /**
+     * Writes current cryptobox array to the file
+     */
+    public void writeFile() {
+        if (file == null) { return; } //Can't load a null file
+
+        try {
+            FileWriter fileWriter = new FileWriter(file);
+            PrintWriter print_stream = new PrintWriter(fileWriter);
+            //write array to file for each row and col
+            for (int r = 0; r < 4; r++) {
+                String[] val = new String[3];
+                for (int c = 0; c < 3; c++) {
+                    val[c] = this.glyphs[r][0].equals(GlyphColor.BROWN) ? "B" : this.glyphs[r][0].equals(GlyphColor.BROWN) ? "G" : "N";
+                }
+                print_stream.println(val[0] + " " + val[1] + " " + val[2]);
+            }
+        }catch (Exception e) {
+            telemetry.addData("Err load file:", e);
+        }
+    }
+
+    public Cryptobox(Telemetry telemetry) {
         for (int i = 0; i < glyphs.length; i++) {
             for (int j = 0; j < glyphs[0].length; j++) {
                 glyphs[i][j] = GlyphColor.NONE;
             }
         }
+        this.telemetry = telemetry;
+        this.file = new File("./storage/emulated/0/bluetooth/cryptobox.txt");
     }
 
     public void placeGlyph(GlyphColor newGlyph) {
@@ -84,9 +154,8 @@ public class Cryptobox {
                 //If it doesn't match the target, then you can't place there so return false
                 return false;
             }
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
