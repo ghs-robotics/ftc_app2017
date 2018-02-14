@@ -218,6 +218,9 @@ public abstract class Auto extends LinearVisionOpMode {
                 case "up":
                     jewelUp(parameters);
                     break;
+                case "down":
+                    drive.jewelDown();
+                    break;
                 case "knockr":
                     knockRedJewel(parameters);
                     break;
