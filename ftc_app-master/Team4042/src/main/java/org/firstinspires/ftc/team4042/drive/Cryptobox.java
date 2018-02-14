@@ -15,7 +15,9 @@ import java.io.PrintWriter;
  */
 
 public class Cryptobox {
-    private enum GlyphColor { GREY, BROWN, NONE, EITHER }
+    private enum GlyphColor {
+        GREY, BROWN, NONE, EITHER;
+    }
 
     private GlyphColor[][] glyphs = new GlyphColor[3][4];
 
@@ -137,6 +139,8 @@ public class Cryptobox {
 
             //Set up which snake we want to target, then get the other color glyph next
             snakeTarget = newGlyph.equals(GlyphColor.GREY) ? Snake.ONE : Snake.TWO;
+            
+            //Should also return 1
             return newGlyph.equals(GlyphColor.GREY) ? GlyphColor.BROWN : GlyphColor.GREY;
 
         } else {
@@ -169,6 +173,8 @@ public class Cryptobox {
             int grey = greyBrowns[column][0];
             int brown = greyBrowns[column][1];
 
+            //Should also return the difference in how much we desire that color
+            int desirability = Math.abs(grey - brown);
             if (grey > brown) {
                 return GlyphColor.GREY;
             } else if (brown > grey) {
