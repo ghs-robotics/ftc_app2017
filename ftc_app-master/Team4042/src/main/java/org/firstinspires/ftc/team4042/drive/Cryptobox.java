@@ -15,7 +15,7 @@ import java.io.PrintWriter;
  */
 
 public class Cryptobox {
-    private enum GlyphColor { GREY, BROWN, NONE, EITHER }
+    public enum GlyphColor { GREY, BROWN, NONE, EITHER }
 
     private GlyphColor[][] glyphs = new GlyphColor[3][4];
 
@@ -186,8 +186,6 @@ public class Cryptobox {
         glyphPlacementSystem.uiTarget(3 - row, column); //We subtract from 3 because the glyph placer reads 0 -> 3 and this class reads 3 -> 0
         glyphPlacementSystem.drive.glyphLocate();
 
-        while (!glyphPlacementSystem.drive.uTrack()) { }
-
         numGlyphsPlaced++;
     }
 
@@ -314,7 +312,7 @@ public class Cryptobox {
         GlyphColor[] predictions = new GlyphColor[] {GlyphColor.NONE, GlyphColor.NONE, GlyphColor.NONE};
 
         //If there's no space for the new glyph or it doesn't match the target, then there are no future possibilities if we place here
-        if (empties[columnNum] == -1 || !snakeTarget.getGlyphMap()[columnNum][empties[columnNum]].equals(newGlyph)) {
+        if (!snakeTarget.getGlyphMap()[columnNum][empties[columnNum]].equals(newGlyph)) {
             return predictions;
         } else {
             //Assume the glyph gets placed
@@ -323,8 +321,11 @@ public class Cryptobox {
 
         for (int i = 0; i < empties.length; i++) {
             //Get the glyph possibility at the empty space and puts it in the array
-            GlyphColor prediction = snakeTarget.getGlyphMap()[columnNum][empties[i]];
-            predictions[i] = prediction;
+            //if it is 0, you cannot place above this position, and should not count it in predictions
+            if (empties[i] != 0) {
+                GlyphColor prediction = snakeTarget.getGlyphMap()[columnNum][empties[i]];
+                predictions[i] = prediction;
+            }
         }
 
         return predictions;
