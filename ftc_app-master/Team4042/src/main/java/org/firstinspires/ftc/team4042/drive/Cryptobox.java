@@ -81,6 +81,7 @@ public class Cryptobox {
             String line;
             for (int r = 0; r < 4 && (line = bufferedReader.readLine()) != null; r++) {
                 //Reads the lines from the file in order
+                //store each one onto array
                 if (line.length() > 0) {
                     String[] row = line.split(" ");
 
@@ -344,7 +345,7 @@ public class Cryptobox {
         GlyphColor[] column = glyphs[columnNum];
         //Look up the column from the lowest position to the highest to find the first empty space
         for (int i = 0; i < column.length; i++) {
-            if (!column[i].equals(GlyphColor.NONE)) {
+            if (column[i].equals(GlyphColor.NONE)) {
                 return i;
             }
         }
