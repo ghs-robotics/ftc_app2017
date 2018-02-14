@@ -106,6 +106,8 @@ public abstract class Drive {
     public GlyphPlacementSystem.Position targetY;
     public GlyphPlacementSystem.HorizPos targetX;
 
+    public Cryptobox cryptobox;
+
     public int[] deriv = new int[3];
     public int derivCycle = 0;
 
@@ -163,6 +165,8 @@ public abstract class Drive {
         this.log = telemetry.log();
 
         glyph = new GlyphPlacementSystem(hardwareMap, this);
+
+        cryptobox = new Cryptobox(telemetry);
 
         if (useGyro) {
             initializeGyro(telemetry, hardwareMap);
