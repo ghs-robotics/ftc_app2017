@@ -28,7 +28,6 @@ public class TeleOpMecanum extends OpMode {
     private boolean aBack = false;
     private double aBackTime = 0;
     private boolean bLeftStick = false;
-    private boolean bStart = false;
     private boolean lJoyBtn = false;
     private boolean rJoyBtn = false;
 
