@@ -14,7 +14,7 @@ public class TeleOpMecanum extends OpMode {
 
     private double adjustedSpeed;
 
-    private boolean placerModeInstant = true;
+    private boolean placerModeAuto = false;
     private boolean manual = false;
     private boolean onBalancingStone = false;
 
@@ -173,10 +173,10 @@ public class TeleOpMecanum extends OpMode {
             }
             bLeftStick = gamepad2.left_stick_button;
 
-            /*if (gamepad2.left_stick_button && !lJoyBtn) {
-                placerModeInstant = !placerModeInstant;
+            if (gamepad2.left_stick_button && !lJoyBtn) {
+                placerModeAuto = !placerModeAuto;
             }
-            lJoyBtn = gamepad2.left_stick_button;*/
+            lJoyBtn = gamepad2.left_stick_button;
 
             //The first time you hit back, it establishes how long you've been pushing it for
             if (gamepad1.back && !aBack) {
@@ -299,14 +299,6 @@ public class TeleOpMecanum extends OpMode {
 
     private void glyphPlacer() {
         //If you're at the bottom, haven't been pushing a, and now are pushing a
-        /*if (!placerModeInstant && drive.uTrackAtBottom && !bA && gamepad2.a) {
-            drive.uTrack();
-        }
-        //If you're not at the bottom and are pushing a
-        else if (!placerModeInstant && !drive.uTrackAtBottom && gamepad2.a) {
-            drive.uTrack();
-        }
-        bA = gamepad2.a;*/
 
         if (gamepad2.a && !bA) {
             drive.toggleHand();
@@ -360,12 +352,24 @@ public class TeleOpMecanum extends OpMode {
         }
         else if(!manual) {
             //Glyph locate
-            /*if (!placerModeInstant) {
-                glyphUI();
+            if (placerModeAuto) {
+                if (drive.uTrackAtBottom && !bB && gamepad2.b) {
+                    drive.uTrackAutoTarget(Cryptobox.GlyphColor.BROWN);
+                    drive.uTrack();
+                }
+                if (drive.uTrackAtBottom && !bX && gamepad2.x) {
+                    drive.uTrackAutoTarget(Cryptobox.GlyphColor.GREY);
+                    drive.uTrack();
+                }
+                //If you're not at the bottom and are pushing a
+                else if (!drive.uTrackAtBottom && (gamepad2.b || gamepad2.x)) {
+                    drive.uTrack();
+                }
+                bA = gamepad2.a;
+                bX = gamepad2.x;
             } else {
                 glyphTarget();
-            }*/
-            glyphTarget();
+            }
             if (!drive.stage.equals(GlyphPlacementSystem.Stage.RETURN2) && !drive.stage.equals(GlyphPlacementSystem.Stage.RESET)) {
                 drive.glyph.runToPosition();
             }
@@ -481,15 +485,15 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Manual", manual);
         telemetry.addData("Crawl", Drive.crawl);
         telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
-        telemetry.addData("Glyph pos", drive.verticalDriveCurrPos());
+        //telemetry.addData("Glyph pos", drive.verticalDriveCurrPos());
         //telemetry.addData("some pos", drive.motorLeftBack.getCurrentPosition());
-        telemetry.addData("glyph pow", drive.getVerticalDrive());
-        telemetry.addData("Speed factor", adjustedSpeed);
-        telemetry.addData("Tank", Drive.tank);
-        telemetry.addData("Placer Mode Instant", placerModeInstant);
-        telemetry.addData("start pitch", startPitch);
-        telemetry.addData("start roll", startRoll);
-        telemetry.addData("onBalancingStone", onBalancingStone);
+        //telemetry.addData("glyph pow", drive.getVerticalDrive());
+        //telemetry.addData("Speed factor", adjustedSpeed);
+        //telemetry.addData("Tank", Drive.tank);
+        telemetry.addData("Placer Mode Instant", placerModeAuto);
+        //telemetry.addData("start pitch", startPitch);
+        //telemetry.addData("start roll", startRoll);
+        //telemetry.addData("onBalancingStone", onBalancingStone);
         //drive.uTrackAtBottom && !bA && gamepad2.a
         //!drive.uTrackAtBottom && gamepad2.a
         if (drive.verbose) {

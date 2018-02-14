@@ -166,7 +166,7 @@ public abstract class Drive {
 
         glyph = new GlyphPlacementSystem(hardwareMap, this);
 
-        cryptobox = new Cryptobox(telemetry);
+        cryptobox = new Cryptobox(telemetry, glyph);
 
         if (useGyro) {
             initializeGyro(telemetry, hardwareMap);
@@ -501,6 +501,10 @@ public abstract class Drive {
      */
     private void pullBack() {
 
+    }
+
+    public Cryptobox.GlyphColor uTrackAutoTarget(Cryptobox.GlyphColor newGlyph) {
+        return cryptobox.placeGlyph(newGlyph);
     }
 
     public boolean uTrack() {
