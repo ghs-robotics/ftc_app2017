@@ -53,10 +53,6 @@ public class Cryptobox {
 
     private int numGlyphsPlaced;
 
-    public int getNumGlyphsPlaced() {
-        return numGlyphsPlaced;
-    }
-
     private Snake snakeTarget;
 
     public Cryptobox(Telemetry telemetry, GlyphPlacementSystem glyphPlacementSystem) {

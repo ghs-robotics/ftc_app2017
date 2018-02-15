@@ -503,7 +503,7 @@ public abstract class Drive {
 
     }
 
-    public Cryptobox.GlyphColor uTrackAutoTarget(Cryptobox.GlyphColor newGlyph) {
+    public int[] uTrackAutoTarget(Cryptobox.GlyphColor newGlyph) {
         return cryptobox.placeGlyph(newGlyph);
     }
 
