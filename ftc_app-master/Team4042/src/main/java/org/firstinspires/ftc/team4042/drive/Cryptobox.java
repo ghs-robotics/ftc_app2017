@@ -145,9 +145,9 @@ public class Cryptobox {
      * @param newGlyph The glyph currently held to place
      * @return The next color glyph to get
      */
-    public GlyphColor placeGlyph(GlyphColor newGlyph) {
+    public int[] placeGlyph(GlyphColor newGlyph) {
 
-        if (numGlyphsPlaced == 12) { return GlyphColor.NONE; }
+        if (numGlyphsPlaced == 12) { return new int[0]; }
 
         int column;
         int row;
@@ -160,7 +160,7 @@ public class Cryptobox {
             driveGlyphPlacer(newGlyph, 0, 1);
             
             //Should also return 1
-            return newGlyph.equals(GlyphColor.GREY) ? GlyphColor.BROWN : GlyphColor.GREY;
+            return newGlyph.equals(GlyphColor.GREY) ? new int[] { 1, 2 } : new int[] { 2, 1 };
 
         } else {
             GlyphColor[][] predictions = new GlyphColor[3][3];
@@ -188,34 +188,38 @@ public class Cryptobox {
 
             row = maximumHeight == 3 ? 3 : maximumHeight + 1;
 
-            driveGlyphPlacer(newGlyph, row, column);
+            if (driveGlyphPlacer(newGlyph, row, column)) {
 
-            int grey = greyBrowns[column][0];
-            int brown = greyBrowns[column][1];
+                int grey = greyBrowns[column][0];
+                int brown = greyBrowns[column][1];
 
-            //Should also return the difference in how much we desire that color
-            int desirability = Math.abs(grey - brown);
-            if (grey > brown) {
-                return GlyphColor.GREY;
-            } else if (brown > grey) {
-                return GlyphColor.BROWN;
-            } else {
-                return GlyphColor.EITHER;
+                //Should also return the difference in how much we desire that color
+                int desirability = Math.abs(grey - brown);
+                if (numGlyphsPlaced == 12) {
+                    return new int[0];
+                }
+
+                return new int[] {grey, brown};
+            } else { //The glyph doesn't match the cipher
+                return new int[0];
             }
         }
     }
 
-    private void driveGlyphPlacer(GlyphColor newGlyph, int row, int column) {
+    private boolean driveGlyphPlacer(GlyphColor newGlyph, int row, int column) {
         if (addGlyphToColumn(newGlyph, column)) {
             numGlyphsPlaced++;
-        }
 
-        if (glyphPlacementSystem != null) {
-            glyphPlacementSystem.uiTarget(3 - row, column); //We subtract from 3 because the glyph placer reads 0 -> 3 and this class reads 3 -> 0
-            glyphPlacementSystem.drive.glyphLocate();
-        }
+            if (glyphPlacementSystem != null) {
+                glyphPlacementSystem.uiTarget(3 - row, column); //We subtract from 3 because the glyph placer reads 0 -> 3 and this class reads 3 -> 0
+                glyphPlacementSystem.drive.glyphLocate();
+            }
 
-        writeFile();
+            writeFile();
+
+            return true;
+        }
+        return false;
     }
 
     private int getBestColumnIndex(int[][] greyBrowns) {
