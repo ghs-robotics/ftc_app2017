@@ -27,14 +27,23 @@ public class CryptoboxTest extends OpMode {
     
     @Override
     public void loop() {
-        if (!bA && gamepad2.a) {
-            cryptobox.placeGlyph(Cryptobox.GlyphColor.BROWN);
+        try {
+            if (!bA && gamepad2.a) {
+                cryptobox.placeGlyph(Cryptobox.GlyphColor.BROWN);
+            }
+            if (!bX && gamepad2.x) {
+                cryptobox.placeGlyph(Cryptobox.GlyphColor.GREY);
+            }
+            bA = gamepad2.a;
+            bX = gamepad2.x;
+
+            telemetry.addData("Cryptobox", cryptobox.toString());
+            telemetry.addData("Num Glyphs Placed", cryptobox.getNumGlyphsPlaced());
+            telemetry.update();
+        } catch (Exception ex) {
+            telemetry.addData("Exception", Drive.getStackTrace(ex));
+            telemetry.update();
         }
-        if (!bX && gamepad2.x) {
-            cryptobox.placeGlyph(Cryptobox.GlyphColor.GREY);
-        }
-        bA = gamepad2.a;
-        bX = gamepad2.x;
     }
 
     @Override
