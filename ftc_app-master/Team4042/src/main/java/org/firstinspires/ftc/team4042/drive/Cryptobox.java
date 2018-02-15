@@ -113,16 +113,31 @@ public class Cryptobox {
             FileWriter fileWriter = new FileWriter(file);
             PrintWriter print_stream = new PrintWriter(fileWriter);
             //write array to file for each row and col
-            for (int r = 0; r < 4; r++) {
-                String[] val = new String[3];
-                for (int c = 0; c < 3; c++) {
-                    val[c] = this.glyphs[r][0].equals(GlyphColor.BROWN) ? "B" : this.glyphs[r][0].equals(GlyphColor.BROWN) ? "G" : "N";
-                }
-                print_stream.println(val[0] + " " + val[1] + " " + val[2]);
-            }
+            print_stream.print(this.toString());
         } catch (Exception e) {
             telemetry.addData("Err load file:", e);
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder toString = new StringBuilder("\n");
+        for (int r = 0; r < 4; r++) {
+            for (int c = 0; c < 3; c++) {
+                String val = this.glyphs[c][r].equals(GlyphColor.BROWN) ? "B" : this.glyphs[c][r].equals(GlyphColor.GREY) ? "G" : "N";
+                toString.append(val);
+            }
+            toString.append("\n");
+        }
+        return toString.toString();
+    }
+
+    public int getNumGlyphsPlaced() {
+        return numGlyphsPlaced;
+    }
+
+    public Snake getSnakeTarget() {
+        return snakeTarget;
     }
 
     /**
@@ -138,11 +153,11 @@ public class Cryptobox {
         int row;
 
         if (numGlyphsPlaced == 0) {
-            //Always place the first glyph in the center column
-            driveGlyphPlacer(newGlyph, 0, 1);
-
             //Set up which snake we want to target, then get the other color glyph next
             snakeTarget = newGlyph.equals(GlyphColor.GREY) ? Snake.ONE : Snake.TWO;
+
+            //Always place the first glyph in the center column
+            driveGlyphPlacer(newGlyph, 0, 1);
             
             //Should also return 1
             return newGlyph.equals(GlyphColor.GREY) ? GlyphColor.BROWN : GlyphColor.GREY;
@@ -152,6 +167,7 @@ public class Cryptobox {
             for (int i = 0; i < glyphs.length; i++) {
                 //Contains the predictions for if we put the glyph in that column
                 GlyphColor[] prediction = getPrediction(newGlyph, i);
+                telemetry.log().add("Prediction " + i + ": " + prediction[0] + " " + prediction[1] + " " + prediction[2]);
                 predictions[i] = prediction;
             }
 
@@ -190,14 +206,15 @@ public class Cryptobox {
     }
 
     private void driveGlyphPlacer(GlyphColor newGlyph, int row, int column) {
-        addGlyphToColumn(newGlyph, column);
+        if (addGlyphToColumn(newGlyph, column)) {
+            numGlyphsPlaced++;
+        }
 
         if (glyphPlacementSystem != null) {
             glyphPlacementSystem.uiTarget(3 - row, column); //We subtract from 3 because the glyph placer reads 0 -> 3 and this class reads 3 -> 0
             glyphPlacementSystem.drive.glyphLocate();
         }
 
-        numGlyphsPlaced++;
         writeFile();
     }
 
@@ -206,61 +223,74 @@ public class Cryptobox {
 
         for (int i = 0; i < greyBrowns.length; i++) {
             sums[i] = greyBrowns[i][0] + greyBrowns[i][1];
-
-            //Determine which prediction is the most desirable based on which one
-            // has the highest sum with a tiebreaker of the variance
-            ArrayList<Integer> maximums = getIndicesOfExtreme(sums, true);
-            if (maximums.size() == 1) {
-                return maximums.get(0);
-            } else {
-                int[] variances = new int[3];
-                //Get the variances of the differences between the two number of greys and browns
-                for (int j = 0; j < greyBrowns.length; j++) {
+            telemetry.log().add("Sum " + i + ": " + sums[i]);
+        }
+        //Determine which prediction is the most desirable based on which one
+        // has the highest sum with a tiebreaker of the variance
+        ArrayList<Integer> maximums = getIndicesOfExtreme(sums, true);
+        if (maximums.size() == 1) {
+            return maximums.get(0);
+        } else {
+            int[] variances = new int[3];
+            //Get the variances of the differences between the two number of greys and browns
+            for (int j = 0; j < greyBrowns.length; j++) {
+                if (maximums.contains(j)) {
                     variances[j] = Math.abs(greyBrowns[j][0] - greyBrowns[j][1]);
+                    telemetry.log().add("Variance " + j + ": " + variances[j]);
+                } else {
+                    variances[j] = Integer.MAX_VALUE;
+                }
+            }
+
+            //Get the one(s) with the smallest variance
+            ArrayList<Integer> minimums = getIndicesOfExtreme(variances, false);
+
+            //The one with the least variance is returned
+            if (minimums.size() == 1) {
+                return minimums.get(0);
+            } else {
+                telemetry.log().add("success");
+                //Get the heights of the columns
+                int[] height = new int[3];
+                for (int k = 0; k < height.length; k++) {
+                    if (minimums.contains(k)) {
+                        height[k] = getFirstEmpty(k);
+                        telemetry.log().add("Height of column " + k + ": " + height[k]);
+                    } else {
+                        height[k] = Integer.MAX_VALUE;
+                    }
                 }
 
-                //Get the one(s) with the smallest variance
-                ArrayList<Integer> minimums = getIndicesOfExtreme(variances, false);
-
-                //The one with the least variance is returned
-                if (minimums.size() == 1) {
-                    return minimums.get(0);
+                //The one with the fewest glyphs is returned
+                ArrayList<Integer> minimumHeights = getIndicesOfExtreme(height, false);
+                if (minimumHeights.size() == 1) {
+                    return minimumHeights.get(0);
                 } else {
-                    //Get the heights of the columns
-                    int[] height = new int[minimums.size()];
-                    for (int k = 0; k < minimums.size(); k++) {
-                        height[k] = getFirstEmpty(k);
-                    }
-
-                    //The one with the fewest glyphs is returned
-                    ArrayList<Integer> minimumHeights = getIndicesOfExtreme(height, false);
-                    if (minimumHeights.size() == 1) {
-                        return minimumHeights.get(0);
+                    //If we get here, there's only the center tied with an outside one,
+                    // so we prefer the other answer over the center
+                    if (minimumHeights.get(0) == 1) {
+                        return minimumHeights.get(1);
                     } else {
-                        //If we get here, there's only the center tied with an outside one,
-                        // so we prefer the other answer over the center
-                        if (minimumHeights.get(0) == 1) {
-                            return minimumHeights.get(1);
-                        } else {
-                            return minimumHeights.get(0);
-                        }
+                        return minimumHeights.get(0);
                     }
                 }
             }
         }
-        return -1;
     }
 
     private ArrayList<Integer> getIndicesOfExtreme(int[] array, boolean maximum) {
         ArrayList<Integer> extremes = new ArrayList<>();
 
         int extreme = maximum ? Integer.MIN_VALUE : Integer.MAX_VALUE;
-        //Find largest value
+        //Find extreme value
         for (int num : array) {
             if ((num > extreme && maximum) || (num < extreme && !maximum)) {
-                extreme = num;
+                if (!(!maximum && num == -1)) { //Don't count -1's in minimum calculations
+                    extreme = num;
+                }
             }
         }
+        telemetry.log().add("Extreme : " + extreme);
         //Find all that are at largest value
         for (int i = 0; i < array.length; i++) {
             if (extreme == array[i]) {
@@ -297,8 +327,8 @@ public class Cryptobox {
 
         int emptySpace = getFirstEmpty(columnNum);
         if (emptySpace != -1) {
-            if (snakeTarget.getGlyphMap()[columnNum][emptySpace].equals(glyphs[columnNum][emptySpace])) {
-                //If it matches the target, [lace that glyph there
+            if (snakeTarget.getGlyphMap()[columnNum][emptySpace].equals(newGlyph)) {
+                //If it matches the target, place that glyph there
                 glyphs[columnNum][emptySpace] = newGlyph;
                 return true;
             } else {
@@ -324,7 +354,7 @@ public class Cryptobox {
         GlyphColor[] predictions = new GlyphColor[] {GlyphColor.NONE, GlyphColor.NONE, GlyphColor.NONE};
 
         //If there's no space for the new glyph or it doesn't match the target, then there are no future possibilities if we place here
-        if (!snakeTarget.getGlyphMap()[columnNum][empties[columnNum]].equals(newGlyph)) {
+        if (empties[columnNum] == -1 || !snakeTarget.getGlyphMap()[columnNum][empties[columnNum]].equals(newGlyph)) {
             return predictions;
         } else {
             //Assume the glyph gets placed
@@ -334,8 +364,8 @@ public class Cryptobox {
         for (int i = 0; i < empties.length; i++) {
             //Get the glyph possibility at the empty space and puts it in the array
             //if it is 0, you cannot place above this position, and should not count it in predictions
-            if (empties[i] != 0) {
-                GlyphColor prediction = snakeTarget.getGlyphMap()[columnNum][empties[i]];
+            if (!(empties[i] == 0 && i == columnNum) && empties[i] != -1 && empties[i] != 4) {
+                GlyphColor prediction = snakeTarget.getGlyphMap()[i][empties[i]];
                 predictions[i] = prediction;
             }
         }
