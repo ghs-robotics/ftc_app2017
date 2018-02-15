@@ -352,7 +352,7 @@ public class TeleOpMecanum extends OpMode {
         else if(!manual) {
             //Glyph locate
             if (placerModeAuto) {
-                if (drive.uTrackAtBottom && !bB && gamepad2.b) {
+                if (drive.uTrackAtBottom && !bA && gamepad2.a) {
                     drive.uTrackAutoTarget(Cryptobox.GlyphColor.BROWN);
                     drive.uTrack();
                 }
@@ -361,7 +361,7 @@ public class TeleOpMecanum extends OpMode {
                     drive.uTrack();
                 }
                 //If you're not at the bottom and are pushing a
-                else if (!drive.uTrackAtBottom && (gamepad2.b || gamepad2.x)) {
+                else if (!drive.uTrackAtBottom && (gamepad2.a || gamepad2.x)) {
                     drive.uTrack();
                 }
                 bA = gamepad2.a;

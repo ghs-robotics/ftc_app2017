@@ -56,13 +56,17 @@ public class Cryptobox {
     private Snake snakeTarget;
 
     public Cryptobox(Telemetry telemetry, GlyphPlacementSystem glyphPlacementSystem) {
+        this (telemetry);
+        this.glyphPlacementSystem = glyphPlacementSystem;
+    }
+
+    public Cryptobox(Telemetry telemetry) {
         for (int i = 0; i < glyphs.length; i++) {
             for (int j = 0; j < glyphs[0].length; j++) {
                 glyphs[i][j] = GlyphColor.NONE;
             }
         }
 
-        this.glyphPlacementSystem = glyphPlacementSystem;
         this.telemetry = telemetry;
         this.file = new File("./storage/emulated/0/bluetooth/cryptobox.txt");
         this.numGlyphsPlaced = 0;
@@ -188,10 +192,13 @@ public class Cryptobox {
     private void driveGlyphPlacer(GlyphColor newGlyph, int row, int column) {
         addGlyphToColumn(newGlyph, column);
 
-        glyphPlacementSystem.uiTarget(3 - row, column); //We subtract from 3 because the glyph placer reads 0 -> 3 and this class reads 3 -> 0
-        glyphPlacementSystem.drive.glyphLocate();
+        if (glyphPlacementSystem != null) {
+            glyphPlacementSystem.uiTarget(3 - row, column); //We subtract from 3 because the glyph placer reads 0 -> 3 and this class reads 3 -> 0
+            glyphPlacementSystem.drive.glyphLocate();
+        }
 
         numGlyphsPlaced++;
+        writeFile();
     }
 
     private int getBestColumnIndex(int[][] greyBrowns) {
