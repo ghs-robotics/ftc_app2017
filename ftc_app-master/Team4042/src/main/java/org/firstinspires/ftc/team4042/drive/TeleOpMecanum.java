@@ -352,13 +352,18 @@ public class TeleOpMecanum extends OpMode {
         else if(!manual) {
             //Glyph locate
             if (placerModeAuto) {
+                int numPlaces = drive.cryptobox.getNumGlyphsPlaced();
                 if (drive.uTrackAtBottom && !bA && gamepad2.a) {
-                    drive.uTrackAutoTarget(Cryptobox.GlyphColor.BROWN);
-                    drive.uTrack();
+                    int[] predicts = drive.uTrackAutoTarget(Cryptobox.GlyphColor.BROWN);
+                    if(!(((predicts[0] + predicts[1]) == 0) && !(numPlaces == 11))) {
+                        drive.uTrack();
+                    }
                 }
                 if (drive.uTrackAtBottom && !bX && gamepad2.x) {
-                    drive.uTrackAutoTarget(Cryptobox.GlyphColor.GREY);
-                    drive.uTrack();
+                    int[] predicts = drive.uTrackAutoTarget(Cryptobox.GlyphColor.GREY);
+                    if(!(((predicts[0] + predicts[1]) == 0) && !(numPlaces == 11))) {
+                        drive.uTrack();
+                    }
                 }
                 //If you're not at the bottom and are pushing a
                 else if (!drive.uTrackAtBottom && (gamepad2.a || gamepad2.x)) {
