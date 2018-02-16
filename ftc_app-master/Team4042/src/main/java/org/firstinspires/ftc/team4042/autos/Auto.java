@@ -747,14 +747,20 @@ public abstract class Auto extends LinearVisionOpMode {
                 drive.updateRates(offset);
                 double r = getSensorR(targetGyro);
 
-                drive.driveXYR(1, 0, 0, r * 3/2, false);
+                boolean limit = false;
+
+                if (limit) {
+                    drive.driveXYR(1, 0, .75, r * 3 / 2, false);
+                } else {
+                    drive.driveXYR(1, 0, 0, r * 3 / 2, false);
+                }
 
                 if (bangBangTimer.seconds() > C.get().getDouble("BangTimer")) {
                     //Get the distances and derivative terms
                     xIr.addReading(remove);
 
                     xCurrDistance = xIr.getCmAvg(100, offset);
-]
+
                     double xPower = (xCurrDistance - xTargetDistance) / Math.abs(xCurrDistance - xTargetDistance) * -speed;
 
                     log.add("xPower: " + xPower);
