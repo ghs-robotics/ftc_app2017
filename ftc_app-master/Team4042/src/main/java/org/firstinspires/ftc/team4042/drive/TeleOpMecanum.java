@@ -215,6 +215,17 @@ public class TeleOpMecanum extends OpMode {
         } catch (Exception ex) {
             telemetry.addData("Exception", Drive.getStackTrace(ex));
         }
+
+        //will make sure that the cube is not jammed diagonally in the intake. Will not work until bumpswitches are installed also will only work if hazel is not dumb and we actually need it
+        /*if(gamepad1.a) {
+            if(leftBumpswitch == 1) {
+                drive.internalIntakeRight(1);
+                drive.internalIntakeLeft(-1);
+            } else if(rightBumpSwitch == 1) {
+                drive.internalIntakeRight(-1);
+                drive.internalIntakeLeft(1);
+            }
+        }*/
     }
 
     @Override
