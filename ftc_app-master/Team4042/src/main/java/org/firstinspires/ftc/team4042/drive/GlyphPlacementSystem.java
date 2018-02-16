@@ -27,6 +27,7 @@ public class GlyphPlacementSystem {
 
     public ElapsedTime horizontalTimer = new ElapsedTime();
 
+    //indicates the position of the lift in motor encoders
     public enum Position {
         //HOME(0), RAISED(1200), TOP(1600), MID(2000), BOT(2500), TRANSITION(-1);
         HOME(0), RAISEDBACK(1325), RAISED(1375), TOP(1525), MID(1875), BOT(2050), TRANSITION(-1);
@@ -39,6 +40,7 @@ public class GlyphPlacementSystem {
         public String toString() { return this.name() + this.getEncoderVal(); }
     }
 
+    //indicates the action of placing the robot is currently performing
     public enum Stage {
         HOME, PAUSE1, PAUSE2, PLACE1, PLACE2, RETURN1, RETURN2, GRAB, RELEASE, RESET
     }
@@ -56,9 +58,11 @@ public class GlyphPlacementSystem {
     public GlyphPlacementSystem(HardwareMap map, Drive drive) {
         currentY = Position.HOME;
         this.drive = drive;
+        //blank for UI output
         this.baseOutput = "[ _ _ _ ]\n[ _ _ _ ]\n[ _ _ _ ]";
 }
 
+    //converts the currently targeted position for the glyph placer into a string for UI output
     public String getTargetPositionAsString()
     {
         char[] output = baseOutput.toCharArray();
@@ -87,6 +91,7 @@ public class GlyphPlacementSystem {
         return "\n" + new String(output);
     }
 
+    //sets the horizontal position for placing glyphs in auto
     public void setTarget(RelicRecoveryVuMark x, int y) {
         drive.targetY = GlyphPlacementSystem.Position.TOP;
         switch (x) {
@@ -111,11 +116,13 @@ public class GlyphPlacementSystem {
         //uiTargetY = y;
     }
 
+    //sets the UI to display a desired target location
     public void uiTarget(int uiTargetX, int uiTargetY) {
         this.uiTargetX = uiTargetX;
         this.uiTargetY = uiTargetY;
     }
 
+    //indexes the UI target location up one unit
     public int uiUp() {
         if (uiTargetY != 0) {
             uiTargetY -= 1;
@@ -123,6 +130,7 @@ public class GlyphPlacementSystem {
         return uiTargetY;
     }
 
+    //indexes the UI target location down one unit
     public int uiDown() {
         if (uiTargetY != 2) {
             uiTargetY += 1;
@@ -130,6 +138,7 @@ public class GlyphPlacementSystem {
         return uiTargetY;
     }
 
+    //indexes the UI target location left one unit
     public int uiLeft() {
         if (uiTargetX != 0) {
             uiTargetX -= 1;
@@ -137,6 +146,7 @@ public class GlyphPlacementSystem {
         return uiTargetX;
     }
 
+    //indexes the UI target location right one unit
     public int uiRight() {
         if (uiTargetX != 2) {
             uiTargetX += 1;
@@ -144,14 +154,17 @@ public class GlyphPlacementSystem {
         return uiTargetX;
     }
 
+    //sets the encoder target of the drive motor to the specified position
     public void setTargetPosition(Position position) {
         drive.setVerticalDrivePos(position.getEncoderVal());
     }
 
+    //sets the encoder target of the drive motor to the fully returned encoder position
     public void setHomeTarget() {
         drive.setVerticalDrivePos(Position.HOME.getEncoderVal());
     }
 
+    //runs the horizontal drive servo based on the power multipliers in HorizPos
     public void setXPower(HorizPos targetPos) {
         //if target = left(-1) and current = right(1)
         //we want to move left (-1)
@@ -167,6 +180,7 @@ public class GlyphPlacementSystem {
         }
     }
 
+    //handles typewriter motion
     public void adjustBack(double mulch) {
         drive.setHorizontalDrive(mulch * drive.getHorizontalDrive() * -.4);
         ElapsedTime timer = new ElapsedTime();
