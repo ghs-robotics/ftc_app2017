@@ -23,14 +23,14 @@ public class GlyphPlacementSystem {
     public Position currentY;
     public HorizPos currentX;
     private String baseOutput;
-    private Drive drive;
+    public Drive drive;
 
     public ElapsedTime horizontalTimer = new ElapsedTime();
 
     //indicates the position of the lift in motor encoders
     public enum Position {
         //HOME(0), RAISED(1200), TOP(1600), MID(2000), BOT(2500), TRANSITION(-1);
-        HOME(0), RAISEDBACK(1325), RAISED(1375), TOP(1525), MID(1875), BOT(2050), TRANSITION(-1);
+        HOME(0), RAISEDBACK(1325), RAISED(1375), TOP(1550), MID(1875), BOT(2050), TRANSITION(-1);
         //HOME(10), RAISEDBACK(1350), RAISED(1401), TOP(1600), MID(1900), BOT(2200), TRANSITION(-1);
 
         private final Integer encoderVal;
@@ -93,27 +93,27 @@ public class GlyphPlacementSystem {
 
     //sets the horizontal position for placing glyphs in auto
     public void setTarget(RelicRecoveryVuMark x, int y) {
-        drive.targetY = GlyphPlacementSystem.Position.TOP;
+        //drive.targetY = y;
         switch (x) {
-            case LEFT:
-                //uiTargetX = 0;
-                drive.targetX = HorizPos.LEFT;
+            case RIGHT:
+                uiTargetX = 0;
+                //drive.targetX = HorizPos.LEFT;
                 break;
             case CENTER:
-                //uiTargetX = 1;
-                drive.targetX = HorizPos.CENTER;
+                uiTargetX = 1;
+                //targetX = HorizPos.CENTER;
                 break;
-            case RIGHT:
-                //uiTargetX = 2;
-                drive.targetX = HorizPos.RIGHT;
+            case LEFT:
+                uiTargetX = 2;
+                //drive.targetX = HorizPos.RIGHT;
                 break;
             default:
                 //when in doubt, place in the middle
-                //uiTargetX = 1;
-                drive.targetX = HorizPos.CENTER;
+                uiTargetX = 1;
+                //drive.targetX = HorizPos.CENTER;
                 break;
         }
-        //uiTargetY = y;
+        uiTargetY = y;
     }
 
     //sets the UI to display a desired target location
@@ -197,7 +197,7 @@ public class GlyphPlacementSystem {
                 //If you're going to the center and you hit the limit switch, stop
                 (!drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER) && drive.getCenterState()) ||
                 (drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER))) {
-            if (drive.getHorizontalDrive() > 0) {
+            if (drive.getHorizontalDrive() > 0 && drive.targetX.equals(HorizPos.CENTER)) {
                 adjustBack(1);
             }
             drive.setHorizontalDrive(0);

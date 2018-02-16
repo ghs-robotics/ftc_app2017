@@ -6,7 +6,7 @@
     android:versionName="1.0">
 
     <application
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/new_launcher"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
         tools:replace="android:theme">
