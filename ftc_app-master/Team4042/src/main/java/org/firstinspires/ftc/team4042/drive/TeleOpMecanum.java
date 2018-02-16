@@ -14,7 +14,7 @@ public class TeleOpMecanum extends OpMode {
 
     private double adjustedSpeed;
 
-    private boolean placerModeAuto = false;
+    private boolean aiPlacer = false;
     private boolean manual = false;
     private boolean onBalancingStone = false;
 
@@ -173,7 +173,7 @@ public class TeleOpMecanum extends OpMode {
             bLeftStick = gamepad2.left_stick_button;
 
             if (gamepad2.left_stick_button && !lJoyBtn) {
-                placerModeAuto = !placerModeAuto;
+                aiPlacer = !aiPlacer;
             }
             lJoyBtn = gamepad2.left_stick_button;
 
@@ -362,25 +362,28 @@ public class TeleOpMecanum extends OpMode {
         }
         else if(!manual) {
             //Glyph locate
-            if (placerModeAuto) {
+            if (aiPlacer) {
                 int numPlaces = drive.cryptobox.getNumGlyphsPlaced();
-                if (drive.uTrackAtBottom && !bA && gamepad2.a) {
+                if (drive.uTrackAtBottom && !bY && gamepad2.y) {
                     int[] predicts = drive.uTrackAutoTarget(Cryptobox.GlyphColor.BROWN);
                     if(!(((predicts[0] + predicts[1]) == 0) && !(numPlaces == 11))) {
+                        telemetry.log().add("brown placed");
                         drive.uTrack();
                     }
                 }
-                if (drive.uTrackAtBottom && !bX && gamepad2.x) {
+                else if (drive.uTrackAtBottom && !bX && gamepad2.x) {
                     int[] predicts = drive.uTrackAutoTarget(Cryptobox.GlyphColor.GREY);
                     if(!(((predicts[0] + predicts[1]) == 0) && !(numPlaces == 11))) {
+                        telemetry.log().add("grey placed");
                         drive.uTrack();
                     }
                 }
                 //If you're not at the bottom and are pushing a
-                else if (!drive.uTrackAtBottom && (gamepad2.a || gamepad2.x)) {
+                else if (!drive.uTrackAtBottom && (gamepad2.y || gamepad2.x)) {
+                    telemetry.log().add("running");
                     drive.uTrack();
                 }
-                bA = gamepad2.a;
+                bY = gamepad2.y;
                 bX = gamepad2.x;
             } else {
                 glyphTarget();
@@ -505,7 +508,8 @@ public class TeleOpMecanum extends OpMode {
         //telemetry.addData("glyph pow", drive.getVerticalDrive());
         //telemetry.addData("Speed factor", adjustedSpeed);
         //telemetry.addData("Tank", Drive.tank);
-        telemetry.addData("Placer Mode Instant", placerModeAuto);
+        telemetry.addData("Placer AI", aiPlacer);
+        telemetry.addData("Cryptobox", drive.cryptobox.toString());
         //telemetry.addData("start pitch", startPitch);
         //telemetry.addData("start roll", startRoll);
         //telemetry.addData("onBalancingStone", onBalancingStone);
