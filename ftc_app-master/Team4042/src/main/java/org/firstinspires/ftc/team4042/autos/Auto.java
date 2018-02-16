@@ -747,13 +747,9 @@ public abstract class Auto extends LinearVisionOpMode {
                 drive.updateRates(offset);
                 double r = getSensorR(targetGyro);
 
-                boolean limit = false;
+                double wallAdjust = false ? 0 : .75;
 
-                if (limit) {
-                    drive.driveXYR(1, 0, .75, r * 3 / 2, false);
-                } else {
-                    drive.driveXYR(1, 0, 0, r * 3 / 2, false);
-                }
+                drive.driveXYR(1, 0, wallAdjust, r * 3 / 2, false);
 
                 if (bangBangTimer.seconds() > C.get().getDouble("BangTimer")) {
                     //Get the distances and derivative terms
@@ -770,7 +766,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
                     boolean done = false;
                     while (opModeIsActive() && !done) {
-                        Direction dir = new Direction(xPower, 0);
+                        Direction dir = new Direction(xPower, wallAdjust);
 
                         double targetTicks = Math.abs(xCurrDistance - xTargetDistance) > 6 ? 300 : Math.abs(xCurrDistance - xTargetDistance) * prop;
                         log.add(xCurrDistance + "");
