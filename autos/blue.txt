@@ -1,24 +1,20 @@
 f:getmark
 f:knockr
+f:wait sec:.5
 #Get in front of cryptobox
 f:doff x:0 y:-1 speed:1 target:2000 gyro:0
+f:brace
 f:open
 f:drive x:0 y:-1 speed:1 target:600 gyro:0
 f:rot r:-80 speed:1
-f:sdrive speed:-1 xdistance:175 xir:0 xtype:sonar gyro:-90 offset:127
+f:sdrive speed:-1 xdistance:183 xir:0 xtype:sonar gyro:-90 offset:127 prop:40
 #Drive into cryptobox
-f:drive x:0 y:1 speed:1 target:1800
+f:drive x:0 y:1 speed:1 target:3000 time:3.75
 #Back off
-f:drive x:0 y:-1 speed:1 target:600
+f:drive x:0 y:-1 speed:.8 target:400
 #Ram, back off, and place
-f:brace
-f:wait sec:1
 f:rot r:-100 speed:1
-f:drive x:-1 y:.75 speed:.5 target:700 time:2
-f:drive x:0 y:1 speed:1 target:300 time:1
+f:drive x:-1 y:.8 speed:.5 target:1000 time:2
+f:drive x:0 y:1 speed:1 target:500 time:1
 f:place
-f:drive x:0 y:-1 speed:1 target:100
-
-#f:sdrive ydistance:35 yir:0 ytype:short gyro:-90
-#f:sdrive xdistance:33 xir:1 xtype:short ydistance:35 yir:0 ytype:short gyro:-90
-#f:place
+#f:drive x:0 y:-1 speed:1 target:1000

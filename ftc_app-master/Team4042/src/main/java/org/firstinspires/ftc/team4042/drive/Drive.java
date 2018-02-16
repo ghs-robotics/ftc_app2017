@@ -1,11 +1,15 @@
 package org.firstinspires.ftc.team4042.drive;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -102,6 +106,8 @@ public abstract class Drive {
     public GlyphPlacementSystem.Position targetY;
     public GlyphPlacementSystem.HorizPos targetX;
 
+    public Cryptobox cryptobox;
+
     public int[] deriv = new int[3];
     public int derivCycle = 0;
 
@@ -113,6 +119,8 @@ public abstract class Drive {
     public AnalogSensor[] shortIr = new AnalogSensor[3];
     public AnalogSensor[] longIr = new AnalogSensor[2];
     public AnalogSensor[] sonar = new AnalogSensor[2];
+
+    public NormalizedColorSensor colorSensor;
 
     public boolean verbose;
 
@@ -158,6 +166,8 @@ public abstract class Drive {
 
         glyph = new GlyphPlacementSystem(hardwareMap, this);
 
+        cryptobox = new Cryptobox(telemetry, glyph);
+
         if (useGyro) {
             initializeGyro(telemetry, hardwareMap);
         }
@@ -176,6 +186,11 @@ public abstract class Drive {
             for (AnalogSensor aSonar: sonar) {
                 aSonar.initialize(hardwareMap);
             }
+            try {
+                colorSensor = hardwareMap.get(NormalizedColorSensor.class, "color sensor");
+            }catch (IllegalArgumentException ex){
+                colorSensor = null;
+            }
         }
 
         winch = hardwareMap.servo.get("winch");
@@ -185,9 +200,6 @@ public abstract class Drive {
         motorRightBack = initializeMotor(hardwareMap, "back right");
 
         jewelServo = initializeServo(hardwareMap, "jewel");
-        try {
-            jewelIn();
-        } catch (NullPointerException ex) { }
 
         grabbyBoi = initializeServo(hardwareMap, "hand");
 
@@ -247,6 +259,43 @@ public abstract class Drive {
         }
     }
 
+    public float[] getRGB(){
+        NormalizedRGBA color = colorSensor.getNormalizedColors();
+        float[] val = {color.red, color.green, color.blue, color.alpha};
+        return val;
+    }
+
+    public float[] getHSV() {
+        NormalizedRGBA color = colorSensor.getNormalizedColors();
+        float[] hsvValues = new float[3];
+        Color.colorToHSV(color.toColor(), hsvValues);
+        return hsvValues;
+    }
+
+    public void toggleExtendo() {
+        //It's extendo, so put it back together
+        ElapsedTime timer = new ElapsedTime();
+        if (Drive.isExtendo) {
+            timer.reset();
+
+            raiseBrakes();
+            lockCatches();
+            freezeBack();
+
+            Drive.isExtendo = false;
+        }
+        //Not extendo, so take it apart
+        else {
+            timer.reset();
+
+            lowerBrakes();
+            unlockCatches();
+            runBackWithEncoders();
+
+            Drive.isExtendo = true;
+        }
+    }
+
     private DcMotor initializeMotor(HardwareMap hardwareMap, String motorName) {
         DcMotor motor = null;
         try {
@@ -295,9 +344,11 @@ public abstract class Drive {
     private double lastGyro = 0;
     public double gyroRate = 0;
 
-    private double[] lastShortIr = new double[3];
-    private double[] lastLongIr = new double[2];
-    private double[] lastSonar = new double[2];
+    private final static int READINGS = 3;
+
+    private double[][] lastShortIr = new double[READINGS][3];
+    private double[][] lastLongIr = new double[READINGS][2];
+    private double[][] lastSonar = new double[READINGS][2];
 
     public double[] shortIrRates = new double[3];
     public double[] longIrRates = new double[2];
@@ -305,7 +356,13 @@ public abstract class Drive {
 
     private double lastUTrack = 0;
     public double uTrackRate = 0;
+
+    private int index = 0;
+
     public void updateRates() {
+        updateRates(0);
+    }
+    public void updateRates(double offset) {
         //System time
         double currMilli = System.currentTimeMillis();
 
@@ -327,24 +384,24 @@ public abstract class Drive {
         for (int i = 0; i < currShortIr.length; i++) {
             AnalogSensor sIr = shortIr[i];
             sIr.addReading();
-            currShortIr[i] = sIr.getCmAvg();
-            shortIrRates[i] = (currShortIr[i] - lastShortIr[i]) / (currMilli - lastMilli);
+            currShortIr[i] = sIr.getCmAvg(100, offset);
+            shortIrRates[i] = (currShortIr[i] - lastShortIr[index][i]) / (currMilli - lastMilli);
         }
 
         double[] currLongIr = new double[2];
         for (int i = 0; i < currLongIr.length; i++) {
             AnalogSensor lIr = longIr[i];
             lIr.addReading();
-            currLongIr[i] = lIr.getCmAvg();
-            longIrRates[i] = (currLongIr[i] - lastLongIr[i]) / (currMilli - lastMilli);
+            currLongIr[i] = lIr.getCmAvg(100, offset);
+            longIrRates[i] = (currLongIr[i] - lastLongIr[index][i]) / (currMilli - lastMilli);
         }
 
         double[] currSonar = new double[2];
         for (int i = 0; i < currSonar.length; i++) {
             AnalogSensor sIr = sonar[i];
             sIr.addReading();
-            currSonar[i] = sIr.getCmAvg();
-            sonarRates[i] = (currSonar[i] - lastSonar[i]) / (currMilli - lastMilli);
+            currSonar[i] = sIr.getCmAvg(100, offset);
+            sonarRates[i] = (currSonar[i] - lastSonar[index][i]) / (currMilli - lastMilli);
         }
 
         //Gyro rates
@@ -352,9 +409,12 @@ public abstract class Drive {
 
         //Update last to current
         lastGyro = currGyro;
-        lastShortIr = currShortIr;
-        lastLongIr = currLongIr;
-        lastSonar = currSonar;
+
+        index = ++index % READINGS;
+
+        lastShortIr[index] = currShortIr;
+        lastLongIr[index] = currLongIr;
+        lastSonar[index] = currSonar;
 
         lastMilli = currMilli;
     }
@@ -400,6 +460,7 @@ public abstract class Drive {
             //Step 1: intakes in until a glyph is found
             intakeLeft(1);
             intakeRight(1);
+            dance();
             glyphCollectionTimer.reset();
             return false;
         } else if (!isGlyphBack && glyphCollectionTimer.seconds() < C.get().getDouble("time")/2){
@@ -416,13 +477,34 @@ public abstract class Drive {
             //Step 4: If the glyph still isn't in, reset the glyphCollectionTimer to loop us back through to step 2
             glyphCollectionTimer.reset();
             return false;
+            /** Should be made to run the robot backwards for a short period of time and reconnect, then break and return true */
         } else if (isGlyphBack) {
             //Step 5: But if the glyph is in, then stop the intakes and wait
             intakeLeft(0);
             intakeRight(0);
+
+            pullBack();
             return true;
         }
         return false;
+    }
+
+    /**
+     * Needs to be written: should make the robot move forwards and backwards randomly
+     */
+    private void dance() {
+
+    }
+
+    /**
+     * Needs to be written: should run the front motors back aggressively
+     */
+    private void pullBack() {
+
+    }
+
+    public int[] uTrackAutoTarget(Cryptobox.GlyphColor newGlyph) {
+        return cryptobox.placeGlyph(newGlyph);
     }
 
     public boolean uTrack() {
@@ -443,9 +525,9 @@ public abstract class Drive {
         }
         return false;
     }
-
     private void home() {
         //Close the hand
+        //Jaden closed his hand
         closeHand();
         jewelOut();
         glyphLocate();
@@ -457,13 +539,11 @@ public abstract class Drive {
         stage = GlyphPlacementSystem.Stage.GRAB;
         uTrackAtBottom = false;
     }
-
     private void grab() {
-        if (handDropTimer.seconds() >= 1) {
+        if (handDropTimer.seconds() >= .5) {
             stage = GlyphPlacementSystem.Stage.PLACE1;
         }
     }
-
     private void place1() {
         //Raise the u-track
         setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -473,14 +553,12 @@ public abstract class Drive {
             glyph.setXPower(targetX);
         }
     }
-
     private void pause1() {
         //Move to target X location
         if(glyph.xTargetReached(targetX)) {
             stage = GlyphPlacementSystem.Stage.PLACE2;
         }
     }
-
     private void place2() {
         //Move to target Y location
         glyph.setTargetPosition(targetY);
@@ -488,7 +566,6 @@ public abstract class Drive {
             stage = GlyphPlacementSystem.Stage.RETURN1;
         }
     }
-
     private void return1() {
         //Open the hand; raise the u-track
         openHand();
@@ -496,9 +573,8 @@ public abstract class Drive {
 
         stage = GlyphPlacementSystem.Stage.RELEASE;
     }
-
     private void release() {
-        if (handDropTimer.seconds() >= 1) {
+        if (handDropTimer.seconds() >= .5) {
             glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISEDBACK);
             if (glyph.currentY.equals(GlyphPlacementSystem.Position.RAISEDBACK)) {
                 stage = GlyphPlacementSystem.Stage.PAUSE2;
@@ -506,21 +582,14 @@ public abstract class Drive {
             }
         }
     }
-
     private void pause2() {
         //Move back to center x location (so the hand fits back in the robot)
         //glyph.setXPower(GlyphPlacementSystem.HorizPos.CENTER);
         if(glyph.xTargetReached(GlyphPlacementSystem.HorizPos.CENTER)) {
             log.add("reached x target, center is " + getCenterState());
             stage = GlyphPlacementSystem.Stage.RETURN2;
-            /*if (targetX.equals(GlyphPlacementSystem.HorizPos.LEFT)) {
-                glyph.adjustBack(-1);
-            }else if(targetX.equals(GlyphPlacementSystem.HorizPos.LEFT)){
-                glyph.adjustBack(1);
-            }*/
         }
     }
-
     private void return2() {
         //Move back to the bottom and get ready to do it again
         glyph.setHomeTarget();
@@ -533,25 +602,29 @@ public abstract class Drive {
     private ElapsedTime bottomTimer = new ElapsedTime();
 
     private boolean reset() {
-        boolean currBottom = getBottomState();
-        if (currBottom && !lastBottom) {
-            bottomTimer.reset();
-        } else if (currBottom && bottomTimer.milliseconds() / 1000 > C.get().getDouble("bottomWait")) {
-            resetUTrack();
-            uTrackAtBottom = true;
-            return true;
-        } else if (currBottom) {
-            setVerticalDrive((C.get().getDouble("bottomWait") - bottomTimer.milliseconds() / 1000)/-2);
+        if (verticalDrive.getCurrentPosition() < 100) {
+            boolean currBottom = getBottomState();
+            if (currBottom && !lastBottom) {
+                bottomTimer.reset();
+            } else if (currBottom && bottomTimer.milliseconds() / 1000 >
+                    C.get().getDouble("bottomWait")) {
+                resetUTrack();
+                uTrackAtBottom = true;
+                return true;
+            } else if (currBottom) {
+                setVerticalDrive((C.get().getDouble("bottomWait") -
+                        bottomTimer.milliseconds() / 1000) / -2);
+            }
+            lastBottom = currBottom;
+            telemetry.addData("Bottom timer", bottomTimer.milliseconds() / 1000);
         }
-        lastBottom = currBottom;
-        telemetry.addData("Bottom timer", bottomTimer.milliseconds()/1000);
         return false;
     }
-
     public void resetUTrack() {
         stage = GlyphPlacementSystem.Stage.HOME;
         jewelUp();
         setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
         uTrackAtBottom = true;
     }
 
@@ -572,7 +645,7 @@ public abstract class Drive {
         }
 
         // Scales -180 to 180 ==> -8 to 8
-        heading = heading / 22.5;
+        heading = heading / 15;
 
         return heading;
     }
