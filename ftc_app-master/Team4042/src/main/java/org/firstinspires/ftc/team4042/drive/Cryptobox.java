@@ -211,7 +211,8 @@ public class Cryptobox {
             numGlyphsPlaced++;
 
             if (glyphPlacementSystem != null) {
-                glyphPlacementSystem.uiTarget(3 - row, column); //We subtract from 3 because the glyph placer reads 0 -> 3 and this class reads 3 -> 0
+                telemetry.log().add("target: " + column + ", " + (3 - row));
+                glyphPlacementSystem.uiTarget(column, 3 - row); //We subtract from 3 because the glyph placer reads 0 -> 3 and this class reads 3 -> 0
                 glyphPlacementSystem.drive.glyphLocate();
             }
 

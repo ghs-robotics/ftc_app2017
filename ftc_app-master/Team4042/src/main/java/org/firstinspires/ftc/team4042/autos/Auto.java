@@ -714,7 +714,7 @@ public abstract class Auto extends LinearVisionOpMode {
     private void autoSensorDrive(double xTargetDistance, int xIrId, AnalogSensor.Type xType, boolean useX,
                                  double yTargetDistance, int yIrId, AnalogSensor.Type yType, boolean useY,
                                  double targetGyro, double offset, double speed, boolean testMode, double time, double prop, boolean remove) {
-        if (useX || useY) {
+        if (useX) {
             AnalogSensor xIr = null;
             switch (xType) {
                 case SHORT_RANGE:
@@ -728,28 +728,11 @@ public abstract class Auto extends LinearVisionOpMode {
                     break;
             }
 
-            AnalogSensor yIr = null;
-            switch (yType) {
-                case SHORT_RANGE:
-                    yIr = drive.shortIr[yIrId];
-                    break;
-                case LONG_RANGE:
-                    yIr = drive.longIr[yIrId];
-                    break;
-                case SONAR:
-                    yIr = drive.sonar[yIrId];
-                    break;
-            }
-
-            //log.add("xIr: " + xIr + " type: " + xIr.type);
-
             double xCurrDistance;
-            double yCurrDistance;
             int i = 0;
             while (i < AnalogSensor.NUM_OF_READINGS && opModeIsActive()) {
                 //read the IRs just to set them up
                 xIr.addReading();
-                yIr.addReading();
                 i++;
             }
 
@@ -769,12 +752,10 @@ public abstract class Auto extends LinearVisionOpMode {
                 if (bangBangTimer.seconds() > C.get().getDouble("BangTimer")) {
                     //Get the distances and derivative terms
                     xIr.addReading(remove);
-                    //yIr.addReading();
-                    xCurrDistance = xIr.getCmAvg(100, offset);
-                    //yCurrDistance = yIr.getCmAvg(100, offset);
 
+                    xCurrDistance = xIr.getCmAvg(100, offset);
+]
                     double xPower = (xCurrDistance - xTargetDistance) / Math.abs(xCurrDistance - xTargetDistance) * -speed;
-                    //double yPower = (yCurrDistance - yTargetDistance)/Math.abs(yCurrDistance - xTargetDistance);
 
                     log.add("xPower: " + xPower);
                     log.add("diff: " + (xCurrDistance - xTargetDistance));
@@ -782,10 +763,7 @@ public abstract class Auto extends LinearVisionOpMode {
                     drive.runWithEncoders();
 
                     boolean done = false;
-                    while (/*bangBangTimer.seconds() < C.get().getDouble("BangTimer") + C.get().getDouble("BangRunTime")*/ opModeIsActive() && !done) {
-                        //drive.updateRates(offset);
-
-                        //r = getSensorR(targetGyro);
+                    while (opModeIsActive() && !done) {
                         Direction dir = new Direction(xPower, 0);
 
                         double targetTicks = Math.abs(xCurrDistance - xTargetDistance) > 6 ? 300 : Math.abs(xCurrDistance - xTargetDistance) * prop;
@@ -795,7 +773,6 @@ public abstract class Auto extends LinearVisionOpMode {
 
                         done = drive.driveWithEncoders(dir, 1, targetTicks, true, targetGyro, C.get().getDouble("mulch"));
 
-                        //drive.driveXYR(1, xPower, 0, r * 3 / 2, false);
                     }
 
                     drive.resetEncoders();
