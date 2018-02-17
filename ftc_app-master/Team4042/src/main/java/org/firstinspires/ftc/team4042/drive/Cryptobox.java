@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.team4042.drive;
 
+import com.qualcomm.robotcore.util.Range;
+
 import java.util.ArrayList;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -147,7 +149,7 @@ public class Cryptobox {
      */
     public int[] placeGlyph(GlyphColor newGlyph) {
 
-        if (numGlyphsPlaced == 12) { return new int[0]; }
+        if (numGlyphsPlaced == 12) { return new int[] {0, 0}; }
 
         int column;
         int row;
@@ -157,7 +159,7 @@ public class Cryptobox {
             snakeTarget = newGlyph.equals(GlyphColor.GREY) ? Snake.ONE : Snake.TWO;
 
             //Always place the first glyph in the center column
-            driveGlyphPlacer(newGlyph, 0, 1);
+            driveGlyphPlacer(newGlyph, 3, 1);
             
             //Should also return 1
             return newGlyph.equals(GlyphColor.GREY) ? new int[] { 1, 2 } : new int[] { 2, 1 };
@@ -179,14 +181,20 @@ public class Cryptobox {
 
             //Place at the height of one over the lowest
             int[] height = new int[glyphs.length];
+            int maximumHeight = Integer.MIN_VALUE;
             for (int i = 0; i < height.length; i++) {
-                height[i] = getFirstEmpty(i);
+                int curr = getFirstEmpty(i);
+                height[i] = curr;
+                if (curr > maximumHeight) {
+                    maximumHeight = curr;
+                }
             }
 
             //The one with the most glyphs
-            int maximumHeight = getIndicesOfExtreme(height, true).get(0);
+            telemetry.log().add("height: [" + height[0] + ", " + height[1] + ", " + height[2] + "]");
+            telemetry.log().add("maximum height: " + maximumHeight);
 
-            row = maximumHeight == 3 ? 3 : maximumHeight + 1;
+            row = maximumHeight == 3 ? 3 : maximumHeight;
 
             if (driveGlyphPlacer(newGlyph, row, column)) {
 
@@ -196,12 +204,12 @@ public class Cryptobox {
                 //Should also return the difference in how much we desire that color
                 int desirability = Math.abs(grey - brown);
                 if (numGlyphsPlaced == 12) {
-                    return new int[0];
+                    return new int[] {0, 0};
                 }
 
                 return new int[] {grey, brown};
             } else { //The glyph doesn't match the cipher
-                return new int[0];
+                return new int[] {0, 0};
             }
         }
     }
@@ -212,7 +220,7 @@ public class Cryptobox {
 
             if (glyphPlacementSystem != null) {
                 telemetry.log().add("target: " + column + ", " + (3 - row));
-                glyphPlacementSystem.uiTarget(column, 3 - row); //We subtract from 3 because the glyph placer reads 0 -> 3 and this class reads 3 -> 0
+                glyphPlacementSystem.uiTarget(column, Range.clip(3 - row, 0, 2)); //We subtract from 3 because the glyph placer reads 0 -> 3 and this class reads 3 -> 0
                 glyphPlacementSystem.drive.glyphLocate();
             }
 

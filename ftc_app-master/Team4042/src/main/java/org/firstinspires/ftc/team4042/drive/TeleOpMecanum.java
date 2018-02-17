@@ -366,21 +366,20 @@ public class TeleOpMecanum extends OpMode {
                 int numPlaces = drive.cryptobox.getNumGlyphsPlaced();
                 if (drive.uTrackAtBottom && !bY && gamepad2.y) {
                     int[] predicts = drive.uTrackAutoTarget(Cryptobox.GlyphColor.BROWN);
+                    telemetry.log().add("greybrown: [" + predicts[0] + ", " + predicts[1] + "]");
                     if(!(((predicts[0] + predicts[1]) == 0) && !(numPlaces == 11))) {
-                        telemetry.log().add("brown placed");
                         drive.uTrack();
                     }
                 }
                 else if (drive.uTrackAtBottom && !bX && gamepad2.x) {
                     int[] predicts = drive.uTrackAutoTarget(Cryptobox.GlyphColor.GREY);
+                    telemetry.log().add("greybrown: [" + predicts[0] + ", " + predicts[1] + "]");
                     if(!(((predicts[0] + predicts[1]) == 0) && !(numPlaces == 11))) {
-                        telemetry.log().add("grey placed");
                         drive.uTrack();
                     }
                 }
                 //If you're not at the bottom and are pushing a
                 else if (!drive.uTrackAtBottom && (gamepad2.y || gamepad2.x)) {
-                    telemetry.log().add("running");
                     drive.uTrack();
                 }
                 bY = gamepad2.y;
