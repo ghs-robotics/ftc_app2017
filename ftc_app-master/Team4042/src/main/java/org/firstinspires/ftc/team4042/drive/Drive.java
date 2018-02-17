@@ -186,11 +186,11 @@ public abstract class Drive {
             for (AnalogSensor aSonar: sonar) {
                 aSonar.initialize(hardwareMap);
             }
-            try {
+            /*try {
                 colorSensor = hardwareMap.get(NormalizedColorSensor.class, "color sensor");
             }catch (IllegalArgumentException ex){
                 colorSensor = null;
-            }
+            }*/
         }
 
         winch = hardwareMap.servo.get("winch");
