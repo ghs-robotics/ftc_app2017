@@ -388,7 +388,7 @@ public class TeleOpMecanum extends OpMode {
                 glyphTarget();
             }
             if (!drive.stage.equals(GlyphPlacementSystem.Stage.RETURN2) && !drive.stage.equals(GlyphPlacementSystem.Stage.RESET)) {
-                drive.glyph.runToPosition();
+                drive.glyph.runToPosition(gamepad2.left_stick_y);
             }
         }
     }
