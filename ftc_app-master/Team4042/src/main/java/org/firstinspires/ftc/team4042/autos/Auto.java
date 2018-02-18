@@ -424,7 +424,7 @@ public abstract class Auto extends LinearVisionOpMode {
             telemetry.addData("y", "" + drive.targetY);
             drive.uTrackUpdate();
             if (!drive.stage.equals(GlyphPlacementSystem.Stage.RETURN2) && !drive.stage.equals(GlyphPlacementSystem.Stage.RESET)) {
-                drive.glyph.runToPosition();
+                drive.glyph.runToPosition(0);
             }
             done = drive.uTrack();
         } while (opModeIsActive() && !done);
