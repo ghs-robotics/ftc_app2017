@@ -39,7 +39,7 @@ public class Cryptobox {
             {GlyphColor.BROWN, GlyphColor.GREY, GlyphColor.GREY, GlyphColor.BROWN},
             {GlyphColor.BROWN, GlyphColor.BROWN, GlyphColor.GREY, GlyphColor.GREY}};
 
-    private enum Snake {
+    public enum Snake {
         ONE(snake1), TWO(snake2);
         private GlyphColor[][] glyphMap;
         private Snake(GlyphColor[][] glyphMap) {
@@ -63,15 +63,17 @@ public class Cryptobox {
     }
 
     public Cryptobox(Telemetry telemetry) {
+        this.telemetry = telemetry;
+        this.file = new File("./storage/emulated/0/bluetooth/cryptobox.txt");
+        this.numGlyphsPlaced = 0;
+    }
+
+    public void clear() {
         for (int i = 0; i < glyphs.length; i++) {
             for (int j = 0; j < glyphs[0].length; j++) {
                 glyphs[i][j] = GlyphColor.NONE;
             }
         }
-
-        this.telemetry = telemetry;
-        this.file = new File("./storage/emulated/0/bluetooth/cryptobox.txt");
-        this.numGlyphsPlaced = 0;
     }
 
     /**
@@ -142,6 +144,32 @@ public class Cryptobox {
         return snakeTarget;
     }
 
+    public void setSnakeTarget(Snake snakeTarget) {
+        this.snakeTarget = snakeTarget;
+    }
+
+    public void incrementGlyphsPlaced() {
+        numGlyphsPlaced++;
+    }
+
+    /**
+     * Determines the cipher based off of the first glyph and its column target
+     */
+    public void cipherFirstGlyph(GlyphColor newGlyph, int column) {
+        switch (column) {
+            case 0:
+                snakeTarget = newGlyph.equals(GlyphColor.BROWN) ? Snake.ONE : Snake.TWO;
+                break;
+            case 1:
+                snakeTarget = newGlyph.equals(GlyphColor.GREY) ? Snake.ONE : Snake.TWO;
+                break;
+            case 2:
+                snakeTarget = newGlyph.equals(GlyphColor.GREY) ? Snake.ONE : Snake.TWO;
+                break;
+        }
+
+    }
+
     /**
      * Places a glyph and returns the next target
      * @param newGlyph The glyph currently held to place
@@ -156,10 +184,10 @@ public class Cryptobox {
 
         if (numGlyphsPlaced == 0) {
             //Set up which snake we want to target, then get the other color glyph next
-            snakeTarget = newGlyph.equals(GlyphColor.GREY) ? Snake.ONE : Snake.TWO;
+            cipherFirstGlyph(newGlyph, 1);
 
             //Always place the first glyph in the center column
-            driveGlyphPlacer(newGlyph, 3, 1);
+            driveGlyphPlacer(newGlyph, 0, 1);
             
             //Should also return 1
             return newGlyph.equals(GlyphColor.GREY) ? new int[] { 1, 2 } : new int[] { 2, 1 };
@@ -214,7 +242,7 @@ public class Cryptobox {
         }
     }
 
-    private boolean driveGlyphPlacer(GlyphColor newGlyph, int row, int column) {
+    public boolean driveGlyphPlacer(GlyphColor newGlyph, int row, int column) {
         if (addGlyphToColumn(newGlyph, column)) {
             numGlyphsPlaced++;
 

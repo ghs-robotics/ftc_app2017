@@ -52,7 +52,7 @@ public class TeleOpMecanum extends OpMode {
     private boolean bY;
     //CONTROL BOOLEANS END
 
-    private Drive drive = new MecanumDrive(true);
+    public Drive drive = new MecanumDrive(true);
 
     private double startRoll;
     private double startPitch;
@@ -114,8 +114,8 @@ public class TeleOpMecanum extends OpMode {
         try {
             drive.initialize(telemetry, hardwareMap);
             drive.runWithEncoders();
-
             drive.initializeGyro(telemetry, hardwareMap);
+            drive.cryptobox.loadFile();
             //gyro();
 
             telemetry.update();
