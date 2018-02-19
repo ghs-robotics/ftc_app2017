@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.team4042.drive.Cryptobox;
 import org.firstinspires.ftc.team4042.drive.Direction;
 import org.firstinspires.ftc.team4042.drive.Drive;
 import org.firstinspires.ftc.team4042.drive.GlyphPlacementSystem;
@@ -74,6 +75,8 @@ public abstract class Auto extends LinearVisionOpMode {
         drive.targetX = GlyphPlacementSystem.HorizPos.LEFT;
         drive.stage = GlyphPlacementSystem.Stage.HOME;
         drive.glyph.setHomeTarget();
+        drive.cryptobox.clear();
+        drive.cryptobox.writeFile();
 
         //drive.glyph = new GlyphPlacementSystem(1, 0, hardwareMap, drive, false);
 
@@ -407,21 +410,42 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void placeGlyph(HashMap<String, String> parameters) {
-        //TODO: MAKE THIS A USEFUL FUNCTION based on vuMark
 
-        //drive.glyph.setHomeTarget();
         drive.setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
         if (vuMark == RelicRecoveryVuMark.UNKNOWN){
             vuMark = RelicRecoveryVuMark.CENTER;
         }
-        drive.glyph.setTarget(vuMark, 2);
+
+        int column;
+        switch (vuMark) {
+            case RIGHT:
+                column = 0;
+                break;
+            case CENTER:
+                column = 1;
+                break;
+            case LEFT:
+                column = 2;
+                break;
+            default:
+                column = 1;
+                break;
+        }
+
+
+        //TODO: USE COLOR SENSOR
+        Cryptobox.GlyphColor newGlyph = Cryptobox.GlyphColor.GREY;
+
+        drive.cryptobox.cipherFirstGlyph(newGlyph, column);
+
+        //Always place the first glyph in the center column
+        drive.cryptobox.driveGlyphPlacer(newGlyph, 0, column);
+
         drive.stage = GlyphPlacementSystem.Stage.HOME;
 
-        boolean done = false;
-
+        boolean done;
         do {
-            telemetry.addData("y", "" + drive.targetY);
             drive.uTrackUpdate();
             if (!drive.stage.equals(GlyphPlacementSystem.Stage.RETURN2) && !drive.stage.equals(GlyphPlacementSystem.Stage.RESET)) {
                 drive.glyph.runToPosition(0);
