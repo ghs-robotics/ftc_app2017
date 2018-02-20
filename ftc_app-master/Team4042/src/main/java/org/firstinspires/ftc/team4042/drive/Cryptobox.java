@@ -136,6 +136,18 @@ public class Cryptobox {
         return toString.toString();
     }
 
+    public String readableToString() {
+        StringBuilder toString = new StringBuilder("\n");
+        for (int r = 3; r >= 0; r--) {
+            for (int c = 0; c < 3; c++) {
+                String val = this.glyphs[c][r].equals(GlyphColor.BROWN) ? "B" : this.glyphs[c][r].equals(GlyphColor.GREY) ? "G" : "N";
+                toString.append(val);
+            }
+            toString.append("\n");
+        }
+        return toString.toString();
+    }
+
     public int getNumGlyphsPlaced() {
         return numGlyphsPlaced;
     }
