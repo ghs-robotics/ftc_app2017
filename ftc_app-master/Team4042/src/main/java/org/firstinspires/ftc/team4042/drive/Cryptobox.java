@@ -25,6 +25,9 @@ public class Cryptobox {
     private File file = null;
     private Telemetry telemetry;
 
+    private int uiX = 0;
+    private int uiY = 0;
+
     /**
      * The first index is the column, the second index is the row
      * The rows are built from bottom to top, so index 0 is the
@@ -136,12 +139,54 @@ public class Cryptobox {
         return toString.toString();
     }
 
-    public String readableToString() {
+    public void uiUp() {
+        if (uiY != 0) {
+            uiY--;
+        }
+    }
+
+    public void uiDown() {
+        if (uiY != 3) {
+            uiY++;
+        }
+    }
+
+    public void uiLeft() {
+        if (uiX != 2) {
+            uiX++;
+        }
+    }
+
+    public void uiRight() {
+        if (uiX != 0) {
+            uiX--;
+        }
+    }
+
+    /**
+     * Sets the glyph color at the ui's target
+     * @param newGlyph The glyph color to set to
+     */
+    public void setGlyphAtUi(GlyphColor newGlyph) {
+        glyphs[uiX][3 - uiY] = newGlyph;
+    }
+
+    /**
+     * Returns a more user-readable ui
+     * @param cursor Whether or not to display a cursor
+     * @return A readable ui
+     */
+    public String uiToString(boolean cursor) {
         StringBuilder toString = new StringBuilder("\n");
         for (int r = 3; r >= 0; r--) {
             for (int c = 0; c < 3; c++) {
-                String val = this.glyphs[c][r].equals(GlyphColor.BROWN) ? "B" : this.glyphs[c][r].equals(GlyphColor.GREY) ? "G" : "N";
-                toString.append(val);
+                String val;
+                if (cursor && c == uiX && r == (3 - uiY)) {
+                    val = "X";
+                } else {
+                    val = this.glyphs[c][r].equals(GlyphColor.BROWN) ? "B" : this.glyphs[c][r].equals(GlyphColor.GREY) ? "G" : "N";
+                }
+                toString.append(val).append(" ");
             }
             toString.append("\n");
         }

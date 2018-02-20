@@ -64,6 +64,8 @@ public class TeleOpMecanum extends OpMode {
 
     private int[] greyBrown = new int[] {0, 0};
 
+    private int cursorCount = 0;
+
     /**
     GAMEPAD 1:
       Joystick 1 X & Y      movement
@@ -83,7 +85,7 @@ public class TeleOpMecanum extends OpMode {
     GAMEPAD 2:
      Joystick 1 Y           controls placer vertical
      Joystick 1 btn         toggle AI v manual target uTrack
-     Joystick 2 X           controls place horizontal
+     Joystick 2 X           controls placer horizontal
      Joystick 2 btn         toggle automated v manual drive uTrack
      Bumpers (extendo)      internal intakes backwards
      Triggers (extendo)     internal intakes forwards
@@ -91,7 +93,9 @@ public class TeleOpMecanum extends OpMode {
      B,X,Y (manual target)  target x uTrack
      Dpad (manual target)   target y uTrack
      Y (manual drive)       resets the glyph placer
+     Y and dpad (ai target) sets the ui target to the selected glyph color
      X (ai target)          inverse target snake
+     Dpad (ai target)       targets the ui for the ai
      Back                   toggle verbose
      */
 
@@ -187,6 +191,9 @@ public class TeleOpMecanum extends OpMode {
 
             //Runs the intakes
             intakes();
+
+            //Targets the AI's ui and (possibly) sets a glyph color override
+            aiUi();
 
             //Runs the glyph placer
             glyphPlacer();
@@ -284,6 +291,37 @@ public class TeleOpMecanum extends OpMode {
 
         if (Drive.useGyro) {
             drive.useGyro(0);
+        }
+    }
+
+    private void aiUi() {
+        if (gamepad2.dpad_up && !bUp) {
+            if (gamepad2.y) {
+                drive.cryptobox.setGlyphAtUi(Cryptobox.GlyphColor.GREY);
+            } else {
+                drive.cryptobox.uiUp();
+            }
+        }
+        if (gamepad2.dpad_left && !bLeft) {
+            if (gamepad2.y) {
+                drive.cryptobox.setGlyphAtUi(Cryptobox.GlyphColor.NONE);
+            } else {
+                drive.cryptobox.uiLeft();
+            }
+        }
+        if (gamepad2.dpad_down && !bDown) {
+            if (gamepad2.y) {
+                drive.cryptobox.setGlyphAtUi(Cryptobox.GlyphColor.BROWN);
+            } else {
+                drive.cryptobox.uiDown();
+            }
+        }
+        if (gamepad2.dpad_right && !bRight) {
+            if (gamepad2.y) {
+                drive.cryptobox.setGlyphAtUi(Cryptobox.GlyphColor.NONE);
+            } else {
+                drive.cryptobox.uiRight();
+            }
         }
     }
 
@@ -493,11 +531,12 @@ public class TeleOpMecanum extends OpMode {
     }
 
     private void telemetryUpdate() {
+        cursorCount += .1;
         telemetry.addData("Manual", manual);
         telemetry.addData("Crawl", Drive.crawl);
         telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
         telemetry.addData("Placer AI On", aiPlacer);
-        telemetry.addData("Cryptobox", drive.cryptobox.readableToString());
+        telemetry.addData("Cryptobox", drive.cryptobox.uiToString(cursorCount % 3 == 0));
         printNextGlyph();
         telemetry.addData("Snake target", drive.cryptobox.getSnakeTarget().name());
         if (drive.verbose) {
