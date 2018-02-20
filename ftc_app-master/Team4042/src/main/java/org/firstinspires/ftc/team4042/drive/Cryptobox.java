@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.team4042.drive;
 
+import com.qualcomm.robotcore.util.Range;
+
 import java.util.ArrayList;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -29,15 +31,15 @@ public class Cryptobox {
      * lowest position and index 3 the highest position
      */
     private final static GlyphColor[][] snake1 = {
-            {GlyphColor.GREY, GlyphColor.GREY, GlyphColor.BROWN, GlyphColor.BROWN},
-            {GlyphColor.GREY, GlyphColor.BROWN, GlyphColor.BROWN, GlyphColor.GREY},
-            {GlyphColor.BROWN, GlyphColor.BROWN, GlyphColor.GREY, GlyphColor.GREY}};
-    private final static GlyphColor[][] snake2 = {
             {GlyphColor.BROWN, GlyphColor.BROWN, GlyphColor.GREY, GlyphColor.GREY},
-            {GlyphColor.BROWN, GlyphColor.GREY, GlyphColor.GREY, GlyphColor.BROWN},
+            {GlyphColor.GREY, GlyphColor.BROWN, GlyphColor.BROWN, GlyphColor.GREY},
             {GlyphColor.GREY, GlyphColor.GREY, GlyphColor.BROWN, GlyphColor.BROWN}};
+    private final static GlyphColor[][] snake2 = {
+            {GlyphColor.GREY, GlyphColor.GREY, GlyphColor.BROWN, GlyphColor.BROWN},
+            {GlyphColor.BROWN, GlyphColor.GREY, GlyphColor.GREY, GlyphColor.BROWN},
+            {GlyphColor.BROWN, GlyphColor.BROWN, GlyphColor.GREY, GlyphColor.GREY}};
 
-    private enum Snake {
+    public enum Snake {
         ONE(snake1), TWO(snake2);
         private GlyphColor[][] glyphMap;
         private Snake(GlyphColor[][] glyphMap) {
@@ -61,15 +63,17 @@ public class Cryptobox {
     }
 
     public Cryptobox(Telemetry telemetry) {
+        this.telemetry = telemetry;
+        this.file = new File("./storage/emulated/0/bluetooth/cryptobox.txt");
+        this.numGlyphsPlaced = 0;
+    }
+
+    public void clear() {
         for (int i = 0; i < glyphs.length; i++) {
             for (int j = 0; j < glyphs[0].length; j++) {
                 glyphs[i][j] = GlyphColor.NONE;
             }
         }
-
-        this.telemetry = telemetry;
-        this.file = new File("./storage/emulated/0/bluetooth/cryptobox.txt");
-        this.numGlyphsPlaced = 0;
     }
 
     /**
@@ -132,12 +136,58 @@ public class Cryptobox {
         return toString.toString();
     }
 
+    public String readableToString() {
+        StringBuilder toString = new StringBuilder("\n");
+        for (int r = 3; r >= 0; r--) {
+            for (int c = 0; c < 3; c++) {
+                String val = this.glyphs[c][r].equals(GlyphColor.BROWN) ? "B" : this.glyphs[c][r].equals(GlyphColor.GREY) ? "G" : "N";
+                toString.append(val);
+            }
+            toString.append("\n");
+        }
+        return toString.toString();
+    }
+
     public int getNumGlyphsPlaced() {
         return numGlyphsPlaced;
     }
 
     public Snake getSnakeTarget() {
         return snakeTarget;
+    }
+
+    public void toggleSnakeTarget() {
+        if (snakeTarget.equals(Snake.ONE)) {
+            snakeTarget = Snake.TWO;
+        } else if (snakeTarget.equals(Snake.TWO)) {
+            snakeTarget = Snake.ONE;
+        }
+    }
+
+    public void setSnakeTarget(Snake snakeTarget) {
+        this.snakeTarget = snakeTarget;
+    }
+
+    public void incrementGlyphsPlaced() {
+        numGlyphsPlaced++;
+    }
+
+    /**
+     * Determines the cipher based off of the first glyph and its column target
+     */
+    public void cipherFirstGlyph(GlyphColor newGlyph, int column) {
+        switch (column) {
+            case 0:
+                snakeTarget = newGlyph.equals(GlyphColor.BROWN) ? Snake.ONE : Snake.TWO;
+                break;
+            case 1:
+                snakeTarget = newGlyph.equals(GlyphColor.GREY) ? Snake.ONE : Snake.TWO;
+                break;
+            case 2:
+                snakeTarget = newGlyph.equals(GlyphColor.GREY) ? Snake.ONE : Snake.TWO;
+                break;
+        }
+
     }
 
     /**
@@ -147,14 +197,14 @@ public class Cryptobox {
      */
     public int[] placeGlyph(GlyphColor newGlyph) {
 
-        if (numGlyphsPlaced == 12) { return new int[0]; }
+        if (numGlyphsPlaced == 12) { return new int[] {0, 0}; }
 
         int column;
         int row;
 
         if (numGlyphsPlaced == 0) {
             //Set up which snake we want to target, then get the other color glyph next
-            snakeTarget = newGlyph.equals(GlyphColor.GREY) ? Snake.ONE : Snake.TWO;
+            cipherFirstGlyph(newGlyph, 1);
 
             //Always place the first glyph in the center column
             driveGlyphPlacer(newGlyph, 0, 1);
@@ -179,14 +229,20 @@ public class Cryptobox {
 
             //Place at the height of one over the lowest
             int[] height = new int[glyphs.length];
+            int maximumHeight = Integer.MIN_VALUE;
             for (int i = 0; i < height.length; i++) {
-                height[i] = getFirstEmpty(i);
+                int curr = getFirstEmpty(i);
+                height[i] = curr;
+                if (curr > maximumHeight) {
+                    maximumHeight = curr;
+                }
             }
 
             //The one with the most glyphs
-            int maximumHeight = getIndicesOfExtreme(height, true).get(0);
+            telemetry.log().add("height: [" + height[0] + ", " + height[1] + ", " + height[2] + "]");
+            telemetry.log().add("maximum height: " + maximumHeight);
 
-            row = maximumHeight == 3 ? 3 : maximumHeight + 1;
+            row = maximumHeight == 3 ? 3 : maximumHeight;
 
             if (driveGlyphPlacer(newGlyph, row, column)) {
 
@@ -196,23 +252,23 @@ public class Cryptobox {
                 //Should also return the difference in how much we desire that color
                 int desirability = Math.abs(grey - brown);
                 if (numGlyphsPlaced == 12) {
-                    return new int[0];
+                    return new int[] {0, 0};
                 }
 
                 return new int[] {grey, brown};
             } else { //The glyph doesn't match the cipher
-                return new int[0];
+                return new int[] {0, 0};
             }
         }
     }
 
-    private boolean driveGlyphPlacer(GlyphColor newGlyph, int row, int column) {
+    public boolean driveGlyphPlacer(GlyphColor newGlyph, int row, int column) {
         if (addGlyphToColumn(newGlyph, column)) {
             numGlyphsPlaced++;
 
             if (glyphPlacementSystem != null) {
                 telemetry.log().add("target: " + column + ", " + (3 - row));
-                glyphPlacementSystem.uiTarget(column, 3 - row); //We subtract from 3 because the glyph placer reads 0 -> 3 and this class reads 3 -> 0
+                glyphPlacementSystem.uiTarget(column, Range.clip(3 - row, 0, 2)); //We subtract from 3 because the glyph placer reads 0 -> 3 and this class reads 3 -> 0
                 glyphPlacementSystem.drive.glyphLocate();
             }
 
