@@ -19,11 +19,13 @@ import java.io.PrintWriter;
 public class Cryptobox {
     public enum GlyphColor { GREY, BROWN, NONE, EITHER }
 
-
     private GlyphColor[][] glyphs = new GlyphColor[3][4];
 
     private File file = null;
     private Telemetry telemetry;
+
+    private int uiX = 0;
+    private int uiY = 0;
 
     /**
      * The first index is the column, the second index is the row
@@ -136,12 +138,55 @@ public class Cryptobox {
         return toString.toString();
     }
 
-    public String readableToString() {
+    public void uiUp() {
+        if (uiY != 0) {
+            uiY--;
+        }
+    }
+
+    public void uiDown() {
+        if (uiY != 3) {
+            uiY++;
+        }
+    }
+
+    public void uiLeft() {
+        if (uiX != 2) {
+            uiX++;
+        }
+    }
+
+    public void uiRight() {
+        if (uiX != 0) {
+            uiX--;
+        }
+    }
+
+    /**
+     * Sets the glyph color at the ui's target
+     * @param newGlyph The glyph color to set to
+     */
+    public void setGlyphAtUi(GlyphColor newGlyph) {
+        glyphs[uiX][3 - uiY] = newGlyph;
+        writeFile();
+    }
+
+    /**
+     * Returns a more user-readable ui
+     * @param cursor Whether or not to display a cursor
+     * @return A readable ui
+     */
+    public String uiToString(boolean cursor) {
         StringBuilder toString = new StringBuilder("\n");
         for (int r = 3; r >= 0; r--) {
             for (int c = 0; c < 3; c++) {
-                String val = this.glyphs[c][r].equals(GlyphColor.BROWN) ? "B" : this.glyphs[c][r].equals(GlyphColor.GREY) ? "G" : "N";
-                toString.append(val);
+                String val;
+                if (cursor && c == uiX && r == (3 - uiY)) {
+                    val = "X";
+                } else {
+                    val = this.glyphs[c][r].equals(GlyphColor.BROWN) ? "B" : this.glyphs[c][r].equals(GlyphColor.GREY) ? "G" : "N";
+                }
+                toString.append(val).append(" ");
             }
             toString.append("\n");
         }
@@ -208,8 +253,7 @@ public class Cryptobox {
 
             //Always place the first glyph in the center column
             driveGlyphPlacer(newGlyph, 0, 1);
-            
-            //Should also return 1
+
             return newGlyph.equals(GlyphColor.GREY) ? new int[] { 1, 2 } : new int[] { 2, 1 };
 
         } else {
@@ -249,14 +293,13 @@ public class Cryptobox {
                 int grey = greyBrowns[column][0];
                 int brown = greyBrowns[column][1];
 
-                //Should also return the difference in how much we desire that color
-                int desirability = Math.abs(grey - brown);
                 if (numGlyphsPlaced == 12) {
                     return new int[] {0, 0};
                 }
 
                 return new int[] {grey, brown};
             } else { //The glyph doesn't match the cipher
+                //TODO: THIS SHOULD EITHER REJECT THE GLYPH OR BREAK THE CIPHER OR DO *SOMETHING*
                 return new int[] {0, 0};
             }
         }

@@ -263,7 +263,11 @@ public abstract class Drive {
         }
     }
 
-    public float[] getRGB(){
+    public Cryptobox.GlyphColor getGlyphColor() {
+        return getRGB()[3] > COLOR_THRESHOLD ? Cryptobox.GlyphColor.BROWN : Cryptobox.GlyphColor.GREY;
+    }
+
+    private float[] getRGB(){
         NormalizedRGBA color = colorSensor.getNormalizedColors();
         float[] val = {color.red, color.green, color.blue, color.alpha};
         return val;
@@ -518,7 +522,9 @@ public abstract class Drive {
         if (uTrackAtBottom && collected.getState()) {
             internalIntakeRight(0);
             internalIntakeLeft(0);
-            Cryptobox.GlyphColor color = getRGB()[3] > COLOR_THRESHOLD ? Cryptobox.GlyphColor.BROWN : Cryptobox.GlyphColor.GREY;
+
+            Cryptobox.GlyphColor color = getGlyphColor();
+
             predict = uTrackAutoTarget(color);
             telemetry.log().add("greybrown: [" + predict[0] + ", " + predict[1] + "]");
             if(!(((predict[0] + predict[1]) == 0) && !(numPlaces == 11))) {

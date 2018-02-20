@@ -242,7 +242,7 @@ public abstract class Auto extends LinearVisionOpMode {
                 case "place":
                     placeGlyph(parameters);
                     break;
-                case "alignh":
+                case "align":
                     alignHorizontally(parameters);
                     break;
                 case "glyph":
@@ -433,13 +433,11 @@ public abstract class Auto extends LinearVisionOpMode {
                 break;
         }
 
-
-        //TODO: USE COLOR SENSOR
-        Cryptobox.GlyphColor newGlyph = Cryptobox.GlyphColor.GREY;
+        Cryptobox.GlyphColor newGlyph = drive.getGlyphColor();
 
         drive.cryptobox.cipherFirstGlyph(newGlyph, column);
 
-        //Always place the first glyph in the center column
+        //Place the first glyph to match the vumark
         drive.cryptobox.driveGlyphPlacer(newGlyph, 0, column);
 
         drive.stage = GlyphPlacementSystem.Stage.HOME;
