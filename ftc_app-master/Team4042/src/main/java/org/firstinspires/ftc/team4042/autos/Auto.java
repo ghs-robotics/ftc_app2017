@@ -242,7 +242,7 @@ public abstract class Auto extends LinearVisionOpMode {
                 case "place":
                     placeGlyph(parameters);
                     break;
-                case "alignh":
+                case "align":
                     alignHorizontally(parameters);
                     break;
                 case "glyph":

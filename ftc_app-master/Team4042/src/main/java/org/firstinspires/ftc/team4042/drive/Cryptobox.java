@@ -19,7 +19,6 @@ import java.io.PrintWriter;
 public class Cryptobox {
     public enum GlyphColor { GREY, BROWN, NONE, EITHER }
 
-
     private GlyphColor[][] glyphs = new GlyphColor[3][4];
 
     private File file = null;
