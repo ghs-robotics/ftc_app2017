@@ -62,6 +62,8 @@ public class TeleOpMecanum extends OpMode {
     private Camera.Parameters offParams;
     private boolean flashOn;
 
+    private int[] greyBrown = new int[] {0, 0};
+
     /**
     GAMEPAD 1:
       Joystick 1 X & Y      movement
@@ -366,6 +368,7 @@ public class TeleOpMecanum extends OpMode {
                 int numPlaces = drive.cryptobox.getNumGlyphsPlaced();
                 if (drive.uTrackAtBottom && !bY && gamepad2.y) {
                     int[] predicts = drive.uTrackAutoTarget(Cryptobox.GlyphColor.BROWN);
+                    this.greyBrown = predicts;
                     telemetry.log().add("greybrown: [" + predicts[0] + ", " + predicts[1] + "]");
                     if(!(((predicts[0] + predicts[1]) == 0) && !(numPlaces == 11))) {
                         drive.uTrack();
@@ -373,6 +376,7 @@ public class TeleOpMecanum extends OpMode {
                 }
                 else if (drive.uTrackAtBottom && !bX && gamepad2.x) {
                     int[] predicts = drive.uTrackAutoTarget(Cryptobox.GlyphColor.GREY);
+                    this.greyBrown = predicts;
                     telemetry.log().add("greybrown: [" + predicts[0] + ", " + predicts[1] + "]");
                     if(!(((predicts[0] + predicts[1]) == 0) && !(numPlaces == 11))) {
                         drive.uTrack();
@@ -502,18 +506,9 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Manual", manual);
         telemetry.addData("Crawl", Drive.crawl);
         telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
-        //telemetry.addData("Glyph pos", drive.verticalDriveCurrPos());
-        //telemetry.addData("some pos", drive.motorLeftBack.getCurrentPosition());
-        //telemetry.addData("glyph pow", drive.getVerticalDrive());
-        //telemetry.addData("Speed factor", adjustedSpeed);
-        //telemetry.addData("Tank", Drive.tank);
-        telemetry.addData("Placer AI", aiPlacer);
+        telemetry.addData("Placer AI On", aiPlacer);
         telemetry.addData("Cryptobox", drive.cryptobox.toString());
-        //telemetry.addData("start pitch", startPitch);
-        //telemetry.addData("start roll", startRoll);
-        //telemetry.addData("onBalancingStone", onBalancingStone);
-        //drive.uTrackAtBottom && !bA && gamepad2.a
-        //!drive.uTrackAtBottom && gamepad2.a
+        printNextGlyph();
         if (drive.verbose) {
             telemetry.addData("gamepad1.dpad_up", gamepad1.dpad_up);
             telemetry.addData("bottom", drive.getBottomState());
@@ -523,5 +518,23 @@ public class TeleOpMecanum extends OpMode {
             telemetry.addData("gyro", drive.gyro.updateHeading());
         }
         telemetry.update();
+    }
+
+    private void printNextGlyph() {
+        int grey = greyBrown[0];
+        int brown = greyBrown[1];
+        if (grey == 0 && brown == 0) {
+            telemetry.addData("Next glyph", "NO GLYPH");
+        } else if (grey == 0) {
+            telemetry.addData("Next glyph", "NEED BROWN");
+        } else if (brown == 0) {
+            telemetry.addData("Next glyph", "NEED GREY");
+        } else if (grey == brown) {
+            telemetry.addData("Next glyph", "Either");
+        } else if (grey > brown) {
+            telemetry.addData("Next glyph", "Want grey");
+        } else if (grey < brown) {
+            telemetry.addData("Next glyph", "Want brown");
+        }
     }
 }
