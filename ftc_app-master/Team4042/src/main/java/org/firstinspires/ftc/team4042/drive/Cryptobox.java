@@ -208,8 +208,7 @@ public class Cryptobox {
 
             //Always place the first glyph in the center column
             driveGlyphPlacer(newGlyph, 0, 1);
-            
-            //Should also return 1
+
             return newGlyph.equals(GlyphColor.GREY) ? new int[] { 1, 2 } : new int[] { 2, 1 };
 
         } else {
@@ -249,14 +248,13 @@ public class Cryptobox {
                 int grey = greyBrowns[column][0];
                 int brown = greyBrowns[column][1];
 
-                //Should also return the difference in how much we desire that color
-                int desirability = Math.abs(grey - brown);
                 if (numGlyphsPlaced == 12) {
                     return new int[] {0, 0};
                 }
 
                 return new int[] {grey, brown};
             } else { //The glyph doesn't match the cipher
+                //TODO: THIS SHOULD EITHER REJECT THE GLYPH OR BREAK THE CIPHER OR DO *SOMETHING*
                 return new int[] {0, 0};
             }
         }
