@@ -169,6 +169,7 @@ public class Cryptobox {
      */
     public void setGlyphAtUi(GlyphColor newGlyph) {
         glyphs[uiX][3 - uiY] = newGlyph;
+        writeFile();
     }
 
     /**
