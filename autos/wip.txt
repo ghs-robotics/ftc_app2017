@@ -1,0 +1,1 @@
+f:sdrive x:0 xdistance:10 xtype:short prop:40 gyro:0 speed:1
