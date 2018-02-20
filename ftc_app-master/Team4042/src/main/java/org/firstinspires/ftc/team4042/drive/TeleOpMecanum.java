@@ -81,34 +81,17 @@ public class TeleOpMecanum extends OpMode {
       Back                  balance
 
     GAMEPAD 2:
-     Manual mode:
-      Joystick 1 Y          controls placer vertical
-      Joystick 1 btn        toggle Ryan v Brendan uTrack
-      Joystick 2 X          controls place horizontal
-      Joystick 2 btn        toggle manual
-      Bumpers               (extendo) internal intakes backwards
-      Triggers              (extendo) internal intakes forwards
-      B                     manual hand toggle
-      Y                     resets the glyph placer
-      Back                  toggle verbose
-
-     Ryan control:
-      Joystick 1 btn        toggle Ryan v Brendan uTrack
-      Joystick 2 btn        toggle manual
-      Bumpers               (extendo) internal intakes backwards
-      Triggers              (extendo) internal intakes forwards
-      A                     Move uTrack
-      dpad                  Target uTrack
-      Back                  toggle verbose
-
-     Brendan control:
-     Joystick 1 btn        toggle Ryan v Brendan uTrack
-     Joystick 2 btn        toggle manual
-     Bumpers               (extendo) internal intakes backwards
-     Triggers              (extendo) internal intakes forwards
-     A,B,X,Y               Move x trget uTrack
-     dpad                  Move y trget uTrack
-     Back                  toggle verbose
+     Joystick 1 Y           controls placer vertical
+     Joystick 1 btn         toggle AI v manual target uTrack
+     Joystick 2 X           controls place horizontal
+     Joystick 2 btn         toggle automated v manual drive uTrack
+     Bumpers (extendo)      internal intakes backwards
+     Triggers (extendo)     internal intakes forwards
+     A                      manual hand toggle
+     B,X,Y (manual target)  target x uTrack
+     Dpad (manual target)   target y uTrack
+     Y (manual drive)       resets the glyph placer
+     Back                   toggle verbose
      */
 
     @Override
