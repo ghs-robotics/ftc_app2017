@@ -507,7 +507,7 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Crawl", Drive.crawl);
         telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
         telemetry.addData("Placer AI On", aiPlacer);
-        telemetry.addData("Cryptobox", drive.cryptobox.toString());
+        telemetry.addData("Cryptobox", drive.cryptobox.readableToString());
         printNextGlyph();
         telemetry.addData("Snake target", drive.cryptobox.getSnakeTarget().name());
         if (drive.verbose) {
