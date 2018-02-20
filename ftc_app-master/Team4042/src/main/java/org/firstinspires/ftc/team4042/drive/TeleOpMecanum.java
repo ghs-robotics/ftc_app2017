@@ -26,10 +26,10 @@ public class TeleOpMecanum extends OpMode {
     // We have these booleans so we only register a button press once.
     // You have to let go of the button and push it again to register a new event.
     private boolean aBack = false;
+    private boolean bBack = false;
     private double aBackTime = 0;
     private boolean bLeftStick = false;
-    private boolean lJoyBtn = false;
-    private boolean rJoyBtn = false;
+    private boolean bRightStick = false;
 
     private boolean aY = false;
     private boolean aX = false;
@@ -91,6 +91,7 @@ public class TeleOpMecanum extends OpMode {
      B,X,Y (manual target)  target x uTrack
      Dpad (manual target)   target y uTrack
      Y (manual drive)       resets the glyph placer
+     X (ai target)          inverse target snake
      Back                   toggle verbose
      */
 
@@ -143,24 +144,20 @@ public class TeleOpMecanum extends OpMode {
             if (gamepad1.dpad_up && !aUp) {
                 noAutoIntakes = !noAutoIntakes;
             }
-            aUp = gamepad1.dpad_up;
 
             if (gamepad1.dpad_down && !aDown) {
                 drive.toggleWinch();
             }
-            aDown = gamepad1.dpad_down;
             telemetry.addData("winch", drive.winchOpen);
 
             //Toggles verbose
-            if (gamepad2.left_stick_button && !bLeftStick) {
+            if (gamepad2.back && !bBack) {
                 drive.toggleVerbose();
             }
-            bLeftStick = gamepad2.left_stick_button;
 
-            if (gamepad2.left_stick_button && !lJoyBtn) {
+            if (gamepad2.left_stick_button && !bLeftStick) {
                 aiPlacer = !aiPlacer;
             }
-            lJoyBtn = gamepad2.left_stick_button;
 
             //The first time you hit back, it establishes how long you've been pushing it for
             if (gamepad1.back && !aBack) {
@@ -178,7 +175,6 @@ public class TeleOpMecanum extends OpMode {
                     onBalancingStone = !onBalancingStone;
                 }
             }
-            aBack = gamepad1.back;
 
             //Adjust drive modes, speeds, etc
             setUpDrive();
@@ -194,6 +190,8 @@ public class TeleOpMecanum extends OpMode {
 
             //Runs the glyph placer
             glyphPlacer();
+
+            updateControlBooleans();
 
             //Updates the telemetry output
             telemetryUpdate();
@@ -269,7 +267,6 @@ public class TeleOpMecanum extends OpMode {
         if (gamepad1.y && !aY) {
             drive.toggleExtendo();
         }
-        aY = gamepad1.y;
 
         //The X button on the first controller - toggle crawling to let us adjust the back of the robot too
         if (gamepad1.x && !aX) {
@@ -280,12 +277,10 @@ public class TeleOpMecanum extends OpMode {
                 drive.runBackWithEncoders();
             }
         }
-        aX = gamepad1.x;
 
         if (gamepad1.b && !aB) {
             Drive.tank = !Drive.tank;
         }
-        aB = gamepad1.b;
 
         if (Drive.useGyro) {
             drive.useGyro(0);
@@ -298,9 +293,7 @@ public class TeleOpMecanum extends OpMode {
         if (gamepad2.a && !bA) {
             drive.toggleHand();
         }
-        bA = gamepad2.a;
-
-        if (gamepad2.right_stick_button && !rJoyBtn) {
+        if (gamepad2.right_stick_button && !bRightStick) {
             manual = !manual;
 
             if (!manual) {
@@ -330,7 +323,6 @@ public class TeleOpMecanum extends OpMode {
                 drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
         }
-        rJoyBtn = gamepad2.right_stick_button;
 
         if (manual) {
             if (bY && !gamepad2.y) { //When you release Y, reset the utrack
@@ -343,11 +335,14 @@ public class TeleOpMecanum extends OpMode {
                 drive.setVerticalDrive(gamepad2.left_stick_y);
                 drive.setHorizontalDrive(gamepad2.right_stick_x);
             }
-            bY = gamepad2.y;
         }
         else if(!manual) {
             //Glyph locate
             if (aiPlacer) {
+                if (gamepad2.x && !bX) {
+                    drive.cryptobox.toggleSnakeTarget();
+                }
+
                 int numPlaces = drive.cryptobox.getNumGlyphsPlaced();
                 if (drive.uTrackAtBottom && !bY && gamepad2.y) {
                     int[] predicts = drive.uTrackAutoTarget(Cryptobox.GlyphColor.BROWN);
@@ -369,8 +364,6 @@ public class TeleOpMecanum extends OpMode {
                 else if (!drive.uTrackAtBottom && (gamepad2.y || gamepad2.x)) {
                     drive.uTrack();
                 }
-                bY = gamepad2.y;
-                bX = gamepad2.x;
             } else {
                 glyphTarget();
             }
@@ -393,8 +386,6 @@ public class TeleOpMecanum extends OpMode {
         if (gamepad1.right_stick_button && !aRightStick && !gamepad1.left_stick_button) {
             adjustedSpeed = .75;
         }
-        aLeftStick = gamepad1.left_stick_button;
-        aRightStick = gamepad1.right_stick_button;
     }
 
     private boolean done = true;
@@ -409,24 +400,13 @@ public class TeleOpMecanum extends OpMode {
             done = drive.uTrack();
             telemetry.addData("done", done);
         }
-        bRight = gamepad2.dpad_right;
-        bLeft = gamepad2.dpad_left;
-        bUp = gamepad2.dpad_up;
-        bDown = gamepad2.dpad_down;
-        bB = gamepad2.b;
-        bX = gamepad2.x;
-        bY = gamepad2.y;
     }
 
     private void glyphUI() {
         if (gamepad2.dpad_up && !bUp) { drive.glyph.uiUp(); }
-        bUp = gamepad2.dpad_up;
         if (gamepad2.dpad_down && !bDown) { drive.glyph.uiDown(); }
-        bDown = gamepad2.dpad_down;
         if (gamepad2.dpad_left && !bLeft) { drive.glyph.uiLeft(); }
-        bLeft = gamepad2.dpad_left;
         if (gamepad2.dpad_right && !bRight) { drive.glyph.uiRight(); }
-        bRight = gamepad2.dpad_right;
     }
 
     private void intakes() {
@@ -483,6 +463,33 @@ public class TeleOpMecanum extends OpMode {
                 if (!Drive.isExtendo) { drive.internalIntakeLeft(0); }
             }
         }
+    }
+
+    private void updateControlBooleans() {
+        aBack = gamepad1.back;
+        bBack = gamepad2.back;
+
+        aLeftStick = gamepad1.left_stick_button;
+        aRightStick = gamepad1.right_stick_button;
+        bLeftStick = gamepad2.left_stick_button;
+        bRightStick = gamepad2.right_stick_button;
+
+        aY = gamepad1.y;
+        aX = gamepad1.x;
+        aB = gamepad1.b;
+
+        bY = gamepad2.y;
+        bX = gamepad2.x;
+        bA = gamepad2.a;
+        bB = gamepad2.b;
+
+        aUp = gamepad1.dpad_up;
+        aDown = gamepad1.dpad_down;
+
+        bUp = gamepad2.dpad_up;
+        bLeft = gamepad2.dpad_left;
+        bDown = gamepad2.dpad_down;
+        bRight = gamepad2.dpad_right;
     }
 
     private void telemetryUpdate() {

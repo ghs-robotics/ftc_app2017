@@ -156,6 +156,14 @@ public class Cryptobox {
         return snakeTarget;
     }
 
+    public void toggleSnakeTarget() {
+        if (snakeTarget.equals(Snake.ONE)) {
+            snakeTarget = Snake.TWO;
+        } else if (snakeTarget.equals(Snake.TWO)) {
+            snakeTarget = Snake.ONE;
+        }
+    }
+
     public void setSnakeTarget(Snake snakeTarget) {
         this.snakeTarget = snakeTarget;
     }
