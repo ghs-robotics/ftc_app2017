@@ -42,6 +42,8 @@ public abstract class Drive {
 
     public static final double MAGIC_NUMBER = C.get().getDouble("magic");
 
+    public static final double COLOR_THRESHOLD = C.get().getDouble("threshold");
+
     public static final boolean THE_FAST_ONES_ARE_THE_FRONT_ONES = true;
     public static final double LOW_SPEED_MOTOR_THINGS = 7;
     public static final double LOW_SPEED_WHEEL_THINGS = 5;
@@ -95,6 +97,7 @@ public abstract class Drive {
     private CRServo horizontalDrive;
     private DigitalChannel center;
     private DigitalChannel bottom;
+    private DigitalChannel collected;
 
     private Servo grabbyBoi;
     private boolean handIsOpen = false;
@@ -212,6 +215,7 @@ public abstract class Drive {
         horizontalDrive = initializeCrServo(hardwareMap, "horizontal");
 
         center = initializeDigital(hardwareMap, "center");
+        collected = initializeDigital(hardwareMap, "collected");
         try {
             center.setState(false);
             center.setMode(DigitalChannel.Mode.INPUT);
@@ -505,6 +509,30 @@ public abstract class Drive {
 
     public int[] uTrackAutoTarget(Cryptobox.GlyphColor newGlyph) {
         return cryptobox.placeGlyph(newGlyph);
+    }
+
+
+    private int[] predict = {0};
+    public int[] uTrackAutoTarget() {
+        int numPlaces = cryptobox.getNumGlyphsPlaced();
+        if (uTrackAtBottom && collected.getState()) {
+            internalIntakeRight(0);
+            internalIntakeLeft(0);
+            Cryptobox.GlyphColor color = getRGB()[3] > COLOR_THRESHOLD ? Cryptobox.GlyphColor.BROWN : Cryptobox.GlyphColor.GREY;
+            predict = uTrackAutoTarget(color);
+            if(!(((predict[0] + predict[1]) == 0) && !(numPlaces == 11))) {
+                telemetry.log().add("brown placed");
+                uTrack();
+            }
+        } else if (!uTrackAtBottom) {
+            if(!stage.equals(GlyphPlacementSystem.Stage.HOME) && !stage.equals(GlyphPlacementSystem.Stage.GRAB)){
+                internalIntakeLeft(1);
+                internalIntakeRight(1);
+            }
+            telemetry.log().add("running");
+            uTrack();
+        }
+        return predict;
     }
 
     public boolean uTrack() {
