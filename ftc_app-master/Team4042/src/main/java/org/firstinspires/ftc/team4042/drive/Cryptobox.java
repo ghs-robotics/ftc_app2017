@@ -223,6 +223,10 @@ public class Cryptobox {
 
     public void toggleRejectGlyph() { rejectGlyph = !rejectGlyph; }
 
+    public void setRejectGlyph(boolean rejectGlyph) {
+        this.rejectGlyph = rejectGlyph;
+    }
+
     /**
      * Determines the cipher based off of the first glyph and its column target
      */
