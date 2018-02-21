@@ -424,7 +424,8 @@ public class TeleOpMecanum extends OpMode {
         boolean grey = gamepad2.right_stick_y >= .5;
         boolean brown = gamepad2.right_stick_y <= -.5;
 
-        //TODO: USE COLOUR SENSOR
+        //TODO: USE COLOR SENSOR
+        Cryptobox.GlyphColor newGlyph = drive.getGlyphColor();
 
         if (drive.uTrackAtBottom && !bBrown && brown) {
             int[] nextGlyph = drive.uTrackAutoTarget(Cryptobox.GlyphColor.BROWN);
