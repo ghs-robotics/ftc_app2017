@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.team4042.autos;
 
-import android.hardware.camera2.CameraDevice;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -24,8 +23,6 @@ import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
-import org.opencv.core.Size;
-import org.opencv.imgproc.Imgproc;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -35,8 +32,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-
-import javax.microedition.khronos.opengles.GL;
 
 /**
  * Parses a file to figure out which instructions to run. CAN NOT ACTUALLY RUN INSTRUCTIONS.
@@ -217,6 +212,9 @@ public abstract class Auto extends LinearVisionOpMode {
                     break;
                 case "sdrive":
                     autoSensorDrive(parameters);
+                    break;
+                case "s2drive":
+                    autoTwoSensorDrive(parameters);
                     break;
                 case "up":
                     jewelUp(parameters);
@@ -655,6 +653,115 @@ public abstract class Auto extends LinearVisionOpMode {
         drive.resetEncoders();
         drive.runWithEncoders();
         telemetry.update();
+    }
+
+    public void autoTwoSensorDrive(HashMap<String, String> parameters) {
+        double speed = Double.parseDouble(parameters.get("speed"));
+
+        double yTargetDistance = Double.parseDouble(parameters.get("ydistance"));
+        int yIr = Integer.parseInt(parameters.get("yir"));
+        boolean yLongIr = Boolean.parseBoolean(parameters.get("ylong"));
+        double targetGyro = Double.parseDouble(parameters.get("gyro"));
+
+        log.add("" + parameters.containsKey("xdistance"));
+        if (parameters.containsKey("xdistance")) {
+            double xTargetDistance = Double.parseDouble(parameters.get("xdistance"));
+            int xIr = Integer.parseInt(parameters.get("xir"));
+            boolean xLongIr = Boolean.parseBoolean(parameters.get("xlong"));
+            autoTwoSensorDrive(speed, xTargetDistance, xIr, xLongIr, true, yTargetDistance, yIr, yLongIr, targetGyro);
+        }
+        else {
+            autoTwoSensorDrive(speed, 0, 0, false, false, yTargetDistance, yIr, yLongIr, targetGyro);
+        }
+    }
+
+    /**
+     * Drives until two sensors returns a target value, one for the x positioning and one for the y
+     * @param speed The speed to move at
+     * @param xTargetDistance The final distance for the x sensor to return
+     * @param xIrId The sensor to read an x distance from
+     * @param xIsLongRange Whether the x sensor is long-range or not
+     * @param yTargetDistance The final distance for the y sensor to return
+     * @param yIrId The sensor to read an y distance from
+     * @param yIsLongRange Whether the y sensor is long-range or not
+     */
+    //35, 33 diagonal
+    private void autoTwoSensorDrive(double speed, double xTargetDistance, int xIrId, boolean xIsLongRange, boolean useX,
+                                    double yTargetDistance, int yIrId, boolean yIsLongRange, double targetGyro) {
+
+        //autoDrive(direction, speed, targetTicks, -1, false, targetGyro);
+
+        AnalogSensor xIr = xIsLongRange ? drive.longIr[xIrId] : drive.shortIr[xIrId];
+        AnalogSensor yIr = yIsLongRange ? drive.longIr[yIrId] : drive.shortIr[yIrId];
+
+        telemetry.addData("xIr", xIr + " yIr " + yIr);
+
+        double xCurrDistance;
+        double yCurrDistance;
+        int i = 0;
+        while (i < AnalogSensor.NUM_OF_READINGS && opModeIsActive()) {
+            //read the IRs just to set them up
+            xIr.addReading();
+            yIr.addReading();
+            telemetry.addData("xIr cm", xIr.getCmAvg());
+            telemetry.addData("yIr cm", yIr.getCmAvg());
+            telemetry.update();
+            i++;
+        }
+
+        ElapsedTime timeout = new ElapsedTime();
+        timeout.reset();
+
+        do {
+            double speedFactor = speed;
+
+            drive.updateRates();
+
+            double r = drive.useGyro(targetGyro) * .75 + 5 * drive.gyroRate;
+            r = r < .05 && r > 0 ? 0 : r;
+            r = r > -.05 && r < 0 ? 0 : r;
+
+            //Get the distances and derivative terms
+            xCurrDistance = xIr.getCmAvg();
+            yCurrDistance = yIr.getCmAvg();
+            double xDerivValue = xIsLongRange ? drive.longIrRates[xIrId] : drive.shortIrRates[xIrId];
+            double yDerivValue = yIsLongRange ? drive.longIrRates[yIrId] : drive.shortIrRates[yIrId];
+
+            //Set up the derivative and proportional terms
+            double xDeriv = xDerivValue * -10;
+            double xProportional = (xCurrDistance - xTargetDistance) * .025;
+
+            double yDeriv = yDerivValue * -10;
+            double yProportional = (yCurrDistance - yTargetDistance) * .025;
+
+            //Apply the controller
+            double xFactor = (xProportional - xDeriv);
+            double yFactor = (yProportional - yDeriv);
+            telemetry.addData("xIr cm", xCurrDistance);
+            telemetry.addData("yIr cm", yCurrDistance);
+            telemetry.addData("x", xFactor);
+            telemetry.addData("y", yFactor);
+            telemetry.addData("r", r);
+            telemetry.update();
+
+            xFactor = Range.clip(xFactor, -1, 1);
+            yFactor = Range.clip(yFactor, -1, 1);
+            r = Range.clip(r, -1, 1);
+
+            //Actually drives
+            if (useX) {
+                //drive.driveXYR(speedFactor, xFactor/2, -yFactor/2, r, false);
+                drive.runWithoutEncoders();
+                drive.driveXYR(1, xFactor * 4.5, -yFactor / 2, r, false);
+            } else {
+                //drive.driveXYR(speedFactor, 0, -yFactor/2, r, false);
+                drive.driveXYR(1, 0, -yFactor / 2, r, false);
+            }
+        } while (((Math.abs(xTargetDistance - xCurrDistance) > 2)) && timeout.seconds() < 5 && opModeIsActive());
+
+        //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
+        drive.stopMotors();
+        drive.runWithEncoders();
     }
 
     public void autoSensorDrive(HashMap<String, String> parameters) {
