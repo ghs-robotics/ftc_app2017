@@ -440,6 +440,13 @@ public class TeleOpMecanum extends OpMode {
         }
     }
 
+    /**
+     * Rejects the glyph
+     */
+    private void rejectGlyph() {
+        //TODO: WRITE THIS FUNCTION
+    }
+
     private void speedModes() {
         //Left and right stick together = super slow
         if (gamepad1.left_stick_button && !aLeftStick && gamepad1.right_stick_button && !aRightStick) {
