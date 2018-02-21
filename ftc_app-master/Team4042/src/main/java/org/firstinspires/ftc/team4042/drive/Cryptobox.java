@@ -29,7 +29,7 @@ public class Cryptobox {
     private int uiX = 0;
     private int uiY = 0;
 
-    private boolean rejectGlyph;
+    private boolean rejectGlyph = false;
 
     /**
      * The first index is the column, the second index is the row
@@ -221,6 +221,8 @@ public class Cryptobox {
         numGlyphsPlaced++;
     }
 
+    public void toggleRejectGlyph() { rejectGlyph = !rejectGlyph; }
+
     /**
      * Determines the cipher based off of the first glyph and its column target
      */
@@ -285,6 +287,11 @@ public class Cryptobox {
         }
     }
 
+    /**
+     * Handles glyphs that don't match the cipher
+     * @param newGlyph The new glyph's color
+     * @return The desirability of the next glyph, or to reject this glyph
+     */
     private int[] noCipherMatch(GlyphColor newGlyph) {
         snakeTarget = Snake.NONE;
         if (rejectGlyph) {
@@ -296,6 +303,10 @@ public class Cryptobox {
         }
     }
 
+    /**
+     * Finds the row which is one above the highest placement
+     * @return The row height to place the next glyph in
+     */
     private int getRowTarget() {
         int[] height = new int[glyphs.length];
         int maximumHeight = Integer.MIN_VALUE;
@@ -313,6 +324,11 @@ public class Cryptobox {
         return maximumHeight;
     }
 
+    /**
+     * Sees if there is a placement which can match the cipher
+     * @param greyBrowns The sums of grey and brown targets
+     * @return Whether there exists a placement which matches the cipher
+     */
     private boolean glyphMatchesCipher(int[][] greyBrowns) {
         int[] cipherFailure = new int[] {0, 0};
 
@@ -324,6 +340,11 @@ public class Cryptobox {
         return false;
     }
 
+    /**
+     * Sums each of the predictions to figure out how many grey and brown glyphs are in each
+     * @param newGlyph The color of the glyph to be placed
+     * @return The sums of the grey and brown predictions
+     */
     private int[][] getPredictionSums(GlyphColor newGlyph) {
         GlyphColor[][] predictions = new GlyphColor[3][3];
         for (int i = 0; i < glyphs.length; i++) {
@@ -340,6 +361,11 @@ public class Cryptobox {
         return greyBrowns;
     }
 
+    /**
+     * Handles placing the first glyph
+     * @param newGlyph The first glyph's color
+     * @return The next glyph colors to get
+     */
     private int[] placeFirstGlyph(GlyphColor newGlyph) {
         //Set up which snake we want to target, then get the other color glyph next
         cipherFirstGlyph(newGlyph, 1);
@@ -350,7 +376,13 @@ public class Cryptobox {
         return newGlyph.equals(GlyphColor.GREY) ? new int[] { 1, 2 } : new int[] { 2, 1 };
     }
 
-    public void driveGlyphPlacerNoCipher(GlyphColor newGlyph, int row, int column) {
+    /**
+     * Drives the glyph placer, ignoring a cipher
+     * @param newGlyph The new glyph's color
+     * @param row The row to place in
+     * @param column The column to place in
+     */
+    private void driveGlyphPlacerNoCipher(GlyphColor newGlyph, int row, int column) {
         addGlyphToColumnNoCipher(newGlyph, column);
         numGlyphsPlaced++;
 
