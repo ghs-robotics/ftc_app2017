@@ -50,6 +50,9 @@ public class TeleOpMecanum extends OpMode {
     private boolean bX;
     private boolean bB;
     private boolean bY;
+
+    private boolean bGrey;
+    private boolean bBrown;
     //CONTROL BOOLEANS END
 
     public Drive drive = new MecanumDrive(true);
@@ -83,10 +86,10 @@ public class TeleOpMecanum extends OpMode {
       Back                  balance
 
     GAMEPAD 2:
-     Joystick 1 (manual)    controls placer in manual
-     Joystick 1 btn         toggle AI v manual target uTrack
-     Joystick 2
-     Joystick 2 btn         toggle automated v manual drive uTrack
+     Stick 1 (manual)       controls placer in manual
+     Stick 1 btn            toggle AI v manual target uTrack
+     Stick 2 X (ai target)  glyph color designation
+     Stick 2 btn            toggle automated v manual drive uTrack
      Bumpers (extendo)      internal intakes backwards
      Triggers (extendo)     internal intakes forwards
      A                      manual hand toggle
@@ -418,11 +421,16 @@ public class TeleOpMecanum extends OpMode {
         }
 
         int numPlaces = drive.cryptobox.getNumGlyphsPlaced();
-        if (drive.uTrackAtBottom && !bY && gamepad2.y) {
+        boolean grey = gamepad2.right_stick_y >= .5;
+        boolean brown = gamepad2.right_stick_y <= -.5;
+
+        //TODO: USE COLOUR SENSOR
+
+        if (drive.uTrackAtBottom && !bBrown && brown) {
             int[] nextGlyph = drive.uTrackAutoTarget(Cryptobox.GlyphColor.BROWN);
             aiGlyphPlace(nextGlyph, numPlaces);
         }
-        else if (drive.uTrackAtBottom && !bX && gamepad2.x) {
+        else if (drive.uTrackAtBottom && !bGrey && grey) {
             int[] nextGlyph = drive.uTrackAutoTarget(Cryptobox.GlyphColor.GREY);
             aiGlyphPlace(nextGlyph, numPlaces);
         }
@@ -572,6 +580,9 @@ public class TeleOpMecanum extends OpMode {
         bLeft = gamepad2.dpad_left;
         bDown = gamepad2.dpad_down;
         bRight = gamepad2.dpad_right;
+
+        bGrey = gamepad2.right_stick_y >= .5;
+        bBrown = gamepad2.right_stick_y <= -.5;
     }
 
     private void telemetryUpdate() {
