@@ -96,7 +96,7 @@ public class TeleOpMecanum extends OpMode {
      Y and dpad (ai target) sets the ui target to the selected glyph color
      X (ai target)          inverse target snake
      Dpad (ai target)       targets the ui for the ai
-     Back
+     Back                   toggle glyph reject/cipher break
      */
 
     @Override
@@ -183,6 +183,10 @@ public class TeleOpMecanum extends OpMode {
 
             if (gamepad1.left_stick_button && !aLeftStick) {
                 drive.toggleVerbose();
+            }
+
+            if (gamepad2.back && !bBack) {
+                drive.cryptobox.toggleRejectGlyph();
             }
 
             //Drives the robot
@@ -578,6 +582,7 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Placer AI On", aiPlacer);
         telemetry.addData("Cryptobox", drive.cryptobox.uiToString(cursorCount % 3 == 0));
         printNextGlyph();
+        telemetry.addData("Reject glyph", drive.cryptobox.getRejectGlyph());
         telemetry.addData("Snake target", drive.cryptobox.getSnakeTarget().name());
         if (drive.verbose) {
             telemetry.addData("gamepad1.dpad_up", gamepad1.dpad_up);
