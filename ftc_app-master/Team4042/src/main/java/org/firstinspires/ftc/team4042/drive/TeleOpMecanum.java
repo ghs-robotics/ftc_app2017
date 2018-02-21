@@ -332,82 +332,111 @@ public class TeleOpMecanum extends OpMode {
             drive.toggleHand();
         }
         if (gamepad2.right_stick_button && !bRightStick) {
-            manual = !manual;
-
-            if (!manual) {
-                drive.resetEncoders();
-                drive.runWithEncoders();
-                drive.glyph.setHomeTarget();
-
-                // Turn off flashlight
-                if (flashOn) {
-                    cam.setParameters(offParams);
-                    cam.stopPreview();
-                    flashOn = false;
-                }
-            } else if (manual) {
-                // Turn on flashlight
-                if (!flashOn) {
-                    cam.setParameters(onParams);
-                    cam.startPreview();
-                    flashOn = true;
-                }
-            }
-
-            if (drive.getVerticalDriveMode().equals(DcMotor.RunMode.RUN_TO_POSITION)) {
-                drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            } else {
-                drive.stage = GlyphPlacementSystem.Stage.RETURN2;
-                drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
-            }
+            toggleManual();
         }
 
         if (manual) {
-            if (bY && !gamepad2.y) { //When you release Y, reset the utrack
-                drive.resetUTrack();
-                drive.glyph.setHomeTarget();
-            } else if (gamepad2.y) { //If you're holding y, run the utrack downwards
-                drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                drive.setVerticalDrive(-0.5);
-            } else {
-                drive.setVerticalDrive(gamepad2.left_stick_y);
-                drive.setHorizontalDrive(gamepad2.right_stick_x);
-            }
+            runManualPlacer();
         }
-        else if(!manual) {
+        else {
             //Glyph locate
             if (aiPlacer) {
-                if (gamepad2.x && !bX) {
-                    drive.cryptobox.toggleSnakeTarget();
-                }
-
-                int numPlaces = drive.cryptobox.getNumGlyphsPlaced();
-                if (drive.uTrackAtBottom && !bY && gamepad2.y) {
-                    int[] predicts = drive.uTrackAutoTarget(Cryptobox.GlyphColor.BROWN);
-                    this.greyBrown = predicts;
-                    telemetry.log().add("greybrown: [" + predicts[0] + ", " + predicts[1] + "]");
-                    if(!(((predicts[0] + predicts[1]) == 0) && !(numPlaces == 11))) {
-                        drive.uTrack();
-                    }
-                }
-                else if (drive.uTrackAtBottom && !bX && gamepad2.x) {
-                    int[] predicts = drive.uTrackAutoTarget(Cryptobox.GlyphColor.GREY);
-                    this.greyBrown = predicts;
-                    telemetry.log().add("greybrown: [" + predicts[0] + ", " + predicts[1] + "]");
-                    if(!(((predicts[0] + predicts[1]) == 0) && !(numPlaces == 11))) {
-                        drive.uTrack();
-                    }
-                }
-                //If you're not at the bottom and are pushing a
-                else if (!drive.uTrackAtBottom && (gamepad2.y || gamepad2.x)) {
-                    drive.uTrack();
-                }
+                runAiPlacer();
             } else {
                 glyphTarget();
             }
             if (!drive.stage.equals(GlyphPlacementSystem.Stage.RETURN2) && !drive.stage.equals(GlyphPlacementSystem.Stage.RESET)) {
                 drive.glyph.runToPosition(gamepad2.left_stick_y);
             }
+        }
+    }
+
+    /**
+     * Toggles manual mode, incl. the flashlight and the placer mode
+     */
+    private void toggleManual() {
+        manual = !manual;
+
+        if (!manual) {
+            drive.resetEncoders();
+            drive.runWithEncoders();
+            drive.glyph.setHomeTarget();
+
+            // Turn off flashlight
+            if (flashOn) {
+                cam.setParameters(offParams);
+                cam.stopPreview();
+                flashOn = false;
+            }
+        } else {
+            // Turn on flashlight
+            if (!flashOn) {
+                cam.setParameters(onParams);
+                cam.startPreview();
+                flashOn = true;
+            }
+        }
+
+        if (drive.getVerticalDriveMode().equals(DcMotor.RunMode.RUN_TO_POSITION)) {
+            drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        } else {
+            drive.stage = GlyphPlacementSystem.Stage.RETURN2;
+            drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
+    }
+
+    /**
+     * Handles the placer in manual mode
+     */
+    private void runManualPlacer() {
+        if (bY && !gamepad2.y) { //When you release Y, reset the utrack
+            drive.resetUTrack();
+            drive.glyph.setHomeTarget();
+        } else if (gamepad2.y) { //If you're holding y, run the utrack downwards
+            drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            drive.setVerticalDrive(-0.5);
+        } else {
+            drive.setVerticalDrive(gamepad2.left_stick_y);
+            drive.setHorizontalDrive(gamepad2.right_stick_x);
+        }
+    }
+
+    /**
+     * Handles the ai glyph placement
+     */
+    private void runAiPlacer() {
+        if (gamepad2.x && !bX) {
+            drive.cryptobox.toggleSnakeTarget();
+        }
+
+        int numPlaces = drive.cryptobox.getNumGlyphsPlaced();
+        if (drive.uTrackAtBottom && !bY && gamepad2.y) {
+            int[] nextGlyph = drive.uTrackAutoTarget(Cryptobox.GlyphColor.BROWN);
+            aiGlyphPlace(nextGlyph, numPlaces);
+        }
+        else if (drive.uTrackAtBottom && !bX && gamepad2.x) {
+            int[] nextGlyph = drive.uTrackAutoTarget(Cryptobox.GlyphColor.GREY);
+            aiGlyphPlace(nextGlyph, numPlaces);
+        }
+        //If you're not at the bottom and are pushing a
+        else if (!drive.uTrackAtBottom && (gamepad2.y || gamepad2.x)) {
+            drive.uTrack();
+        }
+    }
+
+    /**
+     * Handles the first frame of placing a glyph using the ai
+     * @param nextGlyph The predictions from the glyph placer
+     * @param numPlaces The number of glyphs placed thus far
+     */
+    private void aiGlyphPlace(int[] nextGlyph, int numPlaces) {
+        this.greyBrown = nextGlyph;
+        telemetry.log().add("greybrown: [" + nextGlyph[0] + ", " + nextGlyph[1] + "]");
+        if (nextGlyph[0] == -1 && nextGlyph[1] == -1) {
+            rejectGlyph();
+        }
+        if(!(((nextGlyph[0] + nextGlyph[1]) == 0) && !(numPlaces == 11))) {
+            drive.uTrack();
         }
     }
 
