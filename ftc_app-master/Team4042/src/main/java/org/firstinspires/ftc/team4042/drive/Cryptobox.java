@@ -227,6 +227,10 @@ public class Cryptobox {
         this.rejectGlyph = rejectGlyph;
     }
 
+    public boolean getRejectGlyph() {
+        return rejectGlyph;
+    }
+
     /**
      * Determines the cipher based off of the first glyph and its column target
      */
