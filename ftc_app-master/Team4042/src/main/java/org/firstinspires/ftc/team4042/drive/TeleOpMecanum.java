@@ -69,9 +69,9 @@ public class TeleOpMecanum extends OpMode {
     /**
     GAMEPAD 1:
       Joystick 1 X & Y      movement
-      Joystick 1 button     fast
+      Joystick 1 button     verbose
       Joystick 2 X          rotation
-      Joystick 2 button     medium
+      Joystick 2 button
       Bumpers               (extendo) external intakes backwards    (normal) both intakes backwards
       Triggers              (extendo) external intakes forwards     (normal) both intakes forwards
       Dpad up               turn off auto intake
@@ -83,9 +83,9 @@ public class TeleOpMecanum extends OpMode {
       Back                  balance
 
     GAMEPAD 2:
-     Joystick 1 Y           controls placer vertical
+     Joystick 1 (manual)    controls placer in manual
      Joystick 1 btn         toggle AI v manual target uTrack
-     Joystick 2 X           controls placer horizontal
+     Joystick 2
      Joystick 2 btn         toggle automated v manual drive uTrack
      Bumpers (extendo)      internal intakes backwards
      Triggers (extendo)     internal intakes forwards
@@ -96,7 +96,7 @@ public class TeleOpMecanum extends OpMode {
      Y and dpad (ai target) sets the ui target to the selected glyph color
      X (ai target)          inverse target snake
      Dpad (ai target)       targets the ui for the ai
-     Back                   toggle verbose
+     Back
      */
 
     @Override
@@ -154,11 +154,6 @@ public class TeleOpMecanum extends OpMode {
             }
             telemetry.addData("winch", drive.winchOpen);
 
-            //Toggles verbose
-            if (gamepad2.back && !bBack) {
-                drive.toggleVerbose();
-            }
-
             if (gamepad2.left_stick_button && !bLeftStick) {
                 aiPlacer = !aiPlacer;
             }
@@ -184,7 +179,11 @@ public class TeleOpMecanum extends OpMode {
             setUpDrive();
 
             //Sets up speed modes
-            speedModes();
+            //speedModes();
+
+            if (gamepad1.left_stick_button && !aLeftStick) {
+                drive.toggleVerbose();
+            }
 
             //Drives the robot
             drive.drive(false, gamepad1, gamepad2, adjustedSpeed * MecanumDrive.FULL_SPEED);
@@ -396,8 +395,13 @@ public class TeleOpMecanum extends OpMode {
             drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
             drive.setVerticalDrive(-0.5);
         } else {
-            drive.setVerticalDrive(gamepad2.left_stick_y);
-            drive.setHorizontalDrive(gamepad2.right_stick_x);
+            double horiz = gamepad2.left_stick_x;
+            double vertical = gamepad2.left_stick_y;
+            if (vertical > horiz) {
+                drive.setVerticalDrive(vertical);
+            } else if (horiz > vertical) {
+                drive.setHorizontalDrive(horiz);
+            }
         }
     }
 
