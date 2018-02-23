@@ -48,16 +48,14 @@ public abstract class Auto extends LinearVisionOpMode {
 
     private Telemetry.Log log;
 
-    File file;
-
-    private ArrayList<AutoInstruction> instructions = new ArrayList<>();
-
     private double startRoll;
     private double startPitch;
     private ElapsedTime intakeTimer = new ElapsedTime();
     private int intakeCount = 0;
 
     private boolean readMark = false;
+
+    private AutoParser parser;
 
     public void setUp(MecanumDrive drive, String filePath) {
         this.drive = drive;
@@ -73,76 +71,9 @@ public abstract class Auto extends LinearVisionOpMode {
         drive.cryptobox.clear();
         drive.cryptobox.writeFile();
 
-        //drive.glyph = new GlyphPlacementSystem(1, 0, hardwareMap, drive, false);
-
-        //drive.setUseGyro(true);
-        //telemetry.addData("glyph", drive.glyph.getTargetPositionAsString());
-
         vuMarkIdentifier.initialize(telemetry, hardwareMap);
 
-        log.add("Reading file " + filePath);
-        file = new File("./storage/emulated/0/bluetooth/" + filePath);
-
-        loadFile();
-
-        /*this.setCamera(Cameras.PRIMARY);
-        this.setFrameSize(new Size(900, 900));
-        //enableExtension(Extensions.BEACON);
-        enableExtension(Extensions.ROTATION);
-        enableExtension(Extensions.CAMERA_CONTROL);
-        rotation.setIsUsingSecondaryCamera(false);
-        rotation.disableAutoRotate();
-        rotation.setActivityOrientationFixed(ScreenOrientation.LANDSCAPE);
-        cameraControl.setColorTemperature(CameraControlExtension.ColorTemperature.AUTO);
-        cameraControl.setAutoExposureCompensation();*/
-    }
-
-    /**
-     * Reads from the file and puts the information into instructions
-     */
-    private void loadFile() {
-        if (file == null) { return; } //Can't load a null file
-
-        try {
-            FileReader fileReader = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                //Reads the lines from the file in order
-                if (line.length() > 0) {
-                    if (line.charAt(0) != '#') { //Use a # for a comment
-                        HashMap<String, String> parameters = new HashMap<>();
-
-                        //x:3 --> k = x, v = 3
-                        String[] inputParameters = line.split(" ");
-                        StringBuilder para = new StringBuilder("Parameter: ");
-                        int i = 0;
-                        while (i < inputParameters.length) {
-                            String parameter = inputParameters[i];
-                            String[] kv = parameter.split(":", 2);
-                            parameters.put(kv[0],  kv[1]);
-                            //Gets the next parameter and adds it to the list
-                            para.append(kv[0]).append(":").append(kv[1]).append(" ");
-                            i++;
-                        }
-
-                        log.add(para.toString());
-
-                        //Stores those values as an instruction
-                        AutoInstruction instruction = new AutoInstruction(parameters);
-                        instructions.add(instruction);
-
-                        telemetry.update();
-                    }
-                }
-            }
-            fileReader.close();
-        } catch (Exception ex) {
-            telemetry.addData("Error", "trying to load file");
-            StringWriter sw = new StringWriter();
-            ex.printStackTrace(new PrintWriter(sw));
-            telemetry.addData("error", sw.toString());
-        }
+        parser = new AutoParser(telemetry, filePath);
     }
 
     /**
@@ -160,17 +91,8 @@ public abstract class Auto extends LinearVisionOpMode {
 
     public void runAuto(boolean useSensors) {
         if (useSensors) runAuto();
-        //vuMarkIdentifier.initialize(telemetry, hardwareMap);
-        //telemetry.addData("vuMarkhere", "ststs");
-
-        //vuMark = vuMarkIdentifier.getMark();
-        //telemetry.addData("vuMarkhere", "after");
-
-
+        
         while(true) {
-            //Mat x = vuMarkIdentifier.getFrame();
-            //Log.d("TOMMY", x.toString());
-
             RelicRecoveryVuMark j = vuMarkIdentifier.getMark();
             //String j = getBallColor(x);
             Log.d("TOMMY", j.toString());
@@ -194,12 +116,13 @@ public abstract class Auto extends LinearVisionOpMode {
         drive.setVerbose(false);
 
         //Reads each instruction and acts accordingly
-        Iterator<AutoInstruction> instructionsIter = instructions.iterator();
-        while (instructionsIter.hasNext() && opModeIsActive()) {
-            AutoInstruction instruction = instructionsIter.next();
+        AutoInstruction instruction = parser.popNext();
+        while (instruction != null && opModeIsActive()) {
+            instruction = parser.popNext();
             String functionName = instruction.getFunctionName();
             HashMap<String, String> parameters = instruction.getParameters();
             log.add("function: " + functionName);
+
             switch (functionName) {
                 case "drive":
                     autoDrive(parameters);
@@ -259,94 +182,19 @@ public abstract class Auto extends LinearVisionOpMode {
                     drive.toggleExtendo();
                     break;
                 default:
-                    System.err.println("Unknown function called from file " + file);
+                    System.err.println("Unknown function called from file " + parser.getFile());
                     break;
             }
         }
-
-        //autoDrive(new Direction(1, .5), Drive.FULL_SPEED, 1000);
-
-        //autoSensorDrive(Direction.Forward, Drive.FULL_SPEED / 4, 7, drive.ir);
-
-        //check sensor sums
-        //robot starts facing right
-        //scan vision patter
-        //go to front of jewels
-        //cv scan
-        //knock off other jewel
-        //head right
-        //whisker sensor hits cryptobox
-        //back up
-        //repeat ^ until whisker disengages
-        //move right until we see -^-^-| from ultrasonic
-        //place block
-        //detach and extend robot towards glyph
     }
 
-    public void getVuMark(HashMap<String, String> parameters) {
+    private void getVuMark(HashMap<String, String> parameters) {
         readMark = true;
         vuMarkIdentifier.prepareMark();
-        //vuMark = vuMarkIdentifier.getMark();
-        //log.add("vuMark: " + vuMark);
-    }
-
-    /*
-    public void placeGlyph(HashMap<String, String> parameters) {
-        //The vumark placement system starts at (1, 0), which is the bottom of the center column
-        if (vuMark.equals(RelicRecoveryVuMark.LEFT)) {
-            drive.glyph.left();
-        } else if (vuMark.equals(RelicRecoveryVuMark.RIGHT)) {
-            drive.glyph.right();
-        }
-
-        if (!vuMark.equals(RelicRecoveryVuMark.UNKNOWN)) {
-            drive.glyph.place();
-        }
-
-        telemetry.addData("glyph", drive.glyph.getTargetPositionAsString());
-        telemetry.update();
-    }
-    */
-
-    /**
-     * Gets a required double parameter, or throws an exception if it's not found
-     * @param parameters A hashmap of all the parameters
-     * @param key The parameter key to look for
-     * @return The value for the key
-     * @throws NoSuchFieldError If the key isn't mapped
-     */
-    private double getParam(HashMap<String, String> parameters, String key) throws NoSuchFieldError {
-        try {
-            return Double.parseDouble(parameters.get(key));
-        } catch (Exception ex) {
-            throw new NoSuchFieldError("Could not find " + key);
-        }
-    }
-
-    /**
-     * Gets an optional double parameter
-     * @param parameters A hashmap of all the parameters
-     * @param key The parameter key to look for
-     * @param defaultVal The value to return if the optional parameter is not included
-     * @return The value for the key, or the default value if the parameter doesn't exist
-     */
-    private double getParam(HashMap<String, String> parameters, String key, double defaultVal) {
-        return parameters.containsKey(key) ? Double.parseDouble(parameters.get(key)) : defaultVal;
-    }
-
-    /**
-     * Gets an optional integer parameter
-     * @param parameters A hashmap of all the parameters
-     * @param key The parameter key to look for
-     * @param defaultVal The value to return if the optional parameter is not included
-     * @return The value for the key, or the default value if the parameter doesn't exist
-     */
-    private int getParam(HashMap<String, String> parameters, String key, int defaultVal) {
-        return parameters.containsKey(key) ? Integer.parseInt(parameters.get(key)) : defaultVal;
     }
 
     public void wait(HashMap<String, String> parameters) {
-        double seconds = getParam(parameters, "sec");
+        double seconds = parser.getParam(parameters, "sec");
 
         ElapsedTime waitTimer = new ElapsedTime();
         while (waitTimer.seconds() < seconds);
@@ -527,10 +375,10 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void autoDrive(HashMap<String, String> parameters) {
-        Direction direction = new Direction(getParam(parameters, "x"), -getParam(parameters, "y"));
-        double speed = getParam(parameters, "speed");
-        double targetTicks = getParam(parameters, "target");
-        double time = getParam(parameters, "time", -1);
+        Direction direction = new Direction(parser.getParam(parameters, "x"), -parser.getParam(parameters, "y"));
+        double speed = parser.getParam(parameters, "speed");
+        double targetTicks = parser.getParam(parameters, "target");
+        double time = parser.getParam(parameters, "time", -1);
         boolean useGyro = parameters.containsKey("gyro");
         double targetGyro = useGyro ? Double.parseDouble(parameters.get("gyro")) : 0;
 
@@ -562,12 +410,12 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     private void autoDriveOff(HashMap<String, String> parameters) {
-        Direction direction = new Direction(getParam(parameters, "x"),
-                -getParam(parameters, "y"));
-        double speed = getParam(parameters, "speed");
-        double gyro = getParam(parameters, "gyro");
+        Direction direction = new Direction(parser.getParam(parameters, "x"),
+                -parser.getParam(parameters, "y"));
+        double speed = parser.getParam(parameters, "speed");
+        double gyro = parser.getParam(parameters, "gyro");
         int sonarId = parameters.containsKey("sonar") ? Integer.parseInt(parameters.get("sonar")) : -1;
-        double dist = getParam(parameters, "dist", 0);
+        double dist = parser.getParam(parameters, "dist", 0);
 
         //Drive in the direction indicated
         if (sonarId >= 0) {
@@ -618,9 +466,9 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void autoRotate(HashMap<String, String> parameters) {
-        double realR = getParam(parameters, "r");
+        double realR = parser.getParam(parameters, "r");
 
-        double speed = getParam(parameters, "speed");
+        double speed = parser.getParam(parameters, "speed");
 
         autoRotate(realR, speed);
 
@@ -765,7 +613,7 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void autoSensorDrive(HashMap<String, String> parameters) {
-        double targetGyro = getParam(parameters, "gyro");
+        double targetGyro = parser.getParam(parameters, "gyro");
 
         boolean useX = parameters.containsKey("xdistance");
         boolean useY = parameters.containsKey("ydistance");
@@ -773,9 +621,9 @@ public abstract class Auto extends LinearVisionOpMode {
         double yTargetDistance = useY ? Double.parseDouble(parameters.get("ydistance")) : 0;
         int yIr = useY ? Integer.parseInt(parameters.get("yir")) : 0;
 
-        double offset = getParam(parameters, "offset", 0);
+        double offset = parser.getParam(parameters, "offset", 0);
 
-        double speed = getParam(parameters, "speed", 1);
+        double speed = parser.getParam(parameters, "speed", 1);
 
         AnalogSensor.Type yType = AnalogSensor.Type.SHORT_RANGE;
         if (useY) {
@@ -820,9 +668,9 @@ public abstract class Auto extends LinearVisionOpMode {
 
         boolean testMode = parameters.containsKey("test");
 
-        double time = getParam(parameters, "time", 2.5);
+        double time = parser.getParam(parameters, "time", 2.5);
 
-        double prop = getParam(parameters, "prop");
+        double prop = parser.getParam(parameters, "prop");
 
         boolean remove = parameters.containsKey("remove") && Boolean.parseBoolean(parameters.get("remove"));
 
