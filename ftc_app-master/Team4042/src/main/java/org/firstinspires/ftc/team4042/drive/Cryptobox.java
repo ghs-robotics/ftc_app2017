@@ -86,7 +86,7 @@ public class Cryptobox {
      * Reads the file and stores data into cryptobox array
      */
     public void loadFile() {
-        if (file == null) { return; } //Can't load a null file
+        if (file.length() > 1) { return; } //Can't load a null file
 
         try {
             FileReader fileReader = new FileReader(file);
