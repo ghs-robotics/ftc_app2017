@@ -279,6 +279,8 @@ public class TeleOpMecanum extends OpMode {
         //First controller pushing Y - toggle extendo
         if (gamepad1.y && !aY) {
             drive.toggleExtendo();
+        } else if (gamepad1.y) {
+            drive.extendoStep();
         }
 
         //The X button on the first controller - toggle crawling to let us adjust the back of the robot too

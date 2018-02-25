@@ -30,6 +30,7 @@ public abstract class Drive {
     //Require drive() in subclasses
     public abstract void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor);
     public abstract void driveXYR(double speedFactor, double x, double y, double r, boolean useGyro);
+    public abstract void driveLR(double speedFactor, double l, double r);
 
     //Initializes a factor for the speed of movement to a position when driving with encoders
     public static final double BASE_SPEED = C.get().getDouble("base");
@@ -280,27 +281,36 @@ public abstract class Drive {
         return hsvValues;
     }
 
+    ElapsedTime extendoTimer;
+
     public void toggleExtendo() {
         //It's extendo, so put it back together
-        ElapsedTime timer = new ElapsedTime();
+        extendoTimer = new ElapsedTime();
+        Drive.isExtendo = !Drive.isExtendo;
+        extendoTimer.reset();
+    }
+
+    public void extendoStep() {
+        //Moving into extendo, so take it apart
         if (Drive.isExtendo) {
-            timer.reset();
-
-            raiseBrakes();
-            lockCatches();
-            freezeBack();
-
-            Drive.isExtendo = false;
+            if (extendoTimer.seconds() < .2) {
+                driveXYR(1, 0, 1, 0, false);
+            } else if (extendoTimer.seconds() < .4) {
+                lowerBrakes();
+                unlockCatches();
+                runBackWithEncoders();
+                driveLR(1, -1, -1);
+            }
         }
-        //Not extendo, so take it apart
+        //Moving out of extendo, so put it together
         else {
-            timer.reset();
-
-            lowerBrakes();
-            unlockCatches();
-            runBackWithEncoders();
-
-            Drive.isExtendo = true;
+            if (extendoTimer.seconds() < .2) {
+                pushRobotTogether();
+            } else if (extendoTimer.seconds() < .4){
+                raiseBrakes();
+                lockCatches();
+                freezeBack();
+            }
         }
     }
 

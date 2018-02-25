@@ -60,7 +60,7 @@ public class  MecanumDrive extends Drive {
         super.setMotorPower(speedWheel, speedFactor);
     }
 
-    private void driveLR(double speedFactor, double l, double r) {
+    public void driveLR(double speedFactor, double l, double r) {
 
         double[] speedWheel = new double[4];
 
