@@ -54,6 +54,7 @@ public abstract class Auto extends LinearVisionOpMode {
     private int intakeCount = 0;
 
     private boolean readMark = false;
+    private boolean done = true;
 
     private AutoParser parser;
 
@@ -74,6 +75,7 @@ public abstract class Auto extends LinearVisionOpMode {
         vuMarkIdentifier.initialize(telemetry, hardwareMap);
 
         parser = new AutoParser(telemetry, filePath);
+        drive.initializeGyro(telemetry, hardwareMap);
     }
 
     /**
@@ -288,14 +290,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
         drive.stage = GlyphPlacementSystem.Stage.HOME;
 
-        boolean done;
-        do {
-            drive.uTrackUpdate();
-            if (!drive.stage.equals(GlyphPlacementSystem.Stage.RETURN2) && !drive.stage.equals(GlyphPlacementSystem.Stage.RESET)) {
-                drive.glyph.runToPosition(0);
-            }
-            done = drive.uTrack();
-        } while (opModeIsActive() && !done);
+        done = false;
     }
 
     public void jewelUp(HashMap<String, String> parameters) {
@@ -815,8 +810,6 @@ public abstract class Auto extends LinearVisionOpMode {
             drive.resetEncoders();
             drive.runWithEncoders();
 
-            //drive.intakeLeft(1);
-            //drive.intakeRight(1);
             log.add("running intakes in");
 
             ElapsedTime timer = new ElapsedTime();
@@ -824,36 +817,12 @@ public abstract class Auto extends LinearVisionOpMode {
             timer.reset();
             drive.jewelDown();
 
-            //while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {}
-            //timer.reset();
-
             //Moves the robot left
             autoRotate(14, Drive.FULL_SPEED);
 
-            //drive.intakeLeft(-1);
-
             drive.jewelUp();
-            //timer.reset();
-            //while (timer.seconds() < 1) {}
-
-            //drive.intakeLeft(1);
 
             autoRotate(0, Drive.FULL_SPEED);
-
-            /*for (int i = 0; i < 2; i++) {
-                drive.intakeLeft(-1);
-                while (timer.seconds() < C.get().getDouble("intakeBackTime")) {
-                }
-                timer.reset();
-
-                drive.intakeLeft(1);
-                while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {
-                }
-                timer.reset();
-            }
-
-            drive.intakeRight(0);
-            drive.intakeLeft(0);*/
 
             //autoRotate(0, Drive.FULL_SPEED/4);
         } catch (NullPointerException ex) {
@@ -868,43 +837,16 @@ public abstract class Auto extends LinearVisionOpMode {
             drive.resetEncoders();
             drive.runWithEncoders();
 
-            //drive.intakeLeft(1);
-            //drive.intakeRight(1);
-
             ElapsedTime timer = new ElapsedTime();
 
             timer.reset();
             drive.jewelDown();
 
-            //while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {}
-            //timer.reset();
-
             autoRotate(-14, Drive.FULL_SPEED);
 
-            //drive.intakeLeft(-1);
-
             drive.jewelUp();
-            //timer.reset();
-            //while (timer.seconds() < 1) {}
-
-            //drive.intakeLeft(1);
 
             autoRotate(0, Drive.FULL_SPEED);
-
-            /*for (int i = 0; i < 2; i++) {
-                drive.intakeLeft(-1);
-                while (timer.seconds() < C.get().getDouble("intakeBackTime")) {
-                }
-                timer.reset();
-
-                drive.intakeLeft(1);
-                while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {
-                }
-                timer.reset();
-            }
-
-            drive.intakeLeft(0);
-            drive.intakeRight(0);*/
 
             //autoRotate(0, Drive.FULL_SPEED/4);
         } catch (NullPointerException ex) {
@@ -936,50 +878,19 @@ public abstract class Auto extends LinearVisionOpMode {
                 com.vuforia.CameraDevice.getInstance().setFlashTorchMode(false);
             }
         }
+        if (!done){
+            drive.uTrackUpdate();
+            if (!drive.stage.equals(GlyphPlacementSystem.Stage.RETURN2) && !drive.stage.equals(GlyphPlacementSystem.Stage.RESET)) {
+                drive.glyph.runToPosition(0);
+            }
+            done = drive.uTrack();
+        }
         //telemetry.addData("Mark", vuMark);
         return super.opModeIsActive();
     }
 
     public void openIntakes(HashMap<String, String> parameters) {
-
         this.intakeCount = 3;
         this.intakeTimer.reset();
-        /*if (this.intakeTimer.milliseconds() / 1000 < C.get().getDouble("intakeForwardTime")){
-            drive.intakeLeft(1);
-            drive.intakeRight(1);
-        }else if (this.intakeTimer.milliseconds() / 1000 < (C.get().getDouble("intakeForwardTime") + C.get().getDouble("intakeBackTime"))){
-            drive.intakeLeft(-1);
-            drive.intakeRight(-1);
-        }else if (this.intakeTimer.milliseconds() / 1000 > (C.get().getDouble("intakeForwardTime") + C.get().getDouble("intakeBackTime"))){
-            drive.intakeLeft(0);
-            drive.intakeRight(0);
-            if (intakeCount > 0){
-                intakeCount--;
-                intakeTimer.reset();
-            }
-        }
-
-        ElapsedTime timer = new ElapsedTime();
-        timer.reset();
-
-        drive.intakeLeft(1);
-        drive.intakeRight(1);
-        while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {}
-        timer.reset();
-
-        for (int i = 0; i < 3; i++) {
-            drive.intakeLeft(-1);
-            while (timer.seconds() < C.get().getDouble("intakeBackTime")) {
-            }
-            timer.reset();
-
-            drive.intakeLeft(1);
-            while (timer.seconds() < C.get().getDouble("intakeForwardTime")) {
-            }
-            timer.reset();
-        }
-
-        drive.intakeLeft(0);
-        drive.intakeRight(0);*/
     }
 }

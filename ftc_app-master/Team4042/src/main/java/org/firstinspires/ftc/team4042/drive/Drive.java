@@ -536,6 +536,7 @@ public abstract class Drive {
             Cryptobox.GlyphColor color = getGlyphColor();
 
             predict = uTrackAutoTarget(color);
+            telemetry.log().add("greybrown: [" + predict[0] + ", " + predict[1] + "]");
             if(!(((predict[0] + predict[1]) == 0) && !(numPlaces == 11))) {
                 telemetry.log().add("brown placed");
                 uTrack();
