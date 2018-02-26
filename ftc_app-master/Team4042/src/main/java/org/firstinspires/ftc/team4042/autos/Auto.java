@@ -111,6 +111,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
         try {
             drive.jewelUp();
+            drive.jewelCenter();
         } catch (NullPointerException ex) { }
 
         drive.resetEncoders();
@@ -120,7 +121,6 @@ public abstract class Auto extends LinearVisionOpMode {
         //Reads each instruction and acts accordingly
         AutoInstruction instruction = parser.popNext();
         while (instruction != null && opModeIsActive()) {
-            instruction = parser.popNext();
             String functionName = instruction.getFunctionName();
             HashMap<String, String> parameters = instruction.getParameters();
             log.add("function: " + functionName);
@@ -187,6 +187,7 @@ public abstract class Auto extends LinearVisionOpMode {
                     System.err.println("Unknown function called from file " + parser.getFile());
                     break;
             }
+            instruction = parser.popNext();
         }
     }
 
@@ -307,11 +308,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
     public void knockRedJewel(HashMap<String, String> parameters) {
         try {
-            //String balls = getBallColor(vuMarkIdentifier.getFrameAsMat());
-            //String balls = getBallColor(getFrameRgba());
             String balls = getBallColor(vuMarkIdentifier.getFrame());
-            //String balls = getBallColor(vuMarkIdentifier.getJewel());
-            //String balls = "red, blue";
             telemetry.addData("ball orientation", balls);
             switch (balls) {
                 case "red":
@@ -807,24 +804,18 @@ public abstract class Auto extends LinearVisionOpMode {
 
     public void jewelLeft() {
         try {
+            drive.jewelLeft();
+
             drive.resetEncoders();
             drive.runWithEncoders();
 
-            log.add("running intakes in");
-
-            ElapsedTime timer = new ElapsedTime();
-
-            timer.reset();
             drive.jewelDown();
 
-            //Moves the robot left
-            autoRotate(14, Drive.FULL_SPEED);
+            /*autoRotate(14, Drive.FULL_SPEED);
 
             drive.jewelUp();
 
-            autoRotate(0, Drive.FULL_SPEED);
-
-            //autoRotate(0, Drive.FULL_SPEED/4);
+            autoRotate(0, Drive.FULL_SPEED);*/
         } catch (NullPointerException ex) {
             StringWriter sw = new StringWriter();
             ex.printStackTrace(new PrintWriter(sw));
@@ -834,21 +825,18 @@ public abstract class Auto extends LinearVisionOpMode {
 
     public void jewelRight() {
         try {
+            drive.jewelRight();
+
             drive.resetEncoders();
             drive.runWithEncoders();
 
-            ElapsedTime timer = new ElapsedTime();
-
-            timer.reset();
             drive.jewelDown();
 
-            autoRotate(-14, Drive.FULL_SPEED);
+            /*autoRotate(-14, Drive.FULL_SPEED);
 
             drive.jewelUp();
 
-            autoRotate(0, Drive.FULL_SPEED);
-
-            //autoRotate(0, Drive.FULL_SPEED/4);
+            autoRotate(0, Drive.FULL_SPEED);*/
         } catch (NullPointerException ex) {
             StringWriter sw = new StringWriter();
             ex.printStackTrace(new PrintWriter(sw));
