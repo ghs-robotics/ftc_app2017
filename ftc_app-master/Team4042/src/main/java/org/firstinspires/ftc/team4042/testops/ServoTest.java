@@ -52,6 +52,10 @@ public class ServoTest extends OpMode {
         }
         b = gamepad1.b;
 
+        telemetry.addData("Y", "up " + STEP * 10);
+        telemetry.addData("A", "down " + STEP * 10);
+        telemetry.addData("X", "up " + STEP);
+        telemetry.addData("B", "down " + STEP);
         telemetry.addData("position", position);
         telemetry.update();
     }

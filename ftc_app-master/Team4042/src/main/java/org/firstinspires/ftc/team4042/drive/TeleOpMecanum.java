@@ -67,14 +67,14 @@ public class TeleOpMecanum extends OpMode {
 
     private int[] greyBrown = new int[] {0, 0};
 
-    private int cursorCount = 0;
+    private double cursorCount = 1;
 
     /**
     GAMEPAD 1:
       Joystick 1 X & Y      movement
       Joystick 1 button     verbose
       Joystick 2 X          rotation
-      Joystick 2 button
+      Joystick 2 button     jewel stowed
       Bumpers               (extendo) external intakes backwards    (normal) both intakes backwards
       Triggers              (extendo) external intakes forwards     (normal) both intakes forwards
       Dpad up               turn off auto intake
@@ -109,7 +109,6 @@ public class TeleOpMecanum extends OpMode {
             drive.runWithEncoders();
             drive.initializeGyro(telemetry, hardwareMap);
             drive.cryptobox.loadFile();
-            //gyro();
 
             telemetry.update();
 
@@ -157,10 +156,6 @@ public class TeleOpMecanum extends OpMode {
             }
             telemetry.addData("winch", drive.winchOpen);
 
-            if (gamepad2.left_stick_button && !bLeftStick) {
-                aiPlacer = !aiPlacer;
-            }
-
             //The first time you hit back, it establishes how long you've been pushing it for
             if (gamepad1.back && !aBack) {
                 aBackTime = System.nanoTime();
@@ -192,8 +187,9 @@ public class TeleOpMecanum extends OpMode {
                 drive.cryptobox.toggleRejectGlyph();
             }
 
-            //Drives the robot
-            drive.drive(false, gamepad1, gamepad2, adjustedSpeed * MecanumDrive.FULL_SPEED);
+            if (gamepad1.right_stick_button) {
+                drive.jewelStowed();
+            }
 
             //Runs the intakes
             intakes();
@@ -227,6 +223,7 @@ public class TeleOpMecanum extends OpMode {
     @Override
     public void stop() {
         super.stop();
+        drive.cryptobox.writeFile();
         cam.release();
     }
 
@@ -281,7 +278,11 @@ public class TeleOpMecanum extends OpMode {
             drive.toggleExtendo();
         } else if (gamepad1.y) {
             drive.extendoStep();
+        } else {
+            //Drives the robot
+            drive.drive(false, gamepad1, gamepad2, adjustedSpeed * MecanumDrive.FULL_SPEED);
         }
+        aY = gamepad1.y;
 
         //The X button on the first controller - toggle crawling to let us adjust the back of the robot too
         if (gamepad1.x && !aX) {
@@ -292,10 +293,12 @@ public class TeleOpMecanum extends OpMode {
                 drive.runBackWithEncoders();
             }
         }
+        aX = gamepad1.x;
 
         if (gamepad1.b && !aB) {
             Drive.tank = !Drive.tank;
         }
+        aB = gamepad1.b;
 
         if (Drive.useGyro) {
             drive.useGyro(0);
@@ -339,9 +342,15 @@ public class TeleOpMecanum extends OpMode {
         if (gamepad2.a && !bA) {
             drive.toggleHand();
         }
-        if (gamepad2.right_stick_button && !bRightStick) {
+        if (gamepad2.left_stick_button && !bLeftStick) {
             toggleManual();
         }
+
+        if (gamepad2.right_stick_button && !bRightStick) {
+            aiPlacer = !aiPlacer;
+            telemetry.log().add("right!");
+        }
+        bRightStick = gamepad2.right_stick_button;
 
         if (manual) {
             runManualPlacer();
@@ -423,8 +432,8 @@ public class TeleOpMecanum extends OpMode {
         }
 
         int numPlaces = drive.cryptobox.getNumGlyphsPlaced();
-        boolean grey = gamepad2.right_stick_y >= .5;
-        boolean brown = gamepad2.right_stick_y <= -.5;
+        boolean grey = -gamepad2.right_stick_y >= .5;
+        boolean brown = -gamepad2.right_stick_y <= -.5;
 
         //TODO: USE COLOR SENSOR
         Cryptobox.GlyphColor newGlyph = drive.getGlyphColor();
@@ -438,7 +447,7 @@ public class TeleOpMecanum extends OpMode {
             aiGlyphPlace(nextGlyph, numPlaces);
         }
         //If you're not at the bottom and are pushing a
-        else if (!drive.uTrackAtBottom && (gamepad2.y || gamepad2.x)) {
+        else if (!drive.uTrackAtBottom && (grey || brown)) {
             drive.uTrack();
         }
     }
@@ -567,7 +576,7 @@ public class TeleOpMecanum extends OpMode {
         bLeftStick = gamepad2.left_stick_button;
         bRightStick = gamepad2.right_stick_button;
 
-        aY = gamepad1.y;
+        //aY = gamepad1.y;
         aX = gamepad1.x;
         aB = gamepad1.b;
 
@@ -593,15 +602,22 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Manual", manual);
         telemetry.addData("Crawl", Drive.crawl);
         telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
-        telemetry.addData("Placer AI On", aiPlacer);
-        telemetry.addData("Cryptobox", drive.cryptobox.uiToString(cursorCount % 3 == 0));
+        telemetry.addData("AI", aiPlacer);
+        telemetry.addData("Cryptobox", drive.cryptobox == null ? "" : drive.cryptobox.uiToString((int) cursorCount % 2 == 0));
         printNextGlyph();
         telemetry.addData("Reject glyph", drive.cryptobox.getRejectGlyph());
-        telemetry.addData("Snake target", drive.cryptobox.getSnakeTarget().name());
+        Cryptobox.Snake snakeTarget = drive.cryptobox.getSnakeTarget();
+        telemetry.addData("Snake target", snakeTarget == null ? "null" : snakeTarget.name());
         if (drive.verbose) {
             telemetry.addData("gamepad1.dpad_up", gamepad1.dpad_up);
             telemetry.addData("bottom", drive.getBottomState());
             telemetry.addData("center", drive.getCenterState());
+            telemetry.addData("cursorCount", (int) cursorCount);
+            telemetry.addData("bLeftStick", bLeftStick);
+            telemetry.addData("gamepad2.left_stick_button", gamepad2.left_stick_button);
+            telemetry.addData("!bLeftStick && gamepad2.left_stick_button", !bLeftStick && gamepad2.left_stick_button);
+            telemetry.addData("!bRightStick && gamepad2.right_stick_button", !bRightStick && gamepad2.right_stick_button);
+            telemetry.addData("extendoTimer", drive.extendoTimer.seconds());
         }
         if (Drive.useGyro) {
             telemetry.addData("gyro", drive.gyro.updateHeading());

@@ -36,17 +36,17 @@ public class Cryptobox {
      * The rows are built from bottom to top, so index 0 is the
      * lowest position and index 3 the highest position
      */
-    private final static GlyphColor[][] snake1 = {
+    private final static GlyphColor[][] bgg = {
             {GlyphColor.BROWN, GlyphColor.BROWN, GlyphColor.GREY, GlyphColor.GREY},
             {GlyphColor.GREY, GlyphColor.BROWN, GlyphColor.BROWN, GlyphColor.GREY},
             {GlyphColor.GREY, GlyphColor.GREY, GlyphColor.BROWN, GlyphColor.BROWN}};
-    private final static GlyphColor[][] snake2 = {
+    private final static GlyphColor[][] gbb = {
             {GlyphColor.GREY, GlyphColor.GREY, GlyphColor.BROWN, GlyphColor.BROWN},
             {GlyphColor.BROWN, GlyphColor.GREY, GlyphColor.GREY, GlyphColor.BROWN},
             {GlyphColor.BROWN, GlyphColor.BROWN, GlyphColor.GREY, GlyphColor.GREY}};
 
     public enum Snake {
-        ONE(snake1), TWO(snake2), NONE(new GlyphColor[0][0]);
+        BGG(bgg), GBB(gbb), NONE(new GlyphColor[0][0]);
         private GlyphColor[][] glyphMap;
         private Snake(GlyphColor[][] glyphMap) {
             this.glyphMap = glyphMap;
@@ -61,7 +61,7 @@ public class Cryptobox {
 
     private int numGlyphsPlaced;
 
-    private Snake snakeTarget;
+    private Snake snakeTarget = Snake.NONE;
 
     public Cryptobox(Telemetry telemetry, GlyphPlacementSystem glyphPlacementSystem) {
         this (telemetry);
@@ -86,12 +86,16 @@ public class Cryptobox {
      * Reads the file and stores data into cryptobox array
      */
     public void loadFile() {
-        if (file.length() < 1) { return; } //Can't load a null file
+        if (file.length() < 1) {
+            clear();
+            return;
+        } //Can't load an empty file
 
         try {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
-            String line;
+            String line = bufferedReader.readLine();
+            snakeTarget = line.equals(Snake.BGG.name()) ? Snake.BGG : line.equals(Snake.GBB.name()) ? Snake.GBB : Snake.NONE;
             for (int r = 0; r < 4 && (line = bufferedReader.readLine()) != null; r++) {
                 //Reads the lines from the file in order
                 //store each one onto array
@@ -100,7 +104,7 @@ public class Cryptobox {
 
                     for (int c = 0; c < row.length; c++) {
                         String pos = row[c];
-                        glyphs[r][c] = pos.equalsIgnoreCase("G") ? GlyphColor.GREY :
+                        glyphs[c][r] = pos.equalsIgnoreCase("G") ? GlyphColor.GREY :
                                 pos.equalsIgnoreCase("B") ? GlyphColor.BROWN : GlyphColor.NONE;
                     }
 
@@ -109,7 +113,7 @@ public class Cryptobox {
             }
             fileReader.close();
         } catch (Exception e) {
-            telemetry.addData("Err load file:", e);
+            telemetry.addData("Err load file", Drive.getStackTrace(e));
         }
     }
 
@@ -123,9 +127,11 @@ public class Cryptobox {
             FileWriter fileWriter = new FileWriter(file);
             PrintWriter print_stream = new PrintWriter(fileWriter);
             //write array to file for each row and col
+            print_stream.println(snakeTarget.name());
             print_stream.print(this.toString());
+            print_stream.close();
         } catch (Exception e) {
-            telemetry.addData("Err load file:", e);
+            telemetry.addData("Err load file:", Drive.getStackTrace(e));
         }
     }
 
@@ -155,14 +161,14 @@ public class Cryptobox {
     }
 
     public void uiLeft() {
-        if (uiX != 2) {
-            uiX++;
+        if (uiX != 0) {
+            uiX--;
         }
     }
 
     public void uiRight() {
-        if (uiX != 0) {
-            uiX--;
+        if (uiX != 2) {
+            uiX++;
         }
     }
 
@@ -188,7 +194,8 @@ public class Cryptobox {
                 if (cursor && c == uiX && r == (3 - uiY)) {
                     val = "X";
                 } else {
-                    val = this.glyphs[c][r].equals(GlyphColor.BROWN) ? "B" : this.glyphs[c][r].equals(GlyphColor.GREY) ? "G" : "N";
+                    GlyphColor glyph = this.glyphs[c][r];
+                    val = glyph == null ? "N" : glyph.equals(GlyphColor.BROWN) ? "B" : this.glyphs[c][r].equals(GlyphColor.GREY) ? "G" : "N";
                 }
                 toString.append(val).append(" ");
             }
@@ -206,10 +213,10 @@ public class Cryptobox {
     }
 
     public void toggleSnakeTarget() {
-        if (snakeTarget.equals(Snake.ONE)) {
-            snakeTarget = Snake.TWO;
-        } else if (snakeTarget.equals(Snake.TWO)) {
-            snakeTarget = Snake.ONE;
+        if (snakeTarget.equals(Snake.BGG)) {
+            snakeTarget = Snake.GBB;
+        } else if (snakeTarget.equals(Snake.GBB)) {
+            snakeTarget = Snake.BGG;
         }
     }
 
@@ -237,13 +244,13 @@ public class Cryptobox {
     public void cipherFirstGlyph(GlyphColor newGlyph, int column) {
         switch (column) {
             case 0:
-                snakeTarget = newGlyph.equals(GlyphColor.BROWN) ? Snake.ONE : Snake.TWO;
+                snakeTarget = newGlyph.equals(GlyphColor.BROWN) ? Snake.BGG : Snake.GBB;
                 break;
             case 1:
-                snakeTarget = newGlyph.equals(GlyphColor.GREY) ? Snake.ONE : Snake.TWO;
+                snakeTarget = newGlyph.equals(GlyphColor.GREY) ? Snake.BGG : Snake.GBB;
                 break;
             case 2:
-                snakeTarget = newGlyph.equals(GlyphColor.GREY) ? Snake.ONE : Snake.TWO;
+                snakeTarget = newGlyph.equals(GlyphColor.GREY) ? Snake.BGG : Snake.GBB;
                 break;
         }
 
