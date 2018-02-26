@@ -223,7 +223,7 @@ public class GlyphPlacementSystem {
     public void runToPosition(double jc) {
         double power = ((double)drive.verticalDriveTargetPos() - (double)drive.verticalDriveCurrPos())/ PROPORTIONAL_CONSTANT + drive.uTrackRate * DERIV_CONSTANT;
         power = (power * (1. - Math.abs(jc))) + jc;
-        power = Math.abs(power) < 0.2 ? 0 : power;
+        power = Math.abs(power) < 0.02 ? 0 : power;
         drive.setVerticalDrive(power);
 
         int pos = drive.verticalDriveCurrPos();
