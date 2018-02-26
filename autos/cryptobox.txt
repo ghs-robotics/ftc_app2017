@@ -1,0 +1,5 @@
+GBB
+N N N
+N N N
+N N N
+N B N
