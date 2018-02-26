@@ -215,15 +215,15 @@ public class GlyphPlacementSystem {
                 drive.targetX = HorizPos.LEFT;
             }
             drive.setHorizontalDrive(-.5 * drive.getHorizontalDrive());
-            //this.setXPower(HorizPos.CENTER);
         }
         return false;
     }
 
-    public void runToPosition(double helper) {
+    public void runToPosition(double jc) {
         double power = ((double)drive.verticalDriveTargetPos() - (double)drive.verticalDriveCurrPos())/ PROPORTIONAL_CONSTANT + drive.uTrackRate * DERIV_CONSTANT;
-        power = (power * (1. - Math.abs(helper))) + helper;
-        power = Math.abs(power) < 0.2 ? 0 : power;
+        power = (power * (1. - Math.abs(jc))) + jc;
+        power = Math.abs(power) < 0.02 ? 0 : power;
+        //Possibly multiply power by something if it's less than a number to help it along
         drive.setVerticalDrive(power);
 
         int pos = drive.verticalDriveCurrPos();
