@@ -9,7 +9,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 /**
  * Created by Hazel on 2/21/2018.
@@ -26,7 +25,7 @@ public class AutoParser {
         this.telemetry = telemetry;
         this.log = telemetry.log();
         log.add("Reading file " + filePath);
-        file = new File("./storage/emulated/0/bluetooth/" + filePath);
+        file = new File(Auto.autoRoot, filePath);
 
         loadFile();
     }
