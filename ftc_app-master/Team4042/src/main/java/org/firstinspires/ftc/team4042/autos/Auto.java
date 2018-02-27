@@ -46,6 +46,8 @@ public abstract class Auto extends LinearVisionOpMode {
     private double PROPORTIONAL_ROTATE = C.get().getDouble("PropRot");
     private double DERIV_ROTATE = C.get().getDouble("DerivRot");
 
+    public static final File autoRoot = new File ("./storage/emulated/0/bluetooth/");
+
     private Telemetry.Log log;
 
     private double startRoll;

@@ -23,16 +23,16 @@ public class DelAuto extends OpMode {
                 "red", "redbottom", "redjewel", "redtop", "test"
         };
         for(String auto : autos) {
-            tfile = new File("./storage/emulated/0/bluetooth/" + auto + "-1.txt");
+            tfile = new File(Auto.autoRoot, auto + "-1.txt");
             //log.add("\n\n\n\n\n\nno\n\n\n\n\n\n");
             telemetry.addLine("mebe time");
             if(tfile.exists()) {
                 telemetry.addLine("go time");
                 //log.add("\n\n\n\n\n\ntest\n\n\n\n\n\n");
                 //String f = Environment.getExternalStoragePublicDirectory()
-                ofile = new File("./storage/emulated/0/bluetooth/" + auto + ".txt");
+                ofile = new File(Auto.autoRoot,  auto + ".txt");
                 ofile.delete();
-                ofile = new File("./storage/emulated/0/bluetooth/" + auto + ".txt");
+                ofile = new File(Auto.autoRoot, auto + ".txt");
                 tfile.renameTo(ofile);
             }
         }

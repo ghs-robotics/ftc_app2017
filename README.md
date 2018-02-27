@@ -1,10 +1,40 @@
 
 # Garfield Robotic's ftc_app2017
-Welcome to our code for 2017! This repo contains code for both FTC Team 4042 "Non-Standard Deviation" and for Team 12788 "Ultraviolet".
+
+Welcome to our code for 2017! This repo contains code for both FTC Team 4042 "Nonstandard Deviation" and for Team 12788 "Ultraviolet".
 
 This is an Android Studio project to create the FTC Robot Controller app.
 
-# General Instructions
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/dawgbotics/ftc_app2017/graphs/commit-activity)
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![GitHub watchers](https://img.shields.io/github/stars/dawgbotics/ftc_app2017.svg?style=social&label=Watch&maxAge=2592000)](https://github.com/dawgbotics/ftc_app2017/watchers) 
+[![GitHub stars](https://img.shields.io/github/stars/dawgbotics/ftc_app2017.svg?style=social&label=Star&maxAge=2592000)](https://github.com/dawgbotics/ftc_app2017/stargazers)
+[![GitHub contributors](https://img.shields.io/github/contributors/dawgbotics/ftc_app2017.svg)](https://github.com/dawgbotics/ftc_app2017/graphs/contributors)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/dawgbotics/ftc_app2017/pulls)
+
+# Features
+
+A quick summary, visit [our website](http://garfieldrobotics.com/) or [contact us](mailto:contact@garfieldrobotics.com) for more info.
+
+## Team 4042
+
+### Autonomous
+
+ - Uses OpenCV and Vuforia to identify the pictograph and opposing alliance's jewel
+ - Reads instructions from files
+ - Uses an array of IRs and sonars to navigate the field
+ - Every movement uses a PID controller
+ - Uses a gyroscope to identify when we've driven off the balancing stone
+ - Autonomously opens the intakes
+ - Autonomously collects glyphs and aligns them
+
+### Teleop
+- Glyph placing system is entirely autonomous. It determines glyph color, then uses artificial intelligence to place it in an efficient and strategic place depending on the cipher and previously placed glyphs. Based on that, the glyph placer indexes vertically using encoders and horizontally using limit switches, then places the glyph and indexes back to the home position - all automatically.
+- Four different glyph placing modes (AI, automated drive, manual drive, and reset)
+- Four different drive modes (regular, regular tank, extendo, and extendo crawl)
+- _The robot gets really long._
+
+# General Instructions for Downloading
 
 These instructions are applicable for nearly any GitHub project, but our project has its own quirks and oddities so please read through the directions carefully.
 
@@ -38,28 +68,40 @@ _Note:_ As the repo consists of code for two different teams, the code base is s
 When you next want to interact with GitHub, you can use [the GitHub cheat sheet](https://drive.google.com/file/d/1HvLFKy5sd9aXeU-pLuVbgeNDCWMS_gs4/view?usp=sharing) to get you started.
 
 ## Other teams
-If you would like to use our code, feel free to fork the repo using the Fork button in the upper right on [our GitHub page](https://github.com/dawgbotics/ftc_app2017). Be sure to tell us how you used it at contact@garfieldrobotics.com!
+
+If you would like to use our code, feel free to fork the repo using the Fork button in the upper right on [our GitHub page](https://github.com/dawgbotics/ftc_app2017). Be sure to tell us how you used it at [contact@garfieldrobotics.com](mailto:contact@garfieldrobotics.com)!
 
 If you want to contribute to our project, go through the [Garfield Robotics members](#garfield-robotics-members) steps to download a local copy of the repo. Submit a pull request when you're done and we'll consider it!
 
-# Features
+# Licensing
 
-A quick summary of the features of each team's code.
+This code is licensed under the GNU General Public License v3.0. To summarize, the license...
 
-## Team 4042
+GNU GPLv3 means you can:
+- Use our code commercially
+- Distribute it
+- Modify it
+- Patent it
+- Use it privately
 
-### Autonomous
+But have to:
+- Disclose its source (here!)
+- Provide the [copyright notice](#legalese) and license, which appears in the LICENSE.md
+- License your code under this same license (GNU GPLv3)
+- Document what changes you make to our code
 
- - Uses OpenCV and Vuforia to identify the pictograph and opposing alliance's jewel
- - Reads instructions from files
- - Uses an array of IRs and sonars to navigate the field
- - Every movement uses a PID controller
- - Uses a gyroscope to identify when we've driven off the balancing stone
- - Autonomously opens the intakes
- - Autonomously collects glyphs and aligns them
+And:
+- You don't have a warranty
+- We're not liable
 
-### Teleop
-- Glyph placing system is entirely autonomous. The operator selects the target location, then the glyph placer indexes vertically using encoders and horizontally using limit switches, then places the glyph and indexes back to the home position - all automatically.
-- Four different glyph placing modes (fast, automated, manual, and reset)
-- Four different drive modes (regular, regular tank, extendo, and extendo crawl)
-- _The robot gets really long._
+Copyright (C) 2017 Garfield Robotics
+
+## Legalese
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program.  If not, see [http://www.gnu.org/licenses/](http://www.gnu.org/licenses/).
+
+You can contact us with any questions about licensing [here](mailto:contact@garfieldrobotics.com).

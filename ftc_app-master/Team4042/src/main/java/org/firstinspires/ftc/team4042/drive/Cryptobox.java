@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.util.Range;
 import java.util.ArrayList;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.team4042.autos.Auto;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -70,7 +71,7 @@ public class Cryptobox {
 
     public Cryptobox(Telemetry telemetry) {
         this.telemetry = telemetry;
-        this.file = new File("./storage/emulated/0/bluetooth/cryptobox.txt");
+        this.file = new File(Auto.autoRoot, "cryptobox.txt");
         this.numGlyphsPlaced = 0;
     }
 
