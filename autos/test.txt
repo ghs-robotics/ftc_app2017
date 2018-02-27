@@ -1,1 +1,10 @@
-f:sdrive speed:1 xdistance:179 xir:1 xtype:sonar gyro:0 offset:124 test:true prop:30
+#f:getmark
+#f:knockr
+#f:brace
+f:doff x:0 y:-1 speed:1 target:2000 gyro:0
+#f:open
+f:rot r:110 speed:1
+f:drive x:.25 y:1 speed:1 gyro:110 target:2000 time:7
+#f:drive x:.25 y:1 speed:1 gyro:110 target:200
+#f:drive x:0 y:1 gyro:90 speed:1 target:200
+#f:place

@@ -78,6 +78,7 @@ public abstract class Drive {
     public DcMotor motorRightBack;
 
     private Servo jewelServo;
+    private Servo jewelHead;
 
     private DcMotor intakeLeft;
     private DcMotor intakeRight;
@@ -204,6 +205,7 @@ public abstract class Drive {
         motorRightBack = initializeMotor(hardwareMap, "back right");
 
         jewelServo = initializeServo(hardwareMap, "jewel");
+        jewelHead = initializeServo(hardwareMap, "head");
 
         grabbyBoi = initializeServo(hardwareMap, "hand");
 
@@ -265,7 +267,8 @@ public abstract class Drive {
     }
 
     public Cryptobox.GlyphColor getGlyphColor() {
-        return getRGB()[3] > COLOR_THRESHOLD ? Cryptobox.GlyphColor.BROWN : Cryptobox.GlyphColor.GREY;
+        return Cryptobox.GlyphColor.GREY;
+        //return getRGB()[3] > COLOR_THRESHOLD ? Cryptobox.GlyphColor.BROWN : Cryptobox.GlyphColor.GREY;
     }
 
     private float[] getRGB(){
@@ -281,13 +284,14 @@ public abstract class Drive {
         return hsvValues;
     }
 
-    ElapsedTime extendoTimer;
+    public ElapsedTime extendoTimer = new ElapsedTime();
 
     public void toggleExtendo() {
         //It's extendo, so put it back together
         extendoTimer = new ElapsedTime();
         Drive.isExtendo = !Drive.isExtendo;
         extendoTimer.reset();
+        log.add("EIEIO");
     }
 
     public void extendoStep() {
@@ -299,18 +303,15 @@ public abstract class Drive {
                 lowerBrakes();
                 unlockCatches();
                 runBackWithEncoders();
-                driveLR(1, -1, -1);
+                driveLR(1, 1, 1);
             }
         }
         //Moving out of extendo, so put it together
         else {
-            if (extendoTimer.seconds() < .2) {
-                pushRobotTogether();
-            } else if (extendoTimer.seconds() < .4){
-                raiseBrakes();
-                lockCatches();
-                freezeBack();
-            }
+            raiseBrakes();
+            lockCatches();
+            freezeBack();
+            pushRobotTogether();
         }
     }
 
@@ -792,26 +793,34 @@ public abstract class Drive {
     }
 
     public void jewelDown() {
-        jewelServo.setPosition(.1);
-        while (jewelServo.getPosition() != .1) {  }
+        jewelServo.setPosition(.82);
     }
 
     public void jewelUp() {
-        jewelServo.setPosition(.6);
-        while (jewelServo.getPosition() != .6) {  }
+        jewelServo.setPosition(.47);
     }
 
-    public void jewelIn() {
-        jewelServo.setPosition(.83);
-        while (jewelServo.getPosition() != .83) {  }
+    public void jewelCenter() {
+        jewelHead.setPosition(.47);
+    }
+
+    public void jewelLeft() {
+        jewelHead.setPosition(0.01);
+    }
+
+    public void jewelRight() {
+        jewelHead.setPosition(0.97);
     }
 
     /*
     Moves the jewel out of the way
      */
     public void jewelOut() {
-        jewelServo.setPosition(.43);
-        while (jewelServo.getPosition() != .43) {  }
+        jewelServo.setPosition(.60);
+    }
+
+    public void jewelStowed() {
+        jewelServo.setPosition(.35);
     }
 
     public void lockCatches() {

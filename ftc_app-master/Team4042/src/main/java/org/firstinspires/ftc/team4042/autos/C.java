@@ -28,7 +28,7 @@ public class C {
     }
 
     private C() {
-        file = new File("./storage/emulated/0/bluetooth/" + "constants.txt");
+        file = new File(Auto.autoRoot, "constants.txt");
         myConstants = loadFile();
     }
 
