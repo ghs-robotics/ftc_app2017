@@ -528,11 +528,13 @@ public abstract class Drive {
 
 
     private int[] predict = {0};
-    public int[] uTrackAutoTarget() {
+    public int[] uTrackAutoTarget(Gamepad gamepad2) {
         int numPlaces = cryptobox.getNumGlyphsPlaced();
         if (uTrackAtBottom && collected.getState()) {
-            internalIntakeRight(0);
-            internalIntakeLeft(0);
+            if (!gamepad2.left_bumper && !gamepad2.right_bumper && gamepad2.right_trigger < DEADZONE_SIZE && gamepad2.left_trigger < DEADZONE_SIZE) {
+                internalIntakeRight(0);
+                internalIntakeLeft(0);
+            }
 
             Cryptobox.GlyphColor color = getGlyphColor();
 
@@ -543,7 +545,8 @@ public abstract class Drive {
                 uTrack();
             }
         } else if (!uTrackAtBottom) {
-            if(!stage.equals(GlyphPlacementSystem.Stage.HOME) && !stage.equals(GlyphPlacementSystem.Stage.GRAB)){
+            if(!stage.equals(GlyphPlacementSystem.Stage.HOME) && !stage.equals(GlyphPlacementSystem.Stage.GRAB) &&
+                    !gamepad2.left_bumper && !gamepad2.right_bumper && gamepad2.right_trigger < DEADZONE_SIZE && gamepad2.left_trigger < DEADZONE_SIZE){
                 internalIntakeLeft(1);
                 internalIntakeRight(1);
             }
