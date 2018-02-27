@@ -1,6 +1,6 @@
 
 # Garfield Robotic's ftc_app2017
-Welcome to our code for 2017! This repo contains code for both FTC Team 4042 "Non-Standard Deviation" and for Team 12788 "Ultraviolet".
+Welcome to our code for 2017! This repo contains code for both FTC Team 4042 "Nonstandard Deviation" and for Team 12788 "Ultraviolet".
 
 This is an Android Studio project to create the FTC Robot Controller app.
 
