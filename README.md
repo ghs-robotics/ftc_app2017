@@ -6,7 +6,7 @@ This is an Android Studio project to create the FTC Robot Controller app.
 
 # Features
 
-A quick summary, visit [our website](http://garfieldrobotics.com/) or [contact us](contact@garfieldrobotics.com) for more info.
+A quick summary, visit [our website](http://garfieldrobotics.com/) or [contact us](mailto:contact@garfieldrobotics.com) for more info.
 
 ## Team 4042
 
