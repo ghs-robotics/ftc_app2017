@@ -29,9 +29,7 @@ public class GlyphPlacementSystem {
 
     //indicates the position of the lift in motor encoders
     public enum Position {
-        //HOME(0), RAISED(1200), TOP(1600), MID(2000), BOT(2500), TRANSITION(-1);
-        HOME(0), RAISEDBACK(1325), RAISED(1375), TOP(1550), MID(1875), BOT(2050), TRANSITION(-1);
-        //HOME(10), RAISEDBACK(1350), RAISED(1401), TOP(1600), MID(1900), BOT(2200), TRANSITION(-1);
+        HOME(0), ABOVEHOME(400), RAISEDBACK(1325), RAISED(1375), TOP(1550), MID(1875), BOT(2050), TRANSITION(-1);
 
         private final Integer encoderVal;
         Position(Integer encoderVal) { this.encoderVal = encoderVal; }
@@ -164,6 +162,10 @@ public class GlyphPlacementSystem {
         drive.setVerticalDrivePos(Position.HOME.getEncoderVal());
     }
 
+    public void setAboveHomeTarget() {
+        drive.setVerticalDrivePos(Position.ABOVEHOME.getEncoderVal());
+    }
+
     //runs the horizontal drive servo based on the power multipliers in HorizPos
     public void setXPower(HorizPos targetPos) {
         //if target = left(-1) and current = right(1)
@@ -230,6 +232,9 @@ public class GlyphPlacementSystem {
 
         if (pos < PLACEMENT_ERROR_MARGIN) {
             currentY = Position.HOME;
+        }
+        else if (Math.abs(pos - Position.ABOVEHOME.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
+            currentY = Position.ABOVEHOME;
         }
         else if (Math.abs(pos - Position.RAISED.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
             currentY = Position.RAISED;

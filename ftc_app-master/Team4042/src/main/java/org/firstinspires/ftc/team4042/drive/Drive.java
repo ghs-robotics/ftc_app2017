@@ -558,6 +558,7 @@ public abstract class Drive {
         telemetry.addData("horizontal timer", glyph.horizontalTimer.seconds());
         telemetry.addData("power", getHorizontalDrive());
         switch (stage) {
+            case RESET: { reset(); return false; }
             case HOME: { home(); return false; }
             case GRAB: { grab(); return false; }
             case PLACE1: { place1(); return false; }
@@ -566,8 +567,7 @@ public abstract class Drive {
             case RETURN1: { return1(); return false; }
             case RELEASE: { release(); return false; }
             case PAUSE2: { pause2(); return false; }
-            case RETURN2: { return2(); return false; }
-            case RESET: { return reset(); }
+            case RETURN2: { return2(); return true; }
         }
         return false;
     }
@@ -638,8 +638,7 @@ public abstract class Drive {
     }
     private void return2() {
         //Move back to the bottom and get ready to do it again
-        glyph.setHomeTarget();
-        setVerticalDriveMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        glyph.setAboveHomeTarget();
         setVerticalDrive(-1);
         stage = GlyphPlacementSystem.Stage.RESET;
     }
@@ -647,25 +646,19 @@ public abstract class Drive {
     private boolean lastBottom;
     private ElapsedTime bottomTimer = new ElapsedTime();
 
-    private boolean reset() {
-        if (verticalDrive.getCurrentPosition() < 100) {
-            boolean currBottom = getBottomState();
-            if (currBottom && !lastBottom) {
-                bottomTimer.reset();
-            } else if (currBottom && bottomTimer.milliseconds() / 1000 >
-                    C.get().getDouble("bottomWait")) {
-                resetUTrack();
-                uTrackAtBottom = true;
-                return true;
-            } else if (currBottom) {
-                setVerticalDrive((C.get().getDouble("bottomWait") -
-                        bottomTimer.milliseconds() / 1000) / -2);
-            }
-            lastBottom = currBottom;
-            telemetry.addData("Bottom timer", bottomTimer.milliseconds() / 1000);
+    private void reset() {
+        boolean currBottom = getBottomState();
+
+        if(!currBottom) {
+            setVerticalDriveMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            setVerticalDrive(-1);
+        } else {
+            resetUTrack();
+            uTrackAtBottom = true;
+            stage = GlyphPlacementSystem.Stage.HOME;
         }
-        return false;
     }
+
     public void resetUTrack() {
         stage = GlyphPlacementSystem.Stage.HOME;
         jewelUp();
