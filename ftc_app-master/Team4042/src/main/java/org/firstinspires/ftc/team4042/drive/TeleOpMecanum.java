@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.team4042.drive;
 
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.hardware.Camera;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -13,6 +15,7 @@ import org.firstinspires.ftc.team4042.autos.C;
 public class TeleOpMecanum extends OpMode {
 
     private double adjustedSpeed;
+
 
     private boolean aiPlacer = false;
     private boolean manual = false;
@@ -522,19 +525,19 @@ public class TeleOpMecanum extends OpMode {
             drive.intakeRight(0);
         } else {
             if (Drive.isExtendo) {
-                if (bRightTrigger > 0) { drive.internalIntakeRight(bRightTrigger); }
+                if (bRightTrigger > Drive.DEADZONE_SIZE) { drive.internalIntakeRight(bRightTrigger); }
                 //Right bumper of the b controller runs the right intake backwards
                 else if (bRightBumper) { drive.internalIntakeRight(-1); }
                 else { drive.internalIntakeRight(0); }
 
                 //Left trigger of the b controller runs the left intake forward
-                if (bLeftTrigger > 0) { drive.internalIntakeLeft(bLeftTrigger); }
+                if (bLeftTrigger > Drive.DEADZONE_SIZE) { drive.internalIntakeLeft(bLeftTrigger); }
                 //Left bumper of the b controller runs the left intake backwards
                 else if (bLeftBumper) { drive.internalIntakeLeft(-1); }
                 else { drive.internalIntakeLeft(0); }
             }
 
-            if (aRightTrigger > 0) {
+            if (aRightTrigger > Drive.DEADZONE_SIZE) {
                 drive.intakeRight(aRightTrigger);
                 if (!Drive.isExtendo) { drive.internalIntakeRight(aRightTrigger); }
             } else if (aRightBumper) {
@@ -545,7 +548,7 @@ public class TeleOpMecanum extends OpMode {
                 if (!Drive.isExtendo) { drive.internalIntakeRight(0); }
             }
 
-            if (aLeftTrigger > 0) {
+            if (aLeftTrigger > Drive.DEADZONE_SIZE) {
                 drive.intakeLeft(aLeftTrigger);
                 if (!Drive.isExtendo) { drive.internalIntakeLeft(aLeftTrigger); }
             } else if (aLeftBumper) {
