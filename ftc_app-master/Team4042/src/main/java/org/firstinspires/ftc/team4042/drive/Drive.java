@@ -307,21 +307,27 @@ public abstract class Drive {
     public void extendoStep() {
         //Moving into extendo, so take it apart
         if (Drive.isExtendo) {
-            if (extendoTimer.seconds() < .2) {
+            if (extendoTimer.seconds() < .15) {
                 driveXYR(1, 0, 1, 0, false);
             } else if (extendoTimer.seconds() < .4) {
                 lowerBrakes();
                 unlockCatches();
                 runBackWithEncoders();
                 driveLR(1, 1, 1);
+            } else {
+                driveXYR(1, 0, 0, 0, false);
             }
         }
         //Moving out of extendo, so put it together
         else {
-            raiseBrakes();
-            lockCatches();
-            freezeBack();
-            pushRobotTogether();
+            if (extendoTimer.seconds() < .2) {
+                raiseBrakes();
+                lockCatches();
+                freezeBack();
+                pushRobotTogether();
+            } else {
+                driveXYR(1, 0, 0, 0, false);
+            }
         }
     }
 

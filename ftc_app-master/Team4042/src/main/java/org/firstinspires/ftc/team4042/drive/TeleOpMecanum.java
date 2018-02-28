@@ -157,6 +157,7 @@ public class TeleOpMecanum extends OpMode {
             if (gamepad1.dpad_down && !aDown) {
                 drive.toggleWinch();
             }
+            aDown = gamepad1.dpad_down;
             telemetry.addData("winch", drive.winchOpen);
 
             //The first time you hit back, it establishes how long you've been pushing it for
@@ -589,7 +590,7 @@ public class TeleOpMecanum extends OpMode {
         bB = gamepad2.b;
 
         aUp = gamepad1.dpad_up;
-        aDown = gamepad1.dpad_down;
+        //aDown = gamepad1.dpad_down;
 
         bUp = gamepad2.dpad_up;
         bLeft = gamepad2.dpad_left;
