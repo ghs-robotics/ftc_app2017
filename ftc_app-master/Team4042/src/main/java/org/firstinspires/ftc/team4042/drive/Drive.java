@@ -666,6 +666,7 @@ public abstract class Drive {
         if(glyph.currentY.equals(GlyphPlacementSystem.Position.ABOVEHOME)) {
             stage = GlyphPlacementSystem.Stage.RESET;
             setVerticalDrive(0);
+            jewelUp();
             return true;
         }
         return false;
@@ -689,7 +690,6 @@ public abstract class Drive {
 
     public void resetUTrack() {
         stage = GlyphPlacementSystem.Stage.HOME;
-        jewelUp();
         setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
         uTrackAtBottom = true;
