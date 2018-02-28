@@ -583,7 +583,7 @@ public abstract class Drive {
             case RETURN1: { return1(); return false; }
             case RELEASE: { release(); return false; }
             case PAUSE2: { pause2(); return false; }
-            case RETURN2: { return2(); return true; }
+            case RETURN2: { return return2(); }
         }
         return false;
     }
@@ -651,12 +651,18 @@ public abstract class Drive {
             log.add("reached x target, center is " + getCenterState());
             stage = GlyphPlacementSystem.Stage.RETURN2;
         }
-    }
-    private void return2() {
-        //Move back to the bottom and get ready to do it again
+        setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
         glyph.setAboveHomeTarget();
         setVerticalDrive(-1);
-        stage = GlyphPlacementSystem.Stage.RESET;
+    }
+    private boolean return2() {
+        //Move back to the bottom and get ready to do it again
+        if(glyph.currentY.equals(GlyphPlacementSystem.Position.ABOVEHOME)) {
+            stage = GlyphPlacementSystem.Stage.RESET;
+            setVerticalDrive(0);
+            return true;
+        }
+        return false;
     }
 
     private boolean lastBottom;
