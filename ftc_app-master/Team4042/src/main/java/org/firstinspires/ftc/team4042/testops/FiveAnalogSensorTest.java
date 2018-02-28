@@ -14,6 +14,7 @@ public class FiveAnalogSensorTest extends OpMode{
     private AnalogSensor[] shortRange = new AnalogSensor[3];
     private AnalogSensor[] longRange = new AnalogSensor[2];
     private AnalogSensor[] sonar = new AnalogSensor[2];
+    private AnalogSensor[] lineFollow = new AnalogSensor[1];
 
     @Override
     public void init() {
@@ -44,6 +45,15 @@ public class FiveAnalogSensorTest extends OpMode{
                 }
             }
         }
+        for (int i = 0; i < lineFollow.length; i++) {
+            lineFollow[i] = new AnalogSensor("line follow" + i, AnalogSensor.Type.LINE_FOLLOW);
+            if (lineFollow[i] != null) {
+                lineFollow[i].initialize(hardwareMap);
+                for (int j = 0; j < AnalogSensor.NUM_OF_READINGS; j++) {
+                    lineFollow[i].addReading();
+                }
+            }
+        }
     }
 
     @Override
@@ -64,6 +74,12 @@ public class FiveAnalogSensorTest extends OpMode{
             if (sonar != null) {
                 sonar.addReading();
                 telemetry.addData(sonar.getName(), sonar.getCmAvg());
+            }
+        }
+        for (AnalogSensor follow : lineFollow) {
+            if (follow != null) {
+                follow.addReading();
+                telemetry.addData(follow.getName(), follow.getVAvg());
             }
         }
         telemetry.update();

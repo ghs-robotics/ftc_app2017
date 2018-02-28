@@ -13,7 +13,7 @@ public class AnalogSensor {
     public AnalogInput sensor;
     private String name;
     public Type type;
-    public enum Type { SHORT_RANGE, LONG_RANGE, SONAR }
+    public enum Type { SHORT_RANGE, LONG_RANGE, SONAR, LINE_FOLLOW }
 
     public static final int NUM_OF_READINGS = 6;
 
@@ -129,6 +129,8 @@ public class AnalogSensor {
         if (voltage == -1) { return -1; }
         return (int)Math.round(747.47*voltage - 0.7522);
     }
+
+
 
     //90 - 110
     //0.121412 - .148169

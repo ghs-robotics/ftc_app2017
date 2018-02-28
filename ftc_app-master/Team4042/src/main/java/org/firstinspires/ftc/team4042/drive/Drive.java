@@ -124,8 +124,7 @@ public abstract class Drive {
     public AnalogSensor[] shortIr = new AnalogSensor[3];
     public AnalogSensor[] longIr = new AnalogSensor[2];
     public AnalogSensor[] sonar = new AnalogSensor[2];
-
-    public NormalizedColorSensor colorSensor;
+    public AnalogSensor[] lineFollow = new AnalogSensor[1];
 
     public boolean verbose;
 
@@ -150,6 +149,10 @@ public abstract class Drive {
 
         for (int i = 0; i < sonar.length; i++){
             sonar[i] = new AnalogSensor("sonar"+i, AnalogSensor.Type.SONAR);
+        }
+
+        for (int i = 0; i < lineFollow.length; i++){
+            lineFollow[i] = new AnalogSensor("sonar"+i, AnalogSensor.Type.SONAR);
         }
 
         verbose = false;
@@ -190,6 +193,10 @@ public abstract class Drive {
 
             for (AnalogSensor aSonar: sonar) {
                 aSonar.initialize(hardwareMap);
+            }
+
+            for (AnalogSensor aLineFollow : lineFollow){
+                aLineFollow.initialize(hardwareMap);
             }
             /*try {
                 colorSensor = hardwareMap.get(NormalizedColorSensor.class, "color sensor");
@@ -263,15 +270,18 @@ public abstract class Drive {
             for (AnalogSensor sonar : sonar) {
                 sonar.addReading();
             }
+            for (AnalogSensor lineFollow : lineFollow){
+                lineFollow.addReading();
+            }
         }
     }
 
     public Cryptobox.GlyphColor getGlyphColor() {
         return Cryptobox.GlyphColor.GREY;
-        //return getRGB()[3] > COLOR_THRESHOLD ? Cryptobox.GlyphColor.BROWN : Cryptobox.GlyphColor.GREY;
+        //return lineFollow[0].getVAvg() > COLOR_THRESHOLD ? Cryptobox.GlyphColor.BROWN : Cryptobox.GlyphColor.GREY;
     }
 
-    private float[] getRGB(){
+    /*private float[] getRGB(){
         NormalizedRGBA color = colorSensor.getNormalizedColors();
         float[] val = {color.red, color.green, color.blue, color.alpha};
         return val;
@@ -282,7 +292,7 @@ public abstract class Drive {
         float[] hsvValues = new float[3];
         Color.colorToHSV(color.toColor(), hsvValues);
         return hsvValues;
-    }
+    }*/
 
     public ElapsedTime extendoTimer = new ElapsedTime();
 
@@ -421,6 +431,9 @@ public abstract class Drive {
             sIr.addReading();
             currSonar[i] = sIr.getCmAvg(100, offset);
             sonarRates[i] = (currSonar[i] - lastSonar[index][i]) / (currMilli - lastMilli);
+        }
+        for (AnalogSensor lineFollow : lineFollow) {
+            lineFollow.addReading();
         }
 
         //Gyro rates
