@@ -316,16 +316,19 @@ public abstract class Drive {
         log.add("EIEIO");
     }
 
-    public void extendoStep() {
+    public boolean extendoStep() {
         //Moving into extendo, so take it apart
         if (Drive.isExtendo) {
             if (extendoTimer.seconds() < .15) {
                 driveXYR(1, 0, 1, 0, false);
+                return false;
             } else if (extendoTimer.seconds() < .4) {
                 servoExtendo();
                 driveLR(1, 1, 1);
+                return false;
             } else {
                 driveXYR(1, 0, 0, 0, false);
+                return true;
             }
         }
         //Moving out of extendo, so put it together
@@ -333,8 +336,10 @@ public abstract class Drive {
             if (extendoTimer.seconds() < .2) {
                 servoNotExtendo();
                 pushRobotTogether();
+                return false;
             } else {
                 driveXYR(1, 0, 0, 0, false);
+                return true;
             }
         }
     }

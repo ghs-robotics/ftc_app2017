@@ -183,7 +183,7 @@ public abstract class Auto extends LinearVisionOpMode {
                     wait(parameters);
                     break;
                 case "break":
-                    drive.toggleExtendo();
+                    breakRobot(parameters);
                     break;
                 default:
                     System.err.println("Unknown function called from file " + parser.getFile());
@@ -191,6 +191,11 @@ public abstract class Auto extends LinearVisionOpMode {
             }
             instruction = parser.popNext();
         }
+    }
+
+    private void breakRobot(HashMap<String, String> parameters) {
+        drive.toggleExtendo();
+        while (!drive.extendoStep()) {}
     }
 
     private void getVuMark(HashMap<String, String> parameters) {
