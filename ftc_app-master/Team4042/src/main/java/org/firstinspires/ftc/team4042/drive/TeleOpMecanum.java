@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.team4042.autos.C;
+import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
 
 @TeleOp(name = "Mecanum", group="drive")
 public class TeleOpMecanum extends OpMode {
@@ -145,6 +146,8 @@ public class TeleOpMecanum extends OpMode {
             drive.lockCatches();
 
             drive.jewelOut();
+
+            drive.readSensorsSetUp();
         } catch (Exception ex) {
             telemetry.addData("Exception", Drive.getStackTrace(ex));
         }
@@ -537,6 +540,10 @@ public class TeleOpMecanum extends OpMode {
         drive.shortIr[1].addReading();
         double backDistance = drive.shortIr[1].getCmAvg();
         boolean isGlyphBack = Math.abs(backDistance - C.get().getDouble("glyphIn")) < Math.abs(backDistance - C.get().getDouble("glyphOut"));
+
+        for (AnalogSensor lineFollow : drive.lineFollow){
+            lineFollow.addReading();
+        }
 
         if (noAutoIntakes && isGlyphBack) {
             drive.intakeLeft(0);

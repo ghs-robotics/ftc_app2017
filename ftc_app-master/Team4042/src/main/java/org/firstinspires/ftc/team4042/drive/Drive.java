@@ -20,6 +20,7 @@ import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Random;
 
 /**
  * Created by Hazel on 9/22/2017.
@@ -31,6 +32,7 @@ public abstract class Drive {
     public abstract void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor);
     public abstract void driveXYR(double speedFactor, double x, double y, double r, boolean useGyro);
     public abstract void driveLR(double speedFactor, double l, double r);
+    public abstract void stopMotors();
 
     //Initializes a factor for the speed of movement to a position when driving with encoders
     public static final double BASE_SPEED = C.get().getDouble("base");
@@ -128,6 +130,8 @@ public abstract class Drive {
 
     public boolean verbose;
 
+    public DanceStage dStage;
+
     Telemetry.Log log;
 
     public boolean useSensors;
@@ -171,6 +175,8 @@ public abstract class Drive {
     public void initialize(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
         this.log = telemetry.log();
+
+        dStage = DanceStage.BACK;
 
         glyph = new GlyphPlacementSystem(hardwareMap, this);
 
@@ -278,6 +284,11 @@ public abstract class Drive {
 
     public Cryptobox.GlyphColor getGlyphColor() {
         //return Cryptobox.GlyphColor.GREY;
+        for (int i = 0; i < AnalogSensor.NUM_OF_READINGS; i++){
+            for (AnalogSensor lineFollow : lineFollow){
+                lineFollow.addReading();
+            }
+        }
         return lineFollow[0].getVAvg() > 1.5 ? Cryptobox.GlyphColor.NONE :
                 lineFollow[0].getVAvg() > COLOR_THRESHOLD ? Cryptobox.GlyphColor.BROWN : Cryptobox.GlyphColor.GREY;
     }
@@ -545,11 +556,20 @@ public abstract class Drive {
         return false;
     }
 
+    public enum DanceStage {
+        BACK, TRANS, FORWARD
+    }
     /**
      * Needs to be written: should make the robot move forwards and backwards randomly
      */
     private void dance() {
+        switch (dStage){
+            case BACK:{
+                driveLRWithEncoders(1, -1, -1, 400, 1);
 
+
+            }
+        }
     }
 
     /**
@@ -557,6 +577,37 @@ public abstract class Drive {
      */
     private void pullBack() {
 
+    }
+
+    public boolean driveLRWithEncoders(double left, double right, double speed, double targetTicks, double mulch) throws IllegalArgumentException{
+
+        double currentTicks = max(motorLeftBack.getCurrentPosition(),
+                motorLeftFront.getCurrentPosition(),
+                motorRightBack.getCurrentPosition(), motorRightFront.getCurrentPosition());
+        //if it has not reached the target, it tests if it is in the
+        // last or first fourth of the way there, and
+        // scales the speed such that it speeds up and slows down
+        // to BASE_SPEED as it reaches the target
+        if (currentTicks > targetTicks) {
+            //if it has reached target, stop moving, reset encoders, and return PI
+            stopMotors(); //stops the motors
+            this.resetEncoders();
+            this.runWithEncoders();
+        }
+
+        speed *= mulch;
+
+        //if it hasn't reached the target (it won't have returned yet),
+        // drive at the given speed (possibly scaled b/c of first and last fourth), and return false
+        speed = Range.clip(speed, 0, FULL_SPEED);
+
+        //Drives at x
+        driveLR(FULL_SPEED, left * speed, right * speed);
+        return false;
+    }
+
+    public int random (int min, int max) {
+        return min + (int)(Math.random() * ((max - min) + 1));
     }
 
     public int[] uTrackAutoTarget(Cryptobox.GlyphColor newGlyph) {
@@ -887,7 +938,7 @@ public abstract class Drive {
     }
 
     public void raiseBrakes() {
-        leftBrake.setPosition(0);
+        leftBrake.setPosition(0.03);
         rightBrake.setPosition(.66);
     }
 
