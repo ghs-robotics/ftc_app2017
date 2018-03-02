@@ -143,6 +143,8 @@ public abstract class Auto extends LinearVisionOpMode {
                 case "s2drive":
                     autoTwoSensorDrive(parameters);
                     break;
+                case "driveLR":
+                    autoDriveLR(parameters);
                 case "up":
                     jewelUp(parameters);
                     break;
@@ -608,6 +610,17 @@ public abstract class Auto extends LinearVisionOpMode {
 
         //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
         drive.stopMotors();
+        drive.runWithEncoders();
+    }
+
+    public void autoDriveLR(HashMap<String, String> parameters){
+        double l = Double.parseDouble(parameters.get("l"));
+        double r = Double.parseDouble(parameters.get("r"));
+        double speed = Double.parseDouble(parameters.get("speed"));
+        int target = Integer.parseInt(parameters.get("target"));
+
+        while (opModeIsActive() && !drive.driveLRWithEncoders(l, r, speed, target, 1));
+        drive.resetEncoders();
         drive.runWithEncoders();
     }
 
