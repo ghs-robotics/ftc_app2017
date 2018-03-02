@@ -277,8 +277,9 @@ public abstract class Drive {
     }
 
     public Cryptobox.GlyphColor getGlyphColor() {
-        return Cryptobox.GlyphColor.GREY;
-        //return lineFollow[0].getVAvg() > COLOR_THRESHOLD ? Cryptobox.GlyphColor.BROWN : Cryptobox.GlyphColor.GREY;
+        //return Cryptobox.GlyphColor.GREY;
+        return lineFollow[0].getVAvg() > 1.5 ? Cryptobox.GlyphColor.NONE :
+                lineFollow[0].getVAvg() > COLOR_THRESHOLD ? Cryptobox.GlyphColor.BROWN : Cryptobox.GlyphColor.GREY;
     }
 
     /*private float[] getRGB(){
@@ -310,9 +311,7 @@ public abstract class Drive {
             if (extendoTimer.seconds() < .15) {
                 driveXYR(1, 0, 1, 0, false);
             } else if (extendoTimer.seconds() < .4) {
-                lowerBrakes();
-                unlockCatches();
-                runBackWithEncoders();
+                servoExtendo();
                 driveLR(1, 1, 1);
             } else {
                 driveXYR(1, 0, 0, 0, false);
@@ -321,14 +320,33 @@ public abstract class Drive {
         //Moving out of extendo, so put it together
         else {
             if (extendoTimer.seconds() < .2) {
-                raiseBrakes();
-                lockCatches();
-                freezeBack();
+                servoNotExtendo();
                 pushRobotTogether();
             } else {
                 driveXYR(1, 0, 0, 0, false);
             }
         }
+    }
+
+    public void toggleServoExtendo() {
+        Drive.isExtendo = !Drive.isExtendo;
+        if (Drive.isExtendo) {
+            servoExtendo();
+        } else {
+            servoNotExtendo();
+        }
+    }
+
+    private void servoExtendo() {
+        lowerBrakes();
+        unlockCatches();
+        runBackWithEncoders();
+    }
+
+    private void servoNotExtendo() {
+        raiseBrakes();
+        lockCatches();
+        freezeBack();
     }
 
     private DcMotor initializeMotor(HardwareMap hardwareMap, String motorName) {
@@ -550,25 +568,32 @@ public abstract class Drive {
     public int[] uTrackAutoTarget(Gamepad gamepad2) {
         int numPlaces = cryptobox.getNumGlyphsPlaced();
         if (uTrackAtBottom && collected.getState()) {
-            if (!gamepad2.left_bumper && !gamepad2.right_bumper && gamepad2.right_trigger < DEADZONE_SIZE && gamepad2.left_trigger < DEADZONE_SIZE) {
+            /*if (!gamepad2.left_bumper && !gamepad2.right_bumper && gamepad2.right_trigger < DEADZONE_SIZE && gamepad2.left_trigger < DEADZONE_SIZE) {
                 internalIntakeRight(0);
                 internalIntakeLeft(0);
-            }
+            }*/
 
             Cryptobox.GlyphColor color = getGlyphColor();
 
-            predict = uTrackAutoTarget(color);
-            telemetry.log().add("greybrown: [" + predict[0] + ", " + predict[1] + "]");
-            if(!(((predict[0] + predict[1]) == 0) && !(numPlaces == 11))) {
+            if (!color.equals(Cryptobox.GlyphColor.NONE)) {
+                predict = uTrackAutoTarget(color);
+                telemetry.log().add("greybrown: [" + predict[0] + ", " + predict[1] + "]");
+                /*if (!(((predict[0] + predict[1]) == 0) && !(numPlaces == 11))) {*/
                 telemetry.log().add("brown placed");
                 uTrack();
             }
-        } else if (!uTrackAtBottom) {
+        } /*else if(uTrackAtBottom && !collected.getState()) {
             if(!stage.equals(GlyphPlacementSystem.Stage.HOME) && !stage.equals(GlyphPlacementSystem.Stage.GRAB) &&
                     !gamepad2.left_bumper && !gamepad2.right_bumper && gamepad2.right_trigger < DEADZONE_SIZE && gamepad2.left_trigger < DEADZONE_SIZE){
                 internalIntakeLeft(1);
                 internalIntakeRight(1);
             }
+        } */else if (!uTrackAtBottom) {
+            /*if(!stage.equals(GlyphPlacementSystem.Stage.HOME) && !stage.equals(GlyphPlacementSystem.Stage.GRAB) &&
+                    !gamepad2.left_bumper && !gamepad2.right_bumper && gamepad2.right_trigger < DEADZONE_SIZE && gamepad2.left_trigger < DEADZONE_SIZE){
+                internalIntakeLeft(1);
+                internalIntakeRight(1);
+            }*/
             telemetry.log().add("running");
             uTrack();
         }
@@ -597,7 +622,7 @@ public abstract class Drive {
         //Close the hand
         //Jaden closed his hand
         closeHand();
-        jewelOut();
+        //jewelOut();
         glyphLocate();
         handDropTimer.reset();
 
@@ -605,7 +630,6 @@ public abstract class Drive {
         glyph.currentX = GlyphPlacementSystem.HorizPos.CENTER;
 
         stage = GlyphPlacementSystem.Stage.GRAB;
-        uTrackAtBottom = false;
     }
     private void grab() {
         if (handDropTimer.seconds() >= .5) {
@@ -656,16 +680,17 @@ public abstract class Drive {
         if(glyph.xTargetReached(GlyphPlacementSystem.HorizPos.CENTER)) {
             log.add("reached x target, center is " + getCenterState());
             stage = GlyphPlacementSystem.Stage.RETURN2;
+            setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+            glyph.setAboveHomeTarget();
+            setVerticalDrive(-1);
         }
-        setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
-        glyph.setAboveHomeTarget();
-        setVerticalDrive(-1);
     }
     private boolean return2() {
         //Move back to the bottom and get ready to do it again
         if(glyph.currentY.equals(GlyphPlacementSystem.Position.ABOVEHOME)) {
             stage = GlyphPlacementSystem.Stage.RESET;
             setVerticalDrive(0);
+            uTrackAtBottom = true;
             return true;
         }
         return false;
@@ -676,23 +701,21 @@ public abstract class Drive {
 
     private void reset() {
         boolean currBottom = getBottomState();
+        uTrackAtBottom = false;
 
         if(!currBottom) {
             setVerticalDriveMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             setVerticalDrive(-1);
         } else {
             resetUTrack();
-            uTrackAtBottom = true;
-            stage = GlyphPlacementSystem.Stage.HOME;
         }
     }
 
     public void resetUTrack() {
         stage = GlyphPlacementSystem.Stage.HOME;
-        jewelUp();
+        //jewelUp();
         setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
-        uTrackAtBottom = true;
     }
 
     /**
@@ -827,14 +850,14 @@ public abstract class Drive {
     }
 
     public void jewelRight() {
-        jewelHead.setPosition(0.97);
+        jewelHead.setPosition(0.87);
     }
 
     /*
     Moves the jewel out of the way
      */
     public void jewelOut() {
-        jewelServo.setPosition(.60);
+        jewelServo.setPosition(.80);
     }
 
     public void jewelStowed() {

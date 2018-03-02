@@ -610,6 +610,7 @@ public class Cryptobox {
         GlyphColor[] column = glyphs[columnNum];
         //Look up the column from the lowest position to the highest to find the first empty space
         for (int i = 0; i < column.length; i++) {
+            //telemetry.log().add(column[i]);
             if (column[i].equals(GlyphColor.NONE)) {
                 return i;
             }
