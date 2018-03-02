@@ -17,7 +17,7 @@ public class TeleOpMecanum extends OpMode {
     private double adjustedSpeed;
 
 
-    private boolean aiPlacer = false;
+    private boolean aiPlacer = true;
     private boolean manual = false;
     private boolean onBalancingStone = false;
 
@@ -34,6 +34,7 @@ public class TeleOpMecanum extends OpMode {
     private boolean bLeftStick = false;
     private boolean bRightStick = false;
 
+    private boolean aA = false;
     private boolean aY = false;
     private boolean aX = false;
     private boolean aB = false;
@@ -117,7 +118,7 @@ public class TeleOpMecanum extends OpMode {
 
             drive.targetY = GlyphPlacementSystem.Position.TOP;
             drive.targetX = GlyphPlacementSystem.HorizPos.LEFT;
-            drive.stage = GlyphPlacementSystem.Stage.HOME;
+            drive.stage = GlyphPlacementSystem.Stage.RESET;
             drive.glyph.setHomeTarget();
 
             adjustedSpeed = MecanumDrive.FULL_SPEED;
@@ -137,11 +138,13 @@ public class TeleOpMecanum extends OpMode {
     public void start() {
         try {
             //Moves the servo to the up position
-            drive.jewelUp();
+            //drive.jewelUp();
             //Raises the brakes
             drive.raiseBrakes();
             //Locks the catches
             drive.lockCatches();
+
+            drive.jewelOut();
         } catch (Exception ex) {
             telemetry.addData("Exception", Drive.getStackTrace(ex));
         }
@@ -278,7 +281,9 @@ public class TeleOpMecanum extends OpMode {
         //drive.updateRates();
 
         //First controller pushing Y - toggle extendo
-        if (gamepad1.y && !aY) {
+        if ((gamepad1.a && !aA && gamepad1.y) || (gamepad1.y && !aY && gamepad1.a)) {
+            drive.toggleServoExtendo();
+        } else if (gamepad1.y && !aY && !gamepad1.a) {
             drive.toggleExtendo();
         } else if (gamepad1.y) {
             drive.extendoStep();
@@ -286,6 +291,7 @@ public class TeleOpMecanum extends OpMode {
             //Drives the robot
             drive.drive(false, gamepad1, gamepad2, adjustedSpeed * MecanumDrive.FULL_SPEED);
         }
+        aA = gamepad1.a;
         aY = gamepad1.y;
 
         //The X button on the first controller - toggle crawling to let us adjust the back of the robot too
@@ -366,7 +372,7 @@ public class TeleOpMecanum extends OpMode {
             } else {
                 glyphTarget();
             }
-            if (!drive.stage.equals(GlyphPlacementSystem.Stage.RESET)) {
+            if (!drive.stage.equals(GlyphPlacementSystem.Stage.RESET)){
                 drive.glyph.runToPosition(gamepad2.left_stick_y);
             }
         }
@@ -440,9 +446,11 @@ public class TeleOpMecanum extends OpMode {
         boolean brown = -gamepad2.right_stick_y <= -.5;
 
         //TODO: USE COLOR SENSOR
-        Cryptobox.GlyphColor newGlyph = drive.getGlyphColor();
+        //Cryptobox.GlyphColor newGlyph = drive.getGlyphColor();
 
-        if (drive.uTrackAtBottom && !bBrown && brown) {
+        drive.uTrackAutoTarget(gamepad2);
+
+        /*if (drive.uTrackAtBottom && !bBrown && brown) {
             int[] nextGlyph = drive.uTrackAutoTarget(Cryptobox.GlyphColor.BROWN);
             aiGlyphPlace(nextGlyph, numPlaces);
         }
@@ -453,7 +461,7 @@ public class TeleOpMecanum extends OpMode {
         //If you're not at the bottom and are pushing a
         else if (!drive.uTrackAtBottom && (grey || brown)) {
             drive.uTrack();
-        }
+        }*/
     }
 
     /**
@@ -538,13 +546,21 @@ public class TeleOpMecanum extends OpMode {
                 if (bRightTrigger > Drive.DEADZONE_SIZE) { drive.internalIntakeRight(bRightTrigger); }
                 //Right bumper of the b controller runs the right intake backwards
                 else if (bRightBumper) { drive.internalIntakeRight(-1); }
-                else { drive.internalIntakeRight(0); }
+                else if (drive.stage.equals(GlyphPlacementSystem.Stage.HOME) ||
+                        drive.stage.equals(GlyphPlacementSystem.Stage.GRAB) ||
+                        drive.stage.equals(GlyphPlacementSystem.Stage.PLACE1)) {
+                    drive.internalIntakeLeft(0);
+                } else { drive.internalIntakeRight(1); }
 
                 //Left trigger of the b controller runs the left intake forward
                 if (bLeftTrigger > Drive.DEADZONE_SIZE) { drive.internalIntakeLeft(bLeftTrigger); }
                 //Left bumper of the b controller runs the left intake backwards
                 else if (bLeftBumper) { drive.internalIntakeLeft(-1); }
-                else { drive.internalIntakeLeft(0); }
+                else if (drive.stage.equals(GlyphPlacementSystem.Stage.HOME) ||
+                        drive.stage.equals(GlyphPlacementSystem.Stage.GRAB) ||
+                        drive.stage.equals(GlyphPlacementSystem.Stage.PLACE1)) {
+                    drive.internalIntakeLeft(0);
+                } else { drive.internalIntakeLeft(1); }
             }
 
             if (aRightTrigger > Drive.DEADZONE_SIZE) {
@@ -612,6 +628,7 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Reject glyph", drive.cryptobox.getRejectGlyph());
         Cryptobox.Snake snakeTarget = drive.cryptobox.getSnakeTarget();
         telemetry.addData("Snake target", snakeTarget == null ? "null" : snakeTarget.name());
+        telemetry.addData("line follower", drive.lineFollow[0].getVAvg());
         if (drive.verbose) {
             telemetry.addData("gamepad1.dpad_up", gamepad1.dpad_up);
             telemetry.addData("bottom", drive.getBottomState());

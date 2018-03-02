@@ -40,7 +40,7 @@ public class GlyphPlacementSystem {
 
     //indicates the action of placing the robot is currently performing
     public enum Stage {
-        HOME, PAUSE1, PAUSE2, PLACE1, PLACE2, RETURN1, RETURN2, GRAB, RELEASE, RESET, ABOVE
+        HOME, PAUSE1, PAUSE2, PLACE1, PLACE2, RETURN1, RETURN2, GRAB, RELEASE, RESET
     }
 
     public enum HorizPos {
