@@ -177,6 +177,7 @@ public abstract class Drive {
         this.log = telemetry.log();
 
         dStage = DanceStage.BACK;
+        dirRight = true;
 
         glyph = new GlyphPlacementSystem(hardwareMap, this);
 
@@ -537,6 +538,8 @@ public abstract class Drive {
             return false;
         } else if (!isGlyphBack && glyphCollectionTimer.seconds() < C.get().getDouble("time")/2){
             //Step 2: after a glyph gets in, until half of time, rotate the glyph
+            stopMotors();
+            dStage = DanceStage.BACK;
             intakeLeft(-1);
             intakeRight(1);
             return false;
@@ -555,8 +558,7 @@ public abstract class Drive {
             intakeLeft(0);
             intakeRight(0);
 
-            pullBack();
-            return true;
+            return pullBack();
         }
         return false;
     }
@@ -564,15 +566,34 @@ public abstract class Drive {
     public enum DanceStage {
         BACK, TRANS, FORWARD
     }
+
+    private int targetTick;
+    private boolean dirRight;
     /**
      * Needs to be written: should make the robot move forwards and backwards randomly
      */
     private void dance() {
         switch (dStage){
             case BACK:{
-                driveLRWithEncoders(1, -1, -1, 400, 1);
+                if (driveLRWithEncoders(-1, -1, 1, 400, 1)){
+                    targetTick = random(250, 750);
+                    dirRight = !dirRight;
+                    dStage = DanceStage.TRANS;
+                }
+                break;
+            }case TRANS:{
 
-
+                if (dirRight && driveLRWithEncoders(-1, 1, 1, targetTick, 1)){
+                    dStage = DanceStage.FORWARD;
+                } else if (dirRight && driveLRWithEncoders(1, -1, 1, targetTick, 1)){
+                    dStage = DanceStage.FORWARD;
+                }
+                break;
+            } case FORWARD:{
+                if (driveLRWithEncoders(1, 1, .5, 600, 1)){
+                    dStage = DanceStage.BACK;
+                }
+                break;
             }
         }
     }
@@ -580,8 +601,23 @@ public abstract class Drive {
     /**
      * Needs to be written: should run the front motors back aggressively
      */
-    private void pullBack() {
-
+    private boolean pullBack() {
+        switch (dStage){
+            case BACK:{
+                if (driveLRWithEncoders(-1, -1, 1, 3000, 1)){
+                    dStage = DanceStage.TRANS;
+                }
+                return false;
+            }case TRANS:{
+                if (dirRight && driveLRWithEncoders(1, 1, 1, 400, 1)){
+                    dStage = DanceStage.FORWARD;
+                }
+                return false;
+            } case FORWARD:{
+                return driveLRWithEncoders(-1, -1, .5, 500, 1);
+            }
+        }
+        return false;
     }
 
     public boolean driveLRWithEncoders(double left, double right, double speed, double targetTicks, double mulch) throws IllegalArgumentException{
