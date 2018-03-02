@@ -362,15 +362,7 @@ public class  MecanumDrive extends Drive {
         // last or first fourth of the way there, and
         // scales the speed such that it speeds up and slows down
         // to BASE_SPEED as it reaches the target
-        if (currentTicks <= targetTicks) {
-            double difference = targetTicks / 4;
-            if (currentTicks / targetTicks > .75) { //last fourth
-                difference = targetTicks - currentTicks;
-            } else if (currentTicks / targetTicks < .25) { //first fourth
-                difference = currentTicks;
-            }
-            speed *= (BASE_SPEED + (difference / (targetTicks / 4)) * (1 - BASE_SPEED));
-        } else {
+        if (currentTicks > targetTicks) {
             //if it has reached target, stop moving, reset encoders, and return PI
             stopMotors(); //stops the motors
             this.resetEncoders();

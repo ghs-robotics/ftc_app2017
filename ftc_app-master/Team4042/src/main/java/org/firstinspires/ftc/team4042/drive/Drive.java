@@ -152,7 +152,7 @@ public abstract class Drive {
         }
 
         for (int i = 0; i < lineFollow.length; i++){
-            lineFollow[i] = new AnalogSensor("sonar"+i, AnalogSensor.Type.SONAR);
+            lineFollow[i] = new AnalogSensor("line follow"+i, AnalogSensor.Type.LINE_FOLLOW);
         }
 
         verbose = false;
@@ -621,6 +621,7 @@ public abstract class Drive {
     private void home() {
         //Close the hand
         //Jaden closed his hand
+        //setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
         closeHand();
         //jewelOut();
         glyphLocate();
@@ -690,6 +691,7 @@ public abstract class Drive {
         if(glyph.currentY.equals(GlyphPlacementSystem.Position.ABOVEHOME)) {
             stage = GlyphPlacementSystem.Stage.RESET;
             setVerticalDrive(0);
+            //jewelUp();
             uTrackAtBottom = true;
             return true;
         }
@@ -704,18 +706,19 @@ public abstract class Drive {
         uTrackAtBottom = false;
 
         if(!currBottom) {
-            setVerticalDriveMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
             setVerticalDrive(-1);
         } else {
+            //setVerticalDrive(-.5);
             resetUTrack();
         }
     }
 
     public void resetUTrack() {
         stage = GlyphPlacementSystem.Stage.HOME;
-        //jewelUp();
         setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //jewelUp();
     }
 
     /**
@@ -839,6 +842,7 @@ public abstract class Drive {
 
     public void jewelUp() {
         jewelServo.setPosition(.47);
+        jewelCenter();
     }
 
     public void jewelCenter() {
@@ -858,10 +862,13 @@ public abstract class Drive {
      */
     public void jewelOut() {
         jewelServo.setPosition(.80);
+        jewelCenter();
+
     }
 
     public void jewelStowed() {
         jewelServo.setPosition(.35);
+        jewelCenter();
     }
 
     public void lockCatches() {
