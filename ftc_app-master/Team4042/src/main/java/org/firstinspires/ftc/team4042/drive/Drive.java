@@ -596,6 +596,7 @@ public abstract class Drive {
     private void home() {
         //Close the hand
         //Jaden closed his hand
+        setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
         closeHand();
         jewelOut();
         glyphLocate();
@@ -682,6 +683,7 @@ public abstract class Drive {
             setVerticalDriveMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             setVerticalDrive(-1);
         } else {
+            setVerticalDrive(-.5);
             resetUTrack();
             uTrackAtBottom = true;
             stage = GlyphPlacementSystem.Stage.HOME;
@@ -691,7 +693,7 @@ public abstract class Drive {
     public void resetUTrack() {
         stage = GlyphPlacementSystem.Stage.HOME;
         setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
         uTrackAtBottom = true;
     }
 
