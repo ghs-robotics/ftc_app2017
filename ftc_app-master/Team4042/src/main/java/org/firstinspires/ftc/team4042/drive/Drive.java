@@ -929,7 +929,7 @@ public abstract class Drive {
     }
 
     public void jewelDown() {
-        jewelServo.setPosition(.82);
+        jewelServo.setPosition(.9);
     }
 
     public void jewelUp() {
