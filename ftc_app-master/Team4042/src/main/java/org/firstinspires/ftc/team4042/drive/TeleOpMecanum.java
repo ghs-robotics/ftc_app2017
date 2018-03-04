@@ -446,29 +446,15 @@ public class TeleOpMecanum extends OpMode {
             drive.cryptobox.toggleSnakeTarget();
         }
 
-        int numPlaces = drive.cryptobox.getNumGlyphsPlaced();
-        boolean grey = -gamepad2.right_stick_y >= .5;
-        boolean brown = -gamepad2.right_stick_y <= -.5;
-
         //TODO: USE COLOR SENSOR
         //Cryptobox.GlyphColor newGlyph = drive.getGlyphColor();
 
-        if (gamepad2.right_trigger < drive.DEADZONE_SIZE && gamepad2.left_trigger < drive.DEADZONE_SIZE) {
-            drive.uTrackAutoTarget(gamepad2);
+        if (gamepad2.right_trigger < Drive.DEADZONE_SIZE && gamepad2.left_trigger < Drive.DEADZONE_SIZE) {
+            greyBrown = drive.uTrackAutoTarget(gamepad2);
         }
-
-        /*if (drive.uTrackAtBottom && !bBrown && brown) {
-            int[] nextGlyph = drive.uTrackAutoTarget(Cryptobox.GlyphColor.BROWN);
-            aiGlyphPlace(nextGlyph, numPlaces);
+        if (-gamepad2.right_stick_y >= .5) {
+            greyBrown = drive.cryptobox.wrongColor();
         }
-        else if (drive.uTrackAtBottom && !bGrey && grey) {
-            int[] nextGlyph = drive.uTrackAutoTarget(Cryptobox.GlyphColor.GREY);
-            aiGlyphPlace(nextGlyph, numPlaces);
-        }
-        //If you're not at the bottom and are pushing a
-        else if (!drive.uTrackAtBottom && (grey || brown)) {
-            drive.uTrack();
-        }*/
     }
 
     /**

@@ -30,6 +30,9 @@ public class Cryptobox {
     private int uiX = 0;
     private int uiY = 0;
 
+    private int lastX = 0;
+    private int lastY = 0;
+
     private boolean rejectGlyph = false;
 
     /**
@@ -414,9 +417,22 @@ public class Cryptobox {
         writeFile();
     }
 
+    public int[] wrongColor() {
+        GlyphColor lastGlyph = glyphs[lastX][lastY];
+
+        glyphs[lastX][lastY] = GlyphColor.NONE;
+
+        GlyphColor newGlyph = lastGlyph.equals(GlyphColor.GREY) ? GlyphColor.BROWN : lastGlyph.equals(GlyphColor.BROWN) ? GlyphColor.GREY : GlyphColor.NONE;
+
+        return placeGlyph(newGlyph);
+    }
+
     public boolean driveGlyphPlacer(GlyphColor newGlyph, int row, int column) {
         if (addGlyphToColumn(newGlyph, column)) {
             numGlyphsPlaced++;
+
+            lastX = row;
+            lastY = column;
 
             if (glyphPlacementSystem != null) {
                 telemetry.log().add("target: " + column + ", " + (3 - row));
