@@ -1,12 +1,14 @@
 f:getmark
 f:knockr
+f:wait sec:1
+f:up
 f:brace
-f:doff x:0 y:-1 speed:1 target:2000 gyro:0
+f:doff x:0 y:1 speed:1 target:2000 gyro:0
 f:open
-f:rot r:-70 speed:1
-f:drive x:0 y:1 speed:1 gyro:-70 target:1000 time:4
-f:rot r:-105 speed:1
-f:drive x:-1 y:.35 speed:1 gyro:-105 target:2000 time:7
-f:drive x:0 y:-1 speed:1 gyro:-105 target:500
-f:drive x:-1 y:1 speed:1 target:400 time:3
-f:place
+f:rot r:70 speed:1
+f:drive x:0 y:1 speed:1 gyro:70 target:1000 time:4
+f:rot r:105 speed:1
+f:drive x:1 y:.4 speed:1 gyro:105 target:2000 time:7
+f:drive x:-.25 y:-1 speed:1 gyro:105 target:500
+f:drive x:1 y:1 speed:1 target:400 time:3
+#f:place
