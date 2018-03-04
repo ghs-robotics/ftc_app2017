@@ -57,6 +57,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
     private boolean readMark = false;
     private boolean done = true;
+    private boolean placeNew = false;
 
     private AutoParser parser;
 
@@ -109,6 +110,7 @@ public abstract class Auto extends LinearVisionOpMode {
     public void runAuto() {
         //vuMarkIdentifier.initialize(telemetry, hardwareMap);
 
+        log.add("running auto");
         gyro();
 
         try {
@@ -213,7 +215,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
     public void wait(double seconds) {
         ElapsedTime waitTimer = new ElapsedTime();
-        while (waitTimer.seconds() < seconds);
+        while (waitTimer.seconds() < seconds && opModeIsActive());
     }
 
     public void grabGlyph(HashMap<String, String> parameters) {
@@ -304,7 +306,13 @@ public abstract class Auto extends LinearVisionOpMode {
 
         drive.stage = GlyphPlacementSystem.Stage.HOME;
 
-        done = false;
+        done = drive.uTrack();
+    }
+
+    public void place2 (HashMap<String, String> parameters) {
+        while(!done && opModeIsActive());
+        placeNew = true;
+        drive.stage = GlyphPlacementSystem.Stage.RESET;
     }
 
     public void jewelUp(HashMap<String, String> parameters) {
@@ -898,10 +906,20 @@ public abstract class Auto extends LinearVisionOpMode {
         }
         if (!done){
             drive.uTrackUpdate();
-            if (!drive.stage.equals(GlyphPlacementSystem.Stage.RETURN2) && !drive.stage.equals(GlyphPlacementSystem.Stage.RESET)) {
+            done = drive.uTrack();
+            if (!drive.stage.equals(GlyphPlacementSystem.Stage.RESET)) {
                 drive.glyph.runToPosition(0);
             }
-            done = drive.uTrack();
+        } if (placeNew) {
+            if (drive.uTrackAtBottom && drive.getCollected()) {
+                done = drive.uTrack();
+            } else if(drive.uTrackAtBottom && !drive.getCollected()) {
+                drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+                drive.setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
+            } else if (!drive.uTrackAtBottom && drive.stage.equals(GlyphPlacementSystem.Stage.HOME)) {
+                Cryptobox.GlyphColor color = drive.getGlyphColor();
+                drive.uTrackAutoTarget(color);
+                }
         }
         //telemetry.addData("Mark", vuMark);
         return super.opModeIsActive();

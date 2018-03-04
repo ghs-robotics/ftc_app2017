@@ -733,7 +733,7 @@ public abstract class Drive {
         //Jaden closed his hand
         //setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
         closeHand();
-        jewelOut();
+        //jewelOut();
         glyphLocate();
         handDropTimer.reset();
 
@@ -801,7 +801,7 @@ public abstract class Drive {
         if(glyph.currentY.equals(GlyphPlacementSystem.Position.ABOVEHOME)) {
             stage = GlyphPlacementSystem.Stage.RESET;
             setVerticalDrive(0);
-            jewelUp();
+            //jewelUp();
             uTrackAtBottom = true;
             return true;
         }
