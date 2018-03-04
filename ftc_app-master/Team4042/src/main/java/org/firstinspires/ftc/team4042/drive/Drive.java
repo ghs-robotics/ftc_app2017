@@ -666,44 +666,25 @@ public abstract class Drive {
     private int[] predict = {0};
     private ElapsedTime glyphTimer;
     private boolean hasGlyph;
+    private ElapsedTime readGlyphColorTimer = new ElapsedTime();
+    private boolean glyphColorRead = false;
+
     public int[] uTrackAutoTarget(Gamepad gamepad2) {
         int numPlaces = cryptobox.getNumGlyphsPlaced();
         if (uTrackAtBottom && collected.getState()) {
-            /*if (!gamepad2.left_bumper && !gamepad2.right_bumper && gamepad2.right_trigger < DEADZONE_SIZE && gamepad2.left_trigger < DEADZONE_SIZE) {
-                internalIntakeRight(0);
-                internalIntakeLeft(0);
-            }*/
-
-
-            /*Cryptobox.GlyphColor color = getGlyphColor();
-
-            if (!color.equals(Cryptobox.GlyphColor.NONE)) {
-                predict = uTrackAutoTarget(color);
-                //telemetry.log().add("greybrown: [" + predict[0] + ", " + predict[1] + "]");
-                /*if (!(((predict[0] + predict[1]) == 0) && !(numPlaces == 11))) {
-                //telemetry.log().add("brown placed");
-                uTrack();
-            }*/
+            readGlyphColorTimer.reset();
+            glyphColorRead = false;
             uTrack();
         } else if(uTrackAtBottom && !collected.getState()) {
             setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
         } else if (!uTrackAtBottom) {
-            /*if(!stage.equals(GlyphPlacementSystem.Stage.HOME) && !stage.equals(GlyphPlacementSystem.Stage.GRAB) &&
-                    !gamepad2.left_bumper && !gamepad2.right_bumper && gamepad2.right_trigger < DEADZONE_SIZE && gamepad2.left_trigger < DEADZONE_SIZE){
-                internalIntakeLeft(1);
-                internalIntakeRight(1);
-            }*/
-            telemetry.log().add("running");
-            if (stage.equals(GlyphPlacementSystem.Stage.HOME)){
+            if (readGlyphColorTimer.seconds() > .1 && !glyphColorRead){
                 Cryptobox.GlyphColor color = getGlyphColor();
+                glyphColorRead = true;
 
                 if (!color.equals(Cryptobox.GlyphColor.NONE)) {
                     predict = uTrackAutoTarget(color);
-                    //telemetry.log().add("greybrown: [" + predict[0] + ", " + predict[1] + "]");
-                /*if (!(((predict[0] + predict[1]) == 0) && !(numPlaces == 11))) {*/
-                    //telemetry.log().add("brown placed");
-                    //uTrack();
                 }
             }
             uTrack();
