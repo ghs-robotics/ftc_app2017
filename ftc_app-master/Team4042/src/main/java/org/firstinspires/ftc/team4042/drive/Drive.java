@@ -181,7 +181,7 @@ public abstract class Drive {
         this.log = telemetry.log();
         glyphTimer = new ElapsedTime();
 
-        dStage = DanceStage.BACK;
+        dStage = DanceStage.FORWARD;
         dirRight = true;
 
         lastColor = 0;
@@ -585,25 +585,34 @@ public abstract class Drive {
      * Needs to be written: should make the robot move forwards and backwards randomly
      */
     private void dance() {
+        telemetry.addData("stageD", dStage);
         switch (dStage){
             case BACK:{
-                if (driveLRWithEncoders(1, 1, 1, 400, 1)){
-                    targetTick = random(250, 500);
+                if (driveLRWithEncoders(1, 1, 1, 300, 1)){
+                    targetTick = random(200, 400);
                     dirRight = !dirRight;
                     dStage = DanceStage.TRANS;
+                    resetEncoders();
+                    runWithEncoders();
                 }
                 break;
             }case TRANS:{
 
                 if (dirRight && driveLRWithEncoders(-1, 1, 1, targetTick, 1)){
                     dStage = DanceStage.FORWARD;
-                } else if (dirRight && driveLRWithEncoders(1, -1, 1, targetTick, 1)){
+                    resetEncoders();
+                    runWithEncoders();
+                } else if (!dirRight && driveLRWithEncoders(1, -1, 1, targetTick, 1)){
                     dStage = DanceStage.FORWARD;
+                    resetEncoders();
+                    runWithEncoders();
                 }
                 break;
             } case FORWARD:{
-                if (driveLRWithEncoders(-1, -1, .5, 600, 1)){
+                if (driveLRWithEncoders(-1, -1, .5, 700, 1)){
                     dStage = DanceStage.BACK;
+                    resetEncoders();
+                    runWithEncoders();
                 }
                 break;
             }
