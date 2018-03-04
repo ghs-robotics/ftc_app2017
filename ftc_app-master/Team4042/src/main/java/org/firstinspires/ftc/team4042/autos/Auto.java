@@ -114,7 +114,7 @@ public abstract class Auto extends LinearVisionOpMode {
         gyro();
 
         try {
-            drive.jewelUp();
+            drive.jewelOut();
             drive.jewelCenter();
         } catch (NullPointerException ex) { }
 
@@ -189,17 +189,21 @@ public abstract class Auto extends LinearVisionOpMode {
                 case "break":
                     breakRobot(parameters);
                     break;
+                case "place2":
+                    place2(parameters);
+                    break;
                 default:
                     System.err.println("Unknown function called from file " + parser.getFile());
                     break;
             }
             instruction = parser.popNext();
         }
+        this.waitNew(30);
     }
 
     private void breakRobot(HashMap<String, String> parameters) {
         drive.toggleExtendo();
-        while (!drive.extendoStep()) {}
+        while (!drive.extendoStep() && opModeIsActive()) {}
     }
 
     private void getVuMark(HashMap<String, String> parameters) {
@@ -210,16 +214,18 @@ public abstract class Auto extends LinearVisionOpMode {
     public void wait(HashMap<String, String> parameters) {
         double seconds = parser.getParam(parameters, "sec");
 
-        wait(seconds);
+        waitNew(seconds);
     }
 
-    public void wait(double seconds) {
+    public void waitNew(double seconds) {
         ElapsedTime waitTimer = new ElapsedTime();
         while (waitTimer.seconds() < seconds && opModeIsActive());
     }
 
     public void grabGlyph(HashMap<String, String> parameters) {
         drive.readSensorsSetUp();
+        drive.intakeLeft(1);
+        drive.intakeRight(1);
 
         while (opModeIsActive() && !drive.collectGlyphStep()) {  }
     }
@@ -316,7 +322,7 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void jewelUp(HashMap<String, String> parameters) {
-        drive.jewelUp();
+        drive.jewelOut();
     }
 
     public void knockLeftJewel(HashMap<String, String> parameters) {
@@ -840,7 +846,7 @@ public abstract class Auto extends LinearVisionOpMode {
         try {
             drive.jewelLeft();
 
-            wait(.25);
+            waitNew(.25);
 
             drive.resetEncoders();
             drive.runWithEncoders();
@@ -863,7 +869,7 @@ public abstract class Auto extends LinearVisionOpMode {
         try {
             drive.jewelRight();
 
-            wait(.25);
+            waitNew(.25);
 
             drive.resetEncoders();
             drive.runWithEncoders();
@@ -911,6 +917,8 @@ public abstract class Auto extends LinearVisionOpMode {
                 drive.glyph.runToPosition(0);
             }
         } if (placeNew) {
+            drive.internalIntakeLeft(1);
+            drive.internalIntakeRight(1);
             if (drive.uTrackAtBottom && drive.getCollected()) {
                 done = drive.uTrack();
             } else if(drive.uTrackAtBottom && !drive.getCollected()) {

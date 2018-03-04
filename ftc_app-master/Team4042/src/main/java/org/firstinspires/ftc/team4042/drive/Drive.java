@@ -581,8 +581,8 @@ public abstract class Drive {
     private void dance() {
         switch (dStage){
             case BACK:{
-                if (driveLRWithEncoders(-1, -1, 1, 400, 1)){
-                    targetTick = random(250, 750);
+                if (driveLRWithEncoders(1, 1, 1, 400, 1)){
+                    targetTick = random(250, 500);
                     dirRight = !dirRight;
                     dStage = DanceStage.TRANS;
                 }
@@ -596,7 +596,7 @@ public abstract class Drive {
                 }
                 break;
             } case FORWARD:{
-                if (driveLRWithEncoders(1, 1, .5, 600, 1)){
+                if (driveLRWithEncoders(-1, -1, .5, 600, 1)){
                     dStage = DanceStage.BACK;
                 }
                 break;
@@ -610,17 +610,17 @@ public abstract class Drive {
     private boolean pullBack() {
         switch (dStage){
             case BACK:{
-                if (driveLRWithEncoders(-1, -1, 1, 3000, 1)){
+                if (driveLRWithEncoders(1, 1, 1, 3000, 1)){
                     dStage = DanceStage.TRANS;
                 }
                 return false;
             }case TRANS:{
-                if (dirRight && driveLRWithEncoders(1, 1, 1, 400, 1)){
+                if (dirRight && driveLRWithEncoders(-1, -1, 1, 400, 1)){
                     dStage = DanceStage.FORWARD;
                 }
                 return false;
             } case FORWARD:{
-                return driveLRWithEncoders(-1, -1, .5, 500, 1);
+                return driveLRWithEncoders(1, 1, .5, 500, 1);
             }
         }
         return false;
@@ -640,6 +640,7 @@ public abstract class Drive {
             stopMotors(); //stops the motors
             this.resetEncoders();
             this.runWithEncoders();
+            return true;
         }
 
         speed *= mulch;
