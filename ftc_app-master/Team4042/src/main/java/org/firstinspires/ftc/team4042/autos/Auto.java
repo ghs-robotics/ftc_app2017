@@ -313,12 +313,13 @@ public abstract class Auto extends LinearVisionOpMode {
         drive.stage = GlyphPlacementSystem.Stage.HOME;
 
         done = drive.uTrack();
+        drive.uTrackAtBottom = false;
     }
 
     public void place2 (HashMap<String, String> parameters) {
-        while(!done && opModeIsActive());
+        //while(!done && opModeIsActive());
         placeNew = true;
-        drive.stage = GlyphPlacementSystem.Stage.RESET;
+        //drive.stage = GlyphPlacementSystem.Stage.RESET;
     }
 
     public void jewelUp(HashMap<String, String> parameters) {
@@ -638,6 +639,12 @@ public abstract class Auto extends LinearVisionOpMode {
         double r = Double.parseDouble(parameters.get("r"));
         double speed = Double.parseDouble(parameters.get("speed"));
         int target = Integer.parseInt(parameters.get("target"));
+        boolean intake = parameters.containsKey("intake");
+
+        if (intake) {
+            drive.intakeLeft(1);
+            drive.intakeRight(1);
+        }
 
         while (opModeIsActive() && !drive.driveLRWithEncoders(l, r, speed, target, 1));
         drive.resetEncoders();
