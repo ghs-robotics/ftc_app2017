@@ -120,8 +120,7 @@ public abstract class Drive {
 
     public Cryptobox cryptobox;
 
-    public int[] deriv = new int[3];
-    public int derivCycle = 0;
+    public double lastColor;
 
 
     Telemetry telemetry;
@@ -184,6 +183,8 @@ public abstract class Drive {
 
         dStage = DanceStage.BACK;
         dirRight = true;
+
+        lastColor = 0;
 
         glyph = new GlyphPlacementSystem(hardwareMap, this);
 
@@ -296,6 +297,7 @@ public abstract class Drive {
                 lineFollow.addReading();
             }
         }*/
+        lastColor = lineFollow[0].getV();
         return lineFollow[0].getV() > 1.5 ? Cryptobox.GlyphColor.NONE :
                 lineFollow[0].getV() > COLOR_THRESHOLD ? Cryptobox.GlyphColor.BROWN : Cryptobox.GlyphColor.GREY;
     }
@@ -536,6 +538,9 @@ public abstract class Drive {
         //If the IR reading is closer to glyphInThreshold than glyphBackThreshold, we assume the glyph is in
         boolean isGlyphIn = frontDistance <= glyphInThreshold;
         boolean isGlyphBack = backDistance <= glyphBackThreshold;
+
+        telemetry.addData("glyph In", isGlyphIn);
+        telemetry.addData("glyph Back", isGlyphBack);
 
         if (!isGlyphIn && !isGlyphBack) {
             //Step 1: intakes in until a glyph is found

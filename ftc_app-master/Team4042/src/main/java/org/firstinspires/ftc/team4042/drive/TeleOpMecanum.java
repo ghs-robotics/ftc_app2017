@@ -625,7 +625,7 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Reject glyph", drive.cryptobox.getRejectGlyph());
         Cryptobox.Snake snakeTarget = drive.cryptobox.getSnakeTarget();
         telemetry.addData("Snake target", snakeTarget == null ? "null" : snakeTarget.name());
-        telemetry.addData("line follower", drive.lineFollow[0].getV());
+        telemetry.addData("line follower", drive.lastColor);
         telemetry.addData("collected", drive.getCollected());
         if (drive.verbose) {
             telemetry.addData("gamepad1.dpad_up", gamepad1.dpad_up);
