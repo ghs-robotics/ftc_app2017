@@ -322,7 +322,6 @@ public abstract class Drive {
         extendoTimer = new ElapsedTime();
         Drive.isExtendo = !Drive.isExtendo;
         extendoTimer.reset();
-        log.add("EIEIO");
     }
 
     public boolean extendoStep() {

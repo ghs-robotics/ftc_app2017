@@ -122,6 +122,8 @@ public abstract class Auto extends LinearVisionOpMode {
         drive.setEncoders(true);
         drive.setVerbose(false);
 
+        Drive.isExtendo = false;
+
         //Reads each instruction and acts accordingly
         AutoInstruction instruction = parser.popNext();
         while (instruction != null && opModeIsActive()) {
