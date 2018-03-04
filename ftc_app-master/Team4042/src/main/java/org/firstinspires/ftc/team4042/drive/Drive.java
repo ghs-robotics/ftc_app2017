@@ -715,7 +715,7 @@ public abstract class Drive {
         //Jaden closed his hand
         //setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
         closeHand();
-        //jewelOut();
+        jewelOut();
         glyphLocate();
         handDropTimer.reset();
 
@@ -783,7 +783,7 @@ public abstract class Drive {
         if(glyph.currentY.equals(GlyphPlacementSystem.Position.ABOVEHOME)) {
             stage = GlyphPlacementSystem.Stage.RESET;
             setVerticalDrive(0);
-            //jewelUp();
+            jewelUp();
             uTrackAtBottom = true;
             return true;
         }
@@ -953,7 +953,7 @@ public abstract class Drive {
     Moves the jewel out of the way
      */
     public void jewelOut() {
-        jewelServo.setPosition(.80);
+        jewelServo.setPosition(.65);
         jewelCenter();
 
     }
@@ -975,12 +975,12 @@ public abstract class Drive {
 
     public void lowerBrakes() {
         leftBrake.setPosition(.8);
-        rightBrake.setPosition(.01);
+        rightBrake.setPosition(.04);
     }
 
     public void raiseBrakes() {
         leftBrake.setPosition(0.03);
-        rightBrake.setPosition(.66);
+        rightBrake.setPosition(.75);
     }
 
     public boolean winchOpen = false;
