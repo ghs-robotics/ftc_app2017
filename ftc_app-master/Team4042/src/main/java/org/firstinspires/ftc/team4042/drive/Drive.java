@@ -101,6 +101,11 @@ public abstract class Drive {
     private CRServo horizontalDrive;
     private DigitalChannel center;
     private DigitalChannel bottom;
+
+    public boolean getCollected() {
+        return collected.getState();
+    }
+
     private DigitalChannel collected;
 
     private Servo grabbyBoi;
@@ -175,6 +180,7 @@ public abstract class Drive {
     public void initialize(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
         this.log = telemetry.log();
+        glyphTimer = new ElapsedTime();
 
         dStage = DanceStage.BACK;
         dirRight = true;
@@ -285,13 +291,13 @@ public abstract class Drive {
 
     public Cryptobox.GlyphColor getGlyphColor() {
         //return Cryptobox.GlyphColor.GREY;
-        for (int i = 0; i < AnalogSensor.NUM_OF_READINGS; i++){
+        /*for (int i = 0; i < AnalogSensor.NUM_OF_READINGS; i++){
             for (AnalogSensor lineFollow : lineFollow){
                 lineFollow.addReading();
             }
-        }
-        return lineFollow[0].getVAvg() > 1.5 ? Cryptobox.GlyphColor.NONE :
-                lineFollow[0].getVAvg() > COLOR_THRESHOLD ? Cryptobox.GlyphColor.BROWN : Cryptobox.GlyphColor.GREY;
+        }*/
+        return lineFollow[0].getV() > 1.5 ? Cryptobox.GlyphColor.NONE :
+                lineFollow[0].getV() > COLOR_THRESHOLD ? Cryptobox.GlyphColor.BROWN : Cryptobox.GlyphColor.GREY;
     }
 
     /*private float[] getRGB(){
@@ -320,7 +326,7 @@ public abstract class Drive {
     public boolean extendoStep() {
         //Moving into extendo, so take it apart
         if (Drive.isExtendo) {
-            if (extendoTimer.seconds() < .15) {
+            if (extendoTimer.seconds() < .1) {
                 driveXYR(1, 0, 1, 0, false);
                 return false;
             } else if (extendoTimer.seconds() < .4) {
@@ -503,7 +509,7 @@ public abstract class Drive {
     }
 
     public void glyphLocate() {
-        targetY = GlyphPlacementSystem.Position.values()[glyph.uiTargetY + 3];
+        targetY = GlyphPlacementSystem.Position.values()[glyph.uiTargetY + 4];
         targetX = GlyphPlacementSystem.HorizPos.values()[glyph.uiTargetX];
     }
 
@@ -657,6 +663,8 @@ public abstract class Drive {
 
 
     private int[] predict = {0};
+    private ElapsedTime glyphTimer;
+    private boolean hasGlyph;
     public int[] uTrackAutoTarget(Gamepad gamepad2) {
         int numPlaces = cryptobox.getNumGlyphsPlaced();
         if (uTrackAtBottom && collected.getState()) {
@@ -665,28 +673,38 @@ public abstract class Drive {
                 internalIntakeLeft(0);
             }*/
 
-            Cryptobox.GlyphColor color = getGlyphColor();
+
+            /*Cryptobox.GlyphColor color = getGlyphColor();
 
             if (!color.equals(Cryptobox.GlyphColor.NONE)) {
                 predict = uTrackAutoTarget(color);
-                telemetry.log().add("greybrown: [" + predict[0] + ", " + predict[1] + "]");
-                /*if (!(((predict[0] + predict[1]) == 0) && !(numPlaces == 11))) {*/
-                telemetry.log().add("brown placed");
+                //telemetry.log().add("greybrown: [" + predict[0] + ", " + predict[1] + "]");
+                /*if (!(((predict[0] + predict[1]) == 0) && !(numPlaces == 11))) {
+                //telemetry.log().add("brown placed");
                 uTrack();
-            }
-        } /*else if(uTrackAtBottom && !collected.getState()) {
-            if(!stage.equals(GlyphPlacementSystem.Stage.HOME) && !stage.equals(GlyphPlacementSystem.Stage.GRAB) &&
-                    !gamepad2.left_bumper && !gamepad2.right_bumper && gamepad2.right_trigger < DEADZONE_SIZE && gamepad2.left_trigger < DEADZONE_SIZE){
-                internalIntakeLeft(1);
-                internalIntakeRight(1);
-            }
-        } */else if (!uTrackAtBottom) {
+            }*/
+            uTrack();
+        } else if(uTrackAtBottom && !collected.getState()) {
+            setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+            setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
+        } else if (!uTrackAtBottom) {
             /*if(!stage.equals(GlyphPlacementSystem.Stage.HOME) && !stage.equals(GlyphPlacementSystem.Stage.GRAB) &&
                     !gamepad2.left_bumper && !gamepad2.right_bumper && gamepad2.right_trigger < DEADZONE_SIZE && gamepad2.left_trigger < DEADZONE_SIZE){
                 internalIntakeLeft(1);
                 internalIntakeRight(1);
             }*/
             telemetry.log().add("running");
+            if (stage.equals(GlyphPlacementSystem.Stage.HOME)){
+                Cryptobox.GlyphColor color = getGlyphColor();
+
+                if (!color.equals(Cryptobox.GlyphColor.NONE)) {
+                    predict = uTrackAutoTarget(color);
+                    //telemetry.log().add("greybrown: [" + predict[0] + ", " + predict[1] + "]");
+                /*if (!(((predict[0] + predict[1]) == 0) && !(numPlaces == 11))) {*/
+                    //telemetry.log().add("brown placed");
+                    //uTrack();
+                }
+            }
             uTrack();
         }
         return predict;
@@ -929,11 +947,11 @@ public abstract class Drive {
     }
 
     public void jewelDown() {
-        jewelServo.setPosition(.9);
+        jewelServo.setPosition(.93);
     }
 
     public void jewelUp() {
-        jewelServo.setPosition(.47);
+        jewelServo.setPosition(.5);
         jewelCenter();
     }
 
@@ -953,7 +971,7 @@ public abstract class Drive {
     Moves the jewel out of the way
      */
     public void jewelOut() {
-        jewelServo.setPosition(.80);
+        jewelServo.setPosition(.65);
         jewelCenter();
 
     }

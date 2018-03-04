@@ -208,6 +208,10 @@ public abstract class Auto extends LinearVisionOpMode {
     public void wait(HashMap<String, String> parameters) {
         double seconds = parser.getParam(parameters, "sec");
 
+        wait(seconds);
+    }
+
+    public void wait(double seconds) {
         ElapsedTime waitTimer = new ElapsedTime();
         while (waitTimer.seconds() < seconds);
     }
@@ -471,7 +475,8 @@ public abstract class Auto extends LinearVisionOpMode {
 
         double speed = parser.getParam(parameters, "speed");
 
-        autoRotate(realR, speed);
+        double timeout = parameters.containsKey("time") ? parser.getParam(parameters, "time") : -1;
+        autoRotate(realR, speed, timeout);
 
         drive.resetEncoders();
         drive.runWithEncoders();
@@ -482,10 +487,11 @@ public abstract class Auto extends LinearVisionOpMode {
      * @param realR The degree to rotate to
      * @param speed The speed to rotate at
      */
-    private void autoRotate(double realR, double speed) {
+    private void autoRotate(double realR, double speed, double time) {
         log.add("Got to rotate:");
         log.add("" + opModeIsActive());
         double gyro;
+        ElapsedTime timer = new ElapsedTime();
         do {
             gyro = drive.gyro.updateHeading();
             double diff = realR - gyro;
@@ -496,7 +502,7 @@ public abstract class Auto extends LinearVisionOpMode {
                 drive.driveXYR(speed, 0, 0, DERIV_ROTATE * diff, false, PROPORTIONAL_ROTATE);
             }
             log.add("" + opModeIsActive());
-        } while (Math.abs(gyro - realR) > 2 && opModeIsActive());
+        } while (Math.abs(gyro - realR) > 2 && opModeIsActive() && (time < 0 || timer.seconds() < time));
 
         drive.stopMotors();
         drive.resetEncoders();
@@ -826,6 +832,8 @@ public abstract class Auto extends LinearVisionOpMode {
         try {
             drive.jewelLeft();
 
+            wait(.25);
+
             drive.resetEncoders();
             drive.runWithEncoders();
 
@@ -846,6 +854,8 @@ public abstract class Auto extends LinearVisionOpMode {
     public void jewelRight() {
         try {
             drive.jewelRight();
+
+            wait(.25);
 
             drive.resetEncoders();
             drive.runWithEncoders();
