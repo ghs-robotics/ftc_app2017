@@ -322,7 +322,6 @@ public abstract class Drive {
         extendoTimer = new ElapsedTime();
         Drive.isExtendo = !Drive.isExtendo;
         extendoTimer.reset();
-        log.add("EIEIO");
     }
 
     public boolean extendoStep() {
@@ -516,6 +515,7 @@ public abstract class Drive {
     }
 
     private ElapsedTime glyphCollectionTimer = new ElapsedTime();
+    private ElapsedTime intakeBackTimer = new ElapsedTime();
 
     /**
      * One step in collecting a glyph - designed to be looped over
@@ -544,8 +544,13 @@ public abstract class Drive {
 
         if (!isGlyphIn && !isGlyphBack) {
             //Step 1: intakes in until a glyph is found
-            intakeLeft(1);
-            intakeRight(1);
+            if (intakeBackTimer.seconds() % 3 == 0) {
+                intakeLeft(-1);
+                intakeRight(-1);
+            } else {
+                intakeLeft(1);
+                intakeRight(1);
+            }
             dance();
             glyphCollectionTimer.reset();
             return false;
