@@ -650,20 +650,22 @@ public class TeleOpMecanum extends OpMode {
     }
 
     private void printNextGlyph() {
-        int grey = greyBrown[0];
-        int brown = greyBrown[1];
-        if (grey == 0 && brown == 0) {
-            telemetry.addData("Next glyph", "NO GLYPH");
-        } else if (grey == 0) {
-            telemetry.addData("Next glyph", "NEED BROWN");
-        } else if (brown == 0) {
-            telemetry.addData("Next glyph", "NEED GREY");
-        } else if (grey == brown) {
-            telemetry.addData("Next glyph", "Either");
-        } else if (grey > brown) {
-            telemetry.addData("Next glyph", "Want grey");
-        } else if (grey < brown) {
-            telemetry.addData("Next glyph", "Want brown");
+        if (greyBrown.length == 2) {
+            int grey = greyBrown[0];
+            int brown = greyBrown[1];
+            if (grey == 0 && brown == 0) {
+                telemetry.addData("Next glyph", "NO GLYPH");
+            } else if (grey == 0) {
+                telemetry.addData("Next glyph", "NEED BROWN");
+            } else if (brown == 0) {
+                telemetry.addData("Next glyph", "NEED GREY");
+            } else if (grey == brown) {
+                telemetry.addData("Next glyph", "Either");
+            } else if (grey > brown) {
+                telemetry.addData("Next glyph", "Want grey");
+            } else if (grey < brown) {
+                telemetry.addData("Next glyph", "Want brown");
+            }
         }
     }
 }
