@@ -148,6 +148,11 @@ public class TeleOpMecanum extends OpMode {
             drive.jewelOut();
 
             drive.readSensorsSetUp();
+
+            Drive.isExtendo = false;
+            Drive.crawl = false;
+            Drive.tank = false;
+
         } catch (Exception ex) {
             telemetry.addData("Exception", Drive.getStackTrace(ex));
         }
