@@ -890,6 +890,10 @@ public abstract class Auto extends LinearVisionOpMode {
 
     @Override
     public boolean opModeIsActive(){
+
+        telemetry.addData("Extendo", Drive.isExtendo);
+        telemetry.update();
+
         if (intakeCount > 0 && this.intakeTimer.milliseconds() / 1000 < C.get().getDouble("intakeForwardTime")){
             drive.intakeLeft(1);
             drive.intakeRight(1);

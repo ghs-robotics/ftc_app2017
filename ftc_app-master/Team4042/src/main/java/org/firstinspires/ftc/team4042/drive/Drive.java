@@ -522,8 +522,8 @@ public abstract class Drive {
      * @return Whether a glyph has been collected
      */
     public boolean collectGlyphStep() {
-        double glyphIn = C.get().getDouble("glyphIn");
-        double glyphOut = C.get().getDouble("glyphOut");
+        double glyphInThreshold = C.get().getDouble("glyphInThreshold");
+        double glyphBackThreshold = C.get().getDouble("glyphBackThreshold");
 
         shortIr[0].addReading();
         double frontDistance = shortIr[0].getCmAvg();
@@ -531,11 +531,13 @@ public abstract class Drive {
         shortIr[1].addReading();
         double backDistance = shortIr[1].getCmAvg();
 
+        //9 back 13 front
+
         telemetry.addData("frontDistance", frontDistance);
         telemetry.addData("backDistance", backDistance);
-        //If the IR reading is closer to glyphIn than glyphOut, we assume the glyph is in
-        boolean isGlyphIn = Math.abs(frontDistance - glyphIn) < Math.abs(frontDistance - glyphOut);
-        boolean isGlyphBack = Math.abs(backDistance - glyphIn) < Math.abs(backDistance - glyphOut);
+        //If the IR reading is closer to glyphInThreshold than glyphBackThreshold, we assume the glyph is in
+        boolean isGlyphIn = frontDistance <= glyphInThreshold;
+        boolean isGlyphBack = backDistance <= glyphBackThreshold;
 
         telemetry.addData("glyph In", isGlyphIn);
         telemetry.addData("glyph Back", isGlyphBack);
