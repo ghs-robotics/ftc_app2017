@@ -539,8 +539,8 @@ public abstract class Drive {
         boolean isGlyphIn = frontDistance <= glyphInThreshold;
         boolean isGlyphBack = backDistance <= glyphBackThreshold;
 
-        telemetry.addData("glyph In", isGlyphIn);
-        telemetry.addData("glyph Back", isGlyphBack);
+        //telemetry.addData("glyph In", isGlyphIn);
+        //telemetry.addData("glyph Back", isGlyphBack);
 
         if (!isGlyphIn && !isGlyphBack) {
             //Step 1: intakes in until a glyph is found
@@ -576,7 +576,19 @@ public abstract class Drive {
             intakeLeft(0);
             intakeRight(0);
 
-            return pullBack();
+            if (pullBack()){
+                while(isGlyphBack) {
+                    stopMotors();
+                    internalIntakeLeft(1);
+                    internalIntakeRight(1);
+                    intakeLeft(1);
+                    intakeRight(1);
+                    shortIr[1].addReading();
+                    backDistance = shortIr[1].getCmAvg();
+                    isGlyphBack = backDistance <= glyphBackThreshold;
+                }
+                return true;
+            }
         }
         return false;
     }
@@ -595,7 +607,7 @@ public abstract class Drive {
         switch (dStage){
             case BACK:{
                 if (driveLRWithEncoders(1, 1, 1, 300, 1)){
-                    targetTick = random(200, 400);
+                    targetTick = random(50, 400);
                     dirRight = !dirRight;
                     dStage = DanceStage.TRANS;
                     resetEncoders();
@@ -615,7 +627,7 @@ public abstract class Drive {
                 }
                 break;
             } case FORWARD:{
-                if (driveLRWithEncoders(-1, -1, .5, 700, 1)){
+                if (driveLRWithEncoders(-1, -1, .5, 900, 1)){
                     dStage = DanceStage.BACK;
                     resetEncoders();
                     runWithEncoders();
@@ -629,22 +641,7 @@ public abstract class Drive {
      * Needs to be written: should run the front motors back aggressively
      */
     private boolean pullBack() {
-        switch (dStage){
-            case BACK:{
-                if (driveLRWithEncoders(1, 1, 1, 3000, 1)){
-                    dStage = DanceStage.TRANS;
-                }
-                return false;
-            }case TRANS:{
-                if (dirRight && driveLRWithEncoders(-1, -1, 1, 400, 1)){
-                    dStage = DanceStage.FORWARD;
-                }
-                return false;
-            } case FORWARD:{
-                return driveLRWithEncoders(1, 1, .5, 500, 1);
-            }
-        }
-        return false;
+        return driveLRWithEncoders(1, 1, 1, 3000, 1);
     }
 
     public boolean driveLRWithEncoders(double left, double right, double speed, double targetTicks, double mulch) throws IllegalArgumentException{

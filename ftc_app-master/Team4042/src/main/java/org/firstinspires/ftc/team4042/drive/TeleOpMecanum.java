@@ -534,7 +534,7 @@ public class TeleOpMecanum extends OpMode {
 
         drive.shortIr[1].addReading();
         double backDistance = drive.shortIr[1].getCmAvg();
-        boolean isGlyphBack = Math.abs(backDistance - C.get().getDouble("glyphIn")) < Math.abs(backDistance - C.get().getDouble("glyphOut"));
+        boolean isGlyphBack = backDistance <= C.get().getDouble("glyphBackThreshold");
 
         for (AnalogSensor lineFollow : drive.lineFollow){
             lineFollow.addReading();
