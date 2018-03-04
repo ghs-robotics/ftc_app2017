@@ -84,6 +84,10 @@ public class AnalogSensor {
         return voltage;
     }
 
+    public double getV() {
+        return sensor.getVoltage();
+    }
+
     public double getCmAvg(double threshold, double offset) {
         if (sensor == null) { return -1; }
         double sum = 0;

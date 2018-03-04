@@ -197,8 +197,10 @@ public class TeleOpMecanum extends OpMode {
                 drive.cryptobox.toggleRejectGlyph();
             }
 
-            if (gamepad1.right_stick_button) {
+            if ((gamepad1.dpad_left || gamepad1.dpad_right) && gamepad1.a) {
                 drive.jewelStowed();
+                drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+                drive.setVerticalDrivePos(GlyphPlacementSystem.Position.HOME.getEncoderVal());
             }
 
             //Runs the intakes
@@ -451,7 +453,9 @@ public class TeleOpMecanum extends OpMode {
         //TODO: USE COLOR SENSOR
         //Cryptobox.GlyphColor newGlyph = drive.getGlyphColor();
 
-        drive.uTrackAutoTarget(gamepad2);
+        if (gamepad2.right_trigger < drive.DEADZONE_SIZE && gamepad2.left_trigger < drive.DEADZONE_SIZE) {
+            drive.uTrackAutoTarget(gamepad2);
+        }
 
         /*if (drive.uTrackAtBottom && !bBrown && brown) {
             int[] nextGlyph = drive.uTrackAutoTarget(Cryptobox.GlyphColor.BROWN);
@@ -635,7 +639,8 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Reject glyph", drive.cryptobox.getRejectGlyph());
         Cryptobox.Snake snakeTarget = drive.cryptobox.getSnakeTarget();
         telemetry.addData("Snake target", snakeTarget == null ? "null" : snakeTarget.name());
-        telemetry.addData("line follower", drive.lineFollow[0].getVAvg());
+        telemetry.addData("line follower", drive.lineFollow[0].getV());
+        telemetry.addData("collected", drive.getCollected());
         if (drive.verbose) {
             telemetry.addData("gamepad1.dpad_up", gamepad1.dpad_up);
             telemetry.addData("bottom", drive.getBottomState());
