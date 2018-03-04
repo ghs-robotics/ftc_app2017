@@ -576,10 +576,13 @@ public abstract class Drive {
             intakeLeft(0);
             intakeRight(0);
 
-            if (!pullBack()){
-                while(!isGlyphBack) {
+            if (pullBack()){
+                while(isGlyphBack) {
+                    stopMotors();
                     internalIntakeLeft(1);
                     internalIntakeRight(1);
+                    intakeLeft(1);
+                    intakeRight(1);
                     shortIr[1].addReading();
                     backDistance = shortIr[1].getCmAvg();
                     isGlyphBack = backDistance <= glyphBackThreshold;
@@ -624,7 +627,7 @@ public abstract class Drive {
                 }
                 break;
             } case FORWARD:{
-                if (driveLRWithEncoders(-1, -1, .5, 700, 1)){
+                if (driveLRWithEncoders(-1, -1, .5, 900, 1)){
                     dStage = DanceStage.BACK;
                     resetEncoders();
                     runWithEncoders();
@@ -638,10 +641,7 @@ public abstract class Drive {
      * Needs to be written: should run the front motors back aggressively
      */
     private boolean pullBack() {
-        if (driveLRWithEncoders(1, 1, 1, 3000, 1)){
-            return true;
-        }
-        return false;
+        return driveLRWithEncoders(1, 1, 1, 3000, 1);
     }
 
     public boolean driveLRWithEncoders(double left, double right, double speed, double targetTicks, double mulch) throws IllegalArgumentException{

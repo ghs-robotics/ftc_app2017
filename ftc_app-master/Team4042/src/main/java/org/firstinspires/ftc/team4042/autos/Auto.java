@@ -54,6 +54,7 @@ public abstract class Auto extends LinearVisionOpMode {
     private double startPitch;
     private ElapsedTime intakeTimer = new ElapsedTime();
     private int intakeCount = 0;
+    private ElapsedTime timer = new ElapsedTime();
 
     private boolean readMark = false;
     private boolean done = true;
@@ -125,6 +126,8 @@ public abstract class Auto extends LinearVisionOpMode {
         Drive.isExtendo = false;
         Drive.crawl = false;
         Drive.tank = false;
+
+        timer.reset();
 
         //Reads each instruction and acts accordingly
         AutoInstruction instruction = parser.popNext();
@@ -231,7 +234,10 @@ public abstract class Auto extends LinearVisionOpMode {
         drive.intakeLeft(1);
         drive.intakeRight(1);
 
-        while (opModeIsActive() && !drive.collectGlyphStep()) {  }
+        while (opModeIsActive()) {
+            while (opModeIsActive() && !drive.collectGlyphStep());
+            while (opModeIsActive() && !drive.driveLRWithEncoders(-1, -1, 1, 500, 1));
+        }
     }
 
     public void alignHorizontally(HashMap<String, String> parameters) {
@@ -934,7 +940,7 @@ public abstract class Auto extends LinearVisionOpMode {
         } if (placeNew) {
             drive.internalIntakeLeft(1);
             drive.internalIntakeRight(1);
-            if (drive.uTrackAtBottom && drive.getCollected()) {
+            if (drive.uTrackAtBottom && drive.getCollected() && timer.seconds() > 4) {
                 done = drive.uTrack();
             } else if(drive.uTrackAtBottom && !drive.getCollected()) {
                 drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
