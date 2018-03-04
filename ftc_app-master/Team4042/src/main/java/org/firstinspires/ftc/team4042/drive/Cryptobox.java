@@ -105,6 +105,9 @@ public class Cryptobox {
 
                     for (int c = 0; c < row.length; c++) {
                         String pos = row[c];
+                        if (pos.equalsIgnoreCase("G") || pos.equalsIgnoreCase("B")) {
+                            numGlyphsPlaced++;
+                        }
                         glyphs[c][r] = pos.equalsIgnoreCase("G") ? GlyphColor.GREY :
                                 pos.equalsIgnoreCase("B") ? GlyphColor.BROWN : GlyphColor.NONE;
                     }
