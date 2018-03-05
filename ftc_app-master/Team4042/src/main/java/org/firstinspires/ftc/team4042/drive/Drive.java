@@ -685,11 +685,11 @@ public abstract class Drive {
         if (uTrackAtBottom && collected.getState()) {
             readGlyphColorTimer.reset();
             glyphColorRead = false;
+            smallVoltage = Double.MAX_VALUE;
             uTrack();
         } else if(uTrackAtBottom && !collected.getState()) {
             setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
-            smallVoltage = Double.MAX_VALUE;
         } else if (!uTrackAtBottom) {
             double currVoltage = lineFollow[0].getV();
             //telemetry.log().add("reading at " + readGlyphColorTimer.seconds() + " seconds: " + currVoltage);
