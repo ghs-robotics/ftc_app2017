@@ -157,6 +157,9 @@ public abstract class Auto extends LinearVisionOpMode {
                 case "up":
                     jewelUp(parameters);
                     break;
+                case "center":
+                    jewelCenter(parameters);
+                    break;
                 case "down":
                     drive.jewelDown();
                     break;
@@ -346,7 +349,11 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void jewelUp(HashMap<String, String> parameters) {
-        drive.jewelOut();
+        drive.jewelUp();
+    }
+
+    public void jewelCenter(HashMap<String, String> parameters) {
+        drive.jewelCenter();
     }
 
     public void knockLeftJewel(HashMap<String, String> parameters) {

@@ -952,7 +952,6 @@ public abstract class Drive {
 
     public void jewelUp() {
         jewelServo.setPosition(.5);
-        jewelCenter();
     }
 
     public void jewelCenter() {
