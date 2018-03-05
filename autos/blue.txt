@@ -13,4 +13,7 @@ f:brace
 f:drive x:.25 y:-1 speed:1 gyro:-105 target:400
 f:drive x:-1 y:1 speed:1 target:500 time:3
 f:place
-f:wait sec:10
+f:break
+f:driveLR l:-1 r:-1 speed:1 target:500 intake:true
+f:place2
+f:glyph

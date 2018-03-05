@@ -100,6 +100,10 @@ public class Cryptobox {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line = bufferedReader.readLine();
+            if (line.length() < 1) {
+                clear();
+                return;
+            }
             snakeTarget = line.equals(Snake.BGG.name()) ? Snake.BGG : line.equals(Snake.GBB.name()) ? Snake.GBB : Snake.NONE;
             for (int r = 0; r < 4 && (line = bufferedReader.readLine()) != null; r++) {
                 //Reads the lines from the file in order
