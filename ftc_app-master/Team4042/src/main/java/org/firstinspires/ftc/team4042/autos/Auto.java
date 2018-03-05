@@ -313,7 +313,7 @@ public abstract class Auto extends LinearVisionOpMode {
                 break;
         }
 
-        Cryptobox.GlyphColor newGlyph = drive.getGlyphColor();
+        Cryptobox.GlyphColor newGlyph = drive.getGlyphColor(getColorVoltage());
 
         drive.cryptobox.cipherFirstGlyph(newGlyph, column);
 
@@ -324,6 +324,19 @@ public abstract class Auto extends LinearVisionOpMode {
 
         done = drive.uTrack();
         drive.uTrackAtBottom = false;
+    }
+
+    private double getColorVoltage() {
+        ElapsedTime colorTimer = new ElapsedTime();
+        double smallVoltage = Double.MAX_VALUE;
+
+        while (colorTimer.seconds() < C.get().getDouble("colorReadTimer")) {
+            double currVoltage = drive.lineFollow[0].getV();
+            if (currVoltage < smallVoltage && currVoltage > .1) {
+                smallVoltage = currVoltage;
+            }
+        }
+        return smallVoltage;
     }
 
     public void place2 (HashMap<String, String> parameters) {
@@ -946,7 +959,7 @@ public abstract class Auto extends LinearVisionOpMode {
                 drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
                 drive.setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
             } else if (!drive.uTrackAtBottom && drive.stage.equals(GlyphPlacementSystem.Stage.HOME)) {
-                Cryptobox.GlyphColor color = drive.getGlyphColor();
+                Cryptobox.GlyphColor color = drive.getGlyphColor(getColorVoltage());
                 drive.uTrackAutoTarget(color);
                 }
         }

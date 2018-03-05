@@ -290,16 +290,8 @@ public abstract class Drive {
         }
     }
 
-    public Cryptobox.GlyphColor getGlyphColor() {
-        //return Cryptobox.GlyphColor.GREY;
-        /*for (int i = 0; i < AnalogSensor.NUM_OF_READINGS; i++){
-            for (AnalogSensor lineFollow : lineFollow){
-                lineFollow.addReading();
-            }
-        }*/
-        lastColor = lineFollow[0].getV();
-        return lineFollow[0].getV() > 1.5 ? Cryptobox.GlyphColor.NONE :
-                lineFollow[0].getV() > COLOR_THRESHOLD ? Cryptobox.GlyphColor.BROWN : Cryptobox.GlyphColor.GREY;
+    public Cryptobox.GlyphColor getGlyphColor(double voltage) {
+        return voltage > 1.5 ? Cryptobox.GlyphColor.NONE : voltage > COLOR_THRESHOLD ? Cryptobox.GlyphColor.BROWN : Cryptobox.GlyphColor.GREY;
     }
 
     /*private float[] getRGB(){
@@ -327,10 +319,10 @@ public abstract class Drive {
     public boolean extendoStep() {
         //Moving into extendo, so take it apart
         if (Drive.isExtendo) {
-            if (extendoTimer.seconds() < .1) {
+            if (extendoTimer.seconds() < .15) {
                 driveXYR(1, 0, 1, 0, false);
                 return false;
-            } else if (extendoTimer.seconds() < .4) {
+            } else if (extendoTimer.seconds() < .45) {
                 servoExtendo();
                 driveLR(1, 1, 1);
                 return false;
@@ -686,6 +678,7 @@ public abstract class Drive {
     private boolean hasGlyph;
     private ElapsedTime readGlyphColorTimer = new ElapsedTime();
     private boolean glyphColorRead = false;
+    double smallVoltage = Double.MAX_VALUE;
 
     public int[] uTrackAutoTarget(Gamepad gamepad2) {
         int numPlaces = cryptobox.getNumGlyphsPlaced();
@@ -696,9 +689,16 @@ public abstract class Drive {
         } else if(uTrackAtBottom && !collected.getState()) {
             setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
+            smallVoltage = Double.MAX_VALUE;
         } else if (!uTrackAtBottom) {
-            if (readGlyphColorTimer.seconds() > .1 && !glyphColorRead){
-                Cryptobox.GlyphColor color = getGlyphColor();
+            double currVoltage = lineFollow[0].getV();
+            //telemetry.log().add("reading at " + readGlyphColorTimer.seconds() + " seconds: " + currVoltage);
+            if (currVoltage < smallVoltage && currVoltage > .1) {
+                smallVoltage = currVoltage;
+            }
+            if (readGlyphColorTimer.seconds() > C.get().getDouble("colorReadTimer") && !glyphColorRead){
+                Cryptobox.GlyphColor color = getGlyphColor(smallVoltage);
+                telemetry.log().add("glyph: " + color + " voltage: " + smallVoltage);
                 glyphColorRead = true;
 
                 if (!color.equals(Cryptobox.GlyphColor.NONE)) {
@@ -789,7 +789,7 @@ public abstract class Drive {
         //Move back to center x location (so the hand fits back in the robot)
         //glyph.setXPower(GlyphPlacementSystem.HorizPos.CENTER);
         if(glyph.xTargetReached(GlyphPlacementSystem.HorizPos.CENTER)) {
-            log.add("reached x target, center is " + getCenterState());
+            //log.add("reached x target, center is " + getCenterState());
             stage = GlyphPlacementSystem.Stage.RETURN2;
             setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             glyph.setAboveHomeTarget();

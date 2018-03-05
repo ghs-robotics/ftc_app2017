@@ -91,6 +91,7 @@ public class Cryptobox {
      */
     public void loadFile() {
         if (file.length() < 1) {
+            telemetry.log().add("file was empty, clearing");
             clear();
             return;
         } //Can't load an empty file
@@ -202,7 +203,7 @@ public class Cryptobox {
                     val = "X";
                 } else {
                     GlyphColor glyph = this.glyphs[c][r];
-                    val = glyph == null ? "N" : glyph.equals(GlyphColor.BROWN) ? "B" : this.glyphs[c][r].equals(GlyphColor.GREY) ? "G" : "N";
+                    val = glyph == null ? "null" : glyph.name();
                 }
                 toString.append(val).append(" ");
             }
@@ -341,8 +342,8 @@ public class Cryptobox {
         }
 
         //The one with the most glyphs
-        telemetry.log().add("height: [" + height[0] + ", " + height[1] + ", " + height[2] + "]");
-        telemetry.log().add("maximum height: " + maximumHeight);
+        //telemetry.log().add("height: [" + height[0] + ", " + height[1] + ", " + height[2] + "]");
+        //telemetry.log().add("maximum height: " + maximumHeight);
         return maximumHeight;
     }
 
@@ -372,7 +373,7 @@ public class Cryptobox {
         for (int i = 0; i < glyphs.length; i++) {
             //Contains the predictions for if we put the glyph in that column
             GlyphColor[] prediction = getPrediction(newGlyph, i);
-            telemetry.log().add("Prediction " + i + ": " + prediction[0] + " " + prediction[1] + " " + prediction[2]);
+            //telemetry.log().add("Prediction " + i + ": " + prediction[0] + " " + prediction[1] + " " + prediction[2]);
             predictions[i] = prediction;
         }
 
@@ -409,7 +410,7 @@ public class Cryptobox {
         numGlyphsPlaced++;
 
         if (glyphPlacementSystem != null) {
-            telemetry.log().add("target: " + column + ", " + (3 - row));
+            //telemetry.log().add("target: " + column + ", " + (3 - row));
             glyphPlacementSystem.uiTarget(column, Range.clip(3 - row, 0, 2)); //We subtract from 3 because the glyph placer reads 0 -> 3 and this class reads 3 -> 0
             glyphPlacementSystem.drive.glyphLocate();
         }
@@ -435,7 +436,7 @@ public class Cryptobox {
             lastY = column;
 
             if (glyphPlacementSystem != null) {
-                telemetry.log().add("target: " + column + ", " + (3 - row));
+                //telemetry.log().add("target: " + column + ", " + (3 - row));
                 glyphPlacementSystem.uiTarget(column, Range.clip(3 - row, 0, 2)); //We subtract from 3 because the glyph placer reads 0 -> 3 and this class reads 3 -> 0
                 glyphPlacementSystem.drive.glyphLocate();
             }
@@ -471,7 +472,7 @@ public class Cryptobox {
 
         for (int i = 0; i < greyBrowns.length; i++) {
             sums[i] = greyBrowns[i][0] + greyBrowns[i][1];
-            telemetry.log().add("Sum " + i + ": " + sums[i]);
+            //telemetry.log().add("Sum " + i + ": " + sums[i]);
         }
 
         return getIndicesOfExtreme(sums, true);
@@ -530,7 +531,7 @@ public class Cryptobox {
                 }
             }
         }
-        telemetry.log().add("Extreme : " + extreme);
+        //telemetry.log().add("Extreme : " + extreme);
         //Find all that are at largest value
         for (int i = 0; i < array.length; i++) {
             if (extreme == array[i]) {

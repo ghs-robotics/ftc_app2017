@@ -551,7 +551,7 @@ public class TeleOpMecanum extends OpMode {
                 else if (drive.stage.equals(GlyphPlacementSystem.Stage.HOME) ||
                         drive.stage.equals(GlyphPlacementSystem.Stage.GRAB) ||
                         drive.stage.equals(GlyphPlacementSystem.Stage.PLACE1)) {
-                    drive.internalIntakeLeft(0);
+                    drive.internalIntakeRight(.5);
                 } else { drive.internalIntakeRight(1); }
 
                 //Left trigger of the b controller runs the left intake forward
@@ -561,7 +561,7 @@ public class TeleOpMecanum extends OpMode {
                 else if (drive.stage.equals(GlyphPlacementSystem.Stage.HOME) ||
                         drive.stage.equals(GlyphPlacementSystem.Stage.GRAB) ||
                         drive.stage.equals(GlyphPlacementSystem.Stage.PLACE1)) {
-                    drive.internalIntakeLeft(0);
+                    drive.internalIntakeLeft(.5);
                 } else { drive.internalIntakeLeft(1); }
             }
 
@@ -630,7 +630,7 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Reject glyph", drive.cryptobox.getRejectGlyph());
         Cryptobox.Snake snakeTarget = drive.cryptobox.getSnakeTarget();
         telemetry.addData("Snake target", snakeTarget == null ? "null" : snakeTarget.name());
-        telemetry.addData("line follower", drive.lastColor);
+        telemetry.addData("line follower", drive.smallVoltage);
         telemetry.addData("collected", drive.getCollected());
         if (drive.verbose) {
             telemetry.addData("gamepad1.dpad_up", gamepad1.dpad_up);
