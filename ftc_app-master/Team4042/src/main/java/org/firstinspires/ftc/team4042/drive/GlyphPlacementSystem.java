@@ -221,41 +221,31 @@ public class GlyphPlacementSystem {
         return false;
     }
 
+    /**
+     * Applies the PD controller to the placer
+     * @param jc Joystick control: allows the driver to manually interfere
+     */
     public void runToPosition(double jc) {
-        double power = ((double)drive.verticalDriveTargetPos() - (double)drive.verticalDriveCurrPos())/ PROPORTIONAL_CONSTANT + drive.uTrackRate * DERIV_CONSTANT;
+        //Apply the PD controller
+        double power = ((double)drive.verticalDriveTargetPos() - (double)drive.verticalDriveCurrPos()) /
+                PROPORTIONAL_CONSTANT + drive.uTrackRate * DERIV_CONSTANT;
+
+        //Allow the driver to manually interfere with the controller
         power = (power * (1. - Math.abs(jc))) + jc;
+
         power = Math.abs(power) < 0.02 ? 0 : power;
-        //Possibly multiply power by something if it's less than a number to help it along
         drive.setVerticalDrive(power);
 
         int pos = drive.verticalDriveCurrPos();
 
-        if (pos < PLACEMENT_ERROR_MARGIN) {
-            currentY = Position.HOME;
-        }
-        else if (Math.abs(pos - Position.ABOVEHOME.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
-            currentY = Position.ABOVEHOME;
-        }
-        else if (Math.abs(pos - Position.RAISED.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
-            currentY = Position.RAISED;
-        }
-        else if (Math.abs(pos - Position.RAISEDBACK.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
-            currentY = Position.RAISEDBACK;
-        }
-        else if (Math.abs(pos - Position.TOP.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
-            currentY = Position.TOP;
-        }
-        else if (Math.abs(pos - Position.MID.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
-            currentY = Position.MID;
-        }
-        else if (Math.abs(pos - Position.BOT.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
-            currentY = Position.BOT;
-        }
-        else {
-            currentY = Position.TRANSITION;
-        }
+        //Default to transition if we're not at any position
+        currentY = Position.TRANSITION;
 
-
+        //If we're within tolerance of a position, assume we're there
+        for (Position currPos : Position.values()) {
+            if (Math.abs(pos - currPos.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
+                currentY = currPos;
+            }
+        }
     }
-
 }

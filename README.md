@@ -75,24 +75,19 @@ If you want to contribute to our project, go through the [Garfield Robotics memb
 
 # Licensing
 
-This code is licensed under the GNU General Public License v3.0. To summarize, the license...
+Our code is licensed under the GNU General Public License version 3.0. This means a couple of things if you want to use our code. 
+1. You have to credit us with a link to our GitHub
+2. Provide our copyright notice, which is "Copyright (C) 2017 Garfield Robotics"
+3. License your code under the same license, which is the GNU GPLv3. Literally copy-paste [our LICENSE.md](https://github.com/dawgbotics/ftc_app2017/blob/master/LICENSE.md) into your project. No changes required. ALSO: put [the "legalese" section of our README.md](https://github.com/dawgbotics/ftc_app2017/blob/master/README.md#legalese) in your README.md. Remember to change the contact link to contact you, not us!
+4. Document the changes you make to our code. This can be a super informal bullet list.
+5. You don't get a warranty. And we're not liable.
 
-GNU GPLv3 means you can:
-- Use our code commercially
-- Distribute it
-- Modify it
-- Patent it
-- Use it privately
-
-But have to:
-- Disclose its source (here!)
-- Provide the [copyright notice](#legalese) and license, which appears in the LICENSE.md
-- License your code under this same license (GNU GPLv3)
-- Document what changes you make to our code
-
-And:
-- You don't have a warranty
-- We're not liable
+But, in exchange, you can:
+1. Use our code commercially
+2. Distribute it
+3. Modify it
+4. Patent it
+5. Use it privately
 
 Copyright (C) 2017 Garfield Robotics
 

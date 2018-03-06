@@ -728,12 +728,23 @@ public abstract class Drive {
         }
         return false;
     }
+
+    private void reset() {
+        //Moves the u-track down onto the glyph
+        boolean currBottom = getBottomState();
+        uTrackAtBottom = false;
+
+        if(!currBottom) {
+            setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            setVerticalDrive(-1);
+        } else {
+            resetUTrack();
+        }
+    }
+
     private void home() {
-        //Close the hand
-        //Jaden closed his hand
-        //setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
         closeHand();
-        //jewelOut();
+        //Identifies the glyph color and runs the AI targeting
         glyphLocate();
         handDropTimer.reset();
 
@@ -743,12 +754,13 @@ public abstract class Drive {
         stage = GlyphPlacementSystem.Stage.GRAB;
     }
     private void grab() {
+        //Grabs the glyph
         if (handDropTimer.seconds() >= .5) {
             stage = GlyphPlacementSystem.Stage.PLACE1;
         }
     }
     private void place1() {
-        //Raise the u-track
+        //Raises the u-track
         setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
         glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
         if(glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
@@ -757,26 +769,27 @@ public abstract class Drive {
         }
     }
     private void pause1() {
-        //Move to target X location
+        //Moves to target X location
         if(glyph.xTargetReached(targetX)) {
             stage = GlyphPlacementSystem.Stage.PLACE2;
         }
     }
     private void place2() {
-        //Move to target Y location
+        //Moves to target Y location
         glyph.setTargetPosition(targetY);
         if(glyph.currentY.equals(targetY)) {
             stage = GlyphPlacementSystem.Stage.RETURN1;
         }
     }
     private void return1() {
-        //Open the hand; raise the u-track
+        //Opens the hand; raise the u-track
         openHand();
         handDropTimer.reset();
 
         stage = GlyphPlacementSystem.Stage.RELEASE;
     }
     private void release() {
+        //Lets go of the hand
         if (handDropTimer.seconds() >= .5) {
             glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISEDBACK);
             if (glyph.currentY.equals(GlyphPlacementSystem.Position.RAISEDBACK)) {
@@ -786,10 +799,8 @@ public abstract class Drive {
         }
     }
     private void pause2() {
-        //Move back to center x location (so the hand fits back in the robot)
-        //glyph.setXPower(GlyphPlacementSystem.HorizPos.CENTER);
+        //Moves back to center x location (so the hand fits back in the robot)
         if(glyph.xTargetReached(GlyphPlacementSystem.HorizPos.CENTER)) {
-            //log.add("reached x target, center is " + getCenterState());
             stage = GlyphPlacementSystem.Stage.RETURN2;
             setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             glyph.setAboveHomeTarget();
@@ -797,7 +808,7 @@ public abstract class Drive {
         }
     }
     private boolean return2() {
-        //Move back to the bottom and get ready to do it again
+        //Moves back to the bottom and get ready to do it again
         if(glyph.currentY.equals(GlyphPlacementSystem.Position.ABOVEHOME)) {
             stage = GlyphPlacementSystem.Stage.RESET;
             setVerticalDrive(0);
@@ -808,27 +819,10 @@ public abstract class Drive {
         return false;
     }
 
-    private boolean lastBottom;
-    private ElapsedTime bottomTimer = new ElapsedTime();
-
-    private void reset() {
-        boolean currBottom = getBottomState();
-        uTrackAtBottom = false;
-
-        if(!currBottom) {
-            setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            setVerticalDrive(-1);
-        } else {
-            //setVerticalDrive(-.5);
-            resetUTrack();
-        }
-    }
-
     public void resetUTrack() {
+        //Resets the utrack
         stage = GlyphPlacementSystem.Stage.HOME;
         setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
-        //jewelUp();
     }
 
     /**
@@ -952,7 +946,6 @@ public abstract class Drive {
 
     public void jewelUp() {
         jewelServo.setPosition(.5);
-        jewelCenter();
     }
 
     public void jewelCenter() {

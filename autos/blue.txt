@@ -3,6 +3,8 @@ f:knockb
 f:wait sec:1
 f:up
 f:brace
+f:wait sec:1
+f:center
 f:doff x:0 y:-1 speed:1 target:2000 gyro:0
 f:open
 f:rot r:-70 speed:1 time:3
