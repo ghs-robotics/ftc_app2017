@@ -32,6 +32,7 @@ public abstract class Drive {
     public abstract void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor);
     public abstract void driveXYR(double speedFactor, double x, double y, double r, boolean useGyro);
     public abstract void driveLR(double speedFactor, double l, double r);
+    public abstract boolean driveWithEncoders(Direction direction, double speed, double targetTicks, boolean useGyro, double targetGyro, double mulch);
     public abstract void stopMotors();
 
     //Initializes a factor for the speed of movement to a position when driving with encoders
@@ -313,14 +314,18 @@ public abstract class Drive {
         //It's extendo, so put it back together
         extendoTimer = new ElapsedTime();
         Drive.isExtendo = !Drive.isExtendo;
-        extendoTimer.reset();
+        doneForwards = false;
+
+        //extendoTimer.reset();
     }
+    private boolean doneForwards = false;
 
     public boolean extendoStep() {
         //Moving into extendo, so take it apart
         if (Drive.isExtendo) {
-            if (extendoTimer.seconds() < .15) {
-                driveXYR(1, 0, 1, 0, false);
+            if (!doneForwards && driveWithEncoders(new Direction(0, 1), 1, 250, false, 0, 1)) {
+                extendoTimer.reset();
+                doneForwards = true;
                 return false;
             } else if (extendoTimer.seconds() < .45) {
                 servoExtendo();

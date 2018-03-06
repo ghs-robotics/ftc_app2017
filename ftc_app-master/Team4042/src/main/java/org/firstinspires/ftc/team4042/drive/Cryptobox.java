@@ -429,6 +429,10 @@ public class Cryptobox {
 
         GlyphColor newGlyph = lastGlyph.equals(GlyphColor.GREY) ? GlyphColor.BROWN : lastGlyph.equals(GlyphColor.BROWN) ? GlyphColor.GREY : GlyphColor.NONE;
 
+        if (numGlyphsPlaced == 1) {
+            snakeTarget = snakeTarget.equals(Snake.GBB) ? Snake.BGG : Snake.GBB;
+        }
+
         return placeGlyph(newGlyph);
     }
 
