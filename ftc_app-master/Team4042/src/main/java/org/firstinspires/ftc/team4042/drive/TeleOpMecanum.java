@@ -69,6 +69,7 @@ public class TeleOpMecanum extends OpMode {
     private Camera.Parameters onParams;
     private Camera.Parameters offParams;
     private boolean flashOn;
+    private boolean runDown = false;
 
     private int[] greyBrown = new int[] {0, 0};
 
@@ -152,6 +153,7 @@ public class TeleOpMecanum extends OpMode {
             Drive.isExtendo = false;
             Drive.crawl = false;
             Drive.tank = false;
+            runDown = false;
 
         } catch (Exception ex) {
             telemetry.addData("Exception", Drive.getStackTrace(ex));
@@ -213,10 +215,13 @@ public class TeleOpMecanum extends OpMode {
 
             updateControlBooleans();
 
-            if ((gamepad1.dpad_left || gamepad1.dpad_right) && gamepad1.a) {
+
+            if (((gamepad1.dpad_left || gamepad1.dpad_right) && gamepad1.a) || runDown) {
+                runDown = true;
                 drive.jewelStowed();
                 drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
                 drive.setVerticalDrivePos(GlyphPlacementSystem.Position.HOME.getEncoderVal());
+                drive.glyph.runToPosition(gamepad2.left_stick_y);
             }
 
             //Updates the telemetry output

@@ -690,6 +690,7 @@ public abstract class Drive {
         } else if(uTrackAtBottom && !collected.getState()) {
             setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
+            glyph.runToPosition(gamepad2.left_stick_y);
         } else if (!uTrackAtBottom) {
             double currVoltage = lineFollow[0].getV();
             //telemetry.log().add("reading at " + readGlyphColorTimer.seconds() + " seconds: " + currVoltage);
@@ -746,6 +747,7 @@ public abstract class Drive {
         closeHand();
         //Identifies the glyph color and runs the AI targeting
         glyphLocate();
+        jewelOut();
         handDropTimer.reset();
 
         glyph.currentY = GlyphPlacementSystem.Position.HOME;
