@@ -239,7 +239,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
         while (opModeIsActive()) {
             while (opModeIsActive() && !drive.collectGlyphStep());
-            while (opModeIsActive() && !drive.driveLRWithEncoders(-1, -1, 1, 500, 1));
+            while (opModeIsActive() && !drive.driveLRWithEncoders(-.75, -1, 1, 500, 1));
         }
     }
 
@@ -316,7 +316,7 @@ public abstract class Auto extends LinearVisionOpMode {
                 break;
         }
 
-        Cryptobox.GlyphColor newGlyph = drive.getGlyphColor(getColorVoltage());
+        Cryptobox.GlyphColor newGlyph = Cryptobox.GlyphColor.GREY; //drive.getGlyphColor(getColorVoltage());
 
         drive.cryptobox.cipherFirstGlyph(newGlyph, column);
 
@@ -333,7 +333,7 @@ public abstract class Auto extends LinearVisionOpMode {
         ElapsedTime colorTimer = new ElapsedTime();
         double smallVoltage = Double.MAX_VALUE;
 
-        while (colorTimer.seconds() < C.get().getDouble("colorReadTimer")) {
+        while (colorTimer.seconds() < C.get().getDouble("colorReadTimer") && opModeIsActive()) {
             double currVoltage = drive.lineFollow[0].getV();
             if (currVoltage < smallVoltage && currVoltage > .1) {
                 smallVoltage = currVoltage;
@@ -349,7 +349,7 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void jewelUp(HashMap<String, String> parameters) {
-        drive.jewelUp();
+        drive.jewelOut();
     }
 
     public void jewelCenter(HashMap<String, String> parameters) {
@@ -428,7 +428,7 @@ public abstract class Auto extends LinearVisionOpMode {
         Direction direction = new Direction(parser.getParam(parameters, "x"), -parser.getParam(parameters, "y"));
         double speed = parser.getParam(parameters, "speed");
         double targetTicks = parser.getParam(parameters, "target");
-        double time = parser.getParam(parameters, "time", -1);
+        double time = parser.getParam(parameters, "time", -1.0);
         boolean useGyro = parameters.containsKey("gyro");
         double targetGyro = useGyro ? Double.parseDouble(parameters.get("gyro")) : 0;
 

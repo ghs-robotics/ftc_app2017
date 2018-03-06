@@ -536,7 +536,7 @@ public abstract class Drive {
 
         if (!isGlyphIn && !isGlyphBack) {
             //Step 1: intakes in until a glyph is found
-            if (intakeBackTimer.seconds() % 3 == 0) {
+            if (Math.floor(intakeBackTimer.seconds()) % 3 == 0) {
                 intakeLeft(-1);
                 intakeRight(-1);
             } else {
@@ -965,8 +965,7 @@ public abstract class Drive {
      */
     public void jewelOut() {
         jewelServo.setPosition(.65);
-        jewelCenter();
-
+        //jewelCenter();
     }
 
     public void jewelStowed() {

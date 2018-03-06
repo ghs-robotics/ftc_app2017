@@ -83,6 +83,7 @@ public class TestRobot extends LinearOpMode{
         drive.internalIntakeRight(0);
         drive.internalIntakeLeft(0);
         drive.jewelOut();
+        drive.jewelCenter();
         post();
 
         //Vertical u-track

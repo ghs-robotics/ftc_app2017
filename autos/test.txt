@@ -1,5 +1,5 @@
 f:place
 f:break
-f:driveLR l:-1 r:-1 speed:1 target:500 intake:true
+f:driveLR l:-.75 r:-1 speed:1 target:500 intake:true
 f:place2
 f:glyph

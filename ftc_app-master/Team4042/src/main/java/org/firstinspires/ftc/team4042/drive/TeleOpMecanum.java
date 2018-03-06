@@ -146,6 +146,7 @@ public class TeleOpMecanum extends OpMode {
             drive.lockCatches();
 
             drive.jewelOut();
+            drive.jewelCenter();
 
             drive.readSensorsSetUp();
 

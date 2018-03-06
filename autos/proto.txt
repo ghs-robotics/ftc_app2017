@@ -19,4 +19,6 @@
 #ex: function:d x:1 y:.2 speed:.5 target:1000 will drive right and slightly forward at half speed for 1000 encoder ticks
 f:place
 f:wait sec:.5
+f:driveLR l:-1 r:-1 speed:1 target:500 intake:true
 f:place2
+f:glyph
