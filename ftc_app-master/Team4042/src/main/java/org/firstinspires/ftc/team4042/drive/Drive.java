@@ -598,7 +598,7 @@ public abstract class Drive {
         telemetry.addData("stageD", dStage);
         switch (dStage){
             case BACK:{
-                if (driveLRWithEncoders(1, 1, 1, 300, 1)){
+                if (driveLRWithEncoders(1, 1, 1, 250, 1)){
                     targetTick = random(50, 400);
                     dirRight = !dirRight;
                     dStage = DanceStage.TRANS;
@@ -619,7 +619,7 @@ public abstract class Drive {
                 }
                 break;
             } case FORWARD:{
-                if (driveLRWithEncoders(-1, -1, .5, 900, 1)){
+                if (driveLRWithEncoders(-1, -1, .5, 1000, 1)){
                     dStage = DanceStage.BACK;
                     resetEncoders();
                     runWithEncoders();
@@ -633,7 +633,7 @@ public abstract class Drive {
      * Needs to be written: should run the front motors back aggressively
      */
     private boolean pullBack() {
-        return driveLRWithEncoders(1, 1, 1, 3000, 1);
+        return driveLRWithEncoders(1, 1, 1, 2000, 1);
     }
 
     public boolean driveLRWithEncoders(double left, double right, double speed, double targetTicks, double mulch) throws IllegalArgumentException{

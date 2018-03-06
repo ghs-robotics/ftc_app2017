@@ -202,12 +202,6 @@ public class TeleOpMecanum extends OpMode {
                 drive.cryptobox.toggleRejectGlyph();
             }
 
-            if ((gamepad1.dpad_left || gamepad1.dpad_right) && gamepad1.a) {
-                drive.jewelStowed();
-                drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
-                drive.setVerticalDrivePos(GlyphPlacementSystem.Position.HOME.getEncoderVal());
-            }
-
             //Runs the intakes
             intakes();
 
@@ -218,6 +212,12 @@ public class TeleOpMecanum extends OpMode {
             glyphPlacer();
 
             updateControlBooleans();
+
+            if ((gamepad1.dpad_left || gamepad1.dpad_right) && gamepad1.a) {
+                drive.jewelStowed();
+                drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+                drive.setVerticalDrivePos(GlyphPlacementSystem.Position.HOME.getEncoderVal());
+            }
 
             //Updates the telemetry output
             telemetryUpdate();
