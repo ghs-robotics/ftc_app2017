@@ -100,6 +100,7 @@ public class Cryptobox {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line = bufferedReader.readLine();
+            telemetry.log().add(line);
             if (line.length() < 1) {
                 clear();
                 return;
@@ -108,6 +109,7 @@ public class Cryptobox {
             for (int r = 0; r < 4 && (line = bufferedReader.readLine()) != null; r++) {
                 //Reads the lines from the file in order
                 //store each one onto array
+                telemetry.log().add(line);
                 if (line.length() > 0) {
                     String[] row = line.split(" ");
 
@@ -121,6 +123,9 @@ public class Cryptobox {
                     }
 
                     telemetry.update();
+                } else {
+                    clear();
+                    return;
                 }
             }
             fileReader.close();
@@ -414,7 +419,6 @@ public class Cryptobox {
         numGlyphsPlaced++;
 
         if (glyphPlacementSystem != null) {
-            //telemetry.log().add("target: " + column + ", " + (3 - row));
             glyphPlacementSystem.uiTarget(column, Range.clip(3 - row, 0, 2)); //We subtract from 3 because the glyph placer reads 0 -> 3 and this class reads 3 -> 0
             glyphPlacementSystem.drive.glyphLocate();
         }
@@ -423,13 +427,19 @@ public class Cryptobox {
     }
 
     public int[] wrongColor() {
-        GlyphColor lastGlyph = glyphs[lastX][lastY];
+        telemetry.log().add("lastX: " + lastX + " lastY: " + lastY);
+        GlyphColor lastGlyph = glyphs[lastY][lastX];
 
-        glyphs[lastX][lastY] = GlyphColor.NONE;
+        glyphs[lastY][lastX] = GlyphColor.NONE;
 
         GlyphColor newGlyph = lastGlyph.equals(GlyphColor.GREY) ? GlyphColor.BROWN : lastGlyph.equals(GlyphColor.BROWN) ? GlyphColor.GREY : GlyphColor.NONE;
+        lastGlyph = newGlyph;
 
-        if (numGlyphsPlaced == 1) {
+        telemetry.log().add("lastGlyph: " + lastGlyph + " newGlyph: " + newGlyph);
+
+        numGlyphsPlaced--;
+
+        if (numGlyphsPlaced == 0) {
             snakeTarget = snakeTarget.equals(Snake.GBB) ? Snake.BGG : Snake.GBB;
         }
 
@@ -444,7 +454,6 @@ public class Cryptobox {
             lastY = column;
 
             if (glyphPlacementSystem != null) {
-                //telemetry.log().add("target: " + column + ", " + (3 - row));
                 glyphPlacementSystem.uiTarget(column, Range.clip(3 - row, 0, 2)); //We subtract from 3 because the glyph placer reads 0 -> 3 and this class reads 3 -> 0
                 glyphPlacementSystem.drive.glyphLocate();
             }

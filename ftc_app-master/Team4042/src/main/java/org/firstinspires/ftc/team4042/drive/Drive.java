@@ -315,6 +315,8 @@ public abstract class Drive {
         extendoTimer = new ElapsedTime();
         Drive.isExtendo = !Drive.isExtendo;
         doneForwards = false;
+        resetEncoders();
+        runWithEncoders();
 
         //extendoTimer.reset();
     }
@@ -323,12 +325,14 @@ public abstract class Drive {
     public boolean extendoStep() {
         //Moving into extendo, so take it apart
         if (Drive.isExtendo) {
-            if (!doneForwards && driveWithEncoders(new Direction(0, 1), 1, 250, false, 0, 1)) {
+            if (!doneForwards && driveWithEncoders(new Direction(0, 1), 1, 150, false, 0, 1)) {
                 extendoTimer.reset();
                 doneForwards = true;
                 return false;
             } else if (extendoTimer.seconds() < .45) {
                 servoExtendo();
+                return false;
+            } else if (extendoTimer.seconds() < .95) {
                 driveLR(1, 1, 1);
                 return false;
             } else {
@@ -695,7 +699,7 @@ public abstract class Drive {
         } else if(uTrackAtBottom && !collected.getState()) {
             setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
-            glyph.runToPosition(gamepad2.left_stick_y);
+            glyph.runToPosition(0);
         } else if (!uTrackAtBottom) {
             double currVoltage = lineFollow[0].getV();
             //telemetry.log().add("reading at " + readGlyphColorTimer.seconds() + " seconds: " + currVoltage);
