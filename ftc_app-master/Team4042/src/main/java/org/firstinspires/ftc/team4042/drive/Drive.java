@@ -103,7 +103,7 @@ public abstract class Drive {
     private DigitalChannel center;
     private DigitalChannel bottom;
 
-    public boolean getCollected() {
+    public boolean getCollectedState() {
         return collected.getState();
     }
 
@@ -317,6 +317,10 @@ public abstract class Drive {
         doneForwards = false;
         resetEncoders();
         runWithEncoders();
+<<<<<<< HEAD
+=======
+
+>>>>>>> ea5cb7748df6f8250d0b144b741502e32352c56d
         //extendoTimer.reset();
     }
     private boolean doneForwards = false;
@@ -324,12 +328,14 @@ public abstract class Drive {
     public boolean extendoStep() {
         //Moving into extendo, so take it apart
         if (Drive.isExtendo) {
-            if (!doneForwards && driveWithEncoders(new Direction(0, 1), 1, 150, false, 0, 1)) {
+            if (!doneForwards && driveWithEncoders(new Direction(0, 1), 1, 70, false, 0, 1)) {
                 extendoTimer.reset();
                 doneForwards = true;
             } else if (doneForwards && extendoTimer.seconds() < .45) {
                 runWithoutEncoders();
                 servoExtendo();
+                return false;
+            } else if (extendoTimer.seconds() < .95) {
                 driveLR(1, 1, 1);
             } else if (doneForwards) {
                 driveXYR(1, 0, 0, 0, false);
@@ -696,7 +702,7 @@ public abstract class Drive {
         } else if(uTrackAtBottom && !collected.getState()) {
             setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
-            glyph.runToPosition(gamepad2.left_stick_y);
+            glyph.runToPosition(0);
         } else if (!uTrackAtBottom) {
             double currVoltage = lineFollow[0].getV();
             //telemetry.log().add("reading at " + readGlyphColorTimer.seconds() + " seconds: " + currVoltage);
@@ -812,7 +818,7 @@ public abstract class Drive {
             stage = GlyphPlacementSystem.Stage.RETURN2;
             setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             glyph.setAboveHomeTarget();
-            setVerticalDrive(-1);
+            //setVerticalDrive(-1);
         }
     }
     private boolean return2() {
@@ -880,12 +886,20 @@ public abstract class Drive {
 
     public void openHand() {
         handIsOpen = true;
+<<<<<<< HEAD
         grabbyBoi.setPosition(.36);
+=======
+        grabbyBoi.setPosition(.45);
+>>>>>>> ea5cb7748df6f8250d0b144b741502e32352c56d
     }
 
     public void closeHand() {
         handIsOpen = false;
+<<<<<<< HEAD
         grabbyBoi.setPosition(.1);
+=======
+        grabbyBoi.setPosition(.13);
+>>>>>>> ea5cb7748df6f8250d0b144b741502e32352c56d
     }
 
     public void setHorizontalDrive(double power) {

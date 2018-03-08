@@ -24,14 +24,10 @@ import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 /**
  * Parses a file to figure out which instructions to run. CAN NOT ACTUALLY RUN INSTRUCTIONS.
@@ -960,9 +956,9 @@ public abstract class Auto extends LinearVisionOpMode {
         } if (placeNew) {
             drive.internalIntakeLeft(1);
             drive.internalIntakeRight(1);
-            if (drive.uTrackAtBottom && drive.getCollected() && timer.seconds() > 4) {
+            if (drive.uTrackAtBottom && drive.getCollectedState() && timer.seconds() > 4) {
                 done = drive.uTrack();
-            } else if(drive.uTrackAtBottom && !drive.getCollected()) {
+            } else if(drive.uTrackAtBottom && !drive.getCollectedState()) {
                 drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
                 drive.setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
             } else if (!drive.uTrackAtBottom && drive.stage.equals(GlyphPlacementSystem.Stage.HOME)) {
