@@ -317,10 +317,6 @@ public abstract class Drive {
         doneForwards = false;
         resetEncoders();
         runWithEncoders();
-<<<<<<< HEAD
-=======
-
->>>>>>> ea5cb7748df6f8250d0b144b741502e32352c56d
         //extendoTimer.reset();
     }
     private boolean doneForwards = false;
@@ -699,7 +695,7 @@ public abstract class Drive {
             glyphColorRead = false;
             smallVoltage = Double.MAX_VALUE;
             uTrack();
-        } else if(uTrackAtBottom && !collected.getState()) {
+        } else if(uTrackAtBottom && !collected.getState() && !glyph.currentY.equals(GlyphPlacementSystem.Position.HOME)) {
             setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
             glyph.runToPosition(0);
@@ -886,20 +882,12 @@ public abstract class Drive {
 
     public void openHand() {
         handIsOpen = true;
-<<<<<<< HEAD
-        grabbyBoi.setPosition(.36);
-=======
         grabbyBoi.setPosition(.45);
->>>>>>> ea5cb7748df6f8250d0b144b741502e32352c56d
     }
 
     public void closeHand() {
         handIsOpen = false;
-<<<<<<< HEAD
-        grabbyBoi.setPosition(.1);
-=======
         grabbyBoi.setPosition(.13);
->>>>>>> ea5cb7748df6f8250d0b144b741502e32352c56d
     }
 
     public void setHorizontalDrive(double power) {
