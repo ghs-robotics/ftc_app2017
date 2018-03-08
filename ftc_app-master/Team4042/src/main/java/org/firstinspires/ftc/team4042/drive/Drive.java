@@ -315,7 +315,8 @@ public abstract class Drive {
         extendoTimer = new ElapsedTime();
         Drive.isExtendo = !Drive.isExtendo;
         doneForwards = false;
-
+        resetEncoders();
+        runWithEncoders();
         //extendoTimer.reset();
     }
     private boolean doneForwards = false;
@@ -323,18 +324,18 @@ public abstract class Drive {
     public boolean extendoStep() {
         //Moving into extendo, so take it apart
         if (Drive.isExtendo) {
-            if (!doneForwards && driveWithEncoders(new Direction(0, 1), 1, 250, false, 0, 1)) {
+            if (!doneForwards && driveWithEncoders(new Direction(0, 1), 1, 150, false, 0, 1)) {
                 extendoTimer.reset();
                 doneForwards = true;
-                return false;
-            } else if (extendoTimer.seconds() < .45) {
+            } else if (doneForwards && extendoTimer.seconds() < .45) {
+                runWithoutEncoders();
                 servoExtendo();
                 driveLR(1, 1, 1);
-                return false;
-            } else {
+            } else if (doneForwards) {
                 driveXYR(1, 0, 0, 0, false);
                 return true;
             }
+            return false;
         }
         //Moving out of extendo, so put it together
         else {
@@ -879,12 +880,12 @@ public abstract class Drive {
 
     public void openHand() {
         handIsOpen = true;
-        grabbyBoi.setPosition(.54);
+        grabbyBoi.setPosition(.36);
     }
 
     public void closeHand() {
         handIsOpen = false;
-        grabbyBoi.setPosition(.88);
+        grabbyBoi.setPosition(.1);
     }
 
     public void setHorizontalDrive(double power) {
