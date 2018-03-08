@@ -103,7 +103,7 @@ public abstract class Drive {
     private DigitalChannel center;
     private DigitalChannel bottom;
 
-    public boolean getCollected() {
+    public boolean getCollectedState() {
         return collected.getState();
     }
 
@@ -325,7 +325,7 @@ public abstract class Drive {
     public boolean extendoStep() {
         //Moving into extendo, so take it apart
         if (Drive.isExtendo) {
-            if (!doneForwards && driveWithEncoders(new Direction(0, 1), 1, 150, false, 0, 1)) {
+            if (!doneForwards && driveWithEncoders(new Direction(0, 1), 1, 70, false, 0, 1)) {
                 extendoTimer.reset();
                 doneForwards = true;
                 return false;
@@ -815,7 +815,7 @@ public abstract class Drive {
             stage = GlyphPlacementSystem.Stage.RETURN2;
             setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             glyph.setAboveHomeTarget();
-            setVerticalDrive(-1);
+            //setVerticalDrive(-1);
         }
     }
     private boolean return2() {
@@ -883,12 +883,12 @@ public abstract class Drive {
 
     public void openHand() {
         handIsOpen = true;
-        grabbyBoi.setPosition(.54);
+        grabbyBoi.setPosition(.45);
     }
 
     public void closeHand() {
         handIsOpen = false;
-        grabbyBoi.setPosition(.88);
+        grabbyBoi.setPosition(.13);
     }
 
     public void setHorizontalDrive(double power) {

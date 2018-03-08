@@ -2,6 +2,7 @@ package org.firstinspires.ftc.team4042.drive;
 
 import com.qualcomm.robotcore.util.Range;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -84,12 +85,15 @@ public class Cryptobox {
                 glyphs[i][j] = GlyphColor.NONE;
             }
         }
+        snakeTarget = Snake.NONE;
     }
 
     /**
      * Reads the file and stores data into cryptobox array
      */
     public void loadFile() {
+        logFile();
+
         if (file.length() < 1) {
             telemetry.log().add("file was empty, clearing");
             clear();
@@ -100,8 +104,8 @@ public class Cryptobox {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line = bufferedReader.readLine();
-            telemetry.log().add(line);
             if (line.length() < 1) {
+                telemetry.log().add("no target cipher, clearing");
                 clear();
                 return;
             }
@@ -109,28 +113,43 @@ public class Cryptobox {
             for (int r = 0; r < 4 && (line = bufferedReader.readLine()) != null; r++) {
                 //Reads the lines from the file in order
                 //store each one onto array
-                telemetry.log().add(line);
-                if (line.length() > 0) {
-                    String[] row = line.split(" ");
+                String[] row = line.split("");
 
-                    for (int c = 0; c < row.length; c++) {
+                if (row.length == 4) {
+                    for (int c = 1; c < row.length; c++) {
                         String pos = row[c];
                         if (pos.equalsIgnoreCase("G") || pos.equalsIgnoreCase("B")) {
                             numGlyphsPlaced++;
                         }
-                        glyphs[c][r] = pos.equalsIgnoreCase("G") ? GlyphColor.GREY :
+                        glyphs[c - 1][r] = pos.equalsIgnoreCase("G") ? GlyphColor.GREY :
                                 pos.equalsIgnoreCase("B") ? GlyphColor.BROWN : GlyphColor.NONE;
                     }
-
-                    telemetry.update();
-                } else {
+                } else if (row.length != 0) {
+                    telemetry.log().add("line " + r + " was " + row.length + " characters");
                     clear();
                     return;
+                } else {
+                    telemetry.log().add("skipping empty line " + r);
                 }
+
+                telemetry.update();
             }
             fileReader.close();
         } catch (Exception e) {
             telemetry.addData("Err load file", Drive.getStackTrace(e));
+        }
+    }
+
+    private void logFile() {
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+            telemetry.log().add("Contents of " + file.getName() + ":");
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                telemetry.log().add(line);
+            }
+        } catch (Exception ex) {
+            telemetry.log().add(Drive.getStackTrace(ex));
         }
     }
 
@@ -144,7 +163,7 @@ public class Cryptobox {
             FileWriter fileWriter = new FileWriter(file);
             PrintWriter print_stream = new PrintWriter(fileWriter);
             //write array to file for each row and col
-            print_stream.println(snakeTarget.name());
+            print_stream.print(snakeTarget.name());
             print_stream.print(this.toString());
             print_stream.close();
         } catch (Exception e) {
@@ -194,8 +213,27 @@ public class Cryptobox {
      * @param newGlyph The glyph color to set to
      */
     public void setGlyphAtUi(GlyphColor newGlyph) {
-        glyphs[uiX][3 - uiY] = newGlyph;
-        writeFile();
+
+        if (!newGlyph.equals(glyphs[uiX][3 - uiY])) {
+            if (newGlyph.equals(GlyphColor.NONE) && !glyphs[uiX][3 - uiY].equals(GlyphColor.NONE)) {
+                numGlyphsPlaced--;
+                if (numGlyphsPlaced == 0) {
+                    snakeTarget = Snake.NONE;
+                }
+            }
+            if (!newGlyph.equals(GlyphColor.NONE) && glyphs[uiX][3 - uiY].equals(GlyphColor.NONE)) {
+                if (numGlyphsPlaced == 0) {
+                    cipherFirstGlyph(newGlyph, uiX);
+                }
+                numGlyphsPlaced++;
+            }
+            if (!newGlyph.equals(GlyphColor.NONE) && !glyphs[uiX][3 - uiY].equals(GlyphColor.NONE) && numGlyphsPlaced == 1) {
+                cipherFirstGlyph(newGlyph, uiX);
+            }
+
+            glyphs[uiX][3 - uiY] = newGlyph;
+            writeFile();
+        }
     }
 
     /**
@@ -515,7 +553,11 @@ public class Cryptobox {
         int[] height = new int[3];
         for (int k = 0; k < height.length; k++) {
             if (minimums.contains(k)) {
-                height[k] = getFirstEmpty(k);
+                int colHeight = getFirstEmpty(k);
+                if (colHeight == -1) {
+                    colHeight = 4;
+                }
+                height[k] = colHeight;
             } else {
                 height[k] = Integer.MAX_VALUE;
             }

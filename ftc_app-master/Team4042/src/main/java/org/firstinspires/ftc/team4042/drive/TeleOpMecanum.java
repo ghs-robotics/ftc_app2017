@@ -194,9 +194,10 @@ public class TeleOpMecanum extends OpMode {
                 drive.toggleVerbose();
             }
 
+            /*
             if (gamepad2.back && !bBack) {
                 drive.cryptobox.toggleRejectGlyph();
-            }
+            }*/
 
             //Runs the intakes
             intakes();
@@ -608,25 +609,26 @@ public class TeleOpMecanum extends OpMode {
         cursorCount += .1;
         telemetry.addData("Manual", manual);
         telemetry.addData("Crawl", Drive.crawl);
-        telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
+        //telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());
         telemetry.addData("AI", aiPlacer);
         telemetry.addData("Cryptobox", drive.cryptobox == null ? "" : drive.cryptobox.uiToString((int) cursorCount % 2 == 0));
         printNextGlyph();
-        telemetry.addData("Reject glyph", drive.cryptobox.getRejectGlyph());
+        //telemetry.addData("Reject glyph", drive.cryptobox.getRejectGlyph());
         Cryptobox.Snake snakeTarget = drive.cryptobox.getSnakeTarget();
         telemetry.addData("Snake target", snakeTarget == null ? "null" : snakeTarget.name());
-        telemetry.addData("line follower", drive.smallVoltage);
-        telemetry.addData("collected", drive.getCollected());
+        //telemetry.addData("line follower", drive.smallVoltage);
         if (drive.verbose) {
             telemetry.addData("gamepad1.dpad_up", gamepad1.dpad_up);
             telemetry.addData("bottom", drive.getBottomState());
             telemetry.addData("center", drive.getCenterState());
+            telemetry.addData("collected", drive.getCollectedState());
             telemetry.addData("cursorCount", (int) cursorCount);
             telemetry.addData("bLeftStick", bLeftStick);
             telemetry.addData("gamepad2.left_stick_button", gamepad2.left_stick_button);
             telemetry.addData("!bLeftStick && gamepad2.left_stick_button", !bLeftStick && gamepad2.left_stick_button);
             telemetry.addData("!bRightStick && gamepad2.right_stick_button", !bRightStick && gamepad2.right_stick_button);
             telemetry.addData("extendoTimer", drive.extendoTimer.seconds());
+            telemetry.addData("numGlyphsCollected", drive.cryptobox.getNumGlyphsPlaced());
         }
         if (Drive.useGyro) {
             telemetry.addData("gyro", drive.gyro.updateHeading());
