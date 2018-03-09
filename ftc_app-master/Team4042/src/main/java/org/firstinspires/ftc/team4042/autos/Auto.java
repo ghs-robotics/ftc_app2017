@@ -345,7 +345,7 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void jewelUp(HashMap<String, String> parameters) {
-        drive.jewelOut();
+        drive.jewelUp();
     }
 
     public void jewelCenter(HashMap<String, String> parameters) {

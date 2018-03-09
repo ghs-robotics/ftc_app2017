@@ -695,7 +695,7 @@ public abstract class Drive {
             glyphColorRead = false;
             smallVoltage = Double.MAX_VALUE;
             uTrack();
-        } else if(uTrackAtBottom && !collected.getState() && !glyph.currentY.equals(GlyphPlacementSystem.Position.HOME)) {
+        } else if(uTrackAtBottom && !collected.getState() && verticalDriveTargetPos() != GlyphPlacementSystem.Position.HOME.getEncoderVal()) {
             setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
             glyph.runToPosition(0);
