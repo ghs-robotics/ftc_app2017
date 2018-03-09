@@ -10,11 +10,11 @@ f:open
 f:rot r:-110 speed:1 time:3
 f:drive x:0 y:1 speed:1 gyro:-110 target:1000 time:4
 f:rot r:-70 speed:1 time:3
-f:drive x:1 y:.5 speed:1 gyro:-70 target:2000 time:7
+f:drive x:1 y:.5 speed:1 gyro:-70 target:2000 time:5
 f:drive x:0 y:1 speed:1 gyro:-110 target:100 time:1
 f:brace
 f:drive x:-.25 y:-1 speed:1 gyro:-70 target:475
-f:drive x:1 y:1 speed:1 target:700 time:3.5
+f:drive x:1 y:1 speed:1 target:900 time:4
 f:place
 f:break
 f:driveLR l:-.75 r:-1 speed:1 target:500 intake:true
