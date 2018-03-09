@@ -956,7 +956,7 @@ public abstract class Auto extends LinearVisionOpMode {
         } if (placeNew) {
             drive.internalIntakeLeft(1);
             drive.internalIntakeRight(1);
-            if (drive.uTrackAtBottom && drive.getCollectedState() && timer.seconds() > 4) {
+            if (drive.uTrackAtBottom && drive.getCollectedState() && timer.seconds() < 26) {
                 done = drive.uTrack();
             } else if(drive.uTrackAtBottom && !drive.getCollectedState()) {
                 drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);

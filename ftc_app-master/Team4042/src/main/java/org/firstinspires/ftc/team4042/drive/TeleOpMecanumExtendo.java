@@ -8,8 +8,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 @TeleOp(name = "Mecanum Extendo", group="drive")
 public class TeleOpMecanumExtendo extends TeleOpMecanum {
     @Override
-    public void init() {
-        super.init();
+    public void start() {
+        super.start();
+        Drive.isExtendo = false;
         super.drive.toggleServoExtendo();
     }
 }
