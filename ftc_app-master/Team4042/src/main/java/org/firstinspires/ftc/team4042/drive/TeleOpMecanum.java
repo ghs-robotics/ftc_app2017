@@ -40,6 +40,8 @@ public class TeleOpMecanum extends OpMode {
 
     private boolean aUp = false;
     private boolean aDown = false;
+    private boolean aLeft = false;
+    private boolean aRight = false;
 
     private boolean aLeftStick = false;
     private boolean aRightStick = false;
@@ -210,16 +212,28 @@ public class TeleOpMecanum extends OpMode {
             //Runs the glyph placer
             glyphPlacer();
 
-            updateControlBooleans();
-
-
-            if (((gamepad1.dpad_left || gamepad1.dpad_right) && gamepad1.a) || runDown) {
-                //runDown = true;
-                drive.jewelStowed();
+            if (gamepad1.dpad_left && gamepad1.a && (!aLeft || !aA) || gamepad1.dpad_right && gamepad1.a && (!aRight || !aA)) {
+                runDown = !runDown;
+                if (runDown) {
+                    drive.jewelStowed();
+                    drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    drive.setVerticalDrivePos(GlyphPlacementSystem.Position.HOME.getEncoderVal());
+                    drive.glyph.runToPosition(0);
+                } else {
+                    drive.jewelOut();
+                    drive.setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
+                    drive.glyph.runToPosition(0);
+                }
+            } if (runDown) {
                 drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
                 drive.setVerticalDrivePos(GlyphPlacementSystem.Position.HOME.getEncoderVal());
                 drive.glyph.runToPosition(0);
             }
+
+            aLeft = gamepad1.dpad_left;
+            aRight = gamepad1.dpad_right;
+
+            updateControlBooleans();
 
             //Updates the telemetry output
             telemetryUpdate();
