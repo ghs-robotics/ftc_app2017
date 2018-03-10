@@ -85,6 +85,7 @@ public class Cryptobox {
                 glyphs[i][j] = GlyphColor.NONE;
             }
         }
+        numGlyphsPlaced = 0;
         snakeTarget = Snake.NONE;
     }
 

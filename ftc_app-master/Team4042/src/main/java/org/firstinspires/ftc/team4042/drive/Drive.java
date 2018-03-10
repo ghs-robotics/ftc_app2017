@@ -324,14 +324,14 @@ public abstract class Drive {
     public boolean extendoStep() {
         //Moving into extendo, so take it apart
         if (Drive.isExtendo) {
-            if (!doneForwards && driveWithEncoders(new Direction(0, 1), 1, 150, false, 0, 1)) {
+            if (!doneForwards && driveWithEncoders(new Direction(0, 1), 1, 80, false, 0, 1)) {
                 extendoTimer.reset();
                 doneForwards = true;
             } else if (doneForwards && extendoTimer.seconds() < .45) {
                 runWithoutEncoders();
                 servoExtendo();
                 return false;
-            } else if (extendoTimer.seconds() < .95) {
+            } else if (doneForwards && extendoTimer.seconds() < .95) {
                 driveLR(1, 1, 1);
             } else if (doneForwards) {
                 driveXYR(1, 0, 0, 0, false);

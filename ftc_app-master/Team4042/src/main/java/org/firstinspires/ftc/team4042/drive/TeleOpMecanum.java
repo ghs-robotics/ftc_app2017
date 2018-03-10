@@ -152,6 +152,8 @@ public class TeleOpMecanum extends OpMode {
             Drive.tank = false;
             runDown = false;
 
+            drive.setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
+
         } catch (Exception ex) {
             telemetry.addData("Exception", Drive.getStackTrace(ex));
         }
@@ -212,7 +214,7 @@ public class TeleOpMecanum extends OpMode {
 
 
             if (((gamepad1.dpad_left || gamepad1.dpad_right) && gamepad1.a) || runDown) {
-                runDown = true;
+                //runDown = true;
                 drive.jewelStowed();
                 drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
                 drive.setVerticalDrivePos(GlyphPlacementSystem.Position.HOME.getEncoderVal());
@@ -383,10 +385,13 @@ public class TeleOpMecanum extends OpMode {
     private void toggleManual() {
         manual = !manual;
 
+        //Switching out of manual
         if (!manual) {
-            drive.resetEncoders();
-            drive.runWithEncoders();
-            drive.glyph.setHomeTarget();
+            drive.setVerticalDrive(0);
+            drive.setHorizontalDrive(0);
+            drive.setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+            drive.glyph.setAboveHomeTarget();
 
             // Turn off flashlight
             if (flashOn) {
@@ -401,13 +406,10 @@ public class TeleOpMecanum extends OpMode {
                 cam.startPreview();
                 flashOn = true;
             }
-        }
 
-        if (drive.getVerticalDriveMode().equals(DcMotor.RunMode.RUN_TO_POSITION)) {
-            drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        } else {
-            drive.stage = GlyphPlacementSystem.Stage.RETURN2;
-            drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+            telemetry.log().add("switching into manual");
+
+            drive.setVerticalDriveMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
     }
 
@@ -424,9 +426,14 @@ public class TeleOpMecanum extends OpMode {
         } else {
             double horiz = gamepad2.left_stick_x;
             double vertical = gamepad2.left_stick_y;
-            if (vertical > horiz) {
+            if (Math.abs(vertical) > Math.abs(horiz)) {
                 drive.setVerticalDrive(vertical);
-            } else if (horiz > vertical) {
+                drive.setHorizontalDrive(0);
+            } else if (Math.abs(horiz) > Math.abs(vertical)) {
+                drive.setHorizontalDrive(horiz);
+                drive.setVerticalDrive(0);
+            } else {
+                drive.setVerticalDrive(vertical);
                 drive.setHorizontalDrive(horiz);
             }
         }
@@ -562,7 +569,14 @@ public class TeleOpMecanum extends OpMode {
                 if (!Drive.isExtendo) { drive.internalIntakeRight(-1); }
             } else {
                 drive.intakeRight(0);
-                if (!Drive.isExtendo) { drive.internalIntakeRight(0); }
+                if (!Drive.isExtendo || drive.stage.equals(GlyphPlacementSystem.Stage.HOME) ||
+                        drive.stage.equals(GlyphPlacementSystem.Stage.GRAB) ||
+                        drive.stage.equals(GlyphPlacementSystem.Stage.PLACE1) ||
+                        drive.stage.equals(GlyphPlacementSystem.Stage.RESET)) {
+                    drive.internalIntakeRight(.5);
+                }else if (!Drive.isExtendo) {
+                    drive.internalIntakeRight(0);
+                }
             }
 
             if (aLeftTrigger > Drive.DEADZONE_SIZE) {
@@ -573,7 +587,14 @@ public class TeleOpMecanum extends OpMode {
                 if (!Drive.isExtendo) { drive.internalIntakeLeft(-1); }
             } else {
                 drive.intakeLeft(0);
-                if (!Drive.isExtendo) { drive.internalIntakeLeft(0); }
+                if (!Drive.isExtendo || drive.stage.equals(GlyphPlacementSystem.Stage.HOME) ||
+                        drive.stage.equals(GlyphPlacementSystem.Stage.GRAB) ||
+                        drive.stage.equals(GlyphPlacementSystem.Stage.PLACE1) ||
+                        drive.stage.equals(GlyphPlacementSystem.Stage.RESET)) {
+                    drive.internalIntakeLeft(.5);
+                }else if (!Drive.isExtendo) {
+                    drive.internalIntakeLeft(0);
+                }
             }
         }
     }
