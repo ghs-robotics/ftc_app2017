@@ -324,7 +324,7 @@ public abstract class Drive {
     public boolean extendoStep() {
         //Moving into extendo, so take it apart
         if (Drive.isExtendo) {
-            if (!doneForwards && driveWithEncoders(new Direction(0, 1), 1, 80, false, 0, 1)) {
+            if (!doneForwards && driveWithEncoders(new Direction(0, 1), 1, 60, false, 0, 1)) {
                 extendoTimer.reset();
                 doneForwards = true;
             } else if (doneForwards && extendoTimer.seconds() < .45) {

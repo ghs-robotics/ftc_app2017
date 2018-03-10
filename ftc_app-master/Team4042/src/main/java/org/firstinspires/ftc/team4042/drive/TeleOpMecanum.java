@@ -214,17 +214,13 @@ public class TeleOpMecanum extends OpMode {
 
             if (gamepad1.dpad_left && gamepad1.a && (!aLeft || !aA) || gamepad1.dpad_right && gamepad1.a && (!aRight || !aA)) {
                 runDown = !runDown;
-                if (runDown) {
-                    drive.jewelStowed();
-                    drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    drive.setVerticalDrivePos(GlyphPlacementSystem.Position.HOME.getEncoderVal());
-                    drive.glyph.runToPosition(0);
-                } else {
+                if (!runDown) {
                     drive.jewelOut();
                     drive.setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
                     drive.glyph.runToPosition(0);
                 }
             } if (runDown) {
+                drive.jewelStowed();
                 drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
                 drive.setVerticalDrivePos(GlyphPlacementSystem.Position.HOME.getEncoderVal());
                 drive.glyph.runToPosition(0);
@@ -232,6 +228,7 @@ public class TeleOpMecanum extends OpMode {
 
             aLeft = gamepad1.dpad_left;
             aRight = gamepad1.dpad_right;
+            aA = gamepad1.a;
 
             updateControlBooleans();
 
@@ -306,7 +303,6 @@ public class TeleOpMecanum extends OpMode {
             //Drives the robot
             drive.drive(false, gamepad1, gamepad2, adjustedSpeed * MecanumDrive.FULL_SPEED);
         }
-        aA = gamepad1.a;
         aY = gamepad1.y;
 
         //The X button on the first controller - toggle crawling to let us adjust the back of the robot too
