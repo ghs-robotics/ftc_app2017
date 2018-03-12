@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.team4042.autos.C;
 import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
@@ -61,6 +62,7 @@ public class TeleOpMecanum extends OpMode {
     //CONTROL BOOLEANS END
 
     public Drive drive = new MecanumDrive(true);
+    public ElapsedTime jewelTimer = new ElapsedTime();
 
     private double startRoll;
     private double startPitch;
@@ -70,8 +72,11 @@ public class TeleOpMecanum extends OpMode {
     private Camera.Parameters offParams;
     private boolean flashOn;
     private boolean runDown = false;
+    private boolean movingUp = false;
 
     private int[] greyBrown = new int[] {0, 0};
+
+    private int error = C.get().getInt("PlaceError");
 
     private double cursorCount = 1;
 
@@ -134,6 +139,7 @@ public class TeleOpMecanum extends OpMode {
 
         offParams = cam.getParameters();
         offParams.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+        jewelTimer.reset();
     }
 
     @Override
@@ -212,14 +218,29 @@ public class TeleOpMecanum extends OpMode {
             //Runs the glyph placer
             glyphPlacer();
 
-            if (gamepad1.dpad_left && gamepad1.a && (!aLeft || !aA) || gamepad1.dpad_right && gamepad1.a && (!aRight || !aA)) {
+            //telemetry.addData("runDown", runDown);
+            //telemetry.addData("jewelTimer", jewelTimer.seconds());
+            if (gamepad2.dpad_up && gamepad2.b && !bUp) {
+                error += 20;
+            } else if (gamepad2.dpad_down && gamepad2.b && !bDown) {
+                error -= 20;
+            }
+            error = Range.clip(error, 0, 200);
+            telemetry.addData("error", error);
+
+            if ((gamepad1.dpad_left && gamepad1.a && (!aLeft || !aA)) || (gamepad1.dpad_right && gamepad1.a && (!aRight || !aA))) {
                 runDown = !runDown;
                 if (!runDown) {
                     drive.jewelOut();
-                    drive.setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
-                    drive.glyph.runToPosition(0);
+                    jewelTimer.reset();
+                    movingUp = true;
                 }
-            } if (runDown) {
+            } if (movingUp && jewelTimer.seconds() > .45) {
+                drive.setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
+                drive.glyph.runToPosition(0);
+                movingUp = false;
+            }
+            if (runDown) {
                 drive.jewelStowed();
                 drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
                 drive.setVerticalDrivePos(GlyphPlacementSystem.Position.HOME.getEncoderVal());
@@ -384,7 +405,7 @@ public class TeleOpMecanum extends OpMode {
                 glyphTarget();
             }
             if (!drive.stage.equals(GlyphPlacementSystem.Stage.RESET)){
-                drive.glyph.runToPosition(0);
+                drive.glyph.runToPosition(0, error);
             }
         }
     }
@@ -401,7 +422,10 @@ public class TeleOpMecanum extends OpMode {
             drive.setHorizontalDrive(0);
             drive.setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
-            drive.glyph.setAboveHomeTarget();
+            //drive.glyph.setAboveHomeTarget();
+            drive.stage = GlyphPlacementSystem.Stage.RESET;
+            done = true;
+            drive.uTrackAtBottom = true;
 
             // Turn off flashlight
             if (flashOn) {
@@ -453,9 +477,10 @@ public class TeleOpMecanum extends OpMode {
      * Handles the ai glyph placement
      */
     private void runAiPlacer() {
-        if (gamepad2.x && !bX) {
-            drive.cryptobox.toggleSnakeTarget();
+        if (gamepad2.x && gamepad2.b) {
+            drive.cryptobox.setSnakeTarget(Cryptobox.Snake.NONE);
         }
+        bX = gamepad2.x;
 
         //Triggers as override
         if (gamepad2.right_trigger < Drive.DEADZONE_SIZE && gamepad2.left_trigger < Drive.DEADZONE_SIZE) {
@@ -619,11 +644,9 @@ public class TeleOpMecanum extends OpMode {
         bRightStick = gamepad2.right_stick_button;
 
         //aY = gamepad1.y;
-        aX = gamepad1.x;
         aB = gamepad1.b;
 
         bY = gamepad2.y;
-        bX = gamepad2.x;
         bA = gamepad2.a;
         bB = gamepad2.b;
 

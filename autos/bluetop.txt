@@ -1,7 +1,7 @@
-f:knockb
-f:wait sec:.5
-f:up
+#f:knockb
+#f:wait sec:.5
+#f:up
 #f:brace
-f:wait sec:1
+#f:wait sec:1
 f:doff x:0 y:-1 speed:1 target:2000 gyro:0
 f:drive x:1 y:-1 speed:1 target:1000

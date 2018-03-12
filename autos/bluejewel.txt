@@ -1,3 +1,5 @@
-f:getmark
 f:knockr
+f:wait sec:2
 f:up
+f:wait sec:2
+f:center

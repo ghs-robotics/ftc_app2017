@@ -225,7 +225,7 @@ public class GlyphPlacementSystem {
      * Applies the PD controller to the placer
      * @param jc Joystick control: allows the driver to manually interfere
      */
-    public void runToPosition(double jc) {
+    public void runToPosition(double jc, int error) {
         //Apply the PD controller
         double power = ((double)drive.verticalDriveTargetPos() - (double)drive.verticalDriveCurrPos()) /
                 PROPORTIONAL_CONSTANT + drive.uTrackRate * DERIV_CONSTANT;
@@ -243,9 +243,13 @@ public class GlyphPlacementSystem {
 
         //If we're within tolerance of a position, assume we're there
         for (Position currPos : Position.values()) {
-            if (Math.abs(pos - currPos.getEncoderVal()) < PLACEMENT_ERROR_MARGIN) {
+            if (Math.abs(pos - currPos.getEncoderVal()) < error) {
                 currentY = currPos;
             }
         }
+    }
+
+    public void runToPosition(double jc) {
+        runToPosition(jc, PLACEMENT_ERROR_MARGIN);
     }
 }
