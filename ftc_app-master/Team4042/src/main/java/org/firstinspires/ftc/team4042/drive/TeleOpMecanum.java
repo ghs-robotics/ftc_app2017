@@ -671,6 +671,7 @@ public class TeleOpMecanum extends OpMode {
         Cryptobox.Snake snakeTarget = drive.cryptobox.getSnakeTarget();
         telemetry.addData("Snake target", snakeTarget == null ? "null" : snakeTarget.name());
         //telemetry.addData("line follower", drive.smallVoltage);
+        telemetry.addData("vert Pos", drive.verticalDriveCurrPos());
         if (drive.verbose) {
             telemetry.addData("gamepad1.dpad_up", gamepad1.dpad_up);
             telemetry.addData("bottom", drive.getBottomState());
