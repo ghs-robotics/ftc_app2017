@@ -330,7 +330,6 @@ public abstract class Drive {
             } else if (doneForwards && extendoTimer.seconds() < .45) {
                 runWithoutEncoders();
                 servoExtendo();
-                return false;
             } else if (doneForwards && extendoTimer.seconds() < .95) {
                 driveLR(1, 1, 1);
             } else if (doneForwards) {
