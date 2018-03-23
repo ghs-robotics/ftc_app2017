@@ -950,11 +950,11 @@ public abstract class Drive {
     }
 
     public void jewelDown() {
-        jewelServo.setPosition(.93);
+        jewelServo.setPosition(.86);
     }
 
     public void jewelUp() {
-        jewelServo.setPosition(.5);
+        jewelServo.setPosition(.47);
     }
 
     public void jewelCenter() {
@@ -973,12 +973,12 @@ public abstract class Drive {
     Moves the jewel out of the way
      */
     public void jewelOut() {
-        jewelServo.setPosition(.65);
+        jewelServo.setPosition(.58);
         //jewelCenter();
     }
 
     public void jewelStowed() {
-        jewelServo.setPosition(.35);
+        jewelServo.setPosition(.26);
         jewelCenter();
     }
 
