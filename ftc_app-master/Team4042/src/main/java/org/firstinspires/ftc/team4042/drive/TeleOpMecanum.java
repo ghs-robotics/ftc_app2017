@@ -542,6 +542,10 @@ public class TeleOpMecanum extends OpMode {
             drive.glyphLocate();
             done = drive.uTrack();
             telemetry.addData("done", done);
+        } else if (drive.verticalDriveTargetPos() != GlyphPlacementSystem.Position.HOME.getEncoderVal()) {
+            drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+            drive.setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
+            drive.glyph.runToPosition(0);
         }
     }
 

@@ -29,7 +29,7 @@ public class GlyphPlacementSystem {
 
     //indicates the position of the lift in motor encoders
     public enum Position {
-        HOME(0), ABOVEHOME(550), RAISEDBACK(1325), RAISED(1375), TOP(1600), MID(1875), BOT(2050), TRANSITION(-1);
+        HOME(0), ABOVEHOME(475), RAISEDBACK(1500), RAISED(1550), TOP(1775), MID(2200), BOT(2375), TRANSITION(-1);
 
         private final Integer encoderVal;
         Position(Integer encoderVal) { this.encoderVal = encoderVal; }
