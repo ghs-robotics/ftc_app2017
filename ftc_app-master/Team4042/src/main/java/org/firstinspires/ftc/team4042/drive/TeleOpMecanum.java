@@ -21,7 +21,7 @@ public class TeleOpMecanum extends OpMode {
     private boolean manual = false;
     private boolean onBalancingStone = false;
 
-    private boolean noAutoIntakes = false;
+    private boolean intakeBackstop = true;
 
     private double oops = 1; //switch to -1 if runs in wrong direction when going for balance
 
@@ -171,7 +171,7 @@ public class TeleOpMecanum extends OpMode {
     public void loop() {
         try {
             if (gamepad1.dpad_up && !aUp) {
-                noAutoIntakes = !noAutoIntakes;
+                intakeBackstop = !intakeBackstop;
             }
 
             if (gamepad1.dpad_down && !aDown) {
@@ -542,7 +542,7 @@ public class TeleOpMecanum extends OpMode {
             drive.glyphLocate();
             done = drive.uTrack();
             telemetry.addData("done", done);
-        } else if (drive.verticalDriveTargetPos() != GlyphPlacementSystem.Position.HOME.getEncoderVal()) {
+        } else if (done && drive.verticalDriveTargetPos() != GlyphPlacementSystem.Position.HOME.getEncoderVal()) {
             drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             drive.setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
             drive.glyph.runToPosition(0);
@@ -567,7 +567,8 @@ public class TeleOpMecanum extends OpMode {
         double bLeftTrigger = drive.deadZone(gamepad2.left_trigger);
         boolean bLeftBumper = gamepad2.left_bumper;
 
-        drive.shortIr[1].addReading();
+        drive.shortIr[1].addReading(
+        );
         double backDistance = drive.shortIr[1].getCmAvg();
         boolean isGlyphBack = backDistance <= C.get().getDouble("glyphBackThreshold");
 
@@ -575,7 +576,7 @@ public class TeleOpMecanum extends OpMode {
             lineFollow.addReading();
         }
 
-        if (noAutoIntakes && isGlyphBack) {
+        if (intakeBackstop && isGlyphBack) {
             drive.intakeLeft(0);
             drive.intakeRight(0);
         } else {
@@ -608,10 +609,10 @@ public class TeleOpMecanum extends OpMode {
                 if (!Drive.isExtendo) { drive.internalIntakeRight(-1); }
             } else {
                 drive.intakeRight(0);
-                if (!Drive.isExtendo || drive.stage.equals(GlyphPlacementSystem.Stage.HOME) ||
+                if (!Drive.isExtendo && (drive.stage.equals(GlyphPlacementSystem.Stage.HOME) ||
                         drive.stage.equals(GlyphPlacementSystem.Stage.GRAB) ||
                         drive.stage.equals(GlyphPlacementSystem.Stage.PLACE1) ||
-                        drive.stage.equals(GlyphPlacementSystem.Stage.RESET)) {
+                        drive.stage.equals(GlyphPlacementSystem.Stage.RESET))) {
                     drive.internalIntakeRight(.5);
                 }else if (!Drive.isExtendo) {
                     drive.internalIntakeRight(0);
@@ -626,10 +627,10 @@ public class TeleOpMecanum extends OpMode {
                 if (!Drive.isExtendo) { drive.internalIntakeLeft(-1); }
             } else {
                 drive.intakeLeft(0);
-                if (!Drive.isExtendo || drive.stage.equals(GlyphPlacementSystem.Stage.HOME) ||
+                if (!Drive.isExtendo && (drive.stage.equals(GlyphPlacementSystem.Stage.HOME) ||
                         drive.stage.equals(GlyphPlacementSystem.Stage.GRAB) ||
                         drive.stage.equals(GlyphPlacementSystem.Stage.PLACE1) ||
-                        drive.stage.equals(GlyphPlacementSystem.Stage.RESET)) {
+                        drive.stage.equals(GlyphPlacementSystem.Stage.RESET))) {
                     drive.internalIntakeLeft(.5);
                 }else if (!Drive.isExtendo) {
                     drive.internalIntakeLeft(0);
