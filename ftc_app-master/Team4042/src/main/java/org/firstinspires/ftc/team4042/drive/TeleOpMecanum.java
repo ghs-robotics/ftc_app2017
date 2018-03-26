@@ -607,7 +607,7 @@ public class TeleOpMecanum extends OpMode {
             drive.intakeRight(0);
         }
         //Follow driver inputs
-        if (!intakeBackstop || (backstopEngaged && !ignoreInput && isDriverInput)) {
+        if (!intakeBackstop || (!ignoreInput && isDriverInput)) {
             if (Drive.isExtendo) {
                 if (bRightTrigger > Drive.DEADZONE_SIZE) { drive.internalIntakeRight(bRightTrigger); }
                 //Right bumper of the b controller runs the right intake backwards
