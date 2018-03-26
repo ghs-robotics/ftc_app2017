@@ -298,7 +298,7 @@ public class TeleOpMecanum extends OpMode {
             double y = oops*2*(Math.ceil((currRoll-startRoll)/100)-.5);
             telemetry.addData("y", y);
             drive.driveXYR(1, 0, y, 0, true);
-        } else if (!flat) {
+        } else {
             //adjust
             //double degreeP = .05;
             //If you're on the balancing stone and not quite flat, then adjust
@@ -567,8 +567,7 @@ public class TeleOpMecanum extends OpMode {
         double bLeftTrigger = drive.deadZone(gamepad2.left_trigger);
         boolean bLeftBumper = gamepad2.left_bumper;
 
-        drive.shortIr[1].addReading(
-        );
+        drive.shortIr[1].addReading();
         double backDistance = drive.shortIr[1].getCmAvg();
         boolean isGlyphBack = backDistance <= C.get().getDouble("glyphBackThreshold");
 

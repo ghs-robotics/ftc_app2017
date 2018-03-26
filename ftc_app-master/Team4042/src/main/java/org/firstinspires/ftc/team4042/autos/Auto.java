@@ -235,7 +235,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
         while (opModeIsActive()) {
             while (opModeIsActive() && !drive.collectGlyphStep());
-            while (opModeIsActive() && !drive.driveLRWithEncoders(-.75, -1, 1, 500, 1));
+            while (opModeIsActive() && !drive.driveLRWithEncoders(-.6, -1, 1, 500, 1));
         }
     }
 
