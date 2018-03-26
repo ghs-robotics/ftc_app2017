@@ -22,6 +22,8 @@ public class TeleOpMecanum extends OpMode {
     private boolean onBalancingStone = false;
 
     private boolean intakeBackstop = true;
+    private boolean backstopEngaged = false;
+    private boolean ignoreInput = false;
 
     private double oops = 1; //switch to -1 if runs in wrong direction when going for balance
 
@@ -576,10 +578,37 @@ public class TeleOpMecanum extends OpMode {
             lineFollow.addReading();
         }
 
-        if (intakeBackstop && isGlyphBack) {
+        /*
+         * Follow driver input -> If the backstop is off || (the backstop has been engaged && the driver has released the inputs && the driver is inputting things)
+         * Engage the backstop, ignore immediate input, stop the intakes -> If a glyph is seen && the backstop is on && the backstop isn't engaged
+         * Allow inputs again -> If the driver isn't inputting anything
+         * Stop the intakes -> If a glyph is seen && the backstop is on && the backstop is engaged && (no driver inputs || ignoring immediate inputs)
+         * Disengage the backstop -> If there's no cube in the intakes
+         */
+        boolean isDriverInput = Drive.isExtendo && (aLeftBumper || aRightBumper || aRightTrigger > Drive.DEADZONE_SIZE || aLeftTrigger > Drive.DEADZONE_SIZE);
+
+        //Allows inputs again
+        if (ignoreInput && !isDriverInput) {
+            ignoreInput = false;
+        }
+        //Disengage the backstop
+        if (!isGlyphBack) {
+            backstopEngaged = false;
+        }
+        //Engage the backstop, ignore immediate input, stop the intakes
+        if (intakeBackstop && isGlyphBack && !backstopEngaged) {
             drive.intakeLeft(0);
             drive.intakeRight(0);
-        } else {
+            backstopEngaged = true;
+            ignoreInput = true;
+        }
+        //Stop the intakes
+        if (intakeBackstop && isGlyphBack && backstopEngaged && (ignoreInput || !isDriverInput)) {
+            drive.intakeLeft(0);
+            drive.intakeRight(0);
+        }
+        //Follow driver inputs
+        if (!intakeBackstop || (backstopEngaged && !ignoreInput && isDriverInput)) {
             if (Drive.isExtendo) {
                 if (bRightTrigger > Drive.DEADZONE_SIZE) { drive.internalIntakeRight(bRightTrigger); }
                 //Right bumper of the b controller runs the right intake backwards
