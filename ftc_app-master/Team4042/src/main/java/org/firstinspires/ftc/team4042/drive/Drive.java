@@ -180,7 +180,6 @@ public abstract class Drive {
     public void initialize(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
         this.log = telemetry.log();
-        glyphTimer = new ElapsedTime();
 
         dStage = DanceStage.FORWARD;
         dirRight = true;
@@ -681,38 +680,22 @@ public abstract class Drive {
 
 
     private int[] predict = {0};
-    private ElapsedTime glyphTimer;
-    private boolean hasGlyph;
-    private ElapsedTime readGlyphColorTimer = new ElapsedTime();
-    private boolean glyphColorRead = false;
-    double smallVoltage = Double.MAX_VALUE;
 
     public int[] uTrackAutoTarget(Gamepad gamepad2) {
-        int numPlaces = cryptobox.getNumGlyphsPlaced();
-        if (uTrackAtBottom && collected.getState()) {
-            readGlyphColorTimer.reset();
-            glyphColorRead = false;
-            smallVoltage = Double.MAX_VALUE;
+        //Happens once when the u-track is at the bottom
+        if (uTrackAtBottom && Math.abs(gamepad2.right_stick_y) > .5) {
+            //Get glyph color
+            Cryptobox.GlyphColor color = gamepad2.right_stick_y > .5 ? Cryptobox.GlyphColor.BROWN : Cryptobox.GlyphColor.GREY;
+            predict = uTrackAutoTarget(color);
             uTrack();
-        } else if(uTrackAtBottom && !collected.getState() && verticalDriveTargetPos() != GlyphPlacementSystem.Position.HOME.getEncoderVal()) {
+        } //Runs the u-track to above-home (useful for switching out of manual)
+        else if(uTrackAtBottom && !(Math.abs(gamepad2.right_stick_y) > .5) && verticalDriveTargetPos() != GlyphPlacementSystem.Position.HOME.getEncoderVal()) {
             setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
             glyph.runToPosition(0);
-        } else if (!uTrackAtBottom) {
-            double currVoltage = lineFollow[0].getV();
-            //telemetry.log().add("reading at " + readGlyphColorTimer.seconds() + " seconds: " + currVoltage);
-            if (currVoltage < smallVoltage && currVoltage > .1) {
-                smallVoltage = currVoltage;
-            }
-            if (readGlyphColorTimer.seconds() > C.get().getDouble("colorReadTimer") && !glyphColorRead){
-                Cryptobox.GlyphColor color = getGlyphColor(smallVoltage);
-                telemetry.log().add("glyph: " + color + " voltage: " + smallVoltage);
-                glyphColorRead = true;
-
-                if (!color.equals(Cryptobox.GlyphColor.NONE)) {
-                    predict = uTrackAutoTarget(color);
-                }
-            }
+        }
+        //Runs the u-track
+        else if (!uTrackAtBottom) {
             uTrack();
         }
         return predict;
