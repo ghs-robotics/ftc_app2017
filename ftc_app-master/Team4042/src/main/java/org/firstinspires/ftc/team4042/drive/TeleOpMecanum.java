@@ -584,7 +584,7 @@ public class TeleOpMecanum extends OpMode {
          * Stop the intakes -> If a glyph is seen && the backstop is on && the backstop is engaged && (no driver inputs || ignoring immediate inputs)
          * Disengage the backstop -> If there's no cube in the intakes
          */
-        boolean isDriverInput = Drive.isExtendo && (aLeftBumper || aRightBumper || aRightTrigger > Drive.DEADZONE_SIZE || aLeftTrigger > Drive.DEADZONE_SIZE);
+        boolean isDriverInput = Drive.isExtendo && (aLeftBumper || aRightBumper || aRightTrigger > .9 || aLeftTrigger > .9);
 
         //Allows inputs again
         if (ignoreInput && !isDriverInput) {
