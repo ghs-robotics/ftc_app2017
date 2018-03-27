@@ -206,11 +206,6 @@ public class TeleOpMecanum extends OpMode {
                 drive.toggleVerbose();
             }
 
-            /*
-            if (gamepad2.back && !bBack) {
-                drive.cryptobox.toggleRejectGlyph();
-            }*/
-
             //Runs the intakes
             intakes();
 
@@ -220,8 +215,6 @@ public class TeleOpMecanum extends OpMode {
             //Runs the glyph placer
             glyphPlacer();
 
-            //telemetry.addData("runDown", runDown);
-            //telemetry.addData("jewelTimer", jewelTimer.seconds());
             if (gamepad2.dpad_up && gamepad2.b && !bUp) {
                 error += 20;
             } else if (gamepad2.dpad_down && gamepad2.b && !bDown) {
