@@ -608,26 +608,6 @@ public class TeleOpMecanum extends OpMode {
         }
         //Follow driver inputs
         if (!intakeBackstop || (!ignoreInput && isDriverInput)) {
-            if (Drive.isExtendo) {
-                if (bRightTrigger > Drive.DEADZONE_SIZE) { drive.internalIntakeRight(bRightTrigger); }
-                //Right bumper of the b controller runs the right intake backwards
-                else if (bRightBumper) { drive.internalIntakeRight(-1); }
-                else if (drive.stage.equals(GlyphPlacementSystem.Stage.HOME) ||
-                        drive.stage.equals(GlyphPlacementSystem.Stage.GRAB) ||
-                        drive.stage.equals(GlyphPlacementSystem.Stage.PLACE1)) {
-                    drive.internalIntakeRight(.5);
-                } else { drive.internalIntakeRight(1); }
-
-                //Left trigger of the b controller runs the left intake forward
-                if (bLeftTrigger > Drive.DEADZONE_SIZE) { drive.internalIntakeLeft(bLeftTrigger); }
-                //Left bumper of the b controller runs the left intake backwards
-                else if (bLeftBumper) { drive.internalIntakeLeft(-1); }
-                else if (drive.stage.equals(GlyphPlacementSystem.Stage.HOME) ||
-                        drive.stage.equals(GlyphPlacementSystem.Stage.GRAB) ||
-                        drive.stage.equals(GlyphPlacementSystem.Stage.PLACE1)) {
-                    drive.internalIntakeLeft(.5);
-                } else { drive.internalIntakeLeft(1); }
-            }
 
             if (aRightTrigger > Drive.DEADZONE_SIZE) {
                 drive.intakeRight(aRightTrigger);
@@ -664,6 +644,27 @@ public class TeleOpMecanum extends OpMode {
                     drive.internalIntakeLeft(0);
                 }
             }
+        }
+
+        if (Drive.isExtendo) {
+            if (bRightTrigger > Drive.DEADZONE_SIZE) { drive.internalIntakeRight(bRightTrigger); }
+            //Right bumper of the b controller runs the right intake backwards
+            else if (bRightBumper) { drive.internalIntakeRight(-1); }
+            else if (drive.stage.equals(GlyphPlacementSystem.Stage.HOME) ||
+                    drive.stage.equals(GlyphPlacementSystem.Stage.GRAB) ||
+                    drive.stage.equals(GlyphPlacementSystem.Stage.PLACE1)) {
+                drive.internalIntakeRight(.5);
+            } else { drive.internalIntakeRight(1); }
+
+            //Left trigger of the b controller runs the left intake forward
+            if (bLeftTrigger > Drive.DEADZONE_SIZE) { drive.internalIntakeLeft(bLeftTrigger); }
+            //Left bumper of the b controller runs the left intake backwards
+            else if (bLeftBumper) { drive.internalIntakeLeft(-1); }
+            else if (drive.stage.equals(GlyphPlacementSystem.Stage.HOME) ||
+                    drive.stage.equals(GlyphPlacementSystem.Stage.GRAB) ||
+                    drive.stage.equals(GlyphPlacementSystem.Stage.PLACE1)) {
+                drive.internalIntakeLeft(.5);
+            } else { drive.internalIntakeLeft(1); }
         }
     }
 
