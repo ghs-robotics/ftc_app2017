@@ -223,7 +223,7 @@ public class TeleOpMecanum extends OpMode {
             error = Range.clip(error, 0, 200);
             telemetry.addData("error", error);
 
-            if ((gamepad1.dpad_left && gamepad1.a && (!aLeft || !aA)) || (gamepad1.dpad_right && gamepad1.a && (!aRight || !aA))) {
+            if ((gamepad2.dpad_left && gamepad2.a && (!bLeft || !bA)) || (gamepad2.dpad_right && gamepad2.a && (!bRight || !bA))) {
                 runDown = !runDown;
                 if (!runDown) {
                     drive.jewelOut();
@@ -245,6 +245,13 @@ public class TeleOpMecanum extends OpMode {
             aLeft = gamepad1.dpad_left;
             aRight = gamepad1.dpad_right;
             aA = gamepad1.a;
+
+            bUp = gamepad2.dpad_up;
+            bLeft = gamepad2.dpad_left;
+            bDown = gamepad2.dpad_down;
+            bRight = gamepad2.dpad_right;
+            bB = gamepad2.b;
+            bA = gamepad2.a;
 
             updateControlBooleans();
 
@@ -482,10 +489,10 @@ public class TeleOpMecanum extends OpMode {
             greyBrown = drive.uTrackAutoTarget(gamepad2);
         }
         //Right stick up to switch glyph color
-        if (!bRightStickY && -gamepad2.right_stick_y >= .5) {
+        /*if (!bRightStickY && -gamepad2.right_stick_y >= .5) {
             greyBrown = drive.cryptobox.wrongColor();
         }
-        bRightStickY = -gamepad2.right_stick_y >= .5;
+        bRightStickY = -gamepad2.right_stick_y >= .5;*/
     }
 
     /**
@@ -630,8 +637,7 @@ public class TeleOpMecanum extends OpMode {
                 drive.intakeLeft(0);
                 if (!Drive.isExtendo && (drive.stage.equals(GlyphPlacementSystem.Stage.HOME) ||
                         drive.stage.equals(GlyphPlacementSystem.Stage.GRAB) ||
-                        drive.stage.equals(GlyphPlacementSystem.Stage.PLACE1) ||
-                        drive.stage.equals(GlyphPlacementSystem.Stage.RESET))) {
+                        drive.stage.equals(GlyphPlacementSystem.Stage.PLACE1))) {
                     drive.internalIntakeLeft(.5);
                 }else if (!Drive.isExtendo) {
                     drive.internalIntakeLeft(0);
@@ -674,16 +680,12 @@ public class TeleOpMecanum extends OpMode {
         aB = gamepad1.b;
 
         bY = gamepad2.y;
-        bA = gamepad2.a;
-        bB = gamepad2.b;
+
 
         aUp = gamepad1.dpad_up;
         //aDown = gamepad1.dpad_down;
 
-        bUp = gamepad2.dpad_up;
-        bLeft = gamepad2.dpad_left;
-        bDown = gamepad2.dpad_down;
-        bRight = gamepad2.dpad_right;
+
     }
 
     private void telemetryUpdate() {
