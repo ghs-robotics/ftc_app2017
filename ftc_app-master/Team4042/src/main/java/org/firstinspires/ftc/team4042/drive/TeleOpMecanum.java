@@ -215,11 +215,11 @@ public class TeleOpMecanum extends OpMode {
             //Runs the glyph placer
             glyphPlacer();
 
-            if (gamepad2.dpad_up && gamepad2.b && !bUp) {
+            /*if (gamepad2.dpad_up && gamepad2.b && !bUp) {
                 error += 20;
             } else if (gamepad2.dpad_down && gamepad2.b && !bDown) {
                 error -= 20;
-            }
+            }*/
             error = Range.clip(error, 0, 200);
             telemetry.addData("error", error);
 
@@ -231,13 +231,13 @@ public class TeleOpMecanum extends OpMode {
                     movingUp = true;
                 }
             } if (movingUp && jewelTimer.seconds() > .45) {
+                drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
                 drive.setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
                 drive.glyph.runToPosition(0);
                 movingUp = false;
             }
             if (runDown) {
                 drive.jewelStowed();
-                drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
                 drive.setVerticalDrivePos(GlyphPlacementSystem.Position.HOME.getEncoderVal());
                 drive.glyph.runToPosition(0);
             }
@@ -426,7 +426,6 @@ public class TeleOpMecanum extends OpMode {
             drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             //drive.glyph.setAboveHomeTarget();
             drive.stage = GlyphPlacementSystem.Stage.RESET;
-            done = true;
             drive.uTrackAtBottom = true;
 
             // Turn off flashlight
@@ -533,18 +532,17 @@ public class TeleOpMecanum extends OpMode {
         }
     }
 
-    private boolean done = true;
-
     private void glyphTarget() {
         int targetX = gamepad2.x ? 0 : (gamepad2.y ? 1 : (gamepad2.b ? 2 : -1));
         int targetY = gamepad2.dpad_up ? 0 : (gamepad2.dpad_left || gamepad2.dpad_right ? 1 : (gamepad2.dpad_down ? 2 : -1));
         if (targetX != -1 && targetY != -1 &&
-                (!done || ((done && !bRight && !bLeft && !bUp && !bDown) || (done && !bB && !bX && !bY)))) {
+                ((drive.uTrackAtBottom && !bRight && !bLeft && !bUp && !bDown) || (drive.uTrackAtBottom && !bB && !bX && !bY))) {
             drive.glyph.uiTarget(targetX, targetY);
             drive.glyphLocate();
-            done = drive.uTrack();
-            telemetry.addData("done", done);
-        } else if (done && drive.verticalDriveTargetPos() != GlyphPlacementSystem.Position.HOME.getEncoderVal()) {
+            drive.uTrack();
+        } else if (targetX != -1 && targetY != -1  && !drive.uTrackAtBottom) {
+            drive.uTrack();
+        } else if (drive.uTrackAtBottom && drive.verticalDriveTargetPos() != GlyphPlacementSystem.Position.HOME.getEncoderVal()) {
             drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             drive.setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
             drive.glyph.runToPosition(0);
