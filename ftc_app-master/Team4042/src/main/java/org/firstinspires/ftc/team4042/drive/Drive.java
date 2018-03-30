@@ -106,8 +106,13 @@ public abstract class Drive {
     public boolean getCollectedState() {
         return collected.getState();
     }
+    public boolean getSideState() {
+        return side.getState();
+    }
 
     private DigitalChannel collected;
+
+    private DigitalChannel side;
 
     private Servo grabbyBoi;
     private boolean handIsOpen = false;
@@ -240,6 +245,7 @@ public abstract class Drive {
 
         center = initializeDigital(hardwareMap, "center");
         collected = initializeDigital(hardwareMap, "collected");
+        side = initializeDigital(hardwareMap, "side");
         try {
             center.setState(false);
             center.setMode(DigitalChannel.Mode.INPUT);

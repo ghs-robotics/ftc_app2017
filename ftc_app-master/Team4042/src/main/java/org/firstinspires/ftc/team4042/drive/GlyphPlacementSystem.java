@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.team4042.drive;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -23,9 +24,10 @@ public class GlyphPlacementSystem {
     public Position currentY;
     public HorizPos currentX;
     private String baseOutput;
-    public Drive drive;
+    private Drive drive;
 
     public ElapsedTime horizontalTimer = new ElapsedTime();
+    private boolean translateBack = false;
 
     //indicates the position of the lift in motor encoders
     public enum Position {
@@ -195,10 +197,10 @@ public class GlyphPlacementSystem {
     public boolean xTargetReached(HorizPos targetPos) {
         //If you're going left or right, then use the timer to see if you should stop
         //drive.log.add("target x " + drive.targetX + " targetPos " + targetPos);
-        if (((targetPos.equals(HorizPos.LEFT) || targetPos.equals(HorizPos.RIGHT)) && (horizontalTimer.seconds() >= HORIZONTAL_TRANSLATION_TIME)) ||
+        if (((targetPos.equals(HorizPos.LEFT) || targetPos.equals(HorizPos.RIGHT)) && drive.getSideState()) ||
                 //If you're going to the center and you hit the limit switch, stop
-                (!drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER) && drive.getCenterState()) ||
-                (drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER))) {
+                (!drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER) && drive.getCenterState() && !drive.getSideState()) ||
+                (drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER) && !drive.getSideState())) {
             if (drive.getHorizontalDrive() > 0 && drive.targetX.equals(HorizPos.CENTER)) {
                 adjustBack(1);
             }
@@ -217,6 +219,18 @@ public class GlyphPlacementSystem {
                 drive.targetX = HorizPos.LEFT;
             }
             drive.setHorizontalDrive(-.5 * drive.getHorizontalDrive());
+        } if(!targetPos.equals(HorizPos.CENTER) && (horizontalTimer.seconds() >= HORIZONTAL_TRANSLATION_TIME)){
+            drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+            drive.glyph.setTargetPosition(Position.RAISEDBACK);
+
+            if(!translateBack) {
+                drive.setHorizontalDrive(-drive.getHorizontalDrive());
+                translateBack = true;
+            }
+            if(translateBack && horizontalTimer.seconds() >= HORIZONTAL_TRANSLATION_TIME + .5){
+                drive.setHorizontalDrive(-drive.getHorizontalDrive());
+                horizontalTimer.reset();
+            }
         }
         return false;
     }
