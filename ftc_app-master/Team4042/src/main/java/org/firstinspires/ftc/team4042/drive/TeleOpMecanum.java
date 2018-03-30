@@ -492,6 +492,18 @@ public class TeleOpMecanum extends OpMode {
             greyBrown = drive.cryptobox.wrongColor();
         }
         bRightStickY = -gamepad2.right_stick_y >= .5;*/
+
+        if (aiPlacer && gamepad2.b) {
+            if (gamepad2.dpad_down) {
+                drive.cryptobox.wrongLastGlyph(Cryptobox.GlyphColor.BROWN);
+            }
+            if (gamepad2.dpad_up) {
+                drive.cryptobox.wrongLastGlyph(Cryptobox.GlyphColor.GREY);
+            }
+            if (gamepad2.dpad_left || gamepad2.dpad_right) {
+                drive.cryptobox.wrongLastGlyph(Cryptobox.GlyphColor.NONE);
+            }
+        }
     }
 
     /**

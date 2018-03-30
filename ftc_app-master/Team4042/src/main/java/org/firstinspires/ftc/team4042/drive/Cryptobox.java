@@ -215,24 +215,33 @@ public class Cryptobox {
      */
     public void setGlyphAtUi(GlyphColor newGlyph) {
 
-        if (!newGlyph.equals(glyphs[uiX][3 - uiY])) {
-            if (newGlyph.equals(GlyphColor.NONE) && !glyphs[uiX][3 - uiY].equals(GlyphColor.NONE)) {
+        setGlyph(uiX, 3 - uiY, newGlyph);
+    }
+
+
+    public void wrongLastGlyph(GlyphColor newGlyph) {
+        setGlyph(lastX, lastY, newGlyph);
+    }
+
+    public void setGlyph(int x, int y, GlyphColor newGlyph) {
+        if (!newGlyph.equals(glyphs[x][y])) {
+            if (newGlyph.equals(GlyphColor.NONE) && !glyphs[x][y].equals(GlyphColor.NONE)) {
                 numGlyphsPlaced--;
                 if (numGlyphsPlaced == 0) {
                     snakeTarget = Snake.NONE;
                 }
             }
-            if (!newGlyph.equals(GlyphColor.NONE) && glyphs[uiX][3 - uiY].equals(GlyphColor.NONE)) {
+            if (!newGlyph.equals(GlyphColor.NONE) && glyphs[x][y].equals(GlyphColor.NONE)) {
                 if (numGlyphsPlaced == 0) {
-                    cipherFirstGlyph(newGlyph, uiX);
+                    cipherFirstGlyph(newGlyph, x);
                 }
                 numGlyphsPlaced++;
             }
-            if (!newGlyph.equals(GlyphColor.NONE) && !glyphs[uiX][3 - uiY].equals(GlyphColor.NONE) && numGlyphsPlaced == 1) {
-                cipherFirstGlyph(newGlyph, uiX);
+            if (!newGlyph.equals(GlyphColor.NONE) && !glyphs[x][y].equals(GlyphColor.NONE) && numGlyphsPlaced == 1) {
+                cipherFirstGlyph(newGlyph, x);
             }
 
-            glyphs[uiX][3 - uiY] = newGlyph;
+            glyphs[x][y] = newGlyph;
             writeFile();
         }
     }
