@@ -117,12 +117,15 @@ public abstract class Drive {
     private Servo grabbyBoi;
     private boolean handIsOpen = false;
 
+    public boolean abort = false;
+
     public GlyphPlacementSystem glyph;
     public GlyphPlacementSystem.Stage stage;
     public ElapsedTime handDropTimer = new ElapsedTime();
     public boolean uTrackAtBottom = true;
     public GlyphPlacementSystem.Position targetY;
     public GlyphPlacementSystem.HorizPos targetX;
+    public Cryptobox.GlyphColor color = Cryptobox.GlyphColor.NONE;
 
     public Cryptobox cryptobox;
 
@@ -689,10 +692,11 @@ public abstract class Drive {
 
     public int[] uTrackAutoTarget(Gamepad gamepad2) {
         //Happens once when the u-track is at the bottom
-        if (uTrackAtBottom && Math.abs(gamepad2.right_stick_y) > .5) {
+        if (uTrackAtBottom && Math.abs(gamepad2.left_stick_y) > .5 && gamepad2.b && !gamepad2.y && !gamepad2.x) {
             //Get glyph color
-            Cryptobox.GlyphColor color = gamepad2.right_stick_y > .5 ? Cryptobox.GlyphColor.BROWN : Cryptobox.GlyphColor.GREY;
+            Cryptobox.GlyphColor color = gamepad2.left_stick_y > .5 ? Cryptobox.GlyphColor.BROWN : Cryptobox.GlyphColor.GREY;
             predict = uTrackAutoTarget(color);
+            this.color = color;
             uTrack();
         } //Runs the u-track to above-home (useful for switching out of manual)
         else if(uTrackAtBottom && !(Math.abs(gamepad2.right_stick_y) > .5) && verticalDriveTargetPos() != GlyphPlacementSystem.Position.HOME.getEncoderVal()) {
@@ -701,7 +705,7 @@ public abstract class Drive {
             glyph.runToPosition(0);
         }
         //Runs the u-track
-        else if (!uTrackAtBottom) {
+        else if (!uTrackAtBottom && (gamepad2.b || abort)) {
             uTrack();
         }
         return predict;
@@ -764,19 +768,25 @@ public abstract class Drive {
         if(glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
             stage = GlyphPlacementSystem.Stage.PAUSE1;
             glyph.setXPower(targetX);
+        } else if(abort) {
+            stage = GlyphPlacementSystem.Stage.PAUSE1;
         }
     }
     private void pause1() {
         //Moves to target X location
-        if(glyph.xTargetReached(targetX)) {
+        if(glyph.xTargetReached(targetX, abort)) {
             stage = GlyphPlacementSystem.Stage.PLACE2;
         }
     }
     private void place2() {
         //Moves to target Y location
-        glyph.setTargetPosition(targetY);
-        if(glyph.currentY.equals(targetY)) {
+        if (abort) {
             stage = GlyphPlacementSystem.Stage.RETURN1;
+        } else {
+            glyph.setTargetPosition(targetY);
+            if (glyph.currentY.equals(targetY) || abort) {
+                stage = GlyphPlacementSystem.Stage.RETURN1;
+            }
         }
     }
     private void return1() {
@@ -788,7 +798,7 @@ public abstract class Drive {
     }
     private void release() {
         //Lets go of the hand
-        if (handDropTimer.seconds() >= .5) {
+        if (handDropTimer.seconds() >= .5 || abort) {
             glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISEDBACK);
             if (glyph.currentY.equals(GlyphPlacementSystem.Position.RAISEDBACK)) {
                 stage = GlyphPlacementSystem.Stage.PAUSE2;
@@ -798,7 +808,7 @@ public abstract class Drive {
     }
     private void pause2() {
         //Moves back to center x location (so the hand fits back in the robot)
-        if(glyph.xTargetReached(GlyphPlacementSystem.HorizPos.CENTER)) {
+        if(glyph.xTargetReached(GlyphPlacementSystem.HorizPos.CENTER, false)) {
             stage = GlyphPlacementSystem.Stage.RETURN2;
             setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             glyph.setAboveHomeTarget();
@@ -812,6 +822,7 @@ public abstract class Drive {
             setVerticalDrive(0);
             //jewelUp();
             uTrackAtBottom = true;
+            abort = false;
             return true;
         }
         return false;

@@ -363,32 +363,23 @@ public class TeleOpMecanum extends OpMode {
     }
 
     private void aiUi() {
-        if (gamepad2.dpad_up && !bUp) {
-            if (gamepad2.y) {
-                drive.cryptobox.setGlyphAtUi(Cryptobox.GlyphColor.GREY);
-            } else {
-                drive.cryptobox.uiUp();
-            }
-        }
-        if (gamepad2.dpad_left && !bLeft) {
-            if (gamepad2.y) {
-                drive.cryptobox.setGlyphAtUi(Cryptobox.GlyphColor.NONE);
-            } else {
-                drive.cryptobox.uiLeft();
-            }
-        }
-        if (gamepad2.dpad_down && !bDown) {
-            if (gamepad2.y) {
+        if (gamepad2.dpad_up && !bUp) {drive.cryptobox.uiUp();}
+        if (gamepad2.dpad_left && !bLeft) {drive.cryptobox.uiLeft();}
+        if (gamepad2.dpad_down && !bDown) {drive.cryptobox.uiDown();}
+        if (gamepad2.dpad_right && !bRight) {drive.cryptobox.uiRight();}
+
+        if (aiPlacer && !gamepad2.y && !gamepad2.b && gamepad2.x) {
+            if (gamepad2.left_stick_y > .7 && Math.abs(gamepad2.left_stick_x) < .7) {
                 drive.cryptobox.setGlyphAtUi(Cryptobox.GlyphColor.BROWN);
-            } else {
-                drive.cryptobox.uiDown();
             }
-        }
-        if (gamepad2.dpad_right && !bRight) {
-            if (gamepad2.y) {
+            if (gamepad2.left_stick_y < -.7 && Math.abs(gamepad2.left_stick_x) < .7) {
+                drive.cryptobox.setGlyphAtUi(Cryptobox.GlyphColor.GREY);
+            }
+            if (Math.abs(gamepad2.left_stick_x) > .7 && Math.abs(gamepad2.left_stick_y) < .7) {
                 drive.cryptobox.setGlyphAtUi(Cryptobox.GlyphColor.NONE);
-            } else {
-                drive.cryptobox.uiRight();
+                if (!drive.uTrackAtBottom) {
+                    drive.abort = true;
+                }
             }
         }
     }
@@ -399,12 +390,11 @@ public class TeleOpMecanum extends OpMode {
         if (gamepad2.a && !bA) {
             drive.toggleHand();
         }
-        if (gamepad2.left_stick_button && !bLeftStick) {
+        if (gamepad2.right_stick_button && !bRightStick) {
             toggleManual();
         }
-        bLeftStick = gamepad2.left_stick_button;
 
-        if (gamepad2.right_stick_button && !bRightStick) {
+        if (gamepad2.left_stick_button && !bLeftStick) {
             aiPlacer = !aiPlacer;
             if (aiPlacer) {
                 flashOff();
@@ -414,6 +404,7 @@ public class TeleOpMecanum extends OpMode {
             telemetry.log().add("right!");
         }
         bRightStick = gamepad2.right_stick_button;
+        bLeftStick = gamepad2.left_stick_button;
 
         if (manual) {
             runManualPlacer();
@@ -486,8 +477,8 @@ public class TeleOpMecanum extends OpMode {
             drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
             drive.setVerticalDrive(-0.5);
         } else {
-            double horiz = gamepad2.left_stick_x;
-            double vertical = gamepad2.left_stick_y;
+            double horiz = gamepad2.right_stick_x;
+            double vertical = gamepad2.right_stick_y;
             if (Math.abs(vertical) > Math.abs(horiz)) {
                 drive.setVerticalDrive(vertical);
                 drive.setHorizontalDrive(0);
@@ -510,20 +501,23 @@ public class TeleOpMecanum extends OpMode {
             drive.cryptobox.setCipherTarget(Cryptobox.Cipher.NONE);
         }
 
-        //Triggers as override
-        if (gamepad2.right_trigger < Drive.DEADZONE_SIZE && gamepad2.left_trigger < Drive.DEADZONE_SIZE) {
-            greyBrown = drive.uTrackAutoTarget(gamepad2);
-        }
+        greyBrown = drive.uTrackAutoTarget(gamepad2);
 
-        if (aiPlacer && gamepad2.b) {
-            if (gamepad2.dpad_down) {
+        if (aiPlacer && gamepad2.y && !gamepad2.b && !gamepad2.x) {
+            if (gamepad2.left_stick_y > .7 && Math.abs(gamepad2.left_stick_x) < .7) {
                 drive.cryptobox.wrongLastGlyph(Cryptobox.GlyphColor.BROWN);
+                if (drive.color.equals(Cryptobox.GlyphColor.GREY)) {
+
+                }
             }
-            if (gamepad2.dpad_up) {
+            if (gamepad2.left_stick_y < -.7 && Math.abs(gamepad2.left_stick_x) < .7) {
                 drive.cryptobox.wrongLastGlyph(Cryptobox.GlyphColor.GREY);
             }
-            if (gamepad2.dpad_left || gamepad2.dpad_right) {
+            if (Math.abs(gamepad2.left_stick_x) > .7 && Math.abs(gamepad2.left_stick_y) < .7) {
                 drive.cryptobox.wrongLastGlyph(Cryptobox.GlyphColor.NONE);
+                if (!drive.uTrackAtBottom) {
+                    drive.abort = true;
+                }
             }
         }
     }

@@ -194,10 +194,10 @@ public class GlyphPlacementSystem {
         drive.setHorizontalDrive(0);
     }
 
-    public boolean xTargetReached(HorizPos targetPos) {
+    public boolean xTargetReached(HorizPos targetPos, boolean abort) {
         //If you're going left or right, then use the timer to see if you should stop
         //drive.log.add("target x " + drive.targetX + " targetPos " + targetPos);
-        if (((targetPos.equals(HorizPos.LEFT) || targetPos.equals(HorizPos.RIGHT)) && drive.getSideState()) ||
+        if (abort || ((targetPos.equals(HorizPos.LEFT) || targetPos.equals(HorizPos.RIGHT)) && drive.getSideState()) ||
                 //If you're going to the center and you hit the limit switch, stop
                 (!drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER) && drive.getCenterState() && !drive.getSideState()) ||
                 (drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER) && !drive.getSideState())) {

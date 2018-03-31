@@ -484,9 +484,6 @@ public class Cryptobox {
         if (addGlyphToColumn(newGlyph, column)) {
             numGlyphsPlaced++;
 
-            lastX = row;
-            lastY = column;
-
             if (glyphPlacementSystem != null) {
                 glyphPlacementSystem.uiTarget(column, Range.clip(3 - row, 0, 2)); //We subtract from 3 because the glyph placer reads 0 -> 3 and this class reads 3 -> 0
                 glyphPlacementSystem.drive.glyphLocate();
@@ -626,6 +623,10 @@ public class Cryptobox {
             if (cipherTarget.getGlyphMap()[columnNum][emptySpace].equals(newGlyph)) {
                 //If it matches the target, place that glyph there
                 glyphs[columnNum][emptySpace] = newGlyph;
+
+                lastX = emptySpace;
+                lastY = columnNum;
+
                 return true;
             } else {
                 //If it doesn't match the target, then you can't place there so return false
