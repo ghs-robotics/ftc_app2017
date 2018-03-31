@@ -259,6 +259,8 @@ public class TeleOpMecanum extends OpMode {
             bRight = gamepad2.dpad_right;
             bB = gamepad2.b;
             bA = gamepad2.a;
+            bY = gamepad2.y;
+            bX = gamepad2.x;
 
             updateControlBooleans();
 
@@ -512,7 +514,6 @@ public class TeleOpMecanum extends OpMode {
         if (gamepad2.x && gamepad2.b) {
             drive.cryptobox.setSnakeTarget(Cryptobox.Snake.NONE);
         }
-        bX = gamepad2.x;
 
         //Triggers as override
         if (gamepad2.right_trigger < Drive.DEADZONE_SIZE && gamepad2.left_trigger < Drive.DEADZONE_SIZE) {
@@ -573,8 +574,7 @@ public class TeleOpMecanum extends OpMode {
     private void glyphTarget() {
         int targetX = gamepad2.x ? 0 : (gamepad2.y ? 1 : (gamepad2.b ? 2 : -1));
         int targetY = gamepad2.dpad_up ? 0 : (gamepad2.dpad_left || gamepad2.dpad_right ? 1 : (gamepad2.dpad_down ? 2 : -1));
-        if (targetX != -1 && targetY != -1 &&
-                ((drive.uTrackAtBottom && !bRight && !bLeft && !bUp && !bDown) || (drive.uTrackAtBottom && !bB && !bX && !bY))) {
+        if (targetX != -1 && targetY != -1 && drive.uTrackAtBottom && ((!bRight && !bLeft && !bUp && !bDown) || (!bB && !bX && !bY))) {
             drive.glyph.uiTarget(targetX, targetY);
             drive.glyphLocate();
             drive.uTrack();
@@ -713,8 +713,6 @@ public class TeleOpMecanum extends OpMode {
 
         //aY = gamepad1.y;
         aB = gamepad1.b;
-
-        bY = gamepad2.y;
 
 
         aUp = gamepad1.dpad_up;
