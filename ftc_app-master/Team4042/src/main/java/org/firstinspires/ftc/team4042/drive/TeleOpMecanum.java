@@ -272,7 +272,7 @@ public class TeleOpMecanum extends OpMode {
     private void blink() {
         flashBlink = !aiPlacer && !manual;
         if (flashBlink) {
-            if (Math.round(blinkTimer.seconds()) % 2 == 0) {
+            if (Math.round(blinkTimer.seconds() * 2) % 2 == 0) {
                 flashOn();
             } else {
                 flashOff();
@@ -410,6 +410,11 @@ public class TeleOpMecanum extends OpMode {
 
         if (gamepad2.right_stick_button && !bRightStick) {
             aiPlacer = !aiPlacer;
+            if (!aiPlacer) {
+                flashOff();
+                flashOn = false;
+                flashBlink = false;
+            }
             telemetry.log().add("right!");
         }
         bRightStick = gamepad2.right_stick_button;
