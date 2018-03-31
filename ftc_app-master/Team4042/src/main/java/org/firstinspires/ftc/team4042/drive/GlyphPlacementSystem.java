@@ -24,7 +24,7 @@ public class GlyphPlacementSystem {
     public Position currentY;
     public HorizPos currentX;
     private String baseOutput;
-    private Drive drive;
+    public Drive drive;
 
     public ElapsedTime horizontalTimer = new ElapsedTime();
     private boolean translateBack = false;

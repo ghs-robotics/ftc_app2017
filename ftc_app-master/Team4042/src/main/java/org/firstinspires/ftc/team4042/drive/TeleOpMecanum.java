@@ -629,8 +629,7 @@ public class TeleOpMecanum extends OpMode {
                 drive.intakeRight(0);
                 if (!Drive.isExtendo && (drive.stage.equals(GlyphPlacementSystem.Stage.HOME) ||
                         drive.stage.equals(GlyphPlacementSystem.Stage.GRAB) ||
-                        drive.stage.equals(GlyphPlacementSystem.Stage.PLACE1) ||
-                        drive.stage.equals(GlyphPlacementSystem.Stage.RESET))) {
+                        drive.stage.equals(GlyphPlacementSystem.Stage.PLACE1))) {
                     drive.internalIntakeRight(.5);
                 }else if (!Drive.isExtendo) {
                     drive.internalIntakeRight(0);
