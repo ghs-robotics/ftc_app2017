@@ -73,6 +73,8 @@ public class TeleOpMecanum extends OpMode {
     private Camera.Parameters onParams;
     private Camera.Parameters offParams;
     private boolean flashOn;
+    private boolean flashBlink;
+    private ElapsedTime blinkTimer = new ElapsedTime();
     private boolean runDown = false;
     private boolean movingUp = false;
 
@@ -152,6 +154,8 @@ public class TeleOpMecanum extends OpMode {
             //Locks the catches
             drive.lockCatches();
 
+            blinkTimer.reset();
+
             drive.jewelOut();
             drive.jewelCenter();
 
@@ -215,6 +219,9 @@ public class TeleOpMecanum extends OpMode {
             //Runs the glyph placer
             glyphPlacer();
 
+            //Blinks the flashlight, if needed
+            blink();
+
             /*if (gamepad2.dpad_up && gamepad2.b && !bUp) {
                 error += 20;
             } else if (gamepad2.dpad_down && gamepad2.b && !bDown) {
@@ -259,6 +266,17 @@ public class TeleOpMecanum extends OpMode {
             telemetryUpdate();
         } catch (Exception ex) {
             telemetry.addData("Exception", Drive.getStackTrace(ex));
+        }
+    }
+
+    private void blink() {
+        flashBlink = !aiPlacer && !manual;
+        if (flashBlink) {
+            if (Math.round(blinkTimer.seconds()) % 2 == 0) {
+                flashOn();
+            } else {
+                flashOff();
+            }
         }
     }
 
@@ -430,15 +448,13 @@ public class TeleOpMecanum extends OpMode {
 
             // Turn off flashlight
             if (flashOn) {
-                cam.setParameters(offParams);
-                cam.stopPreview();
+                flashOff();
                 flashOn = false;
             }
         } else {
             // Turn on flashlight
             if (!flashOn) {
-                cam.setParameters(onParams);
-                cam.startPreview();
+                flashOn();
                 flashOn = true;
             }
 
@@ -446,6 +462,16 @@ public class TeleOpMecanum extends OpMode {
 
             drive.setVerticalDriveMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
+    }
+
+    private void flashOff() {
+        cam.setParameters(offParams);
+        cam.stopPreview();
+    }
+
+    private void flashOn() {
+        cam.setParameters(onParams);
+        cam.startPreview();
     }
 
     /**
@@ -487,11 +513,6 @@ public class TeleOpMecanum extends OpMode {
         if (gamepad2.right_trigger < Drive.DEADZONE_SIZE && gamepad2.left_trigger < Drive.DEADZONE_SIZE) {
             greyBrown = drive.uTrackAutoTarget(gamepad2);
         }
-        //Right stick up to switch glyph color
-        /*if (!bRightStickY && -gamepad2.right_stick_y >= .5) {
-            greyBrown = drive.cryptobox.wrongColor();
-        }
-        bRightStickY = -gamepad2.right_stick_y >= .5;*/
 
         if (aiPlacer && gamepad2.b) {
             if (gamepad2.dpad_down) {
