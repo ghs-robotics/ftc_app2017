@@ -220,7 +220,7 @@ public class Cryptobox {
 
 
     public void wrongLastGlyph(GlyphColor newGlyph) {
-        setGlyph(lastX, lastY, newGlyph);
+        setGlyph(lastY, lastX, newGlyph);
     }
 
     public void setGlyph(int x, int y, GlyphColor newGlyph) {
