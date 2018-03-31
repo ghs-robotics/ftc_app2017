@@ -507,7 +507,7 @@ public class TeleOpMecanum extends OpMode {
      */
     private void runAiPlacer() {
         if (gamepad2.x && gamepad2.b) {
-            drive.cryptobox.setSnakeTarget(Cryptobox.Snake.NONE);
+            drive.cryptobox.setCipherTarget(Cryptobox.Cipher.NONE);
         }
 
         //Triggers as override
@@ -691,7 +691,7 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Cryptobox", drive.cryptobox == null ? "" : drive.cryptobox.uiToString((int) cursorCount % 2 == 0));
         printNextGlyph();
         //telemetry.addData("Reject glyph", drive.cryptobox.getRejectGlyph());
-        Cryptobox.Snake snakeTarget = drive.cryptobox.getSnakeTarget();
+        Cryptobox.Cipher snakeTarget = drive.cryptobox.getCipherTarget();
         telemetry.addData("Snake target", snakeTarget == null ? "null" : snakeTarget.name());
         //telemetry.addData("line follower", drive.smallVoltage);
         telemetry.addData("vert Pos", drive.verticalDriveCurrPos());

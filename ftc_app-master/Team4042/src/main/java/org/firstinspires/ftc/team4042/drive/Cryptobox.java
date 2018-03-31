@@ -2,7 +2,6 @@ package org.firstinspires.ftc.team4042.drive;
 
 import com.qualcomm.robotcore.util.Range;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -27,6 +26,7 @@ public class Cryptobox {
 
     private File file = null;
     private Telemetry telemetry;
+    private CurrentCipher currentCipher;
 
     private int uiX = 0;
     private int uiY = 0;
@@ -41,19 +41,35 @@ public class Cryptobox {
      * The rows are built from bottom to top, so index 0 is the
      * lowest position and index 3 the highest position
      */
-    private final static GlyphColor[][] bgg = {
+    private final static GlyphColor[][] brownSnake = {
             {GlyphColor.BROWN, GlyphColor.BROWN, GlyphColor.GREY, GlyphColor.GREY},
             {GlyphColor.GREY, GlyphColor.BROWN, GlyphColor.BROWN, GlyphColor.GREY},
             {GlyphColor.GREY, GlyphColor.GREY, GlyphColor.BROWN, GlyphColor.BROWN}};
-    private final static GlyphColor[][] gbb = {
+    private final static GlyphColor[][] greySnake = {
             {GlyphColor.GREY, GlyphColor.GREY, GlyphColor.BROWN, GlyphColor.BROWN},
             {GlyphColor.BROWN, GlyphColor.GREY, GlyphColor.GREY, GlyphColor.BROWN},
             {GlyphColor.BROWN, GlyphColor.BROWN, GlyphColor.GREY, GlyphColor.GREY}};
+    private final static GlyphColor[][] brownBird = {
+            {GlyphColor.BROWN, GlyphColor.GREY, GlyphColor.GREY, GlyphColor.BROWN},
+            {GlyphColor.GREY, GlyphColor.BROWN, GlyphColor.BROWN, GlyphColor.GREY},
+            {GlyphColor.BROWN, GlyphColor.GREY, GlyphColor.GREY, GlyphColor.BROWN}};
+    private final static GlyphColor[][] brownFrog = {
+            {GlyphColor.GREY, GlyphColor.BROWN, GlyphColor.GREY, GlyphColor.BROWN},
+            {GlyphColor.BROWN, GlyphColor.GREY, GlyphColor.BROWN, GlyphColor.GREY},
+            {GlyphColor.GREY, GlyphColor.BROWN, GlyphColor.GREY, GlyphColor.BROWN}};
+    private final static GlyphColor[][] greyFrog = {
+            {GlyphColor.BROWN, GlyphColor.GREY, GlyphColor.BROWN, GlyphColor.GREY},
+            {GlyphColor.GREY, GlyphColor.BROWN, GlyphColor.GREY, GlyphColor.BROWN},
+            {GlyphColor.BROWN, GlyphColor.GREY, GlyphColor.BROWN, GlyphColor.GREY}};
+    private final static GlyphColor[][] greyBird = {
+            {GlyphColor.GREY, GlyphColor.BROWN, GlyphColor.BROWN, GlyphColor.GREY},
+            {GlyphColor.BROWN, GlyphColor.GREY, GlyphColor.GREY, GlyphColor.BROWN},
+            {GlyphColor.GREY, GlyphColor.BROWN, GlyphColor.BROWN, GlyphColor.GREY}};
 
-    public enum Snake {
-        BGG(bgg), GBB(gbb), NONE(new GlyphColor[0][0]);
+    public enum Cipher {
+        BROWN_SNAKE(brownSnake), GREY_SNAKE(greySnake), BROWN_FROG(brownFrog), GREY_FROG(greyFrog), BROWN_BIRD(brownBird), GREY_BIRD(greyBird), NONE(new GlyphColor[0][0]);
         private GlyphColor[][] glyphMap;
-        private Snake(GlyphColor[][] glyphMap) {
+        private Cipher(GlyphColor[][] glyphMap) {
             this.glyphMap = glyphMap;
         }
 
@@ -66,7 +82,7 @@ public class Cryptobox {
 
     private int numGlyphsPlaced;
 
-    private Snake snakeTarget = Snake.NONE;
+    private Cipher cipherTarget = Cipher.NONE;
 
     public Cryptobox(Telemetry telemetry, GlyphPlacementSystem glyphPlacementSystem) {
         this (telemetry);
@@ -77,6 +93,11 @@ public class Cryptobox {
         this.telemetry = telemetry;
         this.file = new File(Auto.autoRoot, "cryptobox.txt");
         this.numGlyphsPlaced = 0;
+        this.currentCipher = new CurrentCipher();
+    }
+
+    public void updateCipher() {
+        cipherTarget = currentCipher.changeCipher(glyphs);
     }
 
     public void clear() {
@@ -86,7 +107,7 @@ public class Cryptobox {
             }
         }
         numGlyphsPlaced = 0;
-        snakeTarget = Snake.NONE;
+        cipherTarget = Cipher.NONE;
     }
 
     /**
@@ -110,7 +131,16 @@ public class Cryptobox {
                 clear();
                 return;
             }
-            snakeTarget = line.equals(Snake.BGG.name()) ? Snake.BGG : line.equals(Snake.GBB.name()) ? Snake.GBB : Snake.NONE;
+
+            boolean match = false;
+            for(Cipher check : Cipher.values()) {
+                if (line.equals(check.name()) && !match) {
+                    cipherTarget = check;
+                    match = true;
+                }
+            }
+            cipherTarget = match ? cipherTarget : Cipher.NONE;
+
             for (int r = 0; r < 4 && (line = bufferedReader.readLine()) != null; r++) {
                 //Reads the lines from the file in order
                 //store each one onto array
@@ -164,7 +194,7 @@ public class Cryptobox {
             FileWriter fileWriter = new FileWriter(file);
             PrintWriter print_stream = new PrintWriter(fileWriter);
             //write array to file for each row and col
-            print_stream.print(snakeTarget.name());
+            print_stream.print(cipherTarget.name());
             print_stream.print(this.toString());
             print_stream.close();
         } catch (Exception e) {
@@ -229,20 +259,21 @@ public class Cryptobox {
             if (newGlyph.equals(GlyphColor.NONE) && !glyphs[y][x].equals(GlyphColor.NONE)) {
                 numGlyphsPlaced--;
                 if (numGlyphsPlaced == 0) {
-                    snakeTarget = Snake.NONE;
+                    cipherTarget = Cipher.NONE;
                 }
             }
             if (!newGlyph.equals(GlyphColor.NONE) && glyphs[y][x].equals(GlyphColor.NONE)) {
                 if (numGlyphsPlaced == 0) {
-                    cipherFirstGlyph(newGlyph, y);
+                    updateCipher();
                 }
                 numGlyphsPlaced++;
             }
             if (!newGlyph.equals(GlyphColor.NONE) && !glyphs[y][x].equals(GlyphColor.NONE) && numGlyphsPlaced == 1) {
-                cipherFirstGlyph(newGlyph, y);
+                updateCipher();
             }
 
             glyphs[y][x] = newGlyph;
+            updateCipher();
             writeFile();
         }
     }
@@ -274,20 +305,12 @@ public class Cryptobox {
         return numGlyphsPlaced;
     }
 
-    public Snake getSnakeTarget() {
-        return snakeTarget;
+    public Cipher getCipherTarget() {
+        return cipherTarget;
     }
 
-    public void toggleSnakeTarget() {
-        if (snakeTarget.equals(Snake.BGG)) {
-            snakeTarget = Snake.GBB;
-        } else if (snakeTarget.equals(Snake.GBB)) {
-            snakeTarget = Snake.BGG;
-        }
-    }
-
-    public void setSnakeTarget(Snake snakeTarget) {
-        this.snakeTarget = snakeTarget;
+    public void setCipherTarget(Cipher cipherTarget) {
+        this.cipherTarget = cipherTarget;
     }
 
     public void incrementGlyphsPlaced() {
@@ -302,24 +325,6 @@ public class Cryptobox {
 
     public boolean getRejectGlyph() {
         return rejectGlyph;
-    }
-
-    /**
-     * Determines the cipher based off of the first glyph and its column target
-     */
-    public void cipherFirstGlyph(GlyphColor newGlyph, int column) {
-        switch (column) {
-            case 0:
-                snakeTarget = newGlyph.equals(GlyphColor.BROWN) ? Snake.BGG : Snake.GBB;
-                break;
-            case 1:
-                snakeTarget = newGlyph.equals(GlyphColor.GREY) ? Snake.BGG : Snake.GBB;
-                break;
-            case 2:
-                snakeTarget = newGlyph.equals(GlyphColor.GREY) ? Snake.BGG : Snake.GBB;
-                break;
-        }
-
     }
 
     /**
@@ -338,7 +343,7 @@ public class Cryptobox {
         if (numGlyphsPlaced == 0) {
             return placeFirstGlyph(newGlyph);
         } else {
-            if (snakeTarget.equals(Snake.NONE)) {
+            if (cipherTarget.equals(Cipher.NONE)) {
                 return noCipherMatch(newGlyph);
             } else {
                 int[][] greyBrowns = getPredictionSums(newGlyph);
@@ -374,7 +379,7 @@ public class Cryptobox {
      * @return The desirability of the next glyph, or to reject this glyph
      */
     private int[] noCipherMatch(GlyphColor newGlyph) {
-        snakeTarget = Snake.NONE;
+        cipherTarget = Cipher.NONE;
         if (rejectGlyph) {
             return new int[] {-1, -1};
         } else {
@@ -449,7 +454,7 @@ public class Cryptobox {
      */
     private int[] placeFirstGlyph(GlyphColor newGlyph) {
         //Set up which snake we want to target, then get the other color glyph next
-        cipherFirstGlyph(newGlyph, 1);
+        updateCipher();
 
         //Always place the first glyph in the center column
         driveGlyphPlacer(newGlyph, 0, 1);
@@ -473,26 +478,6 @@ public class Cryptobox {
         }
 
         writeFile();
-    }
-
-    public int[] wrongColor() {
-        telemetry.log().add("lastX: " + lastX + " lastY: " + lastY);
-        GlyphColor lastGlyph = glyphs[lastY][lastX];
-
-        glyphs[lastY][lastX] = GlyphColor.NONE;
-
-        GlyphColor newGlyph = lastGlyph.equals(GlyphColor.GREY) ? GlyphColor.BROWN : lastGlyph.equals(GlyphColor.BROWN) ? GlyphColor.GREY : GlyphColor.NONE;
-        lastGlyph = newGlyph;
-
-        telemetry.log().add("lastGlyph: " + lastGlyph + " newGlyph: " + newGlyph);
-
-        numGlyphsPlaced--;
-
-        if (numGlyphsPlaced == 0) {
-            snakeTarget = snakeTarget.equals(Snake.GBB) ? Snake.BGG : Snake.GBB;
-        }
-
-        return placeGlyph(newGlyph);
     }
 
     public boolean driveGlyphPlacer(GlyphColor newGlyph, int row, int column) {
@@ -638,7 +623,7 @@ public class Cryptobox {
 
         int emptySpace = getFirstEmpty(columnNum);
         if (emptySpace != -1) {
-            if (snakeTarget.getGlyphMap()[columnNum][emptySpace].equals(newGlyph)) {
+            if (cipherTarget.getGlyphMap()[columnNum][emptySpace].equals(newGlyph)) {
                 //If it matches the target, place that glyph there
                 glyphs[columnNum][emptySpace] = newGlyph;
                 return true;
@@ -672,7 +657,7 @@ public class Cryptobox {
         GlyphColor[] predictions = new GlyphColor[] {GlyphColor.NONE, GlyphColor.NONE, GlyphColor.NONE};
 
         //If there's no space for the new glyph or it doesn't match the target, then there are no future possibilities if we place here
-        if (empties[columnNum] == -1 || !snakeTarget.getGlyphMap()[columnNum][empties[columnNum]].equals(newGlyph)) {
+        if (empties[columnNum] == -1 || !cipherTarget.getGlyphMap()[columnNum][empties[columnNum]].equals(newGlyph)) {
             return predictions;
         } else {
             //Assume the glyph gets placed
@@ -683,7 +668,7 @@ public class Cryptobox {
             //Get the glyph possibility at the empty space and puts it in the array
             //if it is 0, you cannot place above this position, and should not count it in predictions
             if (!(empties[i] == 0 && i == columnNum) && empties[i] != -1 && empties[i] != 4) {
-                GlyphColor prediction = snakeTarget.getGlyphMap()[i][empties[i]];
+                GlyphColor prediction = cipherTarget.getGlyphMap()[i][empties[i]];
                 predictions[i] = prediction;
             }
         }
