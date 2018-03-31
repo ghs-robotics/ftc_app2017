@@ -107,7 +107,7 @@ public abstract class Drive {
         return collected.getState();
     }
     public boolean getSideState() {
-        return side.getState();
+        return !side.getState();
     }
 
     private DigitalChannel collected;

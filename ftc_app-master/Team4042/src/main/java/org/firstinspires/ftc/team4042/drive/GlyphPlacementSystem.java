@@ -230,6 +230,7 @@ public class GlyphPlacementSystem {
             if(translateBack && horizontalTimer.seconds() >= HORIZONTAL_TRANSLATION_TIME + .5){
                 drive.setHorizontalDrive(-drive.getHorizontalDrive());
                 horizontalTimer.reset();
+                translateBack = false;
             }
         }
         return false;
