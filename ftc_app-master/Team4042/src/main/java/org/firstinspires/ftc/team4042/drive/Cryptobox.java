@@ -215,7 +215,7 @@ public class Cryptobox {
      */
     public void setGlyphAtUi(GlyphColor newGlyph) {
 
-        setGlyph(uiX, 3 - uiY, newGlyph);
+        setGlyph(3 - uiY, uiX, newGlyph);
     }
 
 
@@ -223,25 +223,26 @@ public class Cryptobox {
         setGlyph(lastY, lastX, newGlyph);
     }
 
-    public void setGlyph(int x, int y, GlyphColor newGlyph) {
-        if (!newGlyph.equals(glyphs[x][y])) {
-            if (newGlyph.equals(GlyphColor.NONE) && !glyphs[x][y].equals(GlyphColor.NONE)) {
+    public void setGlyph(int y, int x, GlyphColor newGlyph) {
+        telemetry.log().add("y: " + y + " x: " + x);
+        if (!newGlyph.equals(glyphs[y][x])) {
+            if (newGlyph.equals(GlyphColor.NONE) && !glyphs[y][x].equals(GlyphColor.NONE)) {
                 numGlyphsPlaced--;
                 if (numGlyphsPlaced == 0) {
                     snakeTarget = Snake.NONE;
                 }
             }
-            if (!newGlyph.equals(GlyphColor.NONE) && glyphs[x][y].equals(GlyphColor.NONE)) {
+            if (!newGlyph.equals(GlyphColor.NONE) && glyphs[y][x].equals(GlyphColor.NONE)) {
                 if (numGlyphsPlaced == 0) {
-                    cipherFirstGlyph(newGlyph, x);
+                    cipherFirstGlyph(newGlyph, y);
                 }
                 numGlyphsPlaced++;
             }
-            if (!newGlyph.equals(GlyphColor.NONE) && !glyphs[x][y].equals(GlyphColor.NONE) && numGlyphsPlaced == 1) {
-                cipherFirstGlyph(newGlyph, x);
+            if (!newGlyph.equals(GlyphColor.NONE) && !glyphs[y][x].equals(GlyphColor.NONE) && numGlyphsPlaced == 1) {
+                cipherFirstGlyph(newGlyph, y);
             }
 
-            glyphs[x][y] = newGlyph;
+            glyphs[y][x] = newGlyph;
             writeFile();
         }
     }

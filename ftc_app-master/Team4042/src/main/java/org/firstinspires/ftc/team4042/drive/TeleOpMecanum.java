@@ -54,9 +54,6 @@ public class TeleOpMecanum extends OpMode {
     private boolean bX;
     private boolean bB;
     private boolean bY;
-
-    private boolean bRightStickY;
-    private boolean bBrown;
     //CONTROL BOOLEANS END
 
     public Drive drive = new MecanumDrive(true);
@@ -409,7 +406,7 @@ public class TeleOpMecanum extends OpMode {
 
         if (gamepad2.right_stick_button && !bRightStick) {
             aiPlacer = !aiPlacer;
-            if (!aiPlacer) {
+            if (aiPlacer) {
                 flashOff();
                 flashOn = false;
                 flashBlink = false;
