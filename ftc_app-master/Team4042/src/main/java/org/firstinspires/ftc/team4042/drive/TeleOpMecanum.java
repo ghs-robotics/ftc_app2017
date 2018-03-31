@@ -41,7 +41,6 @@ public class TeleOpMecanum extends OpMode {
     private boolean aB = false;
 
     private boolean aUp = false;
-    private boolean aDown = false;
 
     private boolean aLeftStick = false;
     private boolean aRightStick = false;
@@ -178,10 +177,11 @@ public class TeleOpMecanum extends OpMode {
             }
             aUp = gamepad1.dpad_up;
 
-            if (gamepad1.dpad_down && !aDown) {
+            if (gamepad1.left_stick_button && !aLeftStick) {
                 drive.toggleWinch();
             }
-            aDown = gamepad1.dpad_down;
+            aLeftStick = gamepad1.left_stick_button;
+
             telemetry.addData("winch", drive.winchOpen);
 
             //The first time you hit back, it establishes how long you've been pushing it for
@@ -205,9 +205,10 @@ public class TeleOpMecanum extends OpMode {
             //Adjust drive modes, speeds, etc
             setUpDrive();
 
-            if (gamepad1.left_stick_button && !aLeftStick) {
+            if (gamepad1.right_stick_button && !aRightStick) {
                 drive.toggleVerbose();
             }
+            aRightStick = gamepad1.right_stick_button;
 
             //Runs the intakes
             intakes();
@@ -551,23 +552,6 @@ public class TeleOpMecanum extends OpMode {
      */
     private void rejectGlyph() {
         //TODO: WRITE THIS FUNCTION
-    }
-
-    private void speedModes() {
-        //Left and right stick together = super slow
-        if (gamepad1.left_stick_button && !aLeftStick && gamepad1.right_stick_button && !aRightStick) {
-            adjustedSpeed = .5;
-        }
-        //Left stick = fast
-        if (gamepad1.left_stick_button && !aLeftStick && !gamepad1.right_stick_button) {
-            adjustedSpeed = 1;
-        }
-        //Right stick = med
-        if (gamepad1.right_stick_button && !aRightStick && !gamepad1.left_stick_button) {
-            adjustedSpeed = .75;
-        }
-        aRightStick = gamepad1.right_stick_button;
-        aLeftStick = gamepad1.left_stick_button;
     }
 
     private void glyphTarget() {
