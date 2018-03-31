@@ -31,7 +31,6 @@ public class TeleOpMecanum extends OpMode {
     // We have these booleans so we only register a button press once.
     // You have to let go of the button and push it again to register a new event.
     private boolean aBack = false;
-    private boolean bBack = false;
     private double aBackTime = 0;
     private boolean bLeftStick = false;
     private boolean bRightStick = false;
@@ -43,8 +42,6 @@ public class TeleOpMecanum extends OpMode {
 
     private boolean aUp = false;
     private boolean aDown = false;
-    private boolean aLeft = false;
-    private boolean aRight = false;
 
     private boolean aLeftStick = false;
     private boolean aRightStick = false;
@@ -179,6 +176,7 @@ public class TeleOpMecanum extends OpMode {
             if (gamepad1.dpad_up && !aUp) {
                 intakeBackstop = !intakeBackstop;
             }
+            aUp = gamepad1.dpad_up;
 
             if (gamepad1.dpad_down && !aDown) {
                 drive.toggleWinch();
@@ -202,6 +200,7 @@ public class TeleOpMecanum extends OpMode {
                     onBalancingStone = !onBalancingStone;
                 }
             }
+            aBack = gamepad1.back;
 
             //Adjust drive modes, speeds, etc
             setUpDrive();
@@ -249,8 +248,6 @@ public class TeleOpMecanum extends OpMode {
                 drive.glyph.runToPosition(0);
             }
 
-            aLeft = gamepad1.dpad_left;
-            aRight = gamepad1.dpad_right;
             aA = gamepad1.a;
 
             bUp = gamepad2.dpad_up;
@@ -259,8 +256,6 @@ public class TeleOpMecanum extends OpMode {
             bRight = gamepad2.dpad_right;
             bB = gamepad2.b;
             bA = gamepad2.a;
-
-            updateControlBooleans();
 
             //Updates the telemetry output
             telemetryUpdate();
@@ -407,6 +402,7 @@ public class TeleOpMecanum extends OpMode {
         if (gamepad2.left_stick_button && !bLeftStick) {
             toggleManual();
         }
+        bLeftStick = gamepad2.left_stick_button;
 
         if (gamepad2.right_stick_button && !bRightStick) {
             aiPlacer = !aiPlacer;
@@ -503,6 +499,7 @@ public class TeleOpMecanum extends OpMode {
                 drive.setHorizontalDrive(horiz);
             }
         }
+        bY = gamepad2.y;
     }
 
     /**
@@ -568,6 +565,8 @@ public class TeleOpMecanum extends OpMode {
         if (gamepad1.right_stick_button && !aRightStick && !gamepad1.left_stick_button) {
             adjustedSpeed = .75;
         }
+        aRightStick = gamepad1.right_stick_button;
+        aLeftStick = gamepad1.left_stick_button;
     }
 
     private void glyphTarget() {
@@ -700,27 +699,6 @@ public class TeleOpMecanum extends OpMode {
                 drive.internalIntakeLeft(.5);
             } else { drive.internalIntakeLeft(1); }
         }
-    }
-
-    private void updateControlBooleans() {
-        aBack = gamepad1.back;
-        bBack = gamepad2.back;
-
-        aLeftStick = gamepad1.left_stick_button;
-        aRightStick = gamepad1.right_stick_button;
-        bLeftStick = gamepad2.left_stick_button;
-        bRightStick = gamepad2.right_stick_button;
-
-        //aY = gamepad1.y;
-        aB = gamepad1.b;
-
-        bY = gamepad2.y;
-
-
-        aUp = gamepad1.dpad_up;
-        //aDown = gamepad1.dpad_down;
-
-
     }
 
     private void telemetryUpdate() {
