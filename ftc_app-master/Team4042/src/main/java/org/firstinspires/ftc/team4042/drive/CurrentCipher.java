@@ -24,7 +24,7 @@ public class CurrentCipher {
             return currentTarget;
         }
         for(Cryptobox.Cipher cipher: Cryptobox.Cipher.values()) {
-            if(isValidCipher(cipher.getGlyphMap()) && !cipher.equals(Cryptobox.Cipher.NONE)) {
+            if(!cipher.equals(Cryptobox.Cipher.NONE) && isValidCipher(cipher.getGlyphMap())) {
                 currentTarget = cipher;
                 return cipher;
             }
