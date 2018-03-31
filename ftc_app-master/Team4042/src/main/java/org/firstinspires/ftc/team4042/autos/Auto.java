@@ -314,7 +314,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
         Cryptobox.GlyphColor newGlyph = Cryptobox.GlyphColor.GREY; //drive.getGlyphColor(getColorVoltage());
 
-        drive.cryptobox.cipherFirstGlyph(newGlyph, column);
+        drive.cryptobox.updateCipher();
 
         //Place the first glyph to match the vumark
         drive.cryptobox.driveGlyphPlacer(newGlyph, 0, column);
