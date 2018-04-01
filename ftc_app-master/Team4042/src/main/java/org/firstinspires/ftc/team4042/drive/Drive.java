@@ -126,6 +126,7 @@ public abstract class Drive {
     public GlyphPlacementSystem.Position targetY;
     public GlyphPlacementSystem.HorizPos targetX;
     public Cryptobox.GlyphColor color = Cryptobox.GlyphColor.NONE;
+    public boolean switchColor = false;
 
     public Cryptobox cryptobox;
 
@@ -767,6 +768,16 @@ public abstract class Drive {
         glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
         if(glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {
             stage = GlyphPlacementSystem.Stage.PAUSE1;
+            if(switchColor) {
+                cryptobox.wrongLastGlyph(Cryptobox.GlyphColor.NONE);
+                if (color.equals(Cryptobox.GlyphColor.GREY)){
+                    color = Cryptobox.GlyphColor.BROWN;
+                } else {
+                    color = Cryptobox.GlyphColor.GREY;
+                }
+                uTrackAutoTarget(color);
+                switchColor = false;
+            }
             glyph.setXPower(targetX);
         } else if(abort) {
             stage = GlyphPlacementSystem.Stage.PAUSE1;
@@ -774,7 +785,18 @@ public abstract class Drive {
     }
     private void pause1() {
         //Moves to target X location
-        if(glyph.xTargetReached(targetX, abort)) {
+        if(switchColor) {
+            cryptobox.wrongLastGlyph(Cryptobox.GlyphColor.NONE);
+            if (color.equals(Cryptobox.GlyphColor.GREY)){
+                color = Cryptobox.GlyphColor.BROWN;
+            } else {
+                color = Cryptobox.GlyphColor.GREY;
+            }
+            uTrackAutoTarget(color);
+            switchColor = false;
+            glyph.setXPower(targetX);
+        }
+            if(glyph.horizontalTimer.seconds() > .5 && glyph.xTargetReached(targetX, abort)) {
             stage = GlyphPlacementSystem.Stage.PLACE2;
         }
     }
@@ -823,6 +845,8 @@ public abstract class Drive {
             //jewelUp();
             uTrackAtBottom = true;
             abort = false;
+            color = Cryptobox.GlyphColor.NONE;
+            switchColor = false;
             return true;
         }
         return false;

@@ -507,11 +507,14 @@ public class TeleOpMecanum extends OpMode {
             if (gamepad2.left_stick_y > .7 && Math.abs(gamepad2.left_stick_x) < .7) {
                 drive.cryptobox.wrongLastGlyph(Cryptobox.GlyphColor.BROWN);
                 if (drive.color.equals(Cryptobox.GlyphColor.GREY)) {
-
+                    drive.switchColor = true;
                 }
             }
             if (gamepad2.left_stick_y < -.7 && Math.abs(gamepad2.left_stick_x) < .7) {
                 drive.cryptobox.wrongLastGlyph(Cryptobox.GlyphColor.GREY);
+                if (drive.color.equals(Cryptobox.GlyphColor.BROWN)) {
+                    drive.switchColor = true;
+                }
             }
             if (Math.abs(gamepad2.left_stick_x) > .7 && Math.abs(gamepad2.left_stick_y) < .7) {
                 drive.cryptobox.wrongLastGlyph(Cryptobox.GlyphColor.NONE);
@@ -677,7 +680,7 @@ public class TeleOpMecanum extends OpMode {
     }
 
     private void telemetryUpdate() {
-        cursorCount += .1;
+        cursorCount += .2;
         telemetry.addData("Manual", manual);
         telemetry.addData("Crawl", Drive.crawl);
         //telemetry.addData("Glyph", drive.glyph.getTargetPositionAsString());

@@ -20,7 +20,18 @@ import java.util.List;
  */
 
 public class Cryptobox {
-    public enum GlyphColor { GREY, BROWN, NONE, EITHER }
+    public enum GlyphColor {
+        GREY("G"), BROWN("B"), NONE("N"), EITHER("N");
+
+        private String abbreviation;
+        private GlyphColor(String abbreviation){
+            this.abbreviation = abbreviation;
+        }
+
+        public String getAbbreviation() {
+            return abbreviation;
+        }
+    }
 
     private GlyphColor[][] glyphs = new GlyphColor[3][4];
 
@@ -93,7 +104,7 @@ public class Cryptobox {
         this.telemetry = telemetry;
         this.file = new File(Auto.autoRoot, "cryptobox.txt");
         this.numGlyphsPlaced = 0;
-        this.currentCipher = new CurrentCipher();
+        this.currentCipher = new CurrentCipher(telemetry);
     }
 
     public void updateCipher() {
@@ -245,7 +256,7 @@ public class Cryptobox {
      */
     public void setGlyphAtUi(GlyphColor newGlyph) {
 
-        setGlyph(3 - uiY, uiX, newGlyph);
+        setGlyph(uiX, 3 - uiY, newGlyph);
     }
 
 
@@ -292,7 +303,7 @@ public class Cryptobox {
                     val = "X";
                 } else {
                     GlyphColor glyph = this.glyphs[c][r];
-                    val = glyph == null ? "null" : glyph.name();
+                    val = glyph == null ? "n" : glyph.getAbbreviation();
                 }
                 toString.append(val).append(" ");
             }
@@ -454,7 +465,8 @@ public class Cryptobox {
      */
     private int[] placeFirstGlyph(GlyphColor newGlyph) {
         //Set up which snake we want to target, then get the other color glyph next
-        updateCipher();
+        //updateCipher();
+        cipherTarget = newGlyph.equals(GlyphColor.BROWN) ? Cipher.GREY_SNAKE : Cipher.BROWN_SNAKE;
 
         //Always place the first glyph in the center column
         driveGlyphPlacer(newGlyph, 0, 1);
@@ -640,6 +652,8 @@ public class Cryptobox {
         int emptySpace = getFirstEmpty(columnNum);
         if (emptySpace != -1) {
             glyphs[columnNum][emptySpace] = newGlyph;
+            lastX = emptySpace;
+            lastY = columnNum;
         }
     }
 
