@@ -734,7 +734,7 @@ public abstract class Drive {
     }
 
     private void reset() {
-        //Moves the u-track down onto the glyph/
+        //Moves the u-track down onto the glyph
         boolean currBottom = getBottomState();
         uTrackAtBottom = false;
 
