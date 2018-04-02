@@ -64,6 +64,8 @@ public abstract class Drive {
     //Use gyro - true/false
     public static boolean useGyro = false;
 
+    public static final boolean useSideLimits = true;
+
     //Whether the robot is attached to itself or not
     public static boolean isExtendo = false;
     public static boolean crawl = false;

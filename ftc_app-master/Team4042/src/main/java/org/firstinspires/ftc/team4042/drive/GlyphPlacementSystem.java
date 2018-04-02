@@ -193,12 +193,17 @@ public class GlyphPlacementSystem {
     }
 
     public boolean xTargetReached(HorizPos targetPos, boolean abort, boolean first) {
-        //If you're going left or right, then use the timer to see if you should stop
-        //drive.log.add("target x " + drive.targetX + " targetPos " + targetPos);
-        if (abort || ((targetPos.equals(HorizPos.LEFT) || targetPos.equals(HorizPos.RIGHT)) && drive.getSideState()) ||
-                //If you're going to the center and you hit the limit switch, stop
-                (targetPos.equals(HorizPos.CENTER) && drive.getCenterState() && !drive.getSideState()) ||
-                (!first && drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER) && !drive.getSideState())) {
+        //If you're going left or right, then use the timer to see if you should stop OR the side limit switches
+        boolean sideLimitSwitches = (Drive.useSideLimits && drive.getSideState()) || (!Drive.useSideLimits && horizontalTimer.seconds() >= HORIZONTAL_TRANSLATION_TIME);
+        //Stops you from translating home if the side limit switches are on. Only if this is true will the u-track move back home.
+        boolean sideLimitOverride = (!Drive.useSideLimits || !drive.getSideState());
+
+        //If you're going to the side and hit the side limit switches OR run out of time, success
+        if (abort || ((targetPos.equals(HorizPos.LEFT) || targetPos.equals(HorizPos.RIGHT)) && sideLimitSwitches) ||
+                //If you're going to the center and you hit the center limit switch without the side ones, success
+                (targetPos.equals(HorizPos.CENTER) && drive.getCenterState() && sideLimitOverride) ||
+                //If you're moving back to the center and it's not from aborting, you don't need the center limit switch
+                (!first && drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER) && sideLimitOverride)) {
             if (drive.getHorizontalDrive() > 0 && drive.targetX.equals(HorizPos.CENTER)) {
                 adjustBack(1);
             }
