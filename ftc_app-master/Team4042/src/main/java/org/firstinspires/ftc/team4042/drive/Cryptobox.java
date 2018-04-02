@@ -107,8 +107,12 @@ public class Cryptobox {
         this.currentCipher = new CurrentCipher(telemetry);
     }
 
-    public void updateCipher() {
-        cipherTarget = currentCipher.changeCipher(glyphs);
+    public void updateCipher(GlyphColor color, int col) {
+        if (!color.equals(GlyphColor.NONE) && numGlyphsPlaced == 0) {
+            cipherTarget = Cipher.GREY_SNAKE.getGlyphMap()[col][0].equals(color) ? Cipher.GREY_SNAKE : Cipher.BROWN_SNAKE;
+        } else {
+            cipherTarget = currentCipher.changeCipher(glyphs);
+        }
     }
 
     public void clear() {
@@ -265,26 +269,22 @@ public class Cryptobox {
     }
 
     public void setGlyph(int y, int x, GlyphColor newGlyph) {
-        telemetry.log().add("y: " + y + " x: " + x);
+        //telemetry.log().add("y: " + y + " x: " + x);
         if (!newGlyph.equals(glyphs[y][x])) {
             if (newGlyph.equals(GlyphColor.NONE) && !glyphs[y][x].equals(GlyphColor.NONE)) {
                 numGlyphsPlaced--;
                 if (numGlyphsPlaced == 0) {
                     cipherTarget = Cipher.NONE;
+                    glyphs[y][x] = newGlyph;
+                    writeFile();
+                    return;
                 }
-            }
-            if (!newGlyph.equals(GlyphColor.NONE) && glyphs[y][x].equals(GlyphColor.NONE)) {
-                if (numGlyphsPlaced == 0) {
-                    updateCipher();
-                }
+            } else if (!newGlyph.equals(GlyphColor.NONE) && glyphs[y][x].equals(GlyphColor.NONE)) {
                 numGlyphsPlaced++;
-            }
-            if (!newGlyph.equals(GlyphColor.NONE) && !glyphs[y][x].equals(GlyphColor.NONE) && numGlyphsPlaced == 1) {
-                updateCipher();
             }
 
             glyphs[y][x] = newGlyph;
-            updateCipher();
+            updateCipher(GlyphColor.NONE, 0);
             writeFile();
         }
     }
@@ -465,8 +465,8 @@ public class Cryptobox {
      */
     private int[] placeFirstGlyph(GlyphColor newGlyph) {
         //Set up which snake we want to target, then get the other color glyph next
-        //updateCipher();
-        cipherTarget = newGlyph.equals(GlyphColor.BROWN) ? Cipher.GREY_SNAKE : Cipher.BROWN_SNAKE;
+        updateCipher(newGlyph, 1);
+        //cipherTarget = newGlyph.equals(GlyphColor.BROWN) ? Cipher.GREY_SNAKE : Cipher.BROWN_SNAKE;
 
         //Always place the first glyph in the center column
         driveGlyphPlacer(newGlyph, 0, 1);

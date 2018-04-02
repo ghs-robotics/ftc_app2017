@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 <resources>
 
-  <string name="app_name">FTC Robot Controller</string>
+  <string name="app_name">SLINK.exe</string>
 
   <!-- Menu -->
   <string name="inspection_mode_menu_item">Self Inspect</string>

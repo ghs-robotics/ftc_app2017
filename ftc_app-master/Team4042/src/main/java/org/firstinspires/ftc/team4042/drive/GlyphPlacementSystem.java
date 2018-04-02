@@ -173,15 +173,13 @@ public class GlyphPlacementSystem {
         //if target = left(-1) and current = right(1)
         //we want to move left (-1)
         //so target - current
-        if (!drive.targetX.equals(HorizPos.CENTER)) {
-            double power = targetPos.getPower() - currentX.getPower();
-            power = Range.clip(power, -1, 1);
-            if (targetPos.equals(HorizPos.CENTER)) {
-                power *= C.get().getDouble("returnSpeed");
-            }
-            drive.setHorizontalDrive(power);
-            horizontalTimer.reset();
+        double power = targetPos.getPower() - currentX.getPower();
+        power = Range.clip(power, -1, 1);
+        if (targetPos.equals(HorizPos.CENTER)) {
+            power *= C.get().getDouble("returnSpeed");
         }
+        drive.setHorizontalDrive(power);
+        horizontalTimer.reset();
     }
 
     //handles typewriter motion
@@ -194,13 +192,13 @@ public class GlyphPlacementSystem {
         drive.setHorizontalDrive(0);
     }
 
-    public boolean xTargetReached(HorizPos targetPos, boolean abort) {
+    public boolean xTargetReached(HorizPos targetPos, boolean abort, boolean first) {
         //If you're going left or right, then use the timer to see if you should stop
         //drive.log.add("target x " + drive.targetX + " targetPos " + targetPos);
         if (abort || ((targetPos.equals(HorizPos.LEFT) || targetPos.equals(HorizPos.RIGHT)) && drive.getSideState()) ||
                 //If you're going to the center and you hit the limit switch, stop
-                (!drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER) && drive.getCenterState() && !drive.getSideState()) ||
-                (drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER) && !drive.getSideState())) {
+                (targetPos.equals(HorizPos.CENTER) && drive.getCenterState() && !drive.getSideState()) ||
+                (!first && drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER) && !drive.getSideState())) {
             if (drive.getHorizontalDrive() > 0 && drive.targetX.equals(HorizPos.CENTER)) {
                 adjustBack(1);
             }
@@ -208,16 +206,8 @@ public class GlyphPlacementSystem {
             currentX = targetPos;
             return true;
             //If we want to go to the center but miss the switch, it will reverse th u-track
-        } if(!drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER) && (horizontalTimer.seconds() >= (HORIZONTAL_TRANSLATION_TIME * 1.1))) {
+        } if(targetPos.equals(HorizPos.CENTER) && (horizontalTimer.seconds() >= (HORIZONTAL_TRANSLATION_TIME * 1.1))) {
             this.horizontalTimer.reset();
-            if (this.currentX.equals(HorizPos.LEFT)){
-                this.currentX = HorizPos.RIGHT;
-                drive.targetX = HorizPos.RIGHT;
-            }
-            if (this.currentX.equals(HorizPos.RIGHT)){
-                this.currentX = HorizPos.LEFT;
-                drive.targetX = HorizPos.LEFT;
-            }
             drive.setHorizontalDrive(-.5 * drive.getHorizontalDrive());
         } if(!targetPos.equals(HorizPos.CENTER) && (horizontalTimer.seconds() >= HORIZONTAL_TRANSLATION_TIME)){
             drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);

@@ -97,7 +97,7 @@ public class  MecanumDrive extends Drive {
      * Uses joystick inputs to set motor speeds for mecanum drive. Speeds partially depend on the drive mode.
      * @param useEncoders determines whether or not the motors use encoders
      */
-    public void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor) {
+    public void drive(boolean useEncoders, MyGamepad gamepad1, MyGamepad gamepad2, double speedFactor) {
         super.setEncoders(useEncoders);
 
         if (isExtendo) {

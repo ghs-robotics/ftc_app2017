@@ -29,7 +29,7 @@ import java.util.Random;
 public abstract class Drive {
 
     //Require drive() in subclasses
-    public abstract void drive(boolean useEncoders, Gamepad gamepad1, Gamepad gamepad2, double speedFactor);
+    public abstract void drive(boolean useEncoders, MyGamepad gamepad1, MyGamepad gamepad2, double speedFactor);
     public abstract void driveXYR(double speedFactor, double x, double y, double r, boolean useGyro);
     public abstract void driveLR(double speedFactor, double l, double r);
     public abstract boolean driveWithEncoders(Direction direction, double speed, double targetTicks, boolean useGyro, double targetGyro, double mulch);
@@ -691,7 +691,7 @@ public abstract class Drive {
 
     private int[] predict = {0};
 
-    public int[] uTrackAutoTarget(Gamepad gamepad2) {
+    public int[] uTrackAutoTarget(MyGamepad gamepad2) {
         //Happens once when the u-track is at the bottom
         if (uTrackAtBottom && Math.abs(gamepad2.left_stick_y) > .5 && gamepad2.b && !gamepad2.y && !gamepad2.x) {
             //Get glyph color
@@ -786,6 +786,7 @@ public abstract class Drive {
     private void pause1() {
         //Moves to target X location
         if(switchColor) {
+            glyph.currentX = targetX;
             cryptobox.wrongLastGlyph(Cryptobox.GlyphColor.NONE);
             if (color.equals(Cryptobox.GlyphColor.GREY)){
                 color = Cryptobox.GlyphColor.BROWN;
@@ -796,7 +797,8 @@ public abstract class Drive {
             switchColor = false;
             glyph.setXPower(targetX);
         }
-            if(glyph.horizontalTimer.seconds() > .5 && glyph.xTargetReached(targetX, abort)) {
+        //telemetry.log().add("targetX: " + targetX);
+        if(glyph.horizontalTimer.seconds() > .3 && glyph.xTargetReached(targetX, abort, true)) {
             stage = GlyphPlacementSystem.Stage.PLACE2;
         }
     }
@@ -830,7 +832,7 @@ public abstract class Drive {
     }
     private void pause2() {
         //Moves back to center x location (so the hand fits back in the robot)
-        if(glyph.xTargetReached(GlyphPlacementSystem.HorizPos.CENTER, false)) {
+        if(glyph.xTargetReached(GlyphPlacementSystem.HorizPos.CENTER, false, false)) {
             stage = GlyphPlacementSystem.Stage.RETURN2;
             setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             glyph.setAboveHomeTarget();

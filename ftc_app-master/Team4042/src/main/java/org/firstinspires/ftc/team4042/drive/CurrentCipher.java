@@ -24,7 +24,11 @@ public class CurrentCipher {
     }
 
     public Cryptobox.Cipher changeCipher(Cryptobox.GlyphColor[][] currentCipher) {
-        if(isValidCipher(currentCipher, currentTarget)) {
+        if(isValidCipher(currentCipher, Cryptobox.Cipher.GREY_SNAKE)) {
+            return Cryptobox.Cipher.GREY_SNAKE;
+        } else if(isValidCipher(currentCipher, Cryptobox.Cipher.BROWN_SNAKE)) {
+            return Cryptobox.Cipher.BROWN_SNAKE;
+        } else if(isValidCipher(currentCipher, currentTarget)) {
             return currentTarget;
         }
         for(Cryptobox.Cipher cipher: Cryptobox.Cipher.values()) {
