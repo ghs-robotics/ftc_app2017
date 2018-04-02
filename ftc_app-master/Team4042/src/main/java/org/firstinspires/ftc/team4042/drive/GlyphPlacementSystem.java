@@ -209,7 +209,7 @@ public class GlyphPlacementSystem {
         } if(targetPos.equals(HorizPos.CENTER) && (horizontalTimer.seconds() >= (HORIZONTAL_TRANSLATION_TIME * 1.1))) {
             this.horizontalTimer.reset();
             drive.setHorizontalDrive(-.5 * drive.getHorizontalDrive());
-        } if(!targetPos.equals(HorizPos.CENTER) && (horizontalTimer.seconds() >= HORIZONTAL_TRANSLATION_TIME)){
+        } if(!targetPos.equals(HorizPos.CENTER) && (horizontalTimer.seconds() >= HORIZONTAL_TRANSLATION_TIME * 1.1)){
             drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             drive.glyph.setTargetPosition(Position.RAISEDBACK);
 

@@ -529,15 +529,18 @@ public class TeleOpMecanum extends OpMode {
             if (gamepadB.left_stick_y > .7 && Math.abs(gamepadB.left_stick_x) < .7) {
                 drive.cryptobox.wrongLastGlyph(Cryptobox.GlyphColor.BROWN);
                 drive.switchColor = drive.color.equals(Cryptobox.GlyphColor.GREY);
+                drive.abort = false;
             }
             if (gamepadB.left_stick_y < -.7 && Math.abs(gamepadB.left_stick_x) < .7) {
                 drive.cryptobox.wrongLastGlyph(Cryptobox.GlyphColor.GREY);
                 drive.switchColor = drive.color.equals(Cryptobox.GlyphColor.BROWN);
+                drive.abort = false;
             }
             if (Math.abs(gamepadB.left_stick_x) > .7 && Math.abs(gamepadB.left_stick_y) < .7) {
                 drive.cryptobox.wrongLastGlyph(Cryptobox.GlyphColor.NONE);
                 if (!drive.uTrackAtBottom) {
                     drive.abort = true;
+                    drive.openHand();
                 }
             }
         }
@@ -548,24 +551,18 @@ public class TeleOpMecanum extends OpMode {
      * @param nextGlyph The predictions from the glyph placer
      * @param numPlaces The number of glyphs placed thus far
      */
+
+    //Deprecated: see runAiPlacer
     private void aiGlyphPlace(int[] nextGlyph, int numPlaces) {
         this.greyBrown = nextGlyph;
         telemetry.log().add("greybrown: [" + nextGlyph[0] + ", " + nextGlyph[1] + "]");
         if (nextGlyph[0] == -1 && nextGlyph[1] == -1) {
-            rejectGlyph();
+            return;
         }
         if(!(((nextGlyph[0] + nextGlyph[1]) == 0) && !(numPlaces == 11))) {
             drive.uTrack();
         }
     }
-
-    /**
-     * Rejects the glyph
-     */
-    private void rejectGlyph() {
-        //TODO: WRITE THIS FUNCTION
-    }
-
     private void glyphTarget() {
         int targetX = gamepadB.x ? 0 : (gamepadB.y ? 1 : (gamepadB.b ? 2 : -1));
         int targetY = gamepadB.dpad_up ? 0 : (gamepadB.dpad_left || gamepadB.dpad_right ? 1 : (gamepadB.dpad_down ? 2 : -1));
@@ -713,6 +710,7 @@ public class TeleOpMecanum extends OpMode {
             telemetry.addData("gamepadA.dpad_up", gamepadA.dpad_up);
             telemetry.addData("bottom", drive.getBottomState());
             telemetry.addData("center", drive.getCenterState());
+            telemetry.addData("side", drive.getSideState());
             telemetry.addData("collected", drive.getCollectedState());
             telemetry.addData("cursorCount", (int) cursorCount);
             telemetry.addData("bLeftStick", bLeftStick);

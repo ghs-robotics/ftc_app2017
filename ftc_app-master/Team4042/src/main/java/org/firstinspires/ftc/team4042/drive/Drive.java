@@ -745,7 +745,9 @@ public abstract class Drive {
     }
 
     private void home() {
-        closeHand();
+        if (!abort) {
+            closeHand();
+        }
         //Identifies the glyph color and runs the AI targeting
         glyphLocate();
         jewelOut();
@@ -760,6 +762,11 @@ public abstract class Drive {
         //Grabs the glyph
         if (handDropTimer.seconds() >= .5) {
             stage = GlyphPlacementSystem.Stage.PLACE1;
+        }
+        if (abort) {
+            stage = GlyphPlacementSystem.Stage.RETURN2;
+            setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+            glyph.setAboveHomeTarget();
         }
     }
     private void place1() {

@@ -71,5 +71,7 @@ public class MyGamepad {
         right_bumper = gamepad.right_bumper;
         left_stick_button = gamepad.left_stick_button;
         right_stick_button = gamepad.right_stick_button;
+        left_trigger = gamepad.left_trigger;
+        right_trigger = gamepad.right_trigger;
     }
 }
