@@ -60,6 +60,29 @@ public class  MecanumDrive extends Drive {
         super.setMotorPower(speedWheel, speedFactor);
     }
 
+    public void driveLRXY(double speedFactor, double x, double y) {
+        double[] speedWheel = new double[4];
+
+        y = super.deadZone(y);
+        x = super.deadZone(x);
+
+        //Don't move the back motors
+        speedWheel[2] = 0;
+        speedWheel[3] = 0;
+
+        speedWheel[0] = y + x;
+        speedWheel[1] = y - x;
+
+        //0, 1  --> 1, 1
+        //0, -1 --> -1, -1
+        //1, 0  --> 1, -1
+        //-1, 0 --> -1, 1
+        //0, 0  --> 0, 0
+        //1, .5  --> 1.5, -.5
+
+        super.setMotorPower(speedWheel, speedFactor);
+    }
+
     public void driveLR(double speedFactor, double l, double r) {
 
         double[] speedWheel = new double[4];
@@ -100,11 +123,16 @@ public class  MecanumDrive extends Drive {
     public void drive(boolean useEncoders, MyGamepad gamepad1, MyGamepad gamepad2, double speedFactor) {
         super.setEncoders(useEncoders);
 
-        if (isExtendo) {
+        if (isExtendo && !ivan) {
             double left = gamepad1.left_stick_y;
             double right = gamepad1.right_stick_y;
 
             driveLR(speedFactor, left, right);
+        } else if (isExtendo && ivan) {
+            double x = gamepad1.left_stick_x;
+            double y = -gamepad1.left_stick_y;
+
+            driveLRXY(speedFactor, x, y);
         } else if (tank) {
             double left = gamepad1.left_stick_y;
             double right = gamepad1.right_stick_y;
