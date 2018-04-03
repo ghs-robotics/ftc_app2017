@@ -35,6 +35,7 @@ public class TeleOpMecanum extends OpMode {
     private double aBackTime = 0;
     private boolean bLeftStick = false;
     private boolean bRightStick = false;
+    private boolean aDown = false;
 
     private boolean aA = false;
     private boolean aY = false;
@@ -334,6 +335,11 @@ public class TeleOpMecanum extends OpMode {
     private void setUpDrive() {
         drive.uTrackUpdate();
         //drive.updateRates();
+
+        if (gamepadA.dpad_down && !aDown) {
+            Drive.ivan = !Drive.ivan;
+        }
+        aDown = gamepadA.dpad_down;
 
         //First controller pushing Y - toggle extendo
         if ((gamepadA.a && !aA && gamepadA.y) || (gamepadA.y && !aY && gamepadA.a)) {

@@ -70,6 +70,7 @@ public abstract class Drive {
     public static boolean isExtendo = false;
     public static boolean crawl = false;
     public static boolean tank = false;
+    public static boolean ivan = false;
 
     //Set to false to just get outputs as telemetry
     public static boolean useMotors = true;
