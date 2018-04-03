@@ -763,17 +763,18 @@ public abstract class Drive {
     }
     private void grab() {
         //Grabs the glyph
-        if (abort) {
-            stage = GlyphPlacementSystem.Stage.RETURN2;
-            setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
-            glyph.setAboveHomeTarget();
-        }
-        if (handDropTimer.seconds() >= .5) {
+        if (handDropTimer.seconds() >= .5 || abort) {
             stage = GlyphPlacementSystem.Stage.PLACE1;
         }
     }
     private void place1() {
-        //Raises the u-track
+        //Raises the u-
+        if (abort) {
+            stage = GlyphPlacementSystem.Stage.RETURN2;
+            setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+            glyph.setAboveHomeTarget();
+            return;
+        }
         setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
         glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISED);
         if(glyph.currentY.equals(GlyphPlacementSystem.Position.RAISED)) {

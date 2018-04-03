@@ -70,8 +70,8 @@ public class  MecanumDrive extends Drive {
         speedWheel[2] = 0;
         speedWheel[3] = 0;
 
-        speedWheel[0] = y + x;
-        speedWheel[1] = y - x;
+        speedWheel[0] = y - x;
+        speedWheel[1] = y + x;
 
         //0, 1  --> 1, 1
         //0, -1 --> -1, -1
@@ -130,7 +130,7 @@ public class  MecanumDrive extends Drive {
             driveLR(speedFactor, left, right);
         } else if (isExtendo && ivan) {
             double x = gamepad1.left_stick_x;
-            double y = -gamepad1.left_stick_y;
+            double y = gamepad1.left_stick_y;
 
             driveLRXY(speedFactor, x, y);
         } else if (tank) {
