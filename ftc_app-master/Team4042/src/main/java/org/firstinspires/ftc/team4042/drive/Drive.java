@@ -762,13 +762,13 @@ public abstract class Drive {
     }
     private void grab() {
         //Grabs the glyph
-        if (handDropTimer.seconds() >= .5) {
-            stage = GlyphPlacementSystem.Stage.PLACE1;
-        }
         if (abort) {
             stage = GlyphPlacementSystem.Stage.RETURN2;
             setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             glyph.setAboveHomeTarget();
+        }
+        if (handDropTimer.seconds() >= .5) {
+            stage = GlyphPlacementSystem.Stage.PLACE1;
         }
     }
     private void place1() {

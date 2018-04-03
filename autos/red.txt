@@ -6,18 +6,16 @@ f:brace
 f:wait sec:.5
 f:center
 f:doff x:0 y:1 speed:1 target:2000 gyro:0
-f:drive x:1 y:.5 speed:1 gyro:0 target:400 time:1
+f:drive x:1 y:.7 speed:1 gyro:0 target:450 time:1
 f:open
 f:rot r:-90 speed:1 time:3
 f:drive x:0 y:1 speed:1 gyro:-90 target:1200 time:2
 f:drive x:0 y:-1 speed:1 gyro:-90 target:200 time:1
-f:rot r:-70 speed:1 time:3
-f:drive x:1 y:.57 speed:1 gyro:-70 target:2000 time:4
+f:rot r:-65 speed:1 time:3
+f:drive x:1 y:.6 speed:1 gyro:-65 target:2000 time:4
 f:brace
-f:drive x:0 y:-1 speed:1 gyro:-90 target:180
-f:drive x:1 y:0 speed:1 gyro:-90 target:350 time:1.5
-f:drive x:0 y:1 speed:1 gyro:-90 target:300 time:1
-#f:place
+f:place
+f:drive x:0 y:1 speed:1 target:300 time:1
 #f:break
 #f:driveLR l:-.6 r:-1 speed:1 target:500 intake:true
 #f:place2
