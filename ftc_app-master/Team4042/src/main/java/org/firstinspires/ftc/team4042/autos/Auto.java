@@ -136,6 +136,9 @@ public abstract class Auto extends LinearVisionOpMode {
                 case "drive":
                     autoDrive(parameters);
                     break;
+                case "motor":
+                    motorDrive(parameters);
+                    break;
                 case "doff":
                     autoDriveOff(parameters);
                     break;
@@ -205,6 +208,25 @@ public abstract class Auto extends LinearVisionOpMode {
             instruction = parser.popNext();
         }
         this.waitNew(30);
+    }
+
+    private void motorDrive(HashMap<String, String> parameters) {
+        double leftFront = parser.getParam(parameters, "0");
+        double rightFront = parser.getParam(parameters, "1");
+        double rightBack = parser.getParam(parameters, "2");
+        double leftBack = parser.getParam(parameters, "3");
+
+        double[] motors = {leftFront, rightFront, rightBack, leftBack};
+
+        double speedFactor = parser.getParam(parameters, "speedFactor", 1);
+        double time = parser.getParam(parameters, "time");
+
+        ElapsedTime timer = new ElapsedTime();
+
+        while (timer.seconds() < time) {
+            drive.setMotorPower(motors, speedFactor);
+        }
+        drive.stopMotors();
     }
 
     private void breakRobot(HashMap<String, String> parameters) {
