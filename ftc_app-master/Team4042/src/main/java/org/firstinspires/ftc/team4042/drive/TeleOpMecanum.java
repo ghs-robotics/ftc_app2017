@@ -162,6 +162,7 @@ public class TeleOpMecanum extends OpMode {
             Drive.isExtendo = false;
             Drive.crawl = false;
             Drive.tank = false;
+            Drive.ivan = false;
             runDown = false;
 
             drive.setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
@@ -494,28 +495,21 @@ public class TeleOpMecanum extends OpMode {
             drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
             drive.setVerticalDrive(-0.5);
         } else {
-            double horiz = gamepadB.right_stick_x;
-            double vertical = gamepadB.right_stick_y;
+            double horiz = gamepadB.left_stick_x;
+            double vertical = Math.pow(gamepadB.right_stick_y, 2);
             targetPos = drive.verticalDriveCurrPos();
-            if (Math.abs(vertical) < drive.DEADZONE_SIZE && Math.abs(horiz) < drive.DEADZONE_SIZE &&
-                    gamepadB.left_trigger < drive.DEADZONE_SIZE && gamepadB.right_trigger < drive.DEADZONE_SIZE) {
-                drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
-                drive.setVerticalDrivePos(targetPos);
-                drive.glyph.runToPosition(0);
-                drive.setHorizontalDrive(0);
-            }else if (Math.abs(vertical) > Math.abs(horiz)) {
+            if (Math.abs(vertical) > drive.DEADZONE_SIZE) {
                 drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 drive.setVerticalDrive(vertical);
-                drive.setHorizontalDrive(0);
-            } else if (Math.abs(horiz) > Math.abs(vertical)) {
+            } else {
                 drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
                 drive.setVerticalDrivePos(targetPos);
                 drive.glyph.runToPosition(0);
+            }
+            if (Math.abs(horiz) > drive.DEADZONE_SIZE) {
                 drive.setHorizontalDrive(horiz);
             } else {
-                drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                drive.setVerticalDrive(vertical);
-                drive.setHorizontalDrive(horiz);
+                drive.setHorizontalDrive(0);
             }
         }
         bY = gamepadB.y;
@@ -705,6 +699,7 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Manual", manual);
         telemetry.addData("Crawl", Drive.crawl);
         telemetry.addData("AI", aiPlacer);
+        telemetry.addData("Ivan Extendo Drive", Drive.ivan);
         telemetry.addData("Cryptobox", drive.cryptobox == null ? "" : drive.cryptobox.uiToString((int) cursorCount % 2 == 0));
         printNextGlyph();
         //telemetry.addData("Reject glyph", drive.cryptobox.getRejectGlyph());
