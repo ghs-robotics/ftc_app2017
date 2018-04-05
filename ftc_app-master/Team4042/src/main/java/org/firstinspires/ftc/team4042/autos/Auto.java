@@ -49,7 +49,7 @@ public abstract class Auto extends LinearVisionOpMode {
     private double startRoll;
     private double startPitch;
     private ElapsedTime intakeTimer = new ElapsedTime();
-    private int intakeCount = 0;
+    private int intakeCount = -1;
     private ElapsedTime timer = new ElapsedTime();
 
     private boolean readMark = false;
@@ -224,7 +224,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
         ElapsedTime timer = new ElapsedTime();
 
-        while (timer.seconds() < time) {
+        while (timer.seconds() < time && opModeIsActive()) {
             drive.setMotorPower(motors, speedFactor);
         }
         drive.stopMotors();
@@ -956,7 +956,7 @@ public abstract class Auto extends LinearVisionOpMode {
         }else if (intakeCount > 0 && this.intakeTimer.milliseconds() / 1000 < (C.get().getDouble("intakeForwardTime") + C.get().getDouble("intakeBackTime"))){
             drive.intakeLeft(-1);
             drive.intakeRight(-1);
-        }else if (this.intakeTimer.milliseconds() / 1000 > (C.get().getDouble("intakeForwardTime") + C.get().getDouble("intakeBackTime"))){
+        }else if (intakeCount >= 0 && this.intakeTimer.milliseconds() / 1000 > (C.get().getDouble("intakeForwardTime") + C.get().getDouble("intakeBackTime"))){
             drive.intakeLeft(0);
             drive.intakeRight(0);
             if (intakeCount > 0){

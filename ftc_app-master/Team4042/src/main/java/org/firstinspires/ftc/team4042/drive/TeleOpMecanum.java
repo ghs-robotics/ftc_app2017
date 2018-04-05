@@ -31,7 +31,7 @@ public class TeleOpMecanum extends OpMode {
     //CONTROL BOOLEANS START
     // We have these booleans so we only register a button press once.
     // You have to let go of the button and push it again to register a new event.
-    private boolean aBack = false;
+    private boolean aRight = false;
     private double aBackTime = 0;
     private boolean bLeftStick = false;
     private boolean bRightStick = false;
@@ -60,6 +60,8 @@ public class TeleOpMecanum extends OpMode {
 
     public Drive drive = new MecanumDrive(true);
     public ElapsedTime jewelTimer = new ElapsedTime();
+    public ElapsedTime nanoTime = new ElapsedTime();
+    public ElapsedTime banfTime = new ElapsedTime();
 
     private double startRoll;
     private double startPitch;
@@ -131,6 +133,8 @@ public class TeleOpMecanum extends OpMode {
             drive.glyph.setHomeTarget();
 
             adjustedSpeed = MecanumDrive.FULL_SPEED;
+
+            gyro();
         } catch (Exception ex) {
             telemetry.addData("Exception", Drive.getStackTrace(ex));
         }
@@ -190,25 +194,23 @@ public class TeleOpMecanum extends OpMode {
             telemetry.addData("winch", drive.winchOpen);
 
             //The first time you hit back, it establishes how long you've been pushing it for
-            if (gamepadA.back && !aBack) {
-                aBackTime = System.nanoTime();
-            }
+
             //If you're pushing back and have been for longer than "nano", then run the full balance code
-            if (gamepadA.back && aBack) {
-                if (System.nanoTime() - aBackTime > C.get().getDouble("nano")) {
-                    balance();
-                }
+            if (gamepadA.dpad_right && !gamepadA.a) {
+                balance();
+            } else {
+                setUpDrive();
+            }
+
+            if (gamepadA.dpad_right && gamepadA.a) {
+                onBalancingStone = false;
             }
             //If you've released back and did so for a shorter time than "nano", then toggle whether you're on the stone
-            if (!gamepadA.back && aBack) {
-                if (System.nanoTime() - aBackTime < C.get().getDouble("nano")) {
-                    onBalancingStone = !onBalancingStone;
-                }
-            }
-            aBack = gamepadA.back;
+
+            aRight = gamepadA.dpad_right;
+            telemetry.addData("back", gamepad1.back);
 
             //Adjust drive modes, speeds, etc
-            setUpDrive();
 
             if (gamepadA.right_stick_button && !aRightStick) {
                 drive.toggleVerbose();
@@ -301,6 +303,8 @@ public class TeleOpMecanum extends OpMode {
         } while (startRoll == 0 && startPitch == 0 && timer.seconds() < .5);
     }
 
+    private boolean on = false;
+
     private void balance() {
         drive.gyro.updateAngles();
         double currRoll = drive.gyro.getRoll();
@@ -308,28 +312,50 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("currRoll", currRoll);
         telemetry.addData("currPitch", currPitch);
 
-        boolean flat = Math.abs(currRoll - startRoll) < 2 && Math.abs(currPitch - startPitch) < 2;
-        boolean veryTipped = Math.abs(currRoll - startRoll) > 8 || Math.abs(currPitch - startPitch) > 8;
+        boolean flat = Math.abs(currRoll - startRoll) < 9 && Math.abs(currPitch - startPitch) < 9;
+        boolean veryFlat = Math.abs(currRoll - startRoll) < 7 && Math.abs(currPitch - startPitch) < 7;
+        //veryFlat = true;
+
         telemetry.addData("flat", flat);
+        telemetry.addData("startPitch", startPitch);
+        telemetry.addData("startRoll", startRoll);
+
         if (!onBalancingStone && !flat) {
             //If you get tipped, you must be on the balancing stone and we flag you as such
             onBalancingStone = true;
+            on = false;
+            banfTime.reset();
         } else if (!onBalancingStone && flat) {
             //If you're just getting on or you're on the ground, run back hard
-            drive.driveXYR(1, 0, -1, 0, true);
-        } else if (veryTipped) {
+            drive.driveXYR(1, 0, -1, 0, false);
+        } else if (false && banfTime.seconds() > 1) {
             //Move away from which way you're tipped (should go towards the center)
-            double y = oops*2*(Math.ceil((currRoll-startRoll)/100)-.5);
+            double x = Math.abs(startPitch - currPitch) > Math.abs(startRoll - currRoll) ? (startPitch - currPitch) > 0 ? .1 : -.1 : 0;
+            double y = Math.abs(startPitch - currPitch) < Math.abs(startRoll - currRoll) ? (startRoll - currRoll) > 0 ? .75 : -.75 : 0;
             telemetry.addData("y", y);
-            drive.driveXYR(1, 0, y, 0, true);
+            telemetry.addData("x", x);
+            drive.driveXYR(1, x, y, 0, false);
+            banfTime.reset();
+
         } else {
             //adjust
             //double degreeP = .05;
             //If you're on the balancing stone and not quite flat, then adjust
             double degreeP = C.get().getDouble("degree");
-            double x = degreeP * (startPitch - currPitch);
+            double x = 2 * degreeP * (startPitch - currPitch);
             double y = degreeP * (startRoll - currRoll);
-            drive.driveXYR(1, x, y, 0, true);
+            veryFlat = !on && veryFlat;
+            on = on || veryFlat;
+            if (on && veryFlat) {
+                banfTime.reset();
+            }
+            if (on && banfTime.seconds() < .2){
+                x = 0;
+                y = 0;
+            }
+            telemetry.addData("y", y);
+            telemetry.addData("x", x);
+            drive.driveXYR(1, x, y, 0, false);
         }
     }
 
@@ -495,8 +521,8 @@ public class TeleOpMecanum extends OpMode {
             drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
             drive.setVerticalDrive(-0.5);
         } else {
-            double horiz = gamepadB.left_stick_x;
-            double vertical = Math.pow(gamepadB.right_stick_y, 2);
+            double horiz = Math.pow(gamepadB.left_stick_x, 3);
+            double vertical = Math.pow(gamepadB.right_stick_y, 3);
             targetPos = drive.verticalDriveCurrPos();
             if (Math.abs(vertical) > drive.DEADZONE_SIZE) {
                 drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -720,6 +746,7 @@ public class TeleOpMecanum extends OpMode {
             telemetry.addData("!bRightStick && gamepadB.right_stick_button", !bRightStick && gamepadB.right_stick_button);
             telemetry.addData("extendoTimer", drive.extendoTimer.seconds());
             telemetry.addData("numGlyphsCollected", drive.cryptobox.getNumGlyphsPlaced());
+            telemetry.addData("onStone", onBalancingStone);
         }
         if (Drive.useGyro) {
             telemetry.addData("gyro", drive.gyro.updateHeading());

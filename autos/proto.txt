@@ -17,8 +17,10 @@
 #wait | waits for a number of seconds | parameters - sec
 #break | breaks the robot in half | parameters - [none]
 #ex: function:d x:1 y:.2 speed:.5 target:1000 will drive right and slightly forward at half speed for 1000 encoder ticks
-f:place
-f:wait sec:.5
+#f:place
+#f:wait sec:.5
+f:driveLR l:-1 r:-1 speed:1 target:100 intake:true
+f:driveLR l:1 r:-1 speed:1 target:70 intake:true
 f:driveLR l:-1 r:-1 speed:1 target:500 intake:true
-f:place2
-f:glyph
+#f:place2
+#f:glyph

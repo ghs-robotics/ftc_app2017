@@ -1030,12 +1030,12 @@ public abstract class Drive {
     }
 
     public void lowerBrakes() {
-        leftBrake.setPosition(.8);
+        leftBrake.setPosition(.88);
         rightBrake.setPosition(.04);
     }
 
     public void raiseBrakes() {
-        leftBrake.setPosition(0.03);
+        leftBrake.setPosition(0.19);
         rightBrake.setPosition(.75);
     }
 

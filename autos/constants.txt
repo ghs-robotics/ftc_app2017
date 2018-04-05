@@ -1,3 +1,3 @@
-ds:.01 base:.3 full:1 stop:0 magic:.8 Deriv:10 Prop:18 TransTime:1 PlaceError:25 PropRot:.008 DerivRot:-.02 time:1 degree:.05 nano:1000000000 intakeForwardTime:1 intakeBackTime:.5 returnSpeed:.75 bottomWait:.2 glyphInThreshold:13 glyphBackThreshold:9 missedCenter:.5 SensorDeriv:-6 SensorProp:-0.075 BangTimer:.25 mulch:2 SensorTimeout:4 threshold:1.05 colorReadTimer:.7
+ds:.01 base:.3 full:1 stop:0 magic:.8 Deriv:10 Prop:18 TransTime:1 PlaceError:25 PropRot:.008 DerivRot:-.02 time:1 degree:.05 nano:100 intakeForwardTime:1 intakeBackTime:.5 returnSpeed:.75 bottomWait:.2 glyphInThreshold:13 glyphBackThreshold:9 missedCenter:.5 SensorDeriv:-6 SensorProp:-0.075 BangTimer:.25 mulch:2 SensorTimeout:4 threshold:1.05 colorReadTimer:.7
 #We only read the first line of this file
 #To view the whole line in Notepad++, go to View/Word wrap
