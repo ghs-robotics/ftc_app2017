@@ -166,7 +166,7 @@ public class TeleOpMecanum extends OpMode {
             Drive.isExtendo = false;
             Drive.crawl = false;
             Drive.tank = false;
-            Drive.ivan = false;
+            Drive.ivan = true;
             runDown = false;
 
             drive.setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());

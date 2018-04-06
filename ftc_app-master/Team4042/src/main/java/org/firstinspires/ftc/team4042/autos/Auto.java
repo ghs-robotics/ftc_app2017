@@ -122,7 +122,7 @@ public abstract class Auto extends LinearVisionOpMode {
         Drive.isExtendo = false;
         Drive.crawl = false;
         Drive.tank = false;
-        Drive.ivan = false;
+        Drive.ivan = true;
 
         timer.reset();
 
@@ -258,7 +258,9 @@ public abstract class Auto extends LinearVisionOpMode {
 
         while (opModeIsActive()) {
             while (opModeIsActive() && !drive.collectGlyphStep());
-            while (opModeIsActive() && !drive.driveLRWithEncoders(-.6, -1, 1, 500, 1));
+            while (opModeIsActive() && !drive.driveLRWithEncoders(-1, -1, 1, 100, 1));
+            while (opModeIsActive() && !drive.driveLRWithEncoders(1, -1, 1, 100, 1));
+            while (opModeIsActive() && !drive.driveLRWithEncoders(-1, -1, 1, 500, 1));
         }
     }
 
