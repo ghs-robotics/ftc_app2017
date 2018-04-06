@@ -833,7 +833,10 @@ public abstract class Drive {
     }
     private void release() {
         //Lets go of the hand
-        if (handDropTimer.seconds() >= .5 || abort) {
+        double wait = glyph.uiTargetY == 0 ? 1 : .5;
+        //telemetry.log().add("wait: " + wait);
+
+        if (handDropTimer.seconds() >= wait || abort) {
             glyph.setTargetPosition(GlyphPlacementSystem.Position.RAISEDBACK);
             if (glyph.currentY.equals(GlyphPlacementSystem.Position.RAISEDBACK)) {
                 stage = GlyphPlacementSystem.Stage.PAUSE2;
