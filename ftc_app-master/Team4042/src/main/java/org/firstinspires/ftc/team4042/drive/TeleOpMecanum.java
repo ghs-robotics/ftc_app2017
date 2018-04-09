@@ -206,13 +206,10 @@ public class TeleOpMecanum extends OpMode {
             aRight = gamepadA.dpad_right;
             telemetry.addData("back", gamepad1.back);
 
-<<<<<<< HEAD
             //Adjust drive modes, speeds, etc
 
             /*if (gamepadA.right_stick_button && !aRightStick) {
-=======
             if (gamepadA.right_stick_button && !aRightStick) {
->>>>>>> a2760094a04555692b959734c2d431819b3f87bc
                 drive.toggleVerbose();
             }
             aRightStick = gamepadA.right_stick_button;*/
