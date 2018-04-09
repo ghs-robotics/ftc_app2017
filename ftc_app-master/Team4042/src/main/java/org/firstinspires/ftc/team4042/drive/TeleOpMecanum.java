@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.team4042.autos.C;
 import org.firstinspires.ftc.team4042.sensor.AnalogSensor;
-import org.opencv.core.Mat;
 
 @TeleOp(name = "Mecanum", group="drive")
 public class TeleOpMecanum extends OpMode {
@@ -62,6 +61,7 @@ public class TeleOpMecanum extends OpMode {
     public ElapsedTime jewelTimer = new ElapsedTime();
     public ElapsedTime nanoTime = new ElapsedTime();
     public ElapsedTime banfTime = new ElapsedTime();
+    private ElapsedTime driveOutTopTimer = new ElapsedTime();
 
     private double startRoll;
     private double startPitch;
@@ -146,6 +146,9 @@ public class TeleOpMecanum extends OpMode {
         offParams = cam.getParameters();
         offParams.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
         jewelTimer.reset();
+
+        Drive.useSideLimits = true;
+        Drive.top = false;
     }
 
     @Override
@@ -186,13 +189,6 @@ public class TeleOpMecanum extends OpMode {
             }
             aUp = gamepadA.dpad_up;
 
-            if (gamepadA.left_stick_button && !aLeftStick) {
-                drive.toggleWinch();
-            }
-            aLeftStick = gamepadA.left_stick_button;
-
-            telemetry.addData("winch", drive.winchOpen);
-
             //The first time you hit back, it establishes how long you've been pushing it for
 
             //If you're pushing back and have been for longer than "nano", then run the full balance code
@@ -210,9 +206,13 @@ public class TeleOpMecanum extends OpMode {
             aRight = gamepadA.dpad_right;
             telemetry.addData("back", gamepad1.back);
 
+<<<<<<< HEAD
             //Adjust drive modes, speeds, etc
 
             /*if (gamepadA.right_stick_button && !aRightStick) {
+=======
+            if (gamepadA.right_stick_button && !aRightStick) {
+>>>>>>> a2760094a04555692b959734c2d431819b3f87bc
                 drive.toggleVerbose();
             }
             aRightStick = gamepadA.right_stick_button;*/
@@ -221,7 +221,9 @@ public class TeleOpMecanum extends OpMode {
             intakes();
 
             //Targets the AI's ui and (possibly) sets a glyph color override
-            aiUi();
+            if (!Drive.top) {
+                aiUi();
+            }
 
             //Runs the glyph placer
             glyphPlacer();
@@ -229,11 +231,6 @@ public class TeleOpMecanum extends OpMode {
             //Blinks the flashlight, if needed
             blink();
 
-            /*if (gamepadB.dpad_up && gamepadB.b && !bUp) {
-                error += 20;
-            } else if (gamepadB.dpad_down && gamepadB.b && !bDown) {
-                error -= 20;
-            }*/
             error = Range.clip(error, 0, 200);
             telemetry.addData("error", error);
 
@@ -373,18 +370,32 @@ public class TeleOpMecanum extends OpMode {
             drive.gyro.setAdjust(-drive.gyro.getHeading());
         }
 
+        if (gamepadA.left_stick_button && !aLeftStick && !Drive.top) {
+            if (!Drive.top) {
+                drive.toggleWinch();
+            } else {
+                driveOutTopTimer.reset();
+            }
+        }
+        //First controller's left stick drives the robot forwards a set amount
+        else if (gamepadA.left_stick_button && aLeftStick && Drive.top && driveOutTopTimer.seconds() < C.get().getDouble("driveOutTime")) {
+            double[] forwardArray = {1, 1, 1, 1};
+            drive.setMotorPower(forwardArray, 1);
+        }
         //First controller pushing Y - toggle extendo
-        if ((gamepadA.a && !aA && gamepadA.y) || (gamepadA.y && !aY && gamepadA.a)) {
+        else if ((gamepadA.a && !aA && gamepadA.y) || (gamepadA.y && !aY && gamepadA.a && !Drive.top)) {
             drive.toggleServoExtendo();
-        } else if (gamepadA.y && !aY && !gamepadA.a) {
+        } else if (gamepadA.y && !aY && !gamepadA.a && !Drive.top) {
             drive.toggleExtendo();
-        } else if (gamepadA.y) {
+        } else if (gamepadA.y && !Drive.top) {
             drive.extendoStep();
         } else {
             //Drives the robot
             drive.drive(false, gamepadA, gamepadB, adjustedSpeed * MecanumDrive.FULL_SPEED);
         }
+        aLeftStick = gamepadA.left_stick_button;
         aY = gamepadA.y;
+        telemetry.addData("winch", drive.winchOpen);
 
         //The X button on the first controller - toggle crawling to let us adjust the back of the robot too
         if (gamepadA.x && !aX) {
@@ -454,7 +465,7 @@ public class TeleOpMecanum extends OpMode {
         if (manual) {
             runManualPlacer();
         }
-        else {
+        else if (!Drive.top) {
             //Glyph locate
             if (aiPlacer) {
                 runAiPlacer();
@@ -464,6 +475,8 @@ public class TeleOpMecanum extends OpMode {
             if (!drive.stage.equals(GlyphPlacementSystem.Stage.RESET)){
                 drive.glyph.runToPosition(0, error);
             }
+        } else {
+            glyphTopDrive();
         }
     }
 
@@ -529,7 +542,7 @@ public class TeleOpMecanum extends OpMode {
             double horiz = Math.pow(gamepadB.left_stick_x, 3);
             double vertical = Math.pow(gamepadB.right_stick_y, 3);
             targetPos = drive.verticalDriveCurrPos();
-            if (Math.abs(vertical) > drive.DEADZONE_SIZE) {
+            if (Math.abs(vertical) > Drive.DEADZONE_SIZE) {
                 drive.setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 drive.setVerticalDrive(vertical);
             } else {
@@ -537,7 +550,7 @@ public class TeleOpMecanum extends OpMode {
                 drive.setVerticalDrivePos(targetPos);
                 drive.glyph.runToPosition(0);
             }
-            if (Math.abs(horiz) > drive.DEADZONE_SIZE) {
+            if (Math.abs(horiz) > Drive.DEADZONE_SIZE) {
                 drive.setHorizontalDrive(horiz);
             } else {
                 drive.setHorizontalDrive(0);
@@ -594,6 +607,32 @@ public class TeleOpMecanum extends OpMode {
             drive.uTrack();
         }
     }
+
+    private void glyphTopDrive() {
+        int targetY = gamepadB.x ? 0 : (gamepadB.y ? 1 : (gamepadB.b ? 2 : -1));
+        if (targetY != 1 && !bX && !bY && !bB) {
+            //If you push the button, the first time, it runs the glyph placer
+            drive.glyph.uiTarget(1, targetY);
+            drive.glyphLocate();
+            drive.uTrack();
+        } else if (targetY != 1 && drive.stage != GlyphPlacementSystem.Stage.RETURN1 && drive.stage != GlyphPlacementSystem.Stage.RELEASE) {
+            //On RETURN1 and RELEASE, the hand opens, so we stop here until you explicitly push the button again
+            drive.uTrack();
+        }
+        //Returns automatically once the center limit switch is hit
+        else if ((drive.stage.equals(GlyphPlacementSystem.Stage.RELEASE) || drive.stage.equals(GlyphPlacementSystem.Stage.PAUSE2) ||
+                    drive.stage.equals(GlyphPlacementSystem.Stage.RETURN2)) && drive.getCenterState()) {
+            drive.uTrack();
+        }
+
+        double horiz = Math.pow(gamepadB.left_stick_x, 3);
+        if (Math.abs(horiz) > Drive.DEADZONE_SIZE) {
+            drive.setHorizontalDrive(horiz);
+        } else {
+            drive.setHorizontalDrive(0);
+        }
+    }
+
     private void glyphTarget() {
         int targetX = gamepadB.x ? 0 : (gamepadB.y ? 1 : (gamepadB.b ? 2 : -1));
         int targetY = gamepadB.dpad_up ? 0 : (gamepadB.dpad_left || gamepadB.dpad_right ? 1 : (gamepadB.dpad_down ? 2 : -1));

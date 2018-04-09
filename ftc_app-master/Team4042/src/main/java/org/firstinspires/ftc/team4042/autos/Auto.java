@@ -123,6 +123,8 @@ public abstract class Auto extends LinearVisionOpMode {
         Drive.crawl = false;
         Drive.tank = false;
         Drive.ivan = true;
+        Drive.useSideLimits = true;
+        Drive.top = false;
 
         timer.reset();
 
