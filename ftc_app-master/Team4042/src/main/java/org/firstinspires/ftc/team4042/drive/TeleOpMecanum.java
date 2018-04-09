@@ -204,7 +204,7 @@ public class TeleOpMecanum extends OpMode {
             //If you've released back and did so for a shorter time than "nano", then toggle whether you're on the stone
 
             aRight = gamepadA.dpad_right;
-            telemetry.addData("back", gamepad1.back);
+            //telemetry.addData("back", gamepad1.back);
 
             //Adjust drive modes, speeds, etc
 

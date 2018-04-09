@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.team4042.testops;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -9,7 +10,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 /**
  * Created by Hazel on 10/30/2017.
  */
-@TeleOp(name="CR Servo Test", group="testops")
+@Autonomous(name="CR Servo Test", group="testops")
 public class CRServoTest extends OpMode {
 
     private CRServo crServo;

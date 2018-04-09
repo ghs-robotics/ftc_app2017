@@ -10,7 +10,7 @@ import org.firstinspires.ftc.team4042.drive.MecanumDrive;
  * Gets all the data from a gyro and prints it to telemetry
  */
 @Autonomous(name="Rev_Gyro_test", group="testops")
-//@Disabled
+@Disabled
 public class RevGyroTest extends LinearOpMode {
 
     private MecanumDrive drive = new MecanumDrive(true);

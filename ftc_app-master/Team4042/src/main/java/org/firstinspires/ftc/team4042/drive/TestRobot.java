@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.team4042.drive;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -15,6 +16,7 @@ import java.util.Queue;
  */
 
 @Autonomous(name = "TestRobot", group = "Drive")
+@Disabled
 public class TestRobot extends LinearOpMode{
 
     private Drive drive = new MecanumDrive();

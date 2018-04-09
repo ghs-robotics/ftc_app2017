@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.team4042.testops;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
@@ -13,6 +14,7 @@ import java.util.HashMap;
  */
 
 @Autonomous(name="Vu Mark Test Auto", group="testops")
+@Disabled
 public class AutoVuMarkTest extends LinearOpMode{
 
     private VuMarkIdentifier vuMarkIdentifier;
