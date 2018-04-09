@@ -64,13 +64,15 @@ public abstract class Drive {
     //Use gyro - true/false
     public static boolean useGyro = false;
 
-    public static final boolean useSideLimits = true;
+    public static boolean useSideLimits = true;
 
     //Whether the robot is attached to itself or not
     public static boolean isExtendo = false;
     public static boolean crawl = false;
     public static boolean tank = false;
     public static boolean ivan = true;
+
+    public static boolean top = false;
 
     //Set to false to just get outputs as telemetry
     public static boolean useMotors = true;
@@ -832,7 +834,7 @@ public abstract class Drive {
         stage = GlyphPlacementSystem.Stage.RELEASE;
     }
     private void release() {
-        //Lets go of the hand
+        //Waits for the hand
         double wait = glyph.uiTargetY == 0 ? 1 : .5;
         //telemetry.log().add("wait: " + wait);
 
