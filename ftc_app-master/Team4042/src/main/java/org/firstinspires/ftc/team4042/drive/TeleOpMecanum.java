@@ -212,10 +212,10 @@ public class TeleOpMecanum extends OpMode {
 
             //Adjust drive modes, speeds, etc
 
-            if (gamepadA.right_stick_button && !aRightStick) {
+            /*if (gamepadA.right_stick_button && !aRightStick) {
                 drive.toggleVerbose();
             }
-            aRightStick = gamepadA.right_stick_button;
+            aRightStick = gamepadA.right_stick_button;*/
 
             //Runs the intakes
             intakes();
@@ -367,6 +367,11 @@ public class TeleOpMecanum extends OpMode {
             Drive.ivan = !Drive.ivan;
         }
         aDown = gamepadA.dpad_down;
+
+        drive.gyro.updateHeading();
+        if (gamepadA.dpad_left && gamepadA.right_stick_button) {
+            drive.gyro.setAdjust(-drive.gyro.getHeading());
+        }
 
         //First controller pushing Y - toggle extendo
         if ((gamepadA.a && !aA && gamepadA.y) || (gamepadA.y && !aY && gamepadA.a)) {

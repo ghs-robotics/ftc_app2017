@@ -618,7 +618,7 @@ public abstract class Drive {
         switch (dStage){
             case BACK:{
                 if (driveLRWithEncoders(1, 1, 1, 250, 1)){
-                    targetTick = random(50, 400);
+                    targetTick = random(50, 200);
                     dirRight = !dirRight;
                     dStage = DanceStage.TRANS;
                     resetEncoders();

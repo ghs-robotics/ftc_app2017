@@ -1,7 +1,12 @@
+f:getmark
 f:knockr
 f:wait sec:.5
 f:up
-#f:brace
-f:wait sec:1
+f:brace
+f:wait sec:.5
+f:center
 f:doff x:0 y:1 speed:1 target:2000 gyro:0
-f:drive x:1 y:1 speed:1 target:1000
+f:align y:.5 speed:1 gyro:0 color:r time:5 lPos:98 cPos:80 rPos:62
+f:align y:1 speed:1 gyro:0 color:r time:5 lPos:98 cPos:80 rPos:62
+f:aligh y:-1 speed:1 gyro:0 color:r time:5 lPos:98 cPos:80 rPos:62
+

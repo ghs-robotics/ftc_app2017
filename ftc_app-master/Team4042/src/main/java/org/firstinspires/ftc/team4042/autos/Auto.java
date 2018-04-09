@@ -265,19 +265,62 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void alignHorizontally(HashMap<String, String> parameters) {
-        double prevMiddle = drive.shortIr[0].getCmAvg();
-        double currMiddle;
-        do {
-            currMiddle = drive.shortIr[0].getCmAvg();
-            if (Math.abs(prevMiddle - currMiddle) > 2) { //Moved too far left
-                drive.driveXYR(.5, 1, 0, 0, false); //Move back right
-            } else {
-                drive.driveXYR(.5, -1, 0, 0, false); //Move left
-            }
-        } while (drive.shortIr[1].getCmAvg() > 15 && drive.shortIr[2].getCmAvg() > 15 && opModeIsActive());
+        double speed = parser.getParam(parameters, "speed");
+        boolean isRed = parameters.get("color").equalsIgnoreCase("r");
+        AnalogSensor sonar = isRed ? drive.sonar[0] : drive.sonar[1];
+        double y = parameters.containsKey("y") ? parser.getParam(parameters,"y") : 0;
+        double targetGyro = parser.getParam(parameters, "gyro");
+        double time = parameters.containsKey("time") ? parser.getParam(parameters, "time") : -1;
 
-        //When they're both non-infinite readings, stop
+        double left = parser.getParam(parameters, "lPos");
+        double center = parser.getParam(parameters, "cPos");
+        double right = parser.getParam(parameters, "rPos");
+        double dist = vuMark.equals(RelicRecoveryVuMark.LEFT) ? left : vuMark.equals(RelicRecoveryVuMark.RIGHT) ? right : center;
+
+        double xCurrDistance;
+        double yCurrDistance;
+        int i = 0;
+        while (i < AnalogSensor.NUM_OF_READINGS && opModeIsActive()) {
+            //read the IRs just to set them up
+            sonar.addReading();
+            i++;
+        }
+
+        ElapsedTime timeout = new ElapsedTime();
+        timeout.reset();
+
+        do {
+            drive.updateRates();
+
+            double r = drive.useGyro(targetGyro)/* * .75 + 5 * drive.gyroRate*/;
+            r = r < .05 && r > 0 ? 0 : r;
+            r = r > -.05 && r < 0 ? 0 : r;
+
+            //Get the distances and derivative terms
+            xCurrDistance = sonar.getCmAvg();
+            double xDerivValue = isRed ? drive.sonarRates[0] : drive.sonarRates[1];
+
+            //Set up the derivative and proportional terms
+            double xDeriv = xDerivValue * 10;
+            double xProportional = (xCurrDistance - dist) * .025;
+
+            //Apply the controller
+            double xFactor = (xProportional + xDeriv);
+            telemetry.addData("xIr cm", xCurrDistance);
+            telemetry.addData("x", xFactor);
+            telemetry.addData("r", r);
+            telemetry.update();
+
+            xFactor = Range.clip(xFactor, -1, 1);
+            r = Range.clip(r, -1, 1);
+
+            drive.runWithoutEncoders();
+            drive.driveXYR(1, xFactor * 4.5, y, r, false);
+        } while (((Math.abs(dist - xCurrDistance) > 2)) && (time < 0 || timeout.seconds() < time) && opModeIsActive());
+
+        //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
         drive.stopMotors();
+        drive.runWithEncoders();
     }
 
     public String getBallColor(Mat frame){
