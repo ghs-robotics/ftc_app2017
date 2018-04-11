@@ -364,8 +364,11 @@ public class TeleOpMecanum extends OpMode {
 
         drive.gyro.updateHeading();
         if (gamepadA.dpad_left && gamepadA.right_stick_button) {
-            drive.gyro.setAdjust(-drive.gyro.getHeading());
+            drive.gyro.setAdjust(-drive.gyro.rawHeading());
         }
+
+        telemetry.addData("heading", drive.gyro.getHeading());
+        telemetry.addData("adjust", drive.gyro.getAdjust());
 
         if (gamepadA.left_stick_button && !aLeftStick && !Drive.top) {
             if (!Drive.top) {

@@ -89,6 +89,22 @@ public class RevGyro {
         pitch = angles.thirdAngle;
     }
 
+    public double rawHeading() {
+        double head = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+        while (head > 180) {
+            head -= 360;
+        }
+        while (head < -180) {
+            head += 360;
+        }
+        return head;
+    }
+
+    public double getAdjust() {
+        return adjust;
+    }
+
+
     /**
      * Updates status
      */
