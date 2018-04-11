@@ -2,6 +2,7 @@ package org.firstinspires.ftc.team4042.drive;
 
 import android.hardware.Camera;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -10,6 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.team4042.autos.C;
 
 @TeleOp(name = "CryptoboxTest", group="drive")
+@Disabled
 public class CryptoboxTest extends OpMode {
 
     private Cryptobox cryptobox;

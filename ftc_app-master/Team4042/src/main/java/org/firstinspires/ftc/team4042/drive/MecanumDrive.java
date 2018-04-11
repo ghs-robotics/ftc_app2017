@@ -143,6 +143,10 @@ public class  MecanumDrive extends Drive {
             double y = -gamepad1.left_stick_y; //Y is the opposite direction of what's intuitive: forward is -1, backwards is 1
             double r = gamepad1.right_stick_x;
 
+            if (!gamepad1.dpad_left && gamepad1.right_stick_button) {
+                r = useGyro(0);
+            }
+
             driveXYR(speedFactor, x, y, r, useGyro);
         }
     }

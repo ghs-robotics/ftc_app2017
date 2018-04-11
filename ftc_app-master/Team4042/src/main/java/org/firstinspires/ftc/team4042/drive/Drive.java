@@ -620,7 +620,7 @@ public abstract class Drive {
         switch (dStage){
             case BACK:{
                 if (driveLRWithEncoders(1, 1, 1, 250, 1)){
-                    targetTick = random(50, 400);
+                    targetTick = random(50, 200);
                     dirRight = !dirRight;
                     dStage = DanceStage.TRANS;
                     resetEncoders();
@@ -705,7 +705,8 @@ public abstract class Drive {
             this.color = color;
             uTrack();
         } //Runs the u-track to above-home (useful for switching out of manual)
-        else if(uTrackAtBottom && !(Math.abs(gamepad2.right_stick_y) > .5) && verticalDriveTargetPos() != GlyphPlacementSystem.Position.HOME.getEncoderVal()) {
+        else if(uTrackAtBottom && !(Math.abs(gamepad2.right_stick_y) > .5) &&
+                verticalDriveTargetPos() != GlyphPlacementSystem.Position.HOME.getEncoderVal()) {
             setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
             glyph.runToPosition(0);
@@ -740,12 +741,15 @@ public abstract class Drive {
         //Moves the u-track down onto the glyph
         boolean currBottom = getBottomState();
         uTrackAtBottom = false;
+        abort = false;
 
         if(!currBottom) {
             setVerticalDriveMode(DcMotor.RunMode.RUN_USING_ENCODER);
             setVerticalDrive(-1);
         } else {
-            resetUTrack();
+            //resetUTrack();
+            stage = GlyphPlacementSystem.Stage.HOME;
+            setVerticalDrivePos(GlyphPlacementSystem.Position.HOME.getEncoderVal());
         }
     }
 
@@ -758,14 +762,16 @@ public abstract class Drive {
         jewelOut();
         handDropTimer.reset();
 
-        glyph.currentY = GlyphPlacementSystem.Position.HOME;
-        glyph.currentX = GlyphPlacementSystem.HorizPos.CENTER;
-
         stage = GlyphPlacementSystem.Stage.GRAB;
     }
     private void grab() {
         //Grabs the glyph
         if (handDropTimer.seconds() >= .5 || abort) {
+            resetUTrack();
+
+            glyph.currentY = GlyphPlacementSystem.Position.HOME;
+            glyph.currentX = GlyphPlacementSystem.HorizPos.CENTER;
+
             stage = GlyphPlacementSystem.Stage.PLACE1;
         }
     }
@@ -813,6 +819,7 @@ public abstract class Drive {
         //telemetry.log().add("targetX: " + targetX);
         if(glyph.horizontalTimer.seconds() > .3 && glyph.xTargetReached(targetX, abort, true)) {
             stage = GlyphPlacementSystem.Stage.PLACE2;
+            handDropTimer.reset();
         }
     }
     private void place2() {
@@ -821,7 +828,7 @@ public abstract class Drive {
             stage = GlyphPlacementSystem.Stage.RETURN1;
         } else {
             glyph.setTargetPosition(targetY);
-            if (glyph.currentY.equals(targetY) || abort) {
+            if (glyph.currentY.equals(targetY) || abort || handDropTimer.seconds() > 2) {
                 stage = GlyphPlacementSystem.Stage.RETURN1;
             }
         }
@@ -872,8 +879,9 @@ public abstract class Drive {
 
     public void resetUTrack() {
         //Resets the utrack
-        stage = GlyphPlacementSystem.Stage.HOME;
+        stage = GlyphPlacementSystem.Stage.PLACE1;
         setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
     /**

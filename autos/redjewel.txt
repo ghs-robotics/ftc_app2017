@@ -1,5 +1,6 @@
-f:knockb
-f:wait sec:2
+f:knockr
+f:wait sec:.5
 f:up
-f:wait sec:2
+#f:brace
+f:wait sec:.5
 f:center

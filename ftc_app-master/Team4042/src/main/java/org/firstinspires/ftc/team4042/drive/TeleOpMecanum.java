@@ -204,12 +204,15 @@ public class TeleOpMecanum extends OpMode {
             //If you've released back and did so for a shorter time than "nano", then toggle whether you're on the stone
 
             aRight = gamepadA.dpad_right;
-            telemetry.addData("back", gamepad1.back);
+            //telemetry.addData("back", gamepad1.back);
 
+            //Adjust drive modes, speeds, etc
+
+            /*if (gamepadA.right_stick_button && !aRightStick) {
             if (gamepadA.right_stick_button && !aRightStick) {
                 drive.toggleVerbose();
             }
-            aRightStick = gamepadA.right_stick_button;
+            aRightStick = gamepadA.right_stick_button;*/
 
             //Runs the intakes
             intakes();
@@ -358,6 +361,14 @@ public class TeleOpMecanum extends OpMode {
             Drive.ivan = !Drive.ivan;
         }
         aDown = gamepadA.dpad_down;
+
+        drive.gyro.updateHeading();
+        if (gamepadA.dpad_left && gamepadA.right_stick_button) {
+            drive.gyro.setAdjust(-drive.gyro.rawHeading());
+        }
+
+        telemetry.addData("heading", drive.gyro.getHeading());
+        telemetry.addData("adjust", drive.gyro.getAdjust());
 
         if (gamepadA.left_stick_button && !aLeftStick && !Drive.top) {
             if (!Drive.top) {

@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.team4042.testops;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -56,7 +57,7 @@ import org.firstinspires.ftc.team4042.sensor.DigitalSensor;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Whisker test", group="testops")
+@Autonomous(name="Whisker test", group="testops")
 public class DigitalSensorTest extends OpMode
 {
     /*private DigitalChannel whisker;
