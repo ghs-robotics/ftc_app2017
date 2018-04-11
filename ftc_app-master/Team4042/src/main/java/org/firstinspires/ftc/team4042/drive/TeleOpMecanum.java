@@ -598,14 +598,14 @@ public class TeleOpMecanum extends OpMode {
     }
 
     private void glyphTopDrive() {
-        int targetY = gamepadB.x ? 0 : (gamepadB.y ? 1 : (gamepadB.b ? 2 : -1));
-        if (targetY != 1 && !bX && !bY && !bB) {
+        int targetY = gamepadB.dpad_up ? 0 : (gamepadB.dpad_left || gamepadB.dpad_right ? 1 : (gamepadB.dpad_down ? 2 : -1));
+        if (targetY != 1 && !bRight && !bLeft && !bUp && !bDown) {
             //If you push the button, the first time, it runs the glyph placer
             drive.glyph.uiTarget(1, targetY);
             drive.glyphLocate();
             drive.uTrack();
-        } else if (targetY != 1 && drive.stage != GlyphPlacementSystem.Stage.RETURN1 && drive.stage != GlyphPlacementSystem.Stage.RELEASE) {
-            //On RETURN1 and RELEASE, the hand opens, so we stop here until you explicitly push the button again
+        } else if (targetY != 1 && drive.stage != GlyphPlacementSystem.Stage.RETURN1) {
+            //On RETURN1, the hand opens, so we stop here until you explicitly push the button again
             drive.uTrack();
         }
         //Returns automatically once the center limit switch is hit
