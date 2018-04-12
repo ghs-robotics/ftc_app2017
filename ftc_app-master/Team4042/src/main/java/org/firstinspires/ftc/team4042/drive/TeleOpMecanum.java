@@ -74,6 +74,7 @@ public class TeleOpMecanum extends OpMode {
     private ElapsedTime blinkTimer = new ElapsedTime();
     private boolean runDown = false;
     private boolean movingUp = false;
+    private boolean driveOut = false;
 
     private int[] greyBrown = new int[] {0, 0};
 
@@ -120,6 +121,7 @@ public class TeleOpMecanum extends OpMode {
     @Override
     public void init() {
         try {
+            driveOutTopTimer.reset();
             drive.initialize(telemetry, hardwareMap);
             drive.runWithEncoders();
             drive.initializeGyro(telemetry, hardwareMap);
@@ -357,7 +359,7 @@ public class TeleOpMecanum extends OpMode {
         drive.uTrackUpdate();
         //drive.updateRates();
 
-        if (gamepadA.dpad_down && !aDown) {
+        if (gamepadA.dpad_down && !aDown  && !Drive.top) {
             Drive.ivan = !Drive.ivan;
         }
         aDown = gamepadA.dpad_down;
@@ -370,18 +372,24 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("heading", drive.gyro.getHeading());
         telemetry.addData("adjust", drive.gyro.getAdjust());
 
-        if (gamepadA.left_stick_button && !aLeftStick && !Drive.top) {
+        if (gamepadA.left_stick_button && !aLeftStick) {
             if (!Drive.top) {
                 drive.toggleWinch();
             } else {
                 driveOutTopTimer.reset();
+                driveOut = true;
+                drive.resetEncoders();
+                drive.runWithEncoders();
             }
         }
         //First controller's left stick drives the robot forwards a set amount
-        else if (gamepadA.left_stick_button && aLeftStick && Drive.top && driveOutTopTimer.seconds() < C.get().getDouble("driveOutTime")) {
+        /*else if (gamepadA.left_stick_button && aLeftStick && Drive.top && driveOutTopTimer.seconds() < C.get().getDouble("driveOutTime")) {
             double[] forwardArray = {1, 1, 1, 1};
             drive.setMotorPower(forwardArray, 1);
-        }
+        }*/
+
+
+
         //First controller pushing Y - toggle extendo
         else if ((gamepadA.a && !aA && gamepadA.y) || (gamepadA.y && !aY && gamepadA.a && !Drive.top)) {
             drive.toggleServoExtendo();
@@ -389,6 +397,10 @@ public class TeleOpMecanum extends OpMode {
             drive.toggleExtendo();
         } else if (gamepadA.y && !Drive.top) {
             drive.extendoStep();
+        } else if (driveOut && !drive.driveWithEncoders(new Direction(0, 1), 1, 150, false, 0, 1)) {
+            driveOut = false;
+            drive.resetEncoders();
+            drive.runWithoutEncoders();
         } else {
             //Drives the robot
             drive.drive(false, gamepadA, gamepadB, adjustedSpeed * MecanumDrive.FULL_SPEED);
@@ -398,7 +410,7 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("winch", drive.winchOpen);
 
         //The X button on the first controller - toggle crawling to let us adjust the back of the robot too
-        if (gamepadA.x && !aX) {
+        if (gamepadA.x && !aX && !Drive.top) {
             Drive.crawl = !Drive.crawl;
             if (Drive.crawl) {
                 drive.freezeBack();
@@ -408,7 +420,7 @@ public class TeleOpMecanum extends OpMode {
         }
         aX = gamepadA.x;
 
-        if (gamepadA.b && !aB) {
+        if (gamepadA.b && !aB && !Drive.top) {
             Drive.tank = !Drive.tank;
         }
         aB = gamepadA.b;
