@@ -51,6 +51,8 @@ public abstract class Auto extends LinearVisionOpMode {
     private ElapsedTime intakeTimer = new ElapsedTime();
     private int intakeCount = -1;
     private ElapsedTime timer = new ElapsedTime();
+    private ElapsedTime colorTime = new ElapsedTime();
+    private double colorV = 100;
 
     private boolean readMark = false;
     private boolean done = true;
@@ -107,6 +109,7 @@ public abstract class Auto extends LinearVisionOpMode {
     public void runAuto() {
         //vuMarkIdentifier.initialize(telemetry, hardwareMap);
 
+        timer.reset();
         log.add("running auto");
         gyro();
 
@@ -126,7 +129,7 @@ public abstract class Auto extends LinearVisionOpMode {
         Drive.useSideLimits = true;
         Drive.top = false;
 
-        timer.reset();
+
 
         //Reads each instruction and acts accordingly
         AutoInstruction instruction = parser.popNext();
@@ -204,6 +207,9 @@ public abstract class Auto extends LinearVisionOpMode {
                 case "place2":
                     place2(parameters);
                     break;
+                case "placeFront":
+                    placeInFront(parameters);
+                    break;
                 default:
                     System.err.println("Unknown function called from file " + parser.getFile());
                     break;
@@ -260,8 +266,8 @@ public abstract class Auto extends LinearVisionOpMode {
 
         while (opModeIsActive()) {
             while (opModeIsActive() && !drive.collectGlyphStep());
-            while (opModeIsActive() && !drive.driveLRWithEncoders(-1, -1, 1, 100, 1));
-            while (opModeIsActive() && !drive.driveLRWithEncoders(1, -1, 1, 100, 1));
+            //while (opModeIsActive() && !drive.driveLRWithEncoders(-1, -1, 1, 100, 1));
+            //while (opModeIsActive() && !drive.driveLRWithEncoders(-1, 1, 1, 70, 1));
             while (opModeIsActive() && !drive.driveLRWithEncoders(-1, -1, 1, 500, 1));
         }
     }
@@ -269,7 +275,7 @@ public abstract class Auto extends LinearVisionOpMode {
     public void alignHorizontally(HashMap<String, String> parameters) {
         double speed = parser.getParam(parameters, "speed");
         boolean isRed = parameters.get("color").equalsIgnoreCase("r");
-        AnalogSensor sonar = isRed ? drive.sonar[0] : drive.sonar[1];
+        AnalogSensor sonar = isRed ? drive.sonar[1] : drive.sonar[0];
         double y = parameters.containsKey("y") ? parser.getParam(parameters,"y") : 0;
         double targetGyro = parser.getParam(parameters, "gyro");
         double time = parameters.containsKey("time") ? parser.getParam(parameters, "time") : -1;
@@ -279,7 +285,11 @@ public abstract class Auto extends LinearVisionOpMode {
         double center = parser.getParam(parameters, "cPos");
         double right = parser.getParam(parameters, "rPos");
         vuMark = vuMark.equals(RelicRecoveryVuMark.UNKNOWN) ? RelicRecoveryVuMark.CENTER : vuMark;
-        double dist = vuMark.equals(RelicRecoveryVuMark.LEFT) ? left : vuMark.equals(RelicRecoveryVuMark.RIGHT) ? right : center;
+        double dist = /*vuMark.equals(RelicRecoveryVuMark.LEFT) ? left : vuMark.equals(RelicRecoveryVuMark.RIGHT) ? right : */center;
+
+        drive.stopMotors();
+        drive.resetEncoders();
+        drive.runWithEncoders();
 
         double xCurrDistance;
         int i = 0;
@@ -295,41 +305,46 @@ public abstract class Auto extends LinearVisionOpMode {
         do {
             drive.updateRates();
 
-            double r = drive.useGyro(targetGyro)/* * .75 + 5 * drive.gyroRate*/;
+            double r = drive.useGyro(targetGyro) * .75 + 5 * drive.gyroRate;
             r = r < .05 && r > 0 ? 0 : r;
             r = r > -.05 && r < 0 ? 0 : r;
 
             //Get the distances and derivative terms
             xCurrDistance = sonar.getCmAvg();
-            double xDerivValue = isRed ? drive.sonarRates[0] : drive.sonarRates[1];
+            double xDerivValue = isRed ? drive.sonarRates[1] : drive.sonarRates[0];
 
             //Set up the derivative and proportional terms
-            double xDeriv = xDerivValue * 10;
+            double xDeriv = xDerivValue * 20;
             double xProportional = (xCurrDistance - dist) * .025;
 
             //Apply the controller
-            double xFactor = (xProportional + xDeriv);
-            telemetry.addData("xIr cm", xCurrDistance);
-            telemetry.addData("x", xFactor);
-            telemetry.addData("r", r);
-            telemetry.update();
+            double xFactor = isRed ? -(xProportional + xDeriv) : (xProportional + xDeriv);
+            //telemetry.addData("xIr cm", xCurrDistance);
+            //telemetry.addData("x", xFactor);
+            //telemetry.addData("r", r);
+            telemetry.log().add("" + xDeriv);
+            //telemetry.update();
 
             xFactor = Range.clip(xFactor, -1, 1);
             r = Range.clip(r, -1, 1);
 
-            drive.runWithoutEncoders();
-            drive.driveXYR(1, xFactor * 4.5, y, r, false);
-        } while (((Math.abs(dist - xCurrDistance) > 2) || (target > 0 && target < drive.getEncoderTravel())) && (time < 0 || timeout.seconds() < time) && opModeIsActive());
+            drive.runWithEncoders();
+            drive.driveXYR(1, xFactor, y, r, false);
+        } while (((Math.abs(dist - xCurrDistance) > 2) || target > 0) && (target < 0 || target > drive.getEncoderTravel()) && (time < 0 || timeout.seconds() < time) && opModeIsActive());
 
         //If you're off your target distance by 2 cm or less, that's good enough : exit the while loop
+        telemetry.log().add("target: " + dist);
+        telemetry.log().add("curr: " + xCurrDistance);
+
         drive.stopMotors();
+        drive.resetEncoders();
         drive.runWithEncoders();
     }
 
     public String getBallColor(Mat frame){
         //log.add(frame.height() + " x " + frame.width());
         //Imgproc.resize(frame, frame, new Size(960, 720));
-        telemetry.update();
+        //telemetry.update();
         //Rect left_crop = new Rect(new Point(215,585), new Point(380, 719));
         //Rect right_crop = new Rect(new Point(460,585), new Point(620, 719));
         Rect left_crop = new Rect(new Point(464,688), new Point(617, 719));
@@ -366,6 +381,7 @@ public abstract class Auto extends LinearVisionOpMode {
         if (vuMark == RelicRecoveryVuMark.UNKNOWN){
             vuMark = RelicRecoveryVuMark.CENTER;
         }
+        vuMark = RelicRecoveryVuMark.LEFT;
 
         int column;
         switch (vuMark) {
@@ -396,6 +412,45 @@ public abstract class Auto extends LinearVisionOpMode {
         drive.uTrackAtBottom = false;
     }
 
+    public void placeInFront(HashMap<String, String> parameters) {
+        drive.setVerticalDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+        if (vuMark == RelicRecoveryVuMark.UNKNOWN){
+            vuMark = RelicRecoveryVuMark.CENTER;
+        }
+
+        int column;
+        switch (vuMark) {
+            case RIGHT:
+                column = 0;
+                break;
+            case CENTER:
+                column = 1;
+                break;
+            case LEFT:
+                column = 2;
+                break;
+            default:
+                column = 1;
+                break;
+        }
+
+        Cryptobox.GlyphColor newGlyph = Cryptobox.GlyphColor.GREY; //drive.getGlyphColor(getColorVoltage());
+
+        drive.cryptobox.updateCipher(newGlyph, column);
+
+        //Place the first glyph to match the vumark
+        drive.cryptobox.driveGlyphPlacer(newGlyph, 0, column);
+
+        drive.glyph.uiTarget(1, 2);
+        drive.glyphLocate();
+
+        drive.stage = GlyphPlacementSystem.Stage.HOME;
+
+        done = drive.uTrack();
+        drive.uTrackAtBottom = false;
+    }
+
     private double getColorVoltage() {
         ElapsedTime colorTimer = new ElapsedTime();
         double smallVoltage = Double.MAX_VALUE;
@@ -416,7 +471,7 @@ public abstract class Auto extends LinearVisionOpMode {
     }
 
     public void jewelUp(HashMap<String, String> parameters) {
-        drive.jewelUp();
+        drive.jewelOut();
     }
 
     public void jewelCenter(HashMap<String, String> parameters) {
@@ -434,7 +489,7 @@ public abstract class Auto extends LinearVisionOpMode {
     public void knockRedJewel(HashMap<String, String> parameters) {
         try {
             String balls = getBallColor(vuMarkIdentifier.getFrame());
-            telemetry.addData("ball orientation", balls);
+            //telemetry.addData("ball orientation", balls);
             switch (balls) {
                 case "red":
                     jewelLeft();
@@ -515,7 +570,7 @@ public abstract class Auto extends LinearVisionOpMode {
         timer.reset();
         while (opModeIsActive() && !done && (timer.seconds() <= time || time <= 0)) {
             //Keep going if (you're not done and the seconds are less than the target) or (you're not waiting for the timer and you're not done)
-            done = drive.driveWithEncoders(direction, speed, targetTicks, useGyro, targetGyro, 1);
+            done = drive.driveWithEncoders(direction, speed, targetTicks, useGyro, targetGyro, false, 1);
             //telemetry.addData("targetTime", time);
             //telemetry.addData("time", timer.seconds());
             //telemetry.addData("DONE", done);
@@ -553,7 +608,7 @@ public abstract class Auto extends LinearVisionOpMode {
                 double xFactor = getSensorFactor(AnalogSensor.Type.SONAR, sonarId, xSonar.getCmAvg(), dist);
                 Direction newDir = new Direction(Range.clip(direction.getX() + xFactor, -1, 1), direction.getY());
 
-                done = drive.driveWithEncoders(newDir, speed, 750, true, gyro, 1);
+                done = drive.driveWithEncoders(newDir, speed, 750, true, gyro, false, 1);
             } while (opModeIsActive() && !done);
 
             drive.resetEncoders();
@@ -607,7 +662,7 @@ public abstract class Auto extends LinearVisionOpMode {
         do {
             gyro = drive.gyro.updateHeading();
             double diff = realR - gyro;
-            telemetry.addData("gyro",gyro + " realR: " + realR + " diff: " + diff);
+            //telemetry.addData("gyro",gyro + " realR: " + realR + " diff: " + diff);
             if (diff > 270) { diff -= 360; }
             if (diff < -270) { diff += 360; }
             if (Math.abs(diff) > 2) {
@@ -619,7 +674,7 @@ public abstract class Auto extends LinearVisionOpMode {
         drive.stopMotors();
         drive.resetEncoders();
         drive.runWithEncoders();
-        telemetry.update();
+        //telemetry.update();
     }
 
     public void autoTwoSensorDrive(HashMap<String, String> parameters) {
@@ -672,7 +727,7 @@ public abstract class Auto extends LinearVisionOpMode {
             yIr.addReading();
             telemetry.addData("xIr cm", xIr.getCmAvg());
             telemetry.addData("yIr cm", yIr.getCmAvg());
-            telemetry.update();
+            //telemetry.update();
             i++;
         }
 
@@ -709,7 +764,7 @@ public abstract class Auto extends LinearVisionOpMode {
             telemetry.addData("x", xFactor);
             telemetry.addData("y", yFactor);
             telemetry.addData("r", r);
-            telemetry.update();
+            //telemetry.update();
 
             xFactor = Range.clip(xFactor, -1, 1);
             yFactor = Range.clip(yFactor, -1, 1);
@@ -886,7 +941,7 @@ public abstract class Auto extends LinearVisionOpMode {
 
                         if (Math.abs(xCurrDistance - xTargetDistance) < 0.1) { break; }
 
-                        done = drive.driveWithEncoders(dir, 1, targetTicks, true, targetGyro, C.get().getDouble("mulch"));
+                        done = drive.driveWithEncoders(dir, 1, targetTicks, true, targetGyro,false, C.get().getDouble("mulch"));
 
                     }
 
@@ -923,8 +978,8 @@ public abstract class Auto extends LinearVisionOpMode {
         double deriv = derivValue * C.get().getDouble("SensorDeriv");
         double proportional = (currDistance - targetDistance) * C.get().getDouble("SensorProp");
 
-        telemetry.addData("derivative", deriv);
-        telemetry.addData("proportional", proportional);
+        //telemetry.addData("derivative", deriv);
+        //telemetry.addData("proportional", proportional);
 
         //Apply the controller
         double factor = (proportional + deriv);
@@ -994,9 +1049,10 @@ public abstract class Auto extends LinearVisionOpMode {
 
     @Override
     public boolean opModeIsActive(){
-
-        telemetry.addData("Extendo", Drive.isExtendo);
-        telemetry.update();
+        //telemetry.addData("time", timer.seconds());
+        //telemetry.addData("Extendo", Drive.isExtendo);
+        //telemetry.addData("Cryptobox", drive.cryptobox == null ? "" : drive.cryptobox.uiToString(false));
+        //telemetry.update();
 
         if (intakeCount > 0 && this.intakeTimer.milliseconds() / 1000 < C.get().getDouble("intakeForwardTime")){
             drive.intakeLeft(1);
@@ -1027,17 +1083,26 @@ public abstract class Auto extends LinearVisionOpMode {
         } if (placeNew) {
             drive.internalIntakeLeft(1);
             drive.internalIntakeRight(1);
-            if (drive.uTrackAtBottom && drive.getCollectedState() && timer.seconds() < 26) {
+            if (drive.uTrackAtBottom && drive.getCollectedState() && timer.seconds() < 240000) {
                 done = drive.uTrack();
+                colorTime.reset();
+                colorV = 100;
+                telemetry.log().add("time: " + timer.seconds());
             } else if(drive.uTrackAtBottom && !drive.getCollectedState()) {
                 drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
                 drive.setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
-            } else if (!drive.uTrackAtBottom && drive.stage.equals(GlyphPlacementSystem.Stage.HOME)) {
-                Cryptobox.GlyphColor color = drive.getGlyphColor(getColorVoltage());
+                drive.glyph.runToPosition(0);
+            } else if (!drive.uTrackAtBottom && colorTime.seconds() < 1.25) {
+                double newV = drive.lineFollow[0].getV();
+                colorV = (newV > .01 && newV < colorV) ? newV : colorV;
+            } else if (!drive.uTrackAtBottom && colorTime.seconds() > 1.25 && colorV != 100) {
+                Cryptobox.GlyphColor color = drive.getGlyphColor(colorV);
                 drive.uTrackAutoTarget(color);
-                }
+                telemetry.log().add("voltage: " + colorV + "  " + color);
+                colorV = 100;
+            }
+            //telemetry.addData("Mark", vuMark);
         }
-        //telemetry.addData("Mark", vuMark);
         return super.opModeIsActive();
     }
 

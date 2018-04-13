@@ -397,11 +397,11 @@ public class TeleOpMecanum extends OpMode {
             drive.toggleExtendo();
         } else if (gamepadA.y && !Drive.top) {
             drive.extendoStep();
-        } else if (driveOut && !drive.driveWithEncoders(new Direction(0, 1), 1, 150, false, 0, 1)) {
+        } else if (driveOut && drive.driveWithEncoders(new Direction(0, 1), .75, 150, false, 0, true, 1)) {
             driveOut = false;
             drive.resetEncoders();
             drive.runWithoutEncoders();
-        } else {
+        } else if (!driveOut) {
             //Drives the robot
             drive.drive(false, gamepadA, gamepadB, adjustedSpeed * MecanumDrive.FULL_SPEED);
         }
@@ -489,6 +489,9 @@ public class TeleOpMecanum extends OpMode {
             }
         } else {
             glyphTopDrive();
+            if (!drive.stage.equals(GlyphPlacementSystem.Stage.RESET)){
+                drive.glyph.runToPosition(0, error);
+            }
         }
     }
 
@@ -622,23 +625,29 @@ public class TeleOpMecanum extends OpMode {
 
     private void glyphTopDrive() {
         int targetY = gamepadB.dpad_up ? 0 : (gamepadB.dpad_left || gamepadB.dpad_right ? 1 : (gamepadB.dpad_down ? 2 : -1));
-        if (targetY != 1 && !bRight && !bLeft && !bUp && !bDown) {
+        if (targetY != -1 && !bRight && !bLeft && !bUp && !bDown) {
             //If you push the button, the first time, it runs the glyph placer
             drive.glyph.uiTarget(1, targetY);
-            drive.glyphLocate();
+            //drive.glyphLocate();
             drive.uTrack();
-        } else if (targetY != 1 && drive.stage != GlyphPlacementSystem.Stage.RETURN1) {
+        } else if (!drive.uTrackAtBottom && targetY != -1 &&
+                (drive.stage != GlyphPlacementSystem.Stage.PLACE2 || drive.verticalDriveTargetPos() != GlyphPlacementSystem.Position.RAISED.getEncoderVal())) {
             //On RETURN1, the hand opens, so we stop here until you explicitly push the button again
             drive.uTrack();
         }
         //Returns automatically once the center limit switch is hit
-        else if ((drive.stage.equals(GlyphPlacementSystem.Stage.RELEASE) || drive.stage.equals(GlyphPlacementSystem.Stage.PAUSE2) ||
-                    drive.stage.equals(GlyphPlacementSystem.Stage.RETURN2)) && drive.getCenterState()) {
+        else if ((drive.stage.equals(GlyphPlacementSystem.Stage.RELEASE) || drive.stage.equals(GlyphPlacementSystem.Stage.PAUSE2)) && drive.getCenterState()) {
             drive.uTrack();
+        } else if (drive.stage.equals(GlyphPlacementSystem.Stage.RETURN2)) {
+            drive.uTrack();
+        } else if (drive.uTrackAtBottom && targetY == -1 && drive.verticalDriveTargetPos() != GlyphPlacementSystem.Position.HOME.getEncoderVal()) {
+            drive.setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+            drive.setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
+            drive.glyph.runToPosition(0);
         }
 
-        double horiz = Math.pow(gamepadB.left_stick_x, 3);
-        if (Math.abs(horiz) > Drive.DEADZONE_SIZE) {
+        double horiz = Math.pow(gamepadB.right_stick_x, 3);
+        if (Math.abs(horiz) > Drive.DEADZONE_SIZE && !drive.stage.equals(GlyphPlacementSystem.Stage.RETURN2)) {
             drive.setHorizontalDrive(horiz);
         } else {
             drive.setHorizontalDrive(0);

@@ -2,10 +2,13 @@ f:getmark
 f:knockr
 f:wait sec:.5
 f:up
-f:brace
 f:wait sec:.5
 f:center
 f:doff x:0 y:1 speed:1 target:2000 gyro:0
-f:align y:.5 speed:1 gyro:0 color:r time:5 lPos:98 cPos:80 rPos:62
-f:align y:1 speed:1 gyro:0 color:r time:3 lPos:98 cPos:80 rPos:62
-f:aligh y:-1 speed:1 gyro:0 target:500 color:r time:2 lPos:98 cPos:80 rPos:62
+f:align y:-.1 speed:1 gyro:0 color:r time:5 lPos:129 cPos:104 rPos:79
+f:align y:-.5 speed:1 gyro:0 target:500 color:r time:1.5 lPos:129 cPos:104 rPos:79
+f:place
+f:align y:.5 speed:1 gyro:0 target:400 color:r lPos:129 cPos:104 rPos:79
+f:wait sec:4
+f:drive x:0 y:1 speed:1 gyro:0 target:500 time:1
+f:drive x:0 y:-1 speed:1 gyro:0 target:200 time:1

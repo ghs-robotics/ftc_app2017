@@ -32,7 +32,7 @@ public abstract class Drive {
     public abstract void drive(boolean useEncoders, MyGamepad gamepad1, MyGamepad gamepad2, double speedFactor);
     public abstract void driveXYR(double speedFactor, double x, double y, double r, boolean useGyro);
     public abstract void driveLR(double speedFactor, double l, double r);
-    public abstract boolean driveWithEncoders(Direction direction, double speed, double targetTicks, boolean useGyro, double targetGyro, double mulch);
+    public abstract boolean driveWithEncoders(Direction direction, double speed, double targetTicks, boolean useGyro, double targetGyro, boolean ignoreBack, double mulch);
     public abstract void stopMotors();
 
     //Initializes a factor for the speed of movement to a position when driving with encoders
@@ -338,7 +338,7 @@ public abstract class Drive {
     public boolean extendoStep() {
         //Moving into extendo, so take it apart
         if (Drive.isExtendo) {
-            if (!doneForwards && driveWithEncoders(new Direction(0, 1), 1, 80, false, 0, 1)) {
+            if (!doneForwards && driveWithEncoders(new Direction(0, 1), 1, 50, false, 0, true, 1)) {
                 extendoTimer.reset();
                 doneForwards = true;
             } else if (doneForwards && extendoTimer.seconds() < .45) {
@@ -557,29 +557,25 @@ public abstract class Drive {
 
         if (!isGlyphIn && !isGlyphBack) {
             //Step 1: intakes in until a glyph is found
-            if (Math.floor(intakeBackTimer.seconds()) % 3 == 0) {
-                intakeLeft(-1);
-                intakeRight(-1);
-            } else {
-                intakeLeft(1);
-                intakeRight(1);
-            }
+            intakeLeft(.8);
+            intakeRight(.8);
+
             dance();
             glyphCollectionTimer.reset();
             return false;
-        } else if (!isGlyphBack && glyphCollectionTimer.seconds() < C.get().getDouble("time")/2){
+        } else if (!isGlyphBack && glyphCollectionTimer.seconds() < C.get().getDouble("time") * 2/3){
             //Step 2: after a glyph gets in, until half of time, rotate the glyph
             stopMotors();
             dStage = DanceStage.BACK;
             intakeLeft(-1);
             intakeRight(1);
             return false;
-        } else if (!isGlyphBack && glyphCollectionTimer.seconds() < C.get().getDouble("time") * 3/2) {
+        } else if (!isGlyphBack && glyphCollectionTimer.seconds() < C.get().getDouble("time") * 2) {
             //Step 3: after a glyph gets in and has been rotated, pull it in
             intakeLeft(1);
             intakeRight(1);
             return false;
-        } else if (!isGlyphBack && glyphCollectionTimer.seconds() >= C.get().getDouble("time") * 3/2) {
+        } else if (!isGlyphBack && glyphCollectionTimer.seconds() >= C.get().getDouble("time") * 2) {
             //Step 4: If the glyph still isn't in, reset the glyphCollectionTimer to loop us back through to step 2
             glyphCollectionTimer.reset();
             return false;
@@ -600,6 +596,8 @@ public abstract class Drive {
                     backDistance = shortIr[1].getCmAvg();
                     isGlyphBack = backDistance <= glyphBackThreshold;
                 }
+                resetEncoders();
+                runWithEncoders();
                 return true;
             }
         }
@@ -619,8 +617,8 @@ public abstract class Drive {
         telemetry.addData("stageD", dStage);
         switch (dStage){
             case BACK:{
-                if (driveLRWithEncoders(1, 1, 1, 250, 1)){
-                    targetTick = random(50, 200);
+                if (driveLRWithEncoders(1, 1, .5, 50, 1)){
+                    targetTick = random(40, 100);
                     dirRight = !dirRight;
                     dStage = DanceStage.TRANS;
                     resetEncoders();
@@ -640,7 +638,7 @@ public abstract class Drive {
                 }
                 break;
             } case FORWARD:{
-                if (driveLRWithEncoders(-1, -1, .5, 1000, 1)){
+                if (driveLRWithEncoders(-1, -1, .2, 200, 1)){
                     dStage = DanceStage.BACK;
                     resetEncoders();
                     runWithEncoders();
@@ -719,9 +717,9 @@ public abstract class Drive {
     }
 
     public boolean uTrack() {
-        telemetry.addData("stage", stage);
-        telemetry.addData("horizontal timer", glyph.horizontalTimer.seconds());
-        telemetry.addData("power", getHorizontalDrive());
+        //telemetry.addData("stage", stage);
+        //telemetry.addData("horizontal timer", glyph.horizontalTimer.seconds());
+        //telemetry.addData("power", getHorizontalDrive());
         switch (stage) {
             case RESET: { reset(); return false; }
             case HOME: { home(); return false; }
@@ -749,7 +747,7 @@ public abstract class Drive {
         } else {
             //resetUTrack();
             stage = GlyphPlacementSystem.Stage.HOME;
-            setVerticalDrivePos(GlyphPlacementSystem.Position.HOME.getEncoderVal());
+            setVerticalDrivePos(-5000);
         }
     }
 

@@ -123,12 +123,12 @@ public class  MecanumDrive extends Drive {
     public void drive(boolean useEncoders, MyGamepad gamepad1, MyGamepad gamepad2, double speedFactor) {
         super.setEncoders(useEncoders);
 
-        if (isExtendo && !ivan) {
+        if (crawl || (isExtendo && !ivan)) {
             double left = gamepad1.left_stick_y;
             double right = gamepad1.right_stick_y;
 
             driveLR(speedFactor, left, right);
-        } else if (isExtendo && ivan) {
+        } else if (isExtendo && ivan && !crawl) {
             double x = gamepad1.left_stick_x;
             double y = gamepad1.left_stick_y;
 
@@ -314,7 +314,7 @@ public class  MecanumDrive extends Drive {
         telemetry.addData("Right Back", motorRightBack.getCurrentPosition());
         telemetry.addData("Right Front", motorRightFront.getCurrentPosition());*/
 
-        double scaledSpeed = setUpSpeed(speed, targetTicks);
+        double scaledSpeed = setUpSpeed(speed, targetTicks, false);
         if (scaledSpeed == Math.PI) { //The target's been reached
             return true;
         }
@@ -341,14 +341,14 @@ public class  MecanumDrive extends Drive {
      * @param direction which direction to go
      * @return returns if it is completed (true if has reached target, false if it hasn't)
      */
-    public boolean driveWithEncoders(Direction direction, double speed, double targetTicks, boolean useGyro, double targetGyro, double mulch) throws IllegalArgumentException{
+    public boolean driveWithEncoders(Direction direction, double speed, double targetTicks, boolean useGyro, double targetGyro, boolean ignoreBack, double mulch) throws IllegalArgumentException{
         //telemetry data
         /*if (verbose) {
             log.add("x " + direction.getX());
             log.add("y " + direction.getY());
         }*/
 
-        double scaledSpeed = setUpSpeed(speed, targetTicks);
+        double scaledSpeed = setUpSpeed(speed, targetTicks, ignoreBack);
 
         if (scaledSpeed == Math.PI) { //The target's been reached
             return true;
@@ -385,11 +385,14 @@ public class  MecanumDrive extends Drive {
      * @param targetTicks The final ticks for the encoders
      * @return Returns the speed, scaled, or Math.PI if you've already reached the value
      */
-    private double setUpSpeed(double speed, double targetTicks) {
+    private double setUpSpeed(double speed, double targetTicks, boolean ignoreBack) {
         //finds the maximum of all encoder counts
         double currentTicks = super.max(motorLeftBack.getCurrentPosition(),
                 motorLeftFront.getCurrentPosition(),
                 motorRightBack.getCurrentPosition(), motorRightFront.getCurrentPosition());
+
+        currentTicks = ignoreBack ? Math.max(Math.abs(motorLeftFront.getCurrentPosition()),
+                Math.abs(motorRightFront.getCurrentPosition())) : currentTicks;
         //if it has not reached the target, it tests if it is in the
         // last or first fourth of the way there, and
         // scales the speed such that it speeds up and slows down

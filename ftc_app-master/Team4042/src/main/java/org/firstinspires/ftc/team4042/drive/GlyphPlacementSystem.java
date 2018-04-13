@@ -31,7 +31,7 @@ public class GlyphPlacementSystem {
 
     //indicates the position of the lift in motor encoders
     public enum Position {
-        HOME(0), ABOVEHOME(475), RAISEDBACK(1500), RAISED(1550), TOP(1825), MID(2200), BOT(2375), TRANSITION(-1);
+        HOME(0), ABOVEHOME(475), RAISEDBACK(1500), RAISED(1550), TOP(1850), MID(2200), BOT(2375), TRANSITION(-1);
 
         private final Integer encoderVal;
         Position(Integer encoderVal) { this.encoderVal = encoderVal; }
@@ -203,7 +203,7 @@ public class GlyphPlacementSystem {
                 //If you're going to the center and you hit the center limit switch without the side ones, success
                 (targetPos.equals(HorizPos.CENTER) && drive.getCenterState() && sideLimitOverride) ||
                 //If you're moving back to the center and it's not from aborting, you don't need the center limit switch
-                (!first && drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER) && sideLimitOverride)) {
+                (!first && !Drive.top && drive.targetX.equals(HorizPos.CENTER) && targetPos.equals(HorizPos.CENTER) && sideLimitOverride)) {
             if (drive.getHorizontalDrive() > 0 && drive.targetX.equals(HorizPos.CENTER)) {
                 adjustBack(1);
             }
@@ -211,7 +211,7 @@ public class GlyphPlacementSystem {
             currentX = targetPos;
             return true;
             //If we want to go to the center but miss the switch, it will reverse th u-track
-        } if(targetPos.equals(HorizPos.CENTER) && (horizontalTimer.seconds() >= (HORIZONTAL_TRANSLATION_TIME * 1.1))) {
+        } if(!Drive.top && targetPos.equals(HorizPos.CENTER) && (horizontalTimer.seconds() >= (HORIZONTAL_TRANSLATION_TIME * 1.1))) {
             this.horizontalTimer.reset();
             drive.setHorizontalDrive(-.5 * drive.getHorizontalDrive());
         } if(!targetPos.equals(HorizPos.CENTER) && (horizontalTimer.seconds() >= HORIZONTAL_TRANSLATION_TIME * 1.1)){
