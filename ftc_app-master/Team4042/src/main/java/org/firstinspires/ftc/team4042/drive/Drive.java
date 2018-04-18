@@ -132,6 +132,7 @@ public abstract class Drive {
     public GlyphPlacementSystem.HorizPos targetX;
     public Cryptobox.GlyphColor color = Cryptobox.GlyphColor.NONE;
     public boolean switchColor = false;
+    public boolean first = true;
 
     public Cryptobox cryptobox;
 
@@ -534,74 +535,78 @@ public abstract class Drive {
      * One step in collecting a glyph - designed to be looped over
      * @return Whether a glyph has been collected
      */
-    public boolean collectGlyphStep() {
-        double glyphInThreshold = C.get().getDouble("glyphInThreshold");
-        double glyphBackThreshold = C.get().getDouble("glyphBackThreshold");
+    public boolean collectGlyphStep(boolean opModeIsActive) {
+        if (opModeIsActive) {
+            double glyphInThreshold = C.get().getDouble("glyphInThreshold");
+            double glyphBackThreshold = C.get().getDouble("glyphBackThreshold");
 
-        shortIr[0].addReading();
-        double frontDistance = shortIr[0].getCmAvg();
+            shortIr[0].addReading();
+            double frontDistance = shortIr[0].getCmAvg();
 
-        shortIr[1].addReading();
-        double backDistance = shortIr[1].getCmAvg();
+            shortIr[1].addReading();
+            double backDistance = shortIr[1].getCmAvg();
 
-        //9 back 13 front
+            //9 back 13 front
 
-        telemetry.addData("frontDistance", frontDistance);
-        telemetry.addData("backDistance", backDistance);
-        //If the IR reading is closer to glyphInThreshold than glyphBackThreshold, we assume the glyph is in
-        boolean isGlyphIn = frontDistance <= glyphInThreshold;
-        boolean isGlyphBack = backDistance <= glyphBackThreshold;
+            telemetry.addData("frontDistance", frontDistance);
+            telemetry.addData("backDistance", backDistance);
+            //If the IR reading is closer to glyphInThreshold than glyphBackThreshold, we assume the glyph is in
+            boolean isGlyphIn = frontDistance <= glyphInThreshold;
+            boolean isGlyphBack = backDistance <= glyphBackThreshold;
 
-        //telemetry.addData("glyph In", isGlyphIn);
-        //telemetry.addData("glyph Back", isGlyphBack);
+            //telemetry.addData("glyph In", isGlyphIn);
+            //telemetry.addData("glyph Back", isGlyphBack);
 
-        if (!isGlyphIn && !isGlyphBack) {
-            //Step 1: intakes in until a glyph is found
-            intakeLeft(.8);
-            intakeRight(.8);
+            if (!isGlyphIn && !isGlyphBack) {
+                //Step 1: intakes in until a glyph is found
+                intakeLeft(.8);
+                intakeRight(.8);
 
-            dance();
-            glyphCollectionTimer.reset();
-            return false;
-        } else if (!isGlyphBack && glyphCollectionTimer.seconds() < C.get().getDouble("time") * 2/3){
-            //Step 2: after a glyph gets in, until half of time, rotate the glyph
-            stopMotors();
-            dStage = DanceStage.BACK;
-            intakeLeft(-1);
-            intakeRight(1);
-            return false;
-        } else if (!isGlyphBack && glyphCollectionTimer.seconds() < C.get().getDouble("time") * 2) {
-            //Step 3: after a glyph gets in and has been rotated, pull it in
-            intakeLeft(1);
-            intakeRight(1);
-            return false;
-        } else if (!isGlyphBack && glyphCollectionTimer.seconds() >= C.get().getDouble("time") * 2) {
-            //Step 4: If the glyph still isn't in, reset the glyphCollectionTimer to loop us back through to step 2
-            glyphCollectionTimer.reset();
-            return false;
-            /** Should be made to run the robot backwards for a short period of time and reconnect, then break and return true */
-        } else if (isGlyphBack) {
-            //Step 5: But if the glyph is in, then stop the intakes and wait
-            intakeLeft(0);
-            intakeRight(0);
+                dance();
+                glyphCollectionTimer.reset();
+                return false;
+            } else if (!isGlyphBack && glyphCollectionTimer.seconds() < C.get().getDouble("time") * 2 / 3) {
+                //Step 2: after a glyph gets in, until half of time, rotate the glyph
+                stopMotors();
+                dStage = DanceStage.BACK;
+                intakeLeft(-1);
+                intakeRight(1);
+                return false;
+            } else if (!isGlyphBack && glyphCollectionTimer.seconds() < C.get().getDouble("time") * 2) {
+                //Step 3: after a glyph gets in and has been rotated, pull it in
+                intakeLeft(1);
+                intakeRight(1);
+                return false;
+            } else if (!isGlyphBack && glyphCollectionTimer.seconds() >= C.get().getDouble("time") * 2) {
+                //Step 4: If the glyph still isn't in, reset the glyphCollectionTimer to loop us back through to step 2
+                glyphCollectionTimer.reset();
+                return false;
+                /** Should be made to run the robot backwards for a short period of time and reconnect, then break and return true */
+            } else if (isGlyphBack) {
+                //Step 5: But if the glyph is in, then stop the intakes and wait
+                intakeLeft(0);
+                intakeRight(0);
 
-            if (pullBack()){
-                while(isGlyphBack) {
-                    stopMotors();
-                    internalIntakeLeft(1);
-                    internalIntakeRight(1);
-                    intakeLeft(1);
-                    intakeRight(1);
-                    shortIr[1].addReading();
-                    backDistance = shortIr[1].getCmAvg();
-                    isGlyphBack = backDistance <= glyphBackThreshold;
+                if (pullBack()) {
+                    while (isGlyphBack) {
+                        stopMotors();
+                        internalIntakeLeft(1);
+                        internalIntakeRight(1);
+                        intakeLeft(1);
+                        intakeRight(1);
+                        shortIr[1].addReading();
+                        backDistance = shortIr[1].getCmAvg();
+                        isGlyphBack = backDistance <= glyphBackThreshold;
+                    }
+                    resetEncoders();
+                    runWithEncoders();
+                    return true;
                 }
-                resetEncoders();
-                runWithEncoders();
-                return true;
             }
+            return false;
+        } else {
+            return false;
         }
-        return false;
     }
 
     public enum DanceStage {
@@ -775,6 +780,7 @@ public abstract class Drive {
     }
     private void place1() {
         //Raises the u-
+        first = false;
         if (abort) {
             stage = GlyphPlacementSystem.Stage.RETURN2;
             setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -813,9 +819,10 @@ public abstract class Drive {
             uTrackAutoTarget(color);
             switchColor = false;
             glyph.setXPower(targetX);
+            first = true;
         }
         //telemetry.log().add("targetX: " + targetX);
-        if(glyph.horizontalTimer.seconds() > .3 && glyph.xTargetReached(targetX, abort, true)) {
+        if(glyph.horizontalTimer.seconds() > .3 && glyph.xTargetReached(targetX, abort, first)) {
             stage = GlyphPlacementSystem.Stage.PLACE2;
             handDropTimer.reset();
         }

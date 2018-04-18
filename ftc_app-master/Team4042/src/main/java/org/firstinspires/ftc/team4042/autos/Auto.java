@@ -265,7 +265,7 @@ public abstract class Auto extends LinearVisionOpMode {
         drive.intakeRight(1);
 
         while (opModeIsActive()) {
-            while (opModeIsActive() && !drive.collectGlyphStep());
+            while (opModeIsActive() && !drive.collectGlyphStep(opModeIsActive()));
             //while (opModeIsActive() && !drive.driveLRWithEncoders(-1, -1, 1, 100, 1));
             //while (opModeIsActive() && !drive.driveLRWithEncoders(-1, 1, 1, 70, 1));
             while (opModeIsActive() && !drive.driveLRWithEncoders(-1, -1, 1, 500, 1));
@@ -285,7 +285,7 @@ public abstract class Auto extends LinearVisionOpMode {
         double center = parser.getParam(parameters, "cPos");
         double right = parser.getParam(parameters, "rPos");
         vuMark = vuMark.equals(RelicRecoveryVuMark.UNKNOWN) ? RelicRecoveryVuMark.CENTER : vuMark;
-        double dist = /*vuMark.equals(RelicRecoveryVuMark.LEFT) ? left : vuMark.equals(RelicRecoveryVuMark.RIGHT) ? right : */center;
+        double dist = vuMark.equals(RelicRecoveryVuMark.LEFT) ? left : vuMark.equals(RelicRecoveryVuMark.RIGHT) ? right : center;
 
         drive.stopMotors();
         drive.resetEncoders();
@@ -381,7 +381,6 @@ public abstract class Auto extends LinearVisionOpMode {
         if (vuMark == RelicRecoveryVuMark.UNKNOWN){
             vuMark = RelicRecoveryVuMark.CENTER;
         }
-        vuMark = RelicRecoveryVuMark.LEFT;
 
         int column;
         switch (vuMark) {
@@ -594,7 +593,7 @@ public abstract class Auto extends LinearVisionOpMode {
             AnalogSensor xSonar = drive.sonar[sonarId];
 
             boolean done;
-            for (int i = 0; i < AnalogSensor.NUM_OF_READINGS && opModeIsActive(); i++) {
+            for (int i = 0; opModeIsActive() && i < AnalogSensor.NUM_OF_READINGS; i++) {
                 xSonar.addReading();
             }
 
@@ -628,8 +627,8 @@ public abstract class Auto extends LinearVisionOpMode {
             //log.add("" + opModeIsActive());
             autoDrive(direction, speed, 100, -1, true, gyro);
         }
-        while ((Math.abs(roll - startRoll) >= 3) ||
-                (Math.abs(pitch - startPitch) >= 3) && opModeIsActive());
+        while (opModeIsActive() && ((Math.abs(roll - startRoll) >= 3) ||
+                (Math.abs(pitch - startPitch) >= 3)));
             //If you're too tipped forward/backwards or left/right, then keep driving
             //This effectively drives until you're off the balancing stone
 
@@ -1083,7 +1082,7 @@ public abstract class Auto extends LinearVisionOpMode {
         } if (placeNew) {
             drive.internalIntakeLeft(1);
             drive.internalIntakeRight(1);
-            if (drive.uTrackAtBottom && drive.getCollectedState() && timer.seconds() < 240000) {
+            if (drive.uTrackAtBottom && drive.getCollectedState() && timer.seconds() < 24) {
                 done = drive.uTrack();
                 colorTime.reset();
                 colorV = 100;
