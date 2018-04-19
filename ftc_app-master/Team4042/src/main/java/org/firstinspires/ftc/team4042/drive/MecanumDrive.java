@@ -341,7 +341,8 @@ public class  MecanumDrive extends Drive {
      * @param direction which direction to go
      * @return returns if it is completed (true if has reached target, false if it hasn't)
      */
-    public boolean driveWithEncoders(Direction direction, double speed, double targetTicks, boolean useGyro, double targetGyro, boolean ignoreBack, double mulch) throws IllegalArgumentException{
+    public boolean driveWithEncoders(Direction direction, double speed, double targetTicks, boolean useGyro,
+                                     double targetGyro, boolean ignoreBack, double mulch, double rotConstant) throws IllegalArgumentException{
         //telemetry data
         /*if (verbose) {
             log.add("x " + direction.getX());
@@ -369,8 +370,12 @@ public class  MecanumDrive extends Drive {
         }*/
 
         //Drives at x
-        driveXYR(FULL_SPEED, direction.getX() * scaledSpeed, direction.getY() * scaledSpeed, r, false);
+        driveXYR(FULL_SPEED, direction.getX() * scaledSpeed, direction.getY() * scaledSpeed, r * rotConstant, false);
         return false;
+    }
+
+    public boolean driveWithEncoders(Direction direction, double speed, double targetTicks, boolean useGyro, double targetGyro, boolean ignoreBack, double mulch) throws IllegalArgumentException {
+        return driveWithEncoders(direction, speed, targetTicks, useGyro, targetGyro, ignoreBack, mulch, 1);
     }
 
     public double getEncoderTravel() {
