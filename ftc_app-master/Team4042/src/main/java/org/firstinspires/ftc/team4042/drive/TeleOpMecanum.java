@@ -82,7 +82,8 @@ public class TeleOpMecanum extends OpMode {
       Triggers              (extendo) external intakes forwards     (normal) both intakes forwards
       Y                     toggle extendo (with movement)
       A&Y                   toggle extendo (only servos)
-      Back                  balance
+      Dpad right            balance
+      Dpad right&A          reset balance
 
     GAMEPAD 2:
      Stick 1 (manual)       controls placer in manual
@@ -188,16 +189,6 @@ public class TeleOpMecanum extends OpMode {
             if (gamepadA.dpad_right && gamepadA.a) {
                 onBalancingStone = false;
             }
-            //If you've released back and did so for a shorter time than "nano", then toggle whether you're on the stone
-            //telemetry.addData("back", gamepad1.back);
-
-            //Adjust drive modes, speeds, etc
-
-            /*if (gamepadA.right_stick_button && !aRightStick) {
-            if (gamepadA.right_stick_button && !aRightStick) {
-                drive.toggleVerbose();
-            }
-            aRightStick = gamepadA.right_stick_button;*/
 
             //Runs the intakes
             intakes();
@@ -340,14 +331,6 @@ public class TeleOpMecanum extends OpMode {
 
     private void setUpDrive() {
         drive.uTrackUpdate();
-
-        drive.gyro.updateHeading();
-        if (gamepadA.dpad_left && gamepadA.right_stick_button) {
-            drive.gyro.setAdjust(-drive.gyro.rawHeading());
-        }
-
-        telemetry.addData("heading", drive.gyro.getHeading());
-        telemetry.addData("adjust", drive.gyro.getAdjust());
 
         if (gamepadB.start && !bStart) {
             if (!Drive.top) {
@@ -756,13 +739,10 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("AI", aiPlacer);
         telemetry.addData("Cryptobox", drive.cryptobox == null ? "" : drive.cryptobox.uiToString((int) cursorCount % 2 == 0));
         printNextGlyph();
-        //telemetry.addData("Reject glyph", drive.cryptobox.getRejectGlyph());
         Cryptobox.Cipher snakeTarget = drive.cryptobox.getCipherTarget();
         telemetry.addData("Snake target", snakeTarget == null ? "null" : snakeTarget.name());
-        //telemetry.addData("line follower", drive.smallVoltage);
         telemetry.addData("vert Pos", drive.verticalDriveCurrPos());
         if (drive.verbose) {
-            telemetry.addData("gamepadA.dpad_up", gamepadA.dpad_up);
             telemetry.addData("bottom", drive.getBottomState());
             telemetry.addData("center", drive.getCenterState());
             telemetry.addData("side", drive.getSideState());
