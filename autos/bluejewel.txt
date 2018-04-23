@@ -11,8 +11,9 @@ f:open
 f:rot r:-90 speed:1 time:3
 f:brace
 f:drive x:0 y:1 speed:1 gyro:-90 target:1200 time:2
-f:drive x:0 y:-1 speed:1 gyro:-90 target:200 time:1
+f:drive x:0 y:-1 speed:1 gyro:-90 target:250 time:1
 f:rot r:-105 speed:1 time:3
-f:drive x:-1 y:.6 speed:1 gyro:-105 target:2000 time:4
+f:drive x:-1 y:.55 speed:1 gyro:-105 target:2000 time:4
 f:brace
-f:drive x:-1 y:1 speed:1 target:300 time:1
+f:drive x:-1 y:.25 speed:1 target:200 time:1.5
+f:drive x:-.5 y:1 speed:1 target:300 time:1
