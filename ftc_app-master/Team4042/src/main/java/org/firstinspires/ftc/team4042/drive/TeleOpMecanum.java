@@ -25,26 +25,15 @@ public class TeleOpMecanum extends OpMode {
     private boolean backstopEngaged = false;
     private boolean ignoreInput = false;
 
-    private double oops = 1; //switch to -1 if runs in wrong direction when going for balance
-
     //CONTROL BOOLEANS START
     // We have these booleans so we only register a button press once.
     // You have to let go of the button and push it again to register a new event.
-    private boolean aRight = false;
-    private double aBackTime = 0;
     private boolean bLeftStick = false;
     private boolean bRightStick = false;
-    private boolean aDown = false;
 
     private boolean aA = false;
     private boolean aY = false;
-    private boolean aX = false;
-    private boolean aB = false;
-
-    private boolean aUp = false;
-
-    private boolean aLeftStick = false;
-    private boolean aRightStick = false;
+    private boolean bStart = false;
 
     private boolean bUp;
     private boolean bDown;
@@ -58,9 +47,8 @@ public class TeleOpMecanum extends OpMode {
     //CONTROL BOOLEANS END
 
     public Drive drive = new MecanumDrive(true);
-    public ElapsedTime jewelTimer = new ElapsedTime();
-    public ElapsedTime nanoTime = new ElapsedTime();
-    public ElapsedTime banfTime = new ElapsedTime();
+    private ElapsedTime jewelTimer = new ElapsedTime();
+    private ElapsedTime banfTime = new ElapsedTime();
     private ElapsedTime driveOutTopTimer = new ElapsedTime();
 
     private double startRoll;
@@ -88,17 +76,12 @@ public class TeleOpMecanum extends OpMode {
     /**
     GAMEPAD 1:
       Joystick 1 X & Y      movement
-      Joystick 1 button     verbose
       Joystick 2 X          rotation
-      Joystick 2 button     jewel stowed
+      Joystick 2 Y          glyph color selection
       Bumpers               (extendo) external intakes backwards    (normal) both intakes backwards
       Triggers              (extendo) external intakes forwards     (normal) both intakes forwards
-      Dpad up               turn off auto intake
-      A
-      B                     toggle tank
-      X                     toggle crawl
-      Y                     toggle extendo
-      Start
+      Y                     toggle extendo (with movement)
+      A&Y                   toggle extendo (only servos)
       Back                  balance
 
     GAMEPAD 2:
@@ -113,9 +96,11 @@ public class TeleOpMecanum extends OpMode {
      Dpad (manual target)   target y uTrack
      Y (manual drive)       resets the glyph placer
      Y and dpad (ai target) sets the ui target to the selected glyph color
-     X (ai target)          inverse target snake
+     X                      toggle crawl
      Dpad (ai target)       targets the ui for the ai
      Back                   toggle glyph reject/cipher break
+     Start                  stow jewel
+     Dpad up                turn off auto intake
      */
 
     @Override
@@ -186,10 +171,10 @@ public class TeleOpMecanum extends OpMode {
         try {
             gamepadA.update(gamepad1);
             gamepadB.update(gamepad2);
-            if (gamepadA.dpad_up && !aUp) {
+            if (gamepadB.dpad_up && !bUp) {
                 intakeBackstop = !intakeBackstop;
             }
-            aUp = gamepadA.dpad_up;
+            bUp = gamepadB.dpad_up;
 
             //The first time you hit back, it establishes how long you've been pushing it for
 
@@ -204,8 +189,6 @@ public class TeleOpMecanum extends OpMode {
                 onBalancingStone = false;
             }
             //If you've released back and did so for a shorter time than "nano", then toggle whether you're on the stone
-
-            aRight = gamepadA.dpad_right;
             //telemetry.addData("back", gamepad1.back);
 
             //Adjust drive modes, speeds, etc
@@ -357,12 +340,6 @@ public class TeleOpMecanum extends OpMode {
 
     private void setUpDrive() {
         drive.uTrackUpdate();
-        //drive.updateRates();
-
-        if (gamepadA.dpad_down && !aDown  && !Drive.top) {
-            Drive.ivan = !Drive.ivan;
-        }
-        aDown = gamepadA.dpad_down;
 
         drive.gyro.updateHeading();
         if (gamepadA.dpad_left && gamepadA.right_stick_button) {
@@ -372,7 +349,7 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("heading", drive.gyro.getHeading());
         telemetry.addData("adjust", drive.gyro.getAdjust());
 
-        if (gamepadA.left_stick_button && !aLeftStick) {
+        if (gamepadB.start && !bStart) {
             if (!Drive.top) {
                 drive.toggleWinch();
             } else {
@@ -382,14 +359,6 @@ public class TeleOpMecanum extends OpMode {
                 drive.runWithEncoders();
             }
         }
-        //First controller's left stick drives the robot forwards a set amount
-        /*else if (gamepadA.left_stick_button && aLeftStick && Drive.top && driveOutTopTimer.seconds() < C.get().getDouble("driveOutTime")) {
-            double[] forwardArray = {1, 1, 1, 1};
-            drive.setMotorPower(forwardArray, 1);
-        }*/
-
-
-
         //First controller pushing Y - toggle extendo
         else if ((gamepadA.a && !aA && gamepadA.y) || (gamepadA.y && !aY && gamepadA.a && !Drive.top)) {
             drive.toggleServoExtendo();
@@ -405,12 +374,12 @@ public class TeleOpMecanum extends OpMode {
             //Drives the robot
             drive.drive(false, gamepadA, gamepadB, adjustedSpeed * MecanumDrive.FULL_SPEED);
         }
-        aLeftStick = gamepadA.left_stick_button;
         aY = gamepadA.y;
+        bStart = gamepadB.start;
         telemetry.addData("winch", drive.winchOpen);
 
         //The X button on the first controller - toggle crawling to let us adjust the back of the robot too
-        if (gamepadA.x && !aX && !Drive.top) {
+        if (gamepadB.x && !bX && !Drive.top) {
             Drive.crawl = !Drive.crawl;
             if (Drive.crawl) {
                 drive.freezeBack();
@@ -418,12 +387,7 @@ public class TeleOpMecanum extends OpMode {
                 drive.runBackWithEncoders();
             }
         }
-        aX = gamepadA.x;
-
-        if (gamepadA.b && !aB && !Drive.top) {
-            Drive.tank = !Drive.tank;
-        }
-        aB = gamepadA.b;
+        bX = gamepadB.x;
 
         if (Drive.useGyro) {
             drive.useGyro(0);
@@ -790,7 +754,6 @@ public class TeleOpMecanum extends OpMode {
         telemetry.addData("Manual", manual);
         telemetry.addData("Crawl", Drive.crawl);
         telemetry.addData("AI", aiPlacer);
-        telemetry.addData("Ivan Extendo Drive", Drive.ivan);
         telemetry.addData("Cryptobox", drive.cryptobox == null ? "" : drive.cryptobox.uiToString((int) cursorCount % 2 == 0));
         printNextGlyph();
         //telemetry.addData("Reject glyph", drive.cryptobox.getRejectGlyph());
