@@ -529,7 +529,9 @@ public class TeleOpMecanum extends OpMode {
             drive.cryptobox.setCipherTarget(Cryptobox.Cipher.NONE);
         }
 
-        greyBrown = drive.uTrackAutoTarget(gamepadB);
+        if (Drive.isExtendo) {
+            greyBrown = drive.uTrackAutoTarget(gamepadA);
+        }
 
         if (aiPlacer && gamepadB.y && !gamepadB.b && !gamepadB.x) {
             if (gamepadB.left_stick_y > .7 && Math.abs(gamepadB.left_stick_x) < .7) {
@@ -630,11 +632,6 @@ public class TeleOpMecanum extends OpMode {
         double aLeftTrigger = drive.deadZone(gamepadA.left_trigger);
         boolean aLeftBumper = gamepadA.left_bumper;
 
-        double bRightTrigger = drive.deadZone(gamepadB.right_trigger);
-        boolean bRightBumper = gamepadB.right_bumper;
-        double bLeftTrigger = drive.deadZone(gamepadB.left_trigger);
-        boolean bLeftBumper = gamepadB.left_bumper;
-
         drive.shortIr[1].addReading();
         double backDistance = drive.shortIr[1].getCmAvg();
         boolean isGlyphBack = backDistance <= C.get().getDouble("glyphBackThreshold");
@@ -677,58 +674,46 @@ public class TeleOpMecanum extends OpMode {
 
             if (aRightTrigger > Drive.DEADZONE_SIZE) {
                 drive.intakeRight(aRightTrigger);
-                if (!Drive.isExtendo) { drive.internalIntakeRight(aRightTrigger); }
+                drive.internalIntakeRight(aRightTrigger);
             } else if (aRightBumper) {
                 drive.intakeRight(-1);
-                if (!Drive.isExtendo) { drive.internalIntakeRight(-1); }
+                drive.internalIntakeRight(-1);
             } else {
                 drive.intakeRight(0);
                 if (!Drive.isExtendo && (drive.stage.equals(GlyphPlacementSystem.Stage.HOME) ||
                         drive.stage.equals(GlyphPlacementSystem.Stage.GRAB) ||
                         drive.stage.equals(GlyphPlacementSystem.Stage.PLACE1))) {
                     drive.internalIntakeRight(.5);
-                }else if (!Drive.isExtendo) {
-                    drive.internalIntakeRight(0);
                 }
             }
 
             if (aLeftTrigger > Drive.DEADZONE_SIZE) {
                 drive.intakeLeft(aLeftTrigger);
-                if (!Drive.isExtendo) { drive.internalIntakeLeft(aLeftTrigger); }
+                drive.internalIntakeLeft(aLeftTrigger);
             } else if (aLeftBumper) {
                 drive.intakeLeft(-1);
-                if (!Drive.isExtendo) { drive.internalIntakeLeft(-1); }
+                drive.internalIntakeLeft(-1);
             } else {
                 drive.intakeLeft(0);
                 if (!Drive.isExtendo && (drive.stage.equals(GlyphPlacementSystem.Stage.HOME) ||
                         drive.stage.equals(GlyphPlacementSystem.Stage.GRAB) ||
                         drive.stage.equals(GlyphPlacementSystem.Stage.PLACE1))) {
                     drive.internalIntakeLeft(.5);
-                }else if (!Drive.isExtendo) {
-                    drive.internalIntakeLeft(0);
                 }
             }
         }
 
         if (Drive.isExtendo) {
-            if (bRightTrigger > Drive.DEADZONE_SIZE) { drive.internalIntakeRight(bRightTrigger); }
-            //Right bumper of the b controller runs the right intake backwards
-            else if (bRightBumper) { drive.internalIntakeRight(-1); }
-            else if (drive.stage.equals(GlyphPlacementSystem.Stage.HOME) ||
+            if ((drive.stage.equals(GlyphPlacementSystem.Stage.HOME) ||
                     drive.stage.equals(GlyphPlacementSystem.Stage.GRAB) ||
-                    drive.stage.equals(GlyphPlacementSystem.Stage.PLACE1)) {
+                    drive.stage.equals(GlyphPlacementSystem.Stage.PLACE1)) &&
+                    !(aRightTrigger > Drive.DEADZONE_SIZE) && !aRightBumper) {
                 drive.internalIntakeRight(.5);
-            } else { drive.internalIntakeRight(1); }
-
-            //Left trigger of the b controller runs the left intake forward
-            if (bLeftTrigger > Drive.DEADZONE_SIZE) { drive.internalIntakeLeft(bLeftTrigger); }
-            //Left bumper of the b controller runs the left intake backwards
-            else if (bLeftBumper) { drive.internalIntakeLeft(-1); }
-            else if (drive.stage.equals(GlyphPlacementSystem.Stage.HOME) ||
-                    drive.stage.equals(GlyphPlacementSystem.Stage.GRAB) ||
-                    drive.stage.equals(GlyphPlacementSystem.Stage.PLACE1)) {
                 drive.internalIntakeLeft(.5);
-            } else { drive.internalIntakeLeft(1); }
+            } else if (!(aRightTrigger > Drive.DEADZONE_SIZE) && !aRightBumper) {
+                drive.internalIntakeRight(1);
+                drive.internalIntakeLeft(1);
+            }
         }
     }
 

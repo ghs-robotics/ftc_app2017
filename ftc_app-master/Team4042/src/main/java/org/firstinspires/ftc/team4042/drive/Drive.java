@@ -701,21 +701,21 @@ public abstract class Drive {
 
     public int[] uTrackAutoTarget(MyGamepad gamepad1) {
         //Happens once when the u-track is at the bottom
-        if (uTrackAtBottom && Math.abs(gamepad1.right_stick_y) > .5) {
+        if (uTrackAtBottom && Math.abs(gamepad1.right_stick_y) > .5 && !gamepad1.b) {
             //Get glyph color
             Cryptobox.GlyphColor color = gamepad1.right_stick_y > .5 ? Cryptobox.GlyphColor.BROWN : Cryptobox.GlyphColor.GREY;
             predict = uTrackAutoTarget(color);
             this.color = color;
             uTrack();
         } //Runs the u-track to above-home (useful for switching out of manual)
-        else if(uTrackAtBottom && !(Math.abs(gamepad1.right_stick_y) > .5) &&
+        else if(uTrackAtBottom && !(Math.abs(gamepad1.right_stick_y) > .5 && !gamepad1.b) &&
                 verticalDriveTargetPos() != GlyphPlacementSystem.Position.HOME.getEncoderVal()) {
             setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
             glyph.runToPosition(0);
         }
         //Runs the u-track
-        else if (!uTrackAtBottom && (gamepad1.b || abort)) {
+        else if ((!uTrackAtBottom || abort) && !gamepad1.b) {
             uTrack();
         }
         return predict;
