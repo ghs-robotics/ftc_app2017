@@ -32,6 +32,7 @@ public class TeleOpMecanum extends OpMode {
     private boolean bRightStick = false;
 
     private boolean aA = false;
+    private boolean aUp = false;
     private boolean aY = false;
     private boolean bStart = false;
 
@@ -226,6 +227,10 @@ public class TeleOpMecanum extends OpMode {
                 drive.glyph.runToPosition(0);
             }
 
+            if (gamepadA.dpad_up && !aUp) {
+                drive.cryptobox.clear();
+            }
+            aUp = gamepadA.dpad_up;
             aA = gamepadA.a;
 
             bUp = gamepadB.dpad_up;
