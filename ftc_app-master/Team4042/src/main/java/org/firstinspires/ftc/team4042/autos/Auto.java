@@ -127,6 +127,7 @@ public abstract class Auto extends LinearVisionOpMode {
         Drive.tank = false;
         Drive.ivan = true;
         Drive.useSideLimits = true;
+        Drive.intakeLimit = true;
         Drive.top = false;
 
 

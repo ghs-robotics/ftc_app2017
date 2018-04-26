@@ -34,6 +34,7 @@ public class TeleOpMecanum extends OpMode {
     private boolean aA = false;
     private boolean aUp = false;
     private boolean aY = false;
+    private boolean aB = false;
     private boolean aDown = false;
 
     private boolean bUp;
@@ -78,13 +79,15 @@ public class TeleOpMecanum extends OpMode {
     GAMEPAD 1:
       Joystick 1 X & Y      movement
       Joystick 2 X          rotation
-      Joystick 2 Y          glyph color selection
+      A&Joystick 2 Y        glyph color selection
       Bumpers               (extendo) external intakes backwards    (normal) both intakes backwards
       Triggers              (extendo) external intakes forwards     (normal) both intakes forwards
       Y                     toggle extendo (with movement)
+      A&B                   toggle intake limit switch placement
       A&Y                   toggle extendo (only servos)
       Dpad right            balance
       Dpad right&A          reset balance
+      Dpad down             toggle winch
 
     GAMEPAD 2:
      Stick 1 (manual)       controls placer in manual
@@ -101,7 +104,6 @@ public class TeleOpMecanum extends OpMode {
      X                      toggle crawl
      Dpad (ai target)       targets the ui for the ai
      Back                   toggle glyph reject/cipher break
-     Start                  stow jewel
      Dpad up                turn off auto intake
      */
 
@@ -157,6 +159,7 @@ public class TeleOpMecanum extends OpMode {
 
             Drive.isExtendo = false;
             Drive.crawl = false;
+            Drive.intakeLimit = true;
             Drive.tank = false;
             Drive.ivan = true;
             runDown = false;
@@ -177,6 +180,12 @@ public class TeleOpMecanum extends OpMode {
                 intakeBackstop = !intakeBackstop;
             }
             bUp = gamepadB.dpad_up;
+
+            if ((gamepadA.b && gamepadA.a) && (!aB || !aA)) {
+                Drive.intakeLimit = !Drive.intakeLimit;
+            }
+            aB = gamepadA.b;
+            aA = gamepadA.a;
 
             //The first time you hit back, it establishes how long you've been pushing it for
 

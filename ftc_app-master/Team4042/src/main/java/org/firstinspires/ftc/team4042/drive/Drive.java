@@ -71,6 +71,7 @@ public abstract class Drive {
     public static boolean crawl = false;
     public static boolean tank = false;
     public static boolean ivan = true;
+    public static boolean intakeLimit = true;
 
     public static boolean top = false;
 
@@ -701,21 +702,21 @@ public abstract class Drive {
 
     public int[] uTrackAutoTarget(MyGamepad gamepad1) {
         //Happens once when the u-track is at the bottom
-        if (uTrackAtBottom && Math.abs(gamepad1.right_stick_y) > .5 && !gamepad1.b) {
+        if (uTrackAtBottom && ((Math.abs(gamepad1.right_stick_y) > .5 && gamepad1.a && !Drive.intakeLimit) || (Drive.intakeLimit && getCollectedState()))) {
             //Get glyph color
             Cryptobox.GlyphColor color = gamepad1.right_stick_y > .5 ? Cryptobox.GlyphColor.BROWN : Cryptobox.GlyphColor.GREY;
             predict = uTrackAutoTarget(color);
             this.color = color;
             uTrack();
         } //Runs the u-track to above-home (useful for switching out of manual)
-        else if(uTrackAtBottom && !(Math.abs(gamepad1.right_stick_y) > .5 && !gamepad1.b) &&
+        else if(uTrackAtBottom && !(Math.abs(gamepad1.right_stick_y) > .5 && !gamepad1.a && !getCollectedState()) &&
                 verticalDriveTargetPos() != GlyphPlacementSystem.Position.HOME.getEncoderVal()) {
             setVerticalDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
             setVerticalDrivePos(GlyphPlacementSystem.Position.ABOVEHOME.getEncoderVal());
             glyph.runToPosition(0);
         }
         //Runs the u-track
-        else if ((!uTrackAtBottom || abort) && !gamepad1.b) {
+        else if (!uTrackAtBottom || abort) {
             uTrack();
         }
         return predict;
