@@ -34,7 +34,7 @@ public class TeleOpMecanum extends OpMode {
     private boolean aA = false;
     private boolean aUp = false;
     private boolean aY = false;
-    private boolean bStart = false;
+    private boolean aDown = false;
 
     private boolean bUp;
     private boolean bDown;
@@ -337,7 +337,7 @@ public class TeleOpMecanum extends OpMode {
     private void setUpDrive() {
         drive.uTrackUpdate();
 
-        if (gamepadB.start && !bStart) {
+        if (gamepadA.dpad_down && !aDown) {
             if (!Drive.top) {
                 drive.toggleWinch();
             } else {
@@ -363,7 +363,7 @@ public class TeleOpMecanum extends OpMode {
             drive.drive(false, gamepadA, gamepadB, adjustedSpeed * MecanumDrive.FULL_SPEED);
         }
         aY = gamepadA.y;
-        bStart = gamepadB.start;
+        aDown = gamepadA.dpad_down;
         telemetry.addData("winch", drive.winchOpen);
 
         //The X button on the first controller - toggle crawling to let us adjust the back of the robot too
