@@ -27,7 +27,15 @@ public class MecanumDrive extends Drive {
 
         double x = gamepad1.left_stick_x;
         double y = -gamepad1.left_stick_y; //Y is the opposite direction of what's intuitive: forward is -1, backwards is 1
-        double r = gamepad1.right_stick_x;
+        double r;
+        if (gamepad1.dpad_left && (gamepad1.dpad_down || gamepad1.dpad_up)) {
+            r = -.5;
+        } else if (gamepad1.dpad_right && (gamepad1.dpad_down || gamepad1.dpad_up)) {
+            r = .5;
+        } else {
+            r = gamepad1.dpad_left ? -1 : gamepad1.dpad_right ? 1 : 0;
+        }
+        r = gamepad1.right_stick_x;
 
         if (invert) {
             x = -1 * x;

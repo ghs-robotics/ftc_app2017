@@ -120,11 +120,11 @@ public class TeleOpMecanum extends OpMode {
             lift.setPower(0);
         }*/
 
-        if (gamepad1.left_trigger > .2) {
-            arm.setPower(-gamepad1.left_trigger);
+        if (gamepad1.left_bumper) {
+            arm.setPower(-1);
         }
-        else if (gamepad1.right_trigger > .2) {
-            arm.setPower(gamepad1.right_trigger);
+        else if (gamepad1.right_bumper) {
+            arm.setPower(1);
         }
         else {
             arm.setPower(0);
