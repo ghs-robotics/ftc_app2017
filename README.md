@@ -5,12 +5,14 @@ Welcome to our code for 2017! This repo contains code for both FTC Team 4042 "No
 
 This is an Android Studio project to create the FTC Robot Controller app.
 
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/dawgbotics/ftc_app2017/graphs/commit-activity)
+This repository is no longer current! For our code from the 2018-19 FTC season "Rover Ruckus", see [this repo](https://github.com/ghs-robotics/ftc_app2018).
+
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-no-red.svg)](https://github.com/ghs-robotics/ftc_app2017/graphs/commit-activity)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![GitHub watchers](https://img.shields.io/github/watchers/dawgbotics/ftc_app2017.svg?style=social&label=Watch&maxAge=2592000)](https://github.com/dawgbotics/ftc_app2017/watchers) 
-[![GitHub stars](https://img.shields.io/github/stars/dawgbotics/ftc_app2017.svg?style=social&label=Star&maxAge=2592000)](https://github.com/dawgbotics/ftc_app2017/stargazers)
-[![GitHub contributors](https://img.shields.io/github/contributors/dawgbotics/ftc_app2017.svg)](https://github.com/dawgbotics/ftc_app2017/graphs/contributors)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/dawgbotics/ftc_app2017/pulls)
+[![GitHub watchers](https://img.shields.io/github/watchers/ghs-robotics/ftc_app2017.svg?style=social&label=Watch&maxAge=2592000)](https://github.com/ghs-robotics/ftc_app2017/watchers) 
+[![GitHub stars](https://img.shields.io/github/stars/ghs-robotics/ftc_app2017.svg?style=social&label=Star&maxAge=2592000)](https://github.com/ghs-robotics/ftc_app2017/stargazers)
+[![GitHub contributors](https://img.shields.io/github/contributors/ghs-robotics/ftc_app2017.svg)](https://github.com/ghs-robotics/ftc_app2017/graphs/contributors)
+[![PRs Welcome](https://img.shields.io/badge/PRs-closed-red.svg?style=rounded)](https://github.com/ghs-robotics/ftc_app2017/pulls)
 
 # Features
 
